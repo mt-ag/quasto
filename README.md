@@ -8,7 +8,7 @@ Project uses the MIT License.
 These installation instructions are based on the installation instructions of the software provider: http://utplsql.org/utPLSQL/latest/userguide/install.html
 
 Prerequisites:
-- The installation of utPLSQL requires a database version of Oracle 11gR2, 12c, 12c R2, 18c, 19c, 20c, 21c or above
+- The installation of utPLSQL requires a database version of Oracle 11gR2, 12c, 12c R2, 18c, 19c
 - PowerShell 3.0 or above
 - .NET 4.0 Framework or above
 
