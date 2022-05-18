@@ -5,7 +5,9 @@ CREATE OR REPLACE TRIGGER CLDR_IU_TRG
 DECLARE
   l_user VARCHAR2(255);
 BEGIN
-  SELECT nvl(v('APP_USER'), user)
+  SELECT coalesce(sys_context('apex$session','app_user') 
+        ,sys_context('userenv','os_user')
+	    ,sys_context('userenv','session_user'))
     INTO l_user
     FROM dual;
   IF inserting AND :new.cldr_id IS NULL THEN
