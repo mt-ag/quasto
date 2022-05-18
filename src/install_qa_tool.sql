@@ -20,7 +20,7 @@ PROMPT SQL file for installing the QA Tool on a database. Called from install.sq
 @src/plsql/typ/qa_rule_t.sql
 @src/plsql/typ/qa_rules_t.sql
 @src/plsql/pkg/prepare_test_results_pkg.sql
-@src/plsql/pkg/qa_main_pkg.sql
+@src/plsql/pkg/qa_pkg.sql
 @src/plsql/trg/cldr_iu_trg.sql
 @src/plsql/trg/case_iu_trg.sql
 @src/plsql/trg/run_iu_trg.sql
