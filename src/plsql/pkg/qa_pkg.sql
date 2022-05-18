@@ -1,3 +1,4 @@
+PROMPT create or replace package QA_PKG
 create or replace package qa_pkg as
 
   c_qa_collection_name constant varchar2(30) := 'QA_COLLECTION';
@@ -31,7 +32,7 @@ create or replace package qa_pkg as
     p_app_id      in number
    ,p_app_page_id in number
    ,p_debug       in varchar2 default 'N'
-  ) return t_qa_rules;
+  ) return qa_rules_t;
 
   -- function for inserting a new rule
   -- the function determines the next id and encapsulates the insert operation for new rules
@@ -58,7 +59,7 @@ create or replace package body qa_pkg as
 
   c_debugging constant boolean := false;
 
-  -- same as t_qa_rule.qaru_object_type
+  -- same as qa_rule_t.qaru_object_type
   subtype t_object_type is varchar2(30);
 
   -- @see table comment qa_rules.qaru_object_type
@@ -91,7 +92,7 @@ create or replace package body qa_pkg as
 
   -- Edit Link to jump directly into the Application Builder
   -- Links based on the View wwv_flow_dictionary_views in column link_url
-  function get_edit_link(p_qa_rule in t_qa_rule) return varchar2 is
+  function get_edit_link(p_qa_rule in qa_rule_t) return varchar2 is
     l_url varchar2(1000 char);
   begin
     -- Application
@@ -227,8 +228,8 @@ create or replace package body qa_pkg as
   -- the rule should be excluded in output
   procedure remove_message_if_predecessor
   (
-    p_qa_rules     in t_qa_rules
-   ,p_qa_rules_new in out t_qa_rules
+    p_qa_rules     in qa_rules_t
+   ,p_qa_rules_new in out qa_rules_t
   ) is
   begin
     for n in 1 .. p_qa_rules_new.count
@@ -260,13 +261,13 @@ create or replace package body qa_pkg as
    ,p_app_id          in apex_applications.application_id%type
    ,p_app_page_id     in apex_application_pages.page_id%type
    ,p_debug           in varchar2
-   ,p_qa_rules        in out t_qa_rules
+   ,p_qa_rules        in out qa_rules_t
   ) is
     c_unit constant varchar2(32767) := $$plsql_unit || '.run_rule';
 
     l_qaru_sql        varchar2(32767);
     l_qaru_layer      qa_rules.qaru_layer%type;
-    l_qa_rules_new    t_qa_rules;
+    l_qa_rules_new    qa_rules_t;
   begin
     select qaru.qaru_sql
           ,qaru.qaru_layer
@@ -308,7 +309,7 @@ create or replace package body qa_pkg as
     p_app_id          in apex_applications.application_id%type
    ,p_app_page_id     in apex_application_pages.page_id%type
    ,p_debug           in varchar2
-   ,p_qa_rules        in out t_qa_rules
+   ,p_qa_rules        in out qa_rules_t
   ) is
   begin
     for r in (select qaru.qaru_id
@@ -325,7 +326,7 @@ create or replace package body qa_pkg as
   end run_rules;
 
 
-  procedure rules_2_collection(p_qa_rules in t_qa_rules) is
+  procedure rules_2_collection(p_qa_rules in qa_rules_t) is
   begin
     apex_collection.create_or_truncate_collection(p_collection_name => c_qa_collection_name);
 
@@ -389,7 +390,7 @@ create or replace package body qa_pkg as
   function get_html_rule_line
   (
     p_nr             in pls_integer
-   ,p_qa_rule        in t_qa_rule
+   ,p_qa_rule        in qa_rule_t
   ) return varchar2 is
     l_line varchar2(32767);
   begin
@@ -408,7 +409,7 @@ create or replace package body qa_pkg as
   end get_html_rule_line;
 
   -- print the rules to the region
-  procedure print_result(p_qa_rules in t_qa_rules) is
+  procedure print_result(p_qa_rules in qa_rules_t) is
   begin
     if p_qa_rules is not null and
        p_qa_rules.count > 0
@@ -437,7 +438,7 @@ create or replace package body qa_pkg as
    ,p_is_printer_friendly in boolean
   ) return apex_plugin.t_region_render_result is
 
-    l_qa_rules             t_qa_rules;
+    l_qa_rules             qa_rules_t;
     l_region_render_result apex_plugin.t_region_render_result;
 
     -- variables
@@ -464,7 +465,7 @@ create or replace package body qa_pkg as
    ,p_plugin  in apex_plugin.t_plugin
   ) return apex_plugin.t_process_exec_result is
 
-    l_qa_rules            t_qa_rules;
+    l_qa_rules            qa_rules_t;
     l_process_exec_result apex_plugin.t_process_exec_result;
 
     -- variables
@@ -488,9 +489,9 @@ create or replace package body qa_pkg as
     p_app_id      in number
    ,p_app_page_id in number
    ,p_debug       in varchar2 default 'N'
-  ) return t_qa_rules is
+  ) return qa_rules_t is
 
-    l_qa_rules t_qa_rules;
+    l_qa_rules qa_rules_t;
   begin
     if p_app_page_id is not null
     then

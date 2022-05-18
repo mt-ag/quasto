@@ -1,2 +1,2 @@
-PROMPT SQL file to install the QA Tool on the database. Runs the install_qa_tool.sql file.
-@src/install_qa_tool.sql  
+PROMPT SQL file to install the objects on the database. Runs the install_objects.sql file.
+@src/install_objects.sql  

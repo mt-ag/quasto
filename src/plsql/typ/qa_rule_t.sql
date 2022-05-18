@@ -1,3 +1,4 @@
+PROMPT create or replace type QA_RULE_T force as object
 create or replace type qa_rule_t force as object
 (
 -- Information based on the rule
@@ -9,7 +10,7 @@ create or replace type qa_rule_t force as object
   qaru_error_message  varchar2(4000), -- overwrite the standard error_message for this rule
 -- Information based on the query, related to the object which is checked
   object_id           number, -- object id if possible
-  object_name         varchar2(100), -- name of the object
+  object_name         varchar2(150), -- name of the object
   object_value        varchar2(4000), -- value of the object itself
   object_updated_user varchar2(50), -- last update user on object
   object_updated_date date, -- last update date on object
