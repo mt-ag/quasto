@@ -1,29 +1,56 @@
-CREATE TABLE UTPLSQL_TEST_RUN
-   (	RUN_ID NUMBER NOT NULL,
-	RUN_START_DATE DATE,
-	RUN_END_DATE DATE,
-	RUN_TEST_RESULT_XML CLOB,
-	RUN_TOTAL_TESTS NUMBER,
-	RUN_DISABLED_TESTS NUMBER,
-	RUN_ERRORED_TESTS NUMBER,
-	RUN_FAILED_TESTS NUMBER,
-	RUN_DURATION_SEC VARCHAR2(20 CHAR),
-	RUN_CREATE_USER VARCHAR2(255 CHAR) NOT NULL,
-	RUN_CREATE_DATE DATE NOT NULL,
-	RUN_CHANGE_USER VARCHAR2(255 CHAR) NOT NULL,
-	RUN_CHANGE_DATE DATE NOT NULL
-   ) ;
+PROMPT create table UTPLSQL_TEST_RUN
+declare
+  l_sql varchar2(32767) := 
+'create table UTPLSQL_TEST_RUN
+(
+  run_id              	  NUMBER not null,
+  run_start_date          DATE,
+  run_end_date      	  DATE,
+  run_test_result_xml     CLOB,
+  run_total_tests         NUMBER,
+  run_disabled_tests      NUMBER,
+  run_errored_tests	  NUMBER,
+  run_failed_tests	  NUMBER,
+  run_duration_sec	  VARCHAR2(20 CHAR),
+  run_create_date     	  DATE not null,
+  run_create_user     	  VARCHAR2(255 CHAR) not null,
+  run_change_date     	  DATE not null,
+  run_change_user     	  VARCHAR2(255 CHAR) not null
+)';
+  l_count number;
+begin
 
-COMMENT ON COLUMN UTPLSQL_TEST_RUN.RUN_ID IS 'Primary Key';
-   COMMENT ON COLUMN UTPLSQL_TEST_RUN.RUN_START_DATE IS 'Beginning of test run';
-   COMMENT ON COLUMN UTPLSQL_TEST_RUN.RUN_END_DATE IS 'End of test run';
-   COMMENT ON COLUMN UTPLSQL_TEST_RUN.RUN_TEST_RESULT_XML IS 'Test results in xml';
-   COMMENT ON COLUMN UTPLSQL_TEST_RUN.RUN_TOTAL_TESTS IS 'Number of total tests in this test run';
-   COMMENT ON COLUMN UTPLSQL_TEST_RUN.RUN_DISABLED_TESTS IS 'Number of disabled tests in this test run';
-   COMMENT ON COLUMN UTPLSQL_TEST_RUN.RUN_ERRORED_TESTS IS 'Number of errored tests in this test run';
-   COMMENT ON COLUMN UTPLSQL_TEST_RUN.RUN_FAILED_TESTS IS 'Number of failed tests in this test run';
-   COMMENT ON TABLE UTPLSQL_TEST_RUN  IS 'Table for testruns and their results';
+  select count(1)
+    into l_count
+    from user_tables
+   where table_name = 'UTPLSQL_TEST_RUN';
+  
+  if l_count = 0
+  then
+    execute immediate l_sql;
 
-
-ALTER TABLE UTPLSQL_TEST_RUN
-  ADD CONSTRAINT RUN_PK PRIMARY KEY (RUN_ID);
+	execute immediate q'#comment on table UTPLSQL_TEST_RUN is 'table for testruns and their results'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_RUN.run_id is 'primary key'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_RUN.run_start_date is 'beginning of test run'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_RUN.run_end_date is 'end of test run'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_RUN.run_test_result_xml is 'test results in xml'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_RUN.run_total_tests is 'number of total tests in this test run'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_RUN.run_disabled_tests is 'number of disabled tests in this test run'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_RUN.run_errored_tests is 'number of errored tests in this test run'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_RUN.run_failed_tests is 'number of failed tests in this test run'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_RUN.run_duration_sec is 'duration of testrun in seconds'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_RUN.run_create_user is 'when is the testrun entry created'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_RUN.run_create_date is 'who has the testrun entry created'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_RUN.run_change_user is 'when is the testrun entry updated'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_RUN.run_change_date is 'who has the testrun entry updated'#';
+	
+    dbms_output.put_line('Table UTPLSQL_TEST_RUN has been created.');
+  else
+    dbms_output.put_line('Table UTPLSQL_TEST_RUN was already created.');
+  end if;
+  
+exception
+  when others then
+    dbms_output.put_line('Table UTPLSQL_TEST_RUN could not been created.' || SQLERRM);
+end;
+/

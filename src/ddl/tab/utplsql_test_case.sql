@@ -1,40 +1,64 @@
-CREATE TABLE UTPLSQL_TEST_CASE
-   (	CASE_ID NUMBER NOT NULL,
-	CASE_SUITE_ID NUMBER,
-	CASE_TESTCASE_PATH VARCHAR2(255 CHAR),
-	CASE_TESTCASE_NAME VARCHAR2(255 CHAR),
-	CASE_TEST_STATUS VARCHAR2(20 CHAR),
-	CASE_ASSERTIONS NUMBER,
-	CASE_DURATION_SEC VARCHAR2(20 CHAR),
-	CASE_EXECUTED_ON DATE,
-	CASE_ERROR_STATEMENT VARCHAR2(4000 CHAR),
-	CASE_FAILURE_STATEMENT VARCHAR2(4000 CHAR),
-	CASE_SYSTEM_OUT VARCHAR2(4000 CHAR),
-	CASE_SYSTEM_ERR VARCHAR2(4000 CHAR),
-	CASE_SCHEMA VARCHAR2(50 CHAR),
-	CASE_CREATE_DATE DATE NOT NULL,
-	CASE_CREATE_USER VARCHAR2(255 CHAR) NOT NULL,
-	CASE_CHANGE_DATE DATE NOT NULL,
-	CASE_CHANGE_USER VARCHAR2(255 CHAR) NOT NULL
-   ) ;
+PROMPT create table UTPLSQL_TEST_CASE
+declare
+  l_sql varchar2(32767) := 
+'create table UTPLSQL_TEST_CASE
+(
+  case_id              	  NUMBER not null,
+  case_suite_id        	  NUMBER,
+  case_testcase_path      VARCHAR2(255 CHAR),
+  case_testcase_name      VARCHAR2(255 CHAR),
+  case_test_status        VARCHAR2(20 CHAR),
+  case_assertions      	  NUMBER,
+  case_duration_sec	  VARCHAR2(20 CHAR),
+  case_executed_on	  DATE,
+  case_error_statement	  VARCHAR2(4000 CHAR),
+  case_failure_statement  VARCHAR2(4000 CHAR),
+  case_system_out	  VARCHAR2(4000 CHAR),
+  case_system_err	  VARCHAR2(4000 CHAR),
+  case_schema		  VARCHAR2(50 CHAR),
+  case_create_date     	  DATE not null,
+  case_create_user     	  VARCHAR2(255 CHAR) not null,
+  case_change_date     	  DATE not null,
+  case_change_user     	  VARCHAR2(255 CHAR) not null
+)';
+  l_count number;
+begin
 
-COMMENT ON COLUMN UTPLSQL_TEST_CASE.CASE_ID IS 'Primary Key';
-   COMMENT ON COLUMN UTPLSQL_TEST_CASE.CASE_SUITE_ID IS 'Foreign Key on utplsql_test_suite';
-   COMMENT ON COLUMN UTPLSQL_TEST_CASE.CASE_TESTCASE_PATH IS 'Path/Package of the testcase';
-   COMMENT ON COLUMN UTPLSQL_TEST_CASE.CASE_TESTCASE_NAME IS 'Name of the testcase';
-   COMMENT ON COLUMN UTPLSQL_TEST_CASE.CASE_TEST_STATUS IS 'status of this testrun';
-   COMMENT ON COLUMN UTPLSQL_TEST_CASE.CASE_ASSERTIONS IS 'assertions of testcase';
-   COMMENT ON COLUMN UTPLSQL_TEST_CASE.CASE_DURATION_SEC IS 'duration of testcase run in seconds';
-   COMMENT ON COLUMN UTPLSQL_TEST_CASE.CASE_EXECUTED_ON IS 'date of testcase run';
-   COMMENT ON COLUMN UTPLSQL_TEST_CASE.CASE_ERROR_STATEMENT IS 'Comments when testcase has an error';
-   COMMENT ON COLUMN UTPLSQL_TEST_CASE.CASE_SYSTEM_OUT IS 'System output of testcase run';
-   COMMENT ON COLUMN UTPLSQL_TEST_CASE.CASE_SYSTEM_ERR IS 'Error output of testcase run';
-   COMMENT ON COLUMN UTPLSQL_TEST_CASE.CASE_SCHEMA IS 'Schema for which the testcase was run';
-   COMMENT ON TABLE UTPLSQL_TEST_CASE  IS 'Table for specific testcases and their results';
+  select count(1)
+    into l_count
+    from user_tables
+   where table_name = 'UTPLSQL_TEST_CASE';
+  
+  if l_count = 0
+  then
+    execute immediate l_sql;
 
-
-ALTER TABLE UTPLSQL_TEST_CASE
-  ADD CONSTRAINT CASE_PK PRIMARY KEY (CASE_ID);
-
-ALTER TABLE UTPLSQL_TEST_CASE
-  ADD CONSTRAINT CASE_SUITE_FK FOREIGN KEY (CASE_SUITE_ID) REFERENCES UTPLSQL_TEST_SUITE (SUITE_ID);
+	execute immediate q'#comment on table UTPLSQL_TEST_CASE is 'table for specific testcases and their results'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_CASE.case_id is 'primary key'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_CASE.case_suite_id is 'foreign key on utplsql_test_suite'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_CASE.case_testcase_path is 'path/Package of the testcase'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_CASE.case_testcase_name is 'name of the testcase'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_CASE.case_test_status is 'status of this testrun'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_CASE.case_assertions is 'assertions of testcase'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_CASE.case_duration_sec is 'duration of testcase run in seconds'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_CASE.case_executed_on is 'date of testcase run'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_CASE.case_error_statement is 'comments when testcase has an error'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_CASE.case_failure_statement is 'comments when testcase has a failure'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_CASE.case_system_out is 'system output of testcase run'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_CASE.case_system_err is 'error output of testcase run'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_CASE.case_schema is 'schema for which the testcase was run'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_CASE.case_create_user is 'when is the case entry created'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_CASE.case_create_date is 'who has the case entry created'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_CASE.case_change_user is 'when is the case entry updated'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_CASE.case_change_date is 'who has the case entry updated'#';
+	
+    dbms_output.put_line('Table UTPLSQL_TEST_CASE has been created.');
+  else
+    dbms_output.put_line('Table UTPLSQL_TEST_CASE was already created.');
+  end if;
+  
+exception
+  when others then
+    dbms_output.put_line('Table UTPLSQL_TEST_CASE could not been created.' || SQLERRM);
+end;
+/

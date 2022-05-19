@@ -1,24 +1,50 @@
-CREATE TABLE UTPLSQL_CALENDAR
-   (	CLDR_ID NUMBER NOT NULL,
-	CLDR_TITLE VARCHAR2(200 CHAR) NOT NULL,
-	CLDR_DESCR VARCHAR2(500 CHAR),
-	CLDR_START_DATE DATE,
-	CLDR_END_DATE DATE,
-	CLDR_EVENT_TYPE VARCHAR2(50 CHAR),
-	CLDR_CREATE_USER VARCHAR2(255 CHAR) NOT NULL,
-	CLDR_CREATE_DATE DATE NOT NULL,
-	CLDR_CHANGE_USER VARCHAR2(255 CHAR) NOT NULL,
-	CLDR_CHANGE_DATE DATE NOT NULL
-   ) ;
+PROMPT create table UTPLSQL_CALENDAR
+declare
+  l_sql varchar2(32767) := 
+'create table UTPLSQL_CALENDAR
+(
+  cldr_id              NUMBER not null,
+  cldr_title           VARCHAR2(200 CHAR) not null,
+  cldr_descr           VARCHAR2(500 CHAR),
+  cldr_start_date      DATE,
+  cldr_end_date        DATE,
+  cldr_event_type      VARCHAR2(50 CHAR),
+  cldr_create_date     DATE not null,
+  cldr_create_user     VARCHAR2(255 CHAR) not null,
+  cldr_change_date     DATE not null,
+  cldr_change_user     VARCHAR2(255 CHAR) not null
+)';
+  l_count number;
+begin
 
-COMMENT ON COLUMN UTPLSQL_CALENDAR.CLDR_ID IS 'Primary Key';
-   COMMENT ON COLUMN UTPLSQL_CALENDAR.CLDR_TITLE IS 'Title of calendar entry';
-   COMMENT ON COLUMN UTPLSQL_CALENDAR.CLDR_DESCR IS 'Description of calendar entry';
-   COMMENT ON COLUMN UTPLSQL_CALENDAR.CLDR_START_DATE IS 'Start Date of calendar entry';
-   COMMENT ON COLUMN UTPLSQL_CALENDAR.CLDR_END_DATE IS 'End Date of calendar entry';
-   COMMENT ON COLUMN UTPLSQL_CALENDAR.CLDR_EVENT_TYPE IS 'Type of event (Schema name)';
-   COMMENT ON TABLE UTPLSQL_CALENDAR  IS 'Table for calendar entries';
+  select count(1)
+    into l_count
+    from user_tables
+   where table_name = 'UTPLSQL_CALENDAR';
+  
+  if l_count = 0
+  then
+    execute immediate l_sql;
 
-
-ALTER TABLE UTPLSQL_CALENDAR
-  ADD CONSTRAINT CLDR_PK PRIMARY KEY (CLDR_ID);
+	execute immediate q'#comment on table UTPLSQL_CALENDAR is 'table for calendar entries'#';
+	execute immediate q'#comment on column UTPLSQL_CALENDAR.cldr_id is 'primary key'#';
+	execute immediate q'#comment on column UTPLSQL_CALENDAR.cldr_title is 'title of calendar entry'#';
+	execute immediate q'#comment on column UTPLSQL_CALENDAR.cldr_descr is 'description of calendar entry'#';
+	execute immediate q'#comment on column UTPLSQL_CALENDAR.cldr_start_date is 'start Date of calendar entry'#';
+	execute immediate q'#comment on column UTPLSQL_CALENDAR.cldr_end_date is 'end Date of calendar entry'#';
+	execute immediate q'#comment on column UTPLSQL_CALENDAR.cldr_event_type is 'type of event (Schema name)'#';
+	execute immediate q'#comment on column UTPLSQL_CALENDAR.cldr_create_user is 'when is the calendar entry created'#';
+	execute immediate q'#comment on column UTPLSQL_CALENDAR.cldr_create_date is 'who has the calendar entry created'#';
+	execute immediate q'#comment on column UTPLSQL_CALENDAR.cldr_change_user is 'when is the calendar entry updated'#';
+	execute immediate q'#comment on column UTPLSQL_CALENDAR.cldr_change_date is 'who has the calendar entry updated'#';
+	
+    dbms_output.put_line('Table UTPLSQL_CALENDAR has been created.');
+  else
+    dbms_output.put_line('Table UTPLSQL_CALENDAR was already created.');
+  end if;
+  
+exception
+  when others then
+    dbms_output.put_line('Table UTPLSQL_CALENDAR could not been created.' || SQLERRM);
+end;
+/

@@ -1,43 +1,66 @@
-CREATE TABLE UTPLSQL_TEST_SUITE
-   (	SUITE_ID NUMBER NOT NULL,
-	SUITE_RUN_ID NUMBER,
-	SUITE_PACKAGE_PATH VARCHAR2(100 CHAR),
-	SUITE_TESTSUITE_NAME VARCHAR2(255 CHAR),
-	SUITE_TESTSUITE_ID NUMBER,
-	SUITE_TOTAL_TESTS NUMBER,
-	SUITE_DISABLED_TESTS NUMBER,
-	SUITE_ERRORED_TESTS NUMBER,
-	SUITE_FAILED_TESTS NUMBER,
-	SUITE_DURATION_SEC VARCHAR2(20 CHAR),
-	SUITE_SYSTEM_OUT VARCHAR2(4000 CHAR),
-	SUITE_SYSTEM_ERR VARCHAR2(4000 CHAR),
-	SUITE_TSU_ID NUMBER,
-	SUITE_SCHEMA VARCHAR2(50 CHAR),
-	SUITE_CREATE_USER VARCHAR2(2550 CHAR) NOT NULL,
-	SUITE_CREATE_DATE DATE NOT NULL,
-	SUITE_CHANGE_USER VARCHAR2(255 CHAR) NOT NULL,
-	SUITE_CHANGE_DATE DATE NOT NULL
-   ) ;
+PROMPT create table UTPLSQL_TEST_SUITE
+declare
+  l_sql varchar2(32767) := 
+'create table UTPLSQL_TEST_SUITE
+(
+  suite_id                NUMBER not null,
+  suite_run_id            NUMBER,
+  suite_package_path      VARCHAR2(100 CHAR),
+  suite_testsuite_name    VARCHAR2(255 CHAR),
+  suite_testsuite_id      NUMBER,
+  suite_total_tests       NUMBER,
+  suite_disabled_tests	  NUMBER,
+  suite_errored_tests	  NUMBER,
+  suite_failed_tests	  NUMBER,
+  suite_duration_sec	  VARCHAR2(20 CHAR),
+  suite_system_out	  VARCHAR2(4000 CHAR),
+  suite_system_err	  VARCHAR2(4000 CHAR),
+  suite_tsu_id	  	  NUMBER,
+  suite_schema	  	  VARCHAR2(50 CHAR),
+  suite_create_date       DATE not null,
+  suite_create_user       VARCHAR2(255 CHAR) not null,
+  suite_change_date       DATE not null,
+  suite_change_user       VARCHAR2(255 CHAR) not null
+)';
+  l_count number;
+begin
 
-COMMENT ON COLUMN UTPLSQL_TEST_SUITE.SUITE_ID IS 'Primary Key';
-   COMMENT ON COLUMN UTPLSQL_TEST_SUITE.SUITE_RUN_ID IS 'Foreign Key on utplsql_test_run';
-   COMMENT ON COLUMN UTPLSQL_TEST_SUITE.SUITE_PACKAGE_PATH IS 'Package name of the test suite';
-   COMMENT ON COLUMN UTPLSQL_TEST_SUITE.SUITE_TESTSUITE_NAME IS 'Name of test suite/ package name';
-   COMMENT ON COLUMN UTPLSQL_TEST_SUITE.SUITE_TESTSUITE_ID IS 'ID of the testsuite';
-   COMMENT ON COLUMN UTPLSQL_TEST_SUITE.SUITE_TOTAL_TESTS IS 'Number of total tests in this test suite';
-   COMMENT ON COLUMN UTPLSQL_TEST_SUITE.SUITE_DISABLED_TESTS IS 'Number of disabled tests in this test suite';
-   COMMENT ON COLUMN UTPLSQL_TEST_SUITE.SUITE_ERRORED_TESTS IS 'Number of errored tests in this test suite';
-   COMMENT ON COLUMN UTPLSQL_TEST_SUITE.SUITE_FAILED_TESTS IS 'Number of failed tests in this test run';
-   COMMENT ON COLUMN UTPLSQL_TEST_SUITE.SUITE_DURATION_SEC IS 'Duration in Seconds this test suite runs';
-   COMMENT ON COLUMN UTPLSQL_TEST_SUITE.SUITE_SYSTEM_OUT IS 'System output of this test suite';
-   COMMENT ON COLUMN UTPLSQL_TEST_SUITE.SUITE_SYSTEM_ERR IS 'Error output of this test suite';
-   COMMENT ON COLUMN UTPLSQL_TEST_SUITE.SUITE_TSU_ID IS 'tsu Id';
-   COMMENT ON COLUMN UTPLSQL_TEST_SUITE.SUITE_SCHEMA IS 'Schema this test suite belongs to';
-   COMMENT ON TABLE UTPLSQL_TEST_SUITE  IS 'Table for test suite results';
+  select count(1)
+    into l_count
+    from user_tables
+   where table_name = 'UTPLSQL_TEST_SUITE';
+  
+  if l_count = 0
+  then
+    execute immediate l_sql;
 
-
-ALTER TABLE UTPLSQL_TEST_SUITE
-  ADD CONSTRAINT SUITE_PK PRIMARY KEY (SUITE_ID);
-
-ALTER TABLE UTPLSQL_TEST_SUITE
-  ADD CONSTRAINT SUITE_RUN_FK FOREIGN KEY (SUITE_RUN_ID) REFERENCES UTPLSQL_TEST_RUN (RUN_ID);
+	execute immediate q'#comment on table UTPLSQL_TEST_SUITE is 'table for test suite results'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_id is 'primary key'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_run_id is 'foreign key on utplsql_test_run'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_package_path 'package name of the test suite'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_testsuite_name is 'name of test suite/package name'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_testsuite_id is 'id of the testsuite'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_total_tests is 'number of total tests in this test suite'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_disabled_tests is 'number of disabled tests in this test suite'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_errored_tests is 'number of errored tests in this test suite'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_failed_tests is 'number of failed tests in this test run'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_duration_sec is 'duration in Seconds this test suite runs'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_system_out is 'system output of this test suite'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_system_err is 'error output of this test suite'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_tsu_id is 'tsu id'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_schema is 'schema this test suite belongs to'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_create_date is 'when is the suite entry created'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_create_user is 'who has the suite entry created'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_change_date is 'when is the suite entry updated'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_change_user is 'who has the suite entry updated'#';
+	
+    dbms_output.put_line('Table UTPLSQL_TEST_SUITE has been created.');
+  else
+    dbms_output.put_line('Table UTPLSQL_TEST_SUITE was already created.');
+  end if;
+  
+exception
+  when others then
+    dbms_output.put_line('Table UTPLSQL_TEST_SUITE could not been created.' || SQLERRM);
+end;
+/

@@ -1,3 +1,4 @@
+PROMPT create or replace package PREPARE_TEST_RESULTS_PKG
 create or replace PACKAGE PREPARE_TEST_RESULTS_PKG IS
 
   TYPE rec_sample_data IS RECORD(
