@@ -1,9 +1,11 @@
-# oracle-qa-tool
-a project for checking guidelines and code quality for oracle databases.
+# QUASTO Quality Assurance Tool
+A project for checking guidelines and code quality for oracle databases.
 
 Project uses the MIT License.
 
-## Installing Guidelines and Specifications
+Before you can run the install.sql file and install the QUASTO objects, you will need to install the utPLSQL framework first.
+
+## Installing Guidelines and Specifications for the utPLSQL framework
 
 These installation instructions are based on the installation instructions of the software provider: http://utplsql.org/utPLSQL/latest/userguide/install.html
 
@@ -119,7 +121,7 @@ sqlplus ut3_user/ut3_password@database @create_user_grants.sql ut3 hr
 sqlplus user/user_password@database @create_user_synonyms.sql ut3 hr
 ```
 
-## Checking environment and utPLSQL version
+### Checking environment and utPLSQL version
 
 To check the framework version the following query must be executed:
 
@@ -127,10 +129,22 @@ To check the framework version the following query must be executed:
 select substr(ut.version(),1,60) as ut_version from dual;
 ```
 
-## Uninstalling utPLSQL
+### Uninstalling utPLSQL
 
 To uninstall the utPLSQL framework, run the script uninstall.sql in the source directory by giving the schema name utPLSQL is installed in.
 
 ```
 sqlplus admin/admins_password@database @uninstall.sql ut3
 ```
+
+## Installing Guidelines for the QUASTO Quality Assurance Tool 
+
+### Installing utPLSQL and QUASTO objects
+
+To install the QUASTO Quality Assurance Tool on your oracle database from scratch, run the install.sql file in the root directory of the repository.
+
+This file will install all necessary objects for utPLSQL tests and QUASTO.
+
+### Uninstalling utPLSQL and QUASTO objects
+
+To uninstall the utPLSQL test and QUASTO objects, run the script uninstall.sql in the root directory of the repository.
