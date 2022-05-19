@@ -5,22 +5,22 @@ declare
 (
   qaru_id              NUMBER not null,
   qaru_rule_number     NVARCHAR2(20) not null,
-  qaru_client_name     VARCHAR2(100) not null,
-  qaru_name            VARCHAR2(100) not null,
-  qaru_category        VARCHAR2(10) not null,
+  qaru_client_name     VARCHAR2(100 CHAR) not null,
+  qaru_name	       VARCHAR2(100 CHAR) not null,
+  qaru_category	       VARCHAR2(100 CHAR) not null,
   qaru_object_types    VARCHAR2(4000) not null,
   qaru_error_message   VARCHAR2(4000) not null,
-  qaru_comment         VARCHAR2(4000),
-  qaru_exclude_objects VARCHAR2(4000),
+  qaru_comment	       VARCHAR2(4000),
+  qaru_exclude_objects VARCHAR2(4000 CHAR),
   qaru_error_level     NUMBER not null,
   qaru_is_active       NUMBER default 1 not null,
   qaru_sql             CLOB not null,
-  qaru_predecessor_ids VARCHAR2(4000),
-  qaru_layer           VARCHAR2(100),
-  qaru_created_on      DATE default sysdate not null,
-  qaru_created_by      VARCHAR2(50) default user not null,
-  qaru_updated_on      DATE default sysdate not null,
-  qaru_updated_by      VARCHAR2(50) default user not null
+  qaru_predecessor_ids VARCHAR2(4000 CHAR),
+  qaru_layer           VARCHAR2(100 CHAR) not null,
+  qaru_created_on      DATE not null,
+  qaru_created_by      VARCHAR2(255 CHAR) not null,
+  qaru_updated_on      DATE not null,
+  qaru_updated_by      VARCHAR2(255 CHAR) not null
 )';
   l_count number;
 begin
@@ -34,7 +34,7 @@ begin
   then
     execute immediate l_sql;
 
-	execute immediate q'#comment on table QA_RULES is 'Table for the rules defined for the QA Tool'#';
+	execute immediate q'#comment on table QA_RULES is 'table for the rules defined for the QA Tool'#';
 	execute immediate q'#comment on column QA_RULES.qaru_id is 'pk column'#';
 	execute immediate q'#comment on column QA_RULES.qaru_rule_number is 'rule number'#';
 	execute immediate q'#comment on column QA_RULES.qaru_client_name is 'client project name'#';
