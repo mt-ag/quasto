@@ -7,9 +7,9 @@ create or replace package qa_pkg as
   function get_collection_name return varchar2;
 
   -- render function which is called in the apex region plugin
-  -- %param p_region properties and information of region in which the plugin is used
-  -- %param p_plugin properties of the plugin itself
-  -- %param p_is_printer_friendly displaying the plugin printer friendly mode or not
+  -- %param pi_region properties and information of region in which the plugin is used
+  -- %param pi_plugin properties of the plugin itself
+  -- %param pi_is_printer_friendly displaying the plugin printer friendly mode or not
   function render_qa_region
   (
     pi_region              in apex_plugin.t_region
@@ -18,8 +18,8 @@ create or replace package qa_pkg as
   ) return apex_plugin.t_region_render_result;
 
   -- function is used in the apex process plugin
-  -- %param p_process
-  -- %param p_plugin properties of the plugin itself
+  -- %param pi_process
+  -- %param pi_plugin properties of the plugin itself
   function execute_process
   (
     pi_process in apex_plugin.t_process
@@ -58,7 +58,7 @@ end qa_pkg;
 /
 create or replace package body qa_pkg as
 
- c_debugging constant boolean := false;
+  c_debugging constant boolean := false;
 
   -- same as qa_rule_t.qaru_object_type
   subtype t_object_type is varchar2(30);
@@ -270,6 +270,7 @@ create or replace package body qa_pkg as
    ,pio_qa_rules      in out qa_rules_t
   ) is
     c_unit constant varchar2(32767) := $$plsql_unit || '.run_rule';
+	c_param_list constant varchar2(32767) := 'pi_qaru_id=' || pi_qaru_id || chr(10);
 
     l_qaru_sql        varchar2(32767);
     l_qaru_layer      qa_rules.qaru_layer%type;
