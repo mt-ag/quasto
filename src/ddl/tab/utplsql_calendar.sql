@@ -38,7 +38,15 @@ begin
 	execute immediate q'#comment on column UTPLSQL_CALENDAR.cldr_change_user is 'when is the calendar entry updated'#';
 	execute immediate q'#comment on column UTPLSQL_CALENDAR.cldr_change_date is 'who has the calendar entry updated'#';
 	
-    dbms_output.put_line('Table UTPLSQL_CALENDAR has been created.');
+    select count(1)
+      into l_count
+      from user_tables
+     where table_name = 'UTPLSQL_CALENDAR';
+    if l_count = 0 THEN 
+      dbms_output.put_line('Creation of table UTPLSQL_CALENDAR failed.');
+    else
+      dbms_output.put_line('Table UTPLSQL_CALENDAR has been created.');
+    end if;
   else
     dbms_output.put_line('Table UTPLSQL_CALENDAR was already created.');
   end if;

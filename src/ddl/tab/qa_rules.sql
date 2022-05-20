@@ -54,7 +54,15 @@ begin
 	execute immediate q'#comment on column QA_RULES.qaru_updated_on is 'when is the rule updated'#';
 	execute immediate q'#comment on column QA_RULES.qaru_updated_by is 'who has the rule updated'#';
 	
-    dbms_output.put_line('Table QA_RULES has been created.');
+    select count(1)
+      into l_count
+      from user_tables
+     where table_name = 'QA_RULES';
+    if l_count = 0 THEN 
+      dbms_output.put_line('Creation of table QA_RULES failed.');
+    else
+      dbms_output.put_line('Table QA_RULES has been created.');
+    end if;
   else
     dbms_output.put_line('Table QA_RULES was already created.');
   end if;

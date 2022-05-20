@@ -54,7 +54,15 @@ begin
 	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_change_date is 'when is the suite entry updated'#';
 	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_change_user is 'who has the suite entry updated'#';
 	
-    dbms_output.put_line('Table UTPLSQL_TEST_SUITE has been created.');
+    select count(1)
+      into l_count
+      from user_tables
+     where table_name = 'UTPLSQL_TEST_SUITE';
+    if l_count = 0 THEN 
+      dbms_output.put_line('Creation of table UTPLSQL_TEST_SUITE failed.');
+    else
+      dbms_output.put_line('Table UTPLSQL_TEST_SUITE has been created.');
+    end if;
   else
     dbms_output.put_line('Table UTPLSQL_TEST_SUITE was already created.');
   end if;

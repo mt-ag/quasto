@@ -52,7 +52,15 @@ begin
 	execute immediate q'#comment on column UTPLSQL_TEST_CASE.case_change_user is 'when is the case entry updated'#';
 	execute immediate q'#comment on column UTPLSQL_TEST_CASE.case_change_date is 'who has the case entry updated'#';
 	
-    dbms_output.put_line('Table UTPLSQL_TEST_CASE has been created.');
+    select count(1)
+      into l_count
+      from user_tables
+     where table_name = 'UTPLSQL_TEST_CASE';
+    if l_count = 0 THEN 
+      dbms_output.put_line('Creation of table UTPLSQL_TEST_CASE failed.');
+    else
+      dbms_output.put_line('Table UTPLSQL_TEST_CASE has been created.');
+    end if;
   else
     dbms_output.put_line('Table UTPLSQL_TEST_CASE was already created.');
   end if;

@@ -44,7 +44,15 @@ begin
 	execute immediate q'#comment on column UTPLSQL_TEST_RUN.run_change_user is 'when is the testrun entry updated'#';
 	execute immediate q'#comment on column UTPLSQL_TEST_RUN.run_change_date is 'who has the testrun entry updated'#';
 	
-    dbms_output.put_line('Table UTPLSQL_TEST_RUN has been created.');
+    select count(1)
+      into l_count
+      from user_tables
+     where table_name = 'UTPLSQL_TEST_RUN';
+    if l_count = 0 THEN 
+      dbms_output.put_line('Creation of table UTPLSQL_TEST_RUN failed.');
+    else
+      dbms_output.put_line('Table UTPLSQL_TEST_RUN has been created.');
+    end if;
   else
     dbms_output.put_line('Table UTPLSQL_TEST_RUN was already created.');
   end if;
