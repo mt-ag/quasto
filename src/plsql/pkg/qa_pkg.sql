@@ -34,6 +34,17 @@ create or replace package qa_pkg as
    ,pi_debug           in varchar2 default 'N'
    ,pi_max_error_level in integer default 4
   ) return qa_rules_t;
+  
+  -- procedure for testing a qa rule
+  procedure test_rule
+  (
+    pi_qaru_id         in number
+   ,pi_app_id          in number
+   ,pi_app_page_id     in number
+   ,po_result          out number
+   ,po_object_names    out clob
+   ,po_error_message   out varchar2
+  );
 
   -- function for inserting a new rule
   -- the function determines the next id and encapsulates the insert operation for new rules
@@ -227,6 +238,10 @@ create or replace package body qa_pkg as
                     ,apex_application.g_edit_cookie_session_id);
 
     return l_url;
+
+  exception
+    when others then
+      raise;
   end get_edit_link;
 
 
@@ -254,6 +269,10 @@ create or replace package body qa_pkg as
         exit;
       end loop;
     end loop;
+
+  exception
+    when others then
+      raise;
   end remove_message_if_predecessor;
 
   -- run a single rule
@@ -278,10 +297,10 @@ create or replace package body qa_pkg as
   begin
     select qaru.qaru_sql
           ,qaru.qaru_layer
-    into l_qaru_sql
-        ,l_qaru_layer
-    from qa_rules qaru
-    where qaru.qaru_id = pi_qaru_id;
+      into l_qaru_sql
+          ,l_qaru_layer
+      from qa_rules qaru
+     where qaru.qaru_id = pi_qaru_id;
 
     if pi_debug = 'Y'
     then
@@ -289,8 +308,6 @@ create or replace package body qa_pkg as
       dbms_output.put_line(l_qaru_sql);
     end if;
 
-    if l_qaru_layer = c_qaru_layer_page
-    then
       execute immediate l_qaru_sql bulk collect
         into l_qa_rules_new
         using pi_qaru_id, pi_app_id, pi_app_page_id;
@@ -301,7 +318,6 @@ create or replace package body qa_pkg as
       else
         pio_qa_rules := l_qa_rules_new;
       end if;
-    end if;
 
   exception
     when others then
@@ -323,9 +339,9 @@ create or replace package body qa_pkg as
                 from qa_rules qaru
                where qaru.qaru_is_active = 1
                  and qaru.qaru_error_level <= nvl(pi_max_error_level
-                                             ,4)
-              order by qaru.qaru_error_level
-                      ,qaru.qaru_predecessor_ids nulls first)
+                                                 ,4)
+            order by qaru.qaru_error_level
+                    ,qaru.qaru_predecessor_ids nulls first)
     loop
       run_rule(pi_qaru_id        => r.qaru_id
               ,pi_app_id         => pi_app_id
@@ -333,6 +349,10 @@ create or replace package body qa_pkg as
               ,pi_debug          => pi_debug
               ,pio_qa_rules      => pio_qa_rules);
     end loop;
+
+  exception
+    when others then
+      raise;
   end run_rules;
 
 
@@ -369,6 +389,9 @@ create or replace package body qa_pkg as
       end loop;
     end if;
 
+  exception
+    when others then
+      raise;
   end rules_2_collection;
 
 
@@ -387,6 +410,10 @@ create or replace package body qa_pkg as
                 '</tr>';
 
     return l_header;
+
+  exception
+    when others then
+      raise;
   end get_html_region_header;
 
   -- Footer for Region Plugin
@@ -411,6 +438,10 @@ create or replace package body qa_pkg as
     then
       return 'Info';
     end if;
+
+  exception
+    when others then
+      raise;
   end error_level_2_text;
 
   -- Every single line will be formated like this
@@ -447,6 +478,10 @@ create or replace package body qa_pkg as
      where p.qaru_id = pi_qaru_id;
 
     return l_qaru_exclude_objects;
+
+  exception
+    when others then
+      raise;
   end fc_get_excluded_objects;
 
   -- print the rules to the region
@@ -480,6 +515,10 @@ create or replace package body qa_pkg as
 	else
       htp.p('All Rules successful.');
     end if;
+
+  exception
+    when others then
+      raise;
   end print_result;
 
   -- @see spec
@@ -501,7 +540,8 @@ create or replace package body qa_pkg as
 	-- Maximum Error Level to show
     -- 1=Error / 2=Warning / 4=Info
     l_max_error_level integer(1) 								  := pi_region.attribute_04;
-  begin  
+  begin
+
     if l_app_page_id is null
     then
       for p in (select p.page_id
@@ -526,6 +566,10 @@ create or replace package body qa_pkg as
     print_result(pi_qa_rules => l_qa_rules);
 
     return l_region_render_result;
+    
+  exception
+    when others then
+      raise;
   end render_qa_region;
 
 
@@ -543,7 +587,8 @@ create or replace package body qa_pkg as
     l_app_id      apex_application_page_regions.attribute_01%type := pi_process.attribute_01;
     l_app_page_id apex_application_page_regions.attribute_02%type := pi_process.attribute_02;
     l_debug       apex_application_page_regions.attribute_02%type := pi_process.attribute_03;    
-  begin  
+  begin
+
     run_rules(pi_app_id          => l_app_id
              ,pi_app_page_id     => l_app_page_id
              ,pi_debug           => l_debug
@@ -553,6 +598,10 @@ create or replace package body qa_pkg as
     rules_2_collection(pi_qa_rules => l_qa_rules);
 
     return l_process_exec_result;
+    
+  exception
+    when others then
+      raise;
   end execute_process;
 
 
@@ -587,8 +636,77 @@ create or replace package body qa_pkg as
     end if;
 
     return l_qa_rules;
+
+  exception
+    when others then
+      raise;
   end test;
 
+  -- @see spec
+  procedure test_rule
+  (
+    pi_qaru_id         in number
+   ,pi_app_id          in number
+   ,pi_app_page_id     in number
+   ,po_result          out number
+   ,po_object_names    out clob
+   ,po_error_message   out varchar2
+  )
+  is
+    l_qa_rules qa_rules_t;
+    l_qaru_exclude_objects qa_rules.qaru_exclude_objects%type;
+    l_count_objects number;
+    l_object_names clob;
+    l_qaru_error_message qa_rules.qaru_error_message%type;
+  begin
+
+    run_rule(pi_qaru_id        => pi_qaru_id
+            ,pi_app_id         => pi_app_id
+            ,pi_app_page_id    => pi_app_page_id
+            ,pi_debug          => 'N'
+            ,pio_qa_rules      => l_qa_rules
+            );
+    
+    l_qaru_exclude_objects := fc_get_excluded_objects(pi_qaru_id => pi_qaru_id);
+    
+    select count(1)
+      into l_count_objects
+      from table (l_qa_rules) rule
+      join qa_rules qaru
+        on qaru.qaru_id = rule.qaru_id
+     where qaru.qaru_exclude_objects is null
+        or not (rule.object_name member of apex_string.split(p_str => l_qaru_exclude_objects
+                                                                     ,p_sep => ':'));
+    
+    if l_qa_rules is not null and l_qa_rules.count > 0
+    and l_count_objects > 0
+    then
+        select rtrim(xmlagg(xmlelement(e,rule.object_name,'; ').extract('//text()') order by rule.object_name).GetClobVal(),'; ') as object_names --listagg(rule.object_name, '; ') within group (order by rule.object_name) as object_names
+             , qaru.qaru_error_message
+          into l_object_names
+             , l_qaru_error_message
+          from table (l_qa_rules) rule
+          join qa_rules qaru
+            on qaru.qaru_id = rule.qaru_id
+         where qaru.qaru_exclude_objects is null
+            or not (rule.object_name member of apex_string.split(p_str => l_qaru_exclude_objects
+                                                                         ,p_sep => ':'))
+      group by rule.qaru_id
+             , qaru.qaru_error_message;
+    
+        po_result := 0;
+        po_object_names := l_object_names;
+        po_error_message := l_qaru_error_message;
+    else
+        po_result := 1;
+        po_object_names := 'None.';
+        po_error_message := 'No Errors.';
+    end if;
+  
+  exception
+    when others then
+      raise;
+  end test_rule;
 
   -- @see spec
   function insert_rule
@@ -641,6 +759,9 @@ create or replace package body qa_pkg as
     returning qaru_id into l_qaru_id;  
 
     return l_qaru_id;
+  exception
+    when others then
+      raise;
   end insert_rule;
 
 end qa_pkg;
