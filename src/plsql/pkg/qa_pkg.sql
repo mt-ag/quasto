@@ -681,7 +681,7 @@ create or replace package body qa_pkg as
     if l_qa_rules is not null and l_qa_rules.count > 0
     and l_count_objects > 0
     then
-        select rtrim(xmlagg(xmlelement(e,rule.object_name,'; ').extract('//text()') order by rule.object_name).GetClobVal(),'; ') as object_names --listagg(rule.object_name, '; ') within group (order by rule.object_name) as object_names
+        select rtrim(xmlagg(xmlelement(e,rule.object_name,'; ').extract('//text()') order by rule.object_name).GetClobVal(),'; ') as object_names
              , qaru.qaru_error_message
           into l_object_names
              , l_qaru_error_message
