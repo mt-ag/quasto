@@ -1,40 +1,12 @@
-PROMPT create or replace package QA_PKG
 create or replace package qa_pkg as
 
   c_qa_collection_name constant varchar2(30) := 'QA_COLLECTION';
+  
+  -- Global Variables
+  g_edit_cookie_session_id number;  
 
   -- function for returning the collection name
   function get_collection_name return varchar2;
-
-  -- render function which is called in the apex region plugin
-  -- %param pi_region properties and information of region in which the plugin is used
-  -- %param pi_plugin properties of the plugin itself
-  -- %param pi_is_printer_friendly displaying the plugin printer friendly mode or not
-  function render_qa_region
-  (
-    pi_region              in apex_plugin.t_region
-   ,pi_plugin              in apex_plugin.t_plugin
-   ,pi_is_printer_friendly in boolean
-  ) return apex_plugin.t_region_render_result;
-
-  -- function is used in the apex process plugin
-  -- %param pi_process
-  -- %param pi_plugin properties of the plugin itself
-  function execute_process
-  (
-    pi_process in apex_plugin.t_process
-   ,pi_plugin  in apex_plugin.t_plugin
-  ) return apex_plugin.t_process_exec_result;
-
-  -- procedure for testing purposes
-  function test
-  (
-    pi_app_id          in number
-   ,pi_app_page_id     in number default null
-   ,pi_debug           in varchar2 default 'N'
-   ,pi_max_error_level in integer default 4
-  ) return qa_rules_t;
-
   -- function for inserting a new rule
   -- the function determines the next id and encapsulates the insert operation for new rules
   function insert_rule
@@ -84,7 +56,7 @@ create or replace package body qa_pkg as
 
   -- @see table comment qa_rules.qaru_category
   c_qaru_category_apex constant qa_rules.qaru_category%type := 'APEX';
-  
+
   -- @see table comment qa_rules.qaru_error_level
   c_qaru_error_level_error   constant qa_rules.qaru_error_level%type := 1;
   c_qaru_error_level_warning constant qa_rules.qaru_error_level%type := 2;
@@ -224,7 +196,7 @@ create or replace package body qa_pkg as
                     ,pi_qa_rule.apex_page_id);
     l_url := replace(l_url
                     ,'%session%'
-                    ,apex_application.g_edit_cookie_session_id);
+                    ,g_edit_cookie_session_id);
 
     return l_url;
   end get_edit_link;
@@ -264,8 +236,8 @@ create or replace package body qa_pkg as
   procedure run_rule
   (
     pi_qaru_id        in qa_rules.qaru_id%type
-   ,pi_app_id         in apex_applications.application_id%type
-   ,pi_app_page_id    in apex_application_pages.page_id%type
+   ,pi_app_id         in number
+   ,pi_app_page_id    in number
    ,pi_debug          in varchar2
    ,pio_qa_rules      in out qa_rules_t
   ) is
@@ -312,8 +284,8 @@ create or replace package body qa_pkg as
   -- run all rules which are active
   procedure run_rules
   (
-    pi_app_id          in apex_applications.application_id%type
-   ,pi_app_page_id     in apex_application_pages.page_id%type
+    pi_app_id          in number
+   ,pi_app_page_id     in number
    ,pi_debug           in varchar2
    ,pi_max_error_level in integer
    ,pio_qa_rules       in out qa_rules_t
@@ -334,43 +306,6 @@ create or replace package body qa_pkg as
               ,pio_qa_rules      => pio_qa_rules);
     end loop;
   end run_rules;
-
-
-  procedure rules_2_collection(pi_qa_rules in qa_rules_t) is
-  begin
-    apex_collection.create_or_truncate_collection(p_collection_name => c_qa_collection_name);
-
-    -- only process when rules are returning errors
-    if pi_qa_rules is not null and
-       pi_qa_rules.count > 0
-    then
-
-      -- go through all messages
-      for i in 1 .. pi_qa_rules.count
-      loop
-
-        apex_collection.add_member(p_collection_name => c_qa_collection_name
-                                   -- rule specific informations
-                                  ,p_c001 => pi_qa_rules(i).qaru_id
-                                  ,p_c002 => pi_qa_rules(i).qaru_category
-                                  ,p_c003 => pi_qa_rules(i).qaru_error_level
-                                  ,p_c004 => pi_qa_rules(i).qaru_object_type
-                                  ,p_c005 => pi_qa_rules(i).qaru_error_message
-                                   -- object specific informations
-                                  ,p_c020 => pi_qa_rules(i).object_id
-                                  ,p_c021 => pi_qa_rules(i).object_name
-                                  ,p_c022 => pi_qa_rules(i).object_value
-                                  ,p_c023 => pi_qa_rules(i).object_updated_user
-                                  ,p_d001 => pi_qa_rules(i).object_updated_date
-                                   -- apex specific parameters
-                                  ,p_c040 => pi_qa_rules(i).apex_app_id
-                                  ,p_c041 => pi_qa_rules(i).apex_page_id
-                                  ,p_c042 => pi_qa_rules(i).apex_region_id);
-      end loop;
-    end if;
-
-  end rules_2_collection;
-
 
   -- HTML formated header for the region plugin
   function get_html_region_header return varchar2 is
@@ -397,7 +332,7 @@ create or replace package body qa_pkg as
 
     return l_footer;
   end get_html_region_footer;
-  
+
   -- Converts the number into a readable text
   function error_level_2_text(pi_error_level in integer) return varchar2 deterministic is
   begin
@@ -436,7 +371,7 @@ create or replace package body qa_pkg as
               '</tr>';
     return l_line;
   end get_html_rule_line;
-  
+
   -- get excluded objects for a rule
   function fc_get_excluded_objects(pi_qaru_id in qa_rules.qaru_id%type) return qa_rules.qaru_exclude_objects%type result_cache is
     l_qaru_exclude_objects qa_rules.qaru_exclude_objects%type;
@@ -448,146 +383,6 @@ create or replace package body qa_pkg as
 
     return l_qaru_exclude_objects;
   end fc_get_excluded_objects;
-
-  -- print the rules to the region
-  procedure print_result(pi_qa_rules in qa_rules_t) is
-    l_qaru_exclude_objects qa_rules.qaru_exclude_objects%type;  
-  begin
-    if pi_qa_rules is not null and
-       pi_qa_rules.count > 0
-    then
-      -- print header for plugin region
-      htp.p(get_html_region_header);
-
-      -- go through all messages
-      for i in 1 .. pi_qa_rules.count
-      loop
-	    -- get excluded Objects
-        l_qaru_exclude_objects := fc_get_excluded_objects(pi_qaru_id => pi_qa_rules(i).qaru_id);
-		-- Only print if no objects are excluded
-        if l_qaru_exclude_objects is null or
-           not (pi_qa_rules(i).object_name member of apex_string.split(p_str => l_qaru_exclude_objects
-                                                                      ,p_sep => ':'))
-        then
-        htp.p(get_html_rule_line(pi_nr       => i
-                                ,pi_qa_rule  => pi_qa_rules(i)));
-		end if;
-	  end loop;
-
-      -- print footer
-      htp.p(get_html_region_footer);
-	  
-	else
-      htp.p('All Rules successful.');
-    end if;
-  end print_result;
-
-  -- @see spec
-  function render_qa_region
-  (
-    pi_region              in apex_plugin.t_region
-   ,pi_plugin              in apex_plugin.t_plugin
-   ,pi_is_printer_friendly in boolean
-  ) return apex_plugin.t_region_render_result is
-
-    l_qa_rules             qa_rules_t;
-    l_region_render_result apex_plugin.t_region_render_result;
-
-    -- variables
-    l_app_id      apex_application_page_regions.attribute_01%type := pi_region.attribute_01;
-    l_app_page_id apex_application_page_regions.attribute_02%type := pi_region.attribute_02;
-    -- Yes => Y / No => N
-    l_debug       varchar2(1)                                     := pi_region.attribute_03;
-	-- Maximum Error Level to show
-    -- 1=Error / 2=Warning / 4=Info
-    l_max_error_level integer(1) 								  := pi_region.attribute_04;
-  begin  
-    if l_app_page_id is null
-    then
-      for p in (select p.page_id
-                  from apex_application_pages p
-                 where p.application_id = l_app_id
-              order by p.page_id)
-      loop
-        run_rules(pi_app_id          => l_app_id
-                 ,pi_app_page_id     => p.page_id
-                 ,pi_debug           => l_debug
-                 ,pi_max_error_level => l_max_error_level
-                 ,pio_qa_rules 		 => l_qa_rules);
-      end loop;
-    else
-      run_rules(pi_app_id          => l_app_id
-               ,pi_app_page_id     => l_app_page_id
-               ,pi_debug           => l_debug
-               ,pi_max_error_level => l_max_error_level
-               ,pio_qa_rules 	   => l_qa_rules);
-    end if;
-
-    print_result(pi_qa_rules => l_qa_rules);
-
-    return l_region_render_result;
-  end render_qa_region;
-
-
-  -- @see spec
-  function execute_process
-  (
-    pi_process in apex_plugin.t_process
-   ,pi_plugin  in apex_plugin.t_plugin
-  ) return apex_plugin.t_process_exec_result is
-
-    l_qa_rules            qa_rules_t;
-    l_process_exec_result apex_plugin.t_process_exec_result;
-
-    -- variables
-    l_app_id      apex_application_page_regions.attribute_01%type := pi_process.attribute_01;
-    l_app_page_id apex_application_page_regions.attribute_02%type := pi_process.attribute_02;
-    l_debug       apex_application_page_regions.attribute_02%type := pi_process.attribute_03;    
-  begin  
-    run_rules(pi_app_id          => l_app_id
-             ,pi_app_page_id     => l_app_page_id
-             ,pi_debug           => l_debug
-             ,pi_max_error_level => c_qaru_error_level_info
-             ,pio_qa_rules       => l_qa_rules);
-
-    rules_2_collection(pi_qa_rules => l_qa_rules);
-
-    return l_process_exec_result;
-  end execute_process;
-
-
-  function test
-  (
-    pi_app_id      	   in number
-   ,pi_app_page_id 	   in number
-   ,pi_debug       	   in varchar2 default 'N'
-   ,pi_max_error_level in integer default 4
-  ) return qa_rules_t is
-
-    l_qa_rules qa_rules_t;
-  begin
-    if pi_app_page_id is not null
-    then
-      run_rules(pi_app_id          => pi_app_id
-               ,pi_app_page_id     => pi_app_page_id
-               ,pi_debug           => pi_debug
-			   ,pi_max_error_level => pi_max_error_level
-               ,pio_qa_rules       => l_qa_rules);
-    else
-      for p in (select ap.page_id
-                  from apex_application_pages ap
-                 where ap.application_id = pi_app_id)
-      loop
-        run_rules(pi_app_id          => pi_app_id
-                 ,pi_app_page_id     => p.page_id
-                 ,pi_debug           => pi_debug
-				 ,pi_max_error_level => pi_max_error_level
-                 ,pio_qa_rules       => l_qa_rules);
-      end loop;
-    end if;
-
-    return l_qa_rules;
-  end test;
 
 
   -- @see spec
@@ -638,7 +433,7 @@ create or replace package body qa_pkg as
       ,pi_qaru_sql
       ,pi_qaru_predecessor_ids
       ,pi_qaru_layer)
-    returning qaru_id into l_qaru_id;  
+    returning qaru_id into l_qaru_id;
 
     return l_qaru_id;
   end insert_rule;

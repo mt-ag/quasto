@@ -1,0 +1,38 @@
+create or replace force type t_region is object
+(
+  id                    number,
+  static_id             varchar2(255),
+  name                  varchar2(255),
+  type                  varchar2(255),
+  source                varchar2(32767),
+  ajax_items_to_submit  varchar2(32767),
+  fetched_rows          number,
+  escape_output         number, -- (1 = True, 0 = False) Boolean
+  no_data_found_message varchar2(32767),
+  attribute_01          varchar2(32767),
+  attribute_02          varchar2(32767),
+  attribute_03          varchar2(32767),
+  attribute_04          varchar2(32767),
+  attribute_05          varchar2(32767),
+  attribute_06          varchar2(32767),
+  attribute_07          varchar2(32767),
+  attribute_08          varchar2(32767),
+  attribute_09          varchar2(32767),
+  attribute_10          varchar2(32767),
+  attribute_11          varchar2(32767),
+  attribute_12          varchar2(32767),
+  attribute_13          varchar2(32767),
+  attribute_14          varchar2(32767),
+  attribute_15          varchar2(32767),
+  attribute_16          varchar2(32767),
+  attribute_17          varchar2(32767),
+  attribute_18          varchar2(32767),
+  attribute_19          varchar2(32767),
+  attribute_20          varchar2(32767),
+  attribute_21          varchar2(32767),
+  attribute_22          varchar2(32767),
+  attribute_23          varchar2(32767),
+  attribute_24          varchar2(32767),
+  attribute_25          varchar2(32767)
+)
+/
