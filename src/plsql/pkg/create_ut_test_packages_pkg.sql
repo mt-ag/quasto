@@ -7,12 +7,12 @@ END create_ut_test_packages_pkg;
 /
 create or replace PACKAGE BODY create_ut_test_packages_pkg IS
 
-PROCEDURE create_test_packages_for_qa_rules
+PROCEDURE pr_create_test_packages_for_qa_rules
   IS
     l_package_name VARCHAR2(255);
     l_clob clob;
   BEGIN
-	dbms_output.enable(buffer_size => 10000000);
+    dbms_output.enable(buffer_size => 10000000);
 
     FOR rec_clients IN (SELECT qaru_client_name
                              , regexp_replace(replace(lower(qaru_client_name), ' ', '_'), '[^a-z0-9_]', '_') as qaru_client_name_unified
@@ -37,7 +37,7 @@ PROCEDURE create_test_packages_for_qa_rules
     LOOP
 
       l_clob := l_clob || '--%test(is qa rule "'||rec_rules.qaru_name||'" observed)' || CHR(10);
-      l_clob := l_clob || 'PROCEDURE ut_test_'||rec_rules.qaru_name_unified||';' || CHR(10);
+      l_clob := l_clob || 'PROCEDURE pr_ut_test_'||rec_rules.qaru_name_unified||';' || CHR(10);
 
     END LOOP;
 
@@ -59,7 +59,7 @@ PROCEDURE create_test_packages_for_qa_rules
                     ORDER BY qaru_id asc)
     LOOP
 
-      l_clob := l_clob || 'PROCEDURE ut_test_'||rec_rules.qaru_name_unified || CHR(10);
+      l_clob := l_clob || 'PROCEDURE pr_ut_test_'||rec_rules.qaru_name_unified || CHR(10);
       l_clob := l_clob || 'IS' || CHR(10);
       l_clob := l_clob || '  l_app_id NUMBER;' || CHR(10);
       l_clob := l_clob || '  l_app_page_id NUMBER;' || CHR(10);
@@ -128,7 +128,7 @@ PROCEDURE create_test_packages_for_qa_rules
       l_clob := l_clob || '    dbms_output.put_line(''            ''||SQLERRM);' || CHR(10);
       l_clob := l_clob || '    dbms_output.put_line(''            ''||DBMS_UTILITY.format_error_backtrace);' || CHR(10);
       l_clob := l_clob || '    RAISE;' || CHR(10);
-      l_clob := l_clob || 'END ut_test_'||rec_rules.qaru_name_unified||';' || CHR(10);
+      l_clob := l_clob || 'END pr_ut_test_'||rec_rules.qaru_name_unified||';' || CHR(10);
 
     END LOOP;
 
@@ -144,7 +144,7 @@ EXCEPTION
     dbms_output.put_line('Creation of package '||l_package_name||' raised exception.');
     dbms_output.put_line(SQLERRM);
     dbms_output.put_line(DBMS_UTILITY.format_error_backtrace);
-END create_test_packages_for_qa_rules;
+END pr_create_test_packages_for_qa_rules;
 
 END CREATE_UT_TEST_PACKAGES_PKG;
 /
