@@ -28,8 +28,14 @@ begin
   -- packages
   l_object_name('PREPARE_TEST_RESULTS_PKG') := 'PREPARE_TEST_RESULTS_PKG';
   l_object_type('PREPARE_TEST_RESULTS_PKG') := 'PACKAGE';
+  l_object_name('CREATE_UT_TEST_PACKAGES_PKG') := 'CREATE_UT_TEST_PACKAGES_PKG';
+  l_object_type('CREATE_UT_TEST_PACKAGES_PKG') := 'PACKAGE';
   l_object_name('QA_PKG') := 'QA_PKG';
   l_object_type('QA_PKG') := 'PACKAGE';
+  
+  -- functions
+  l_object_name('FC_EXPORT_QA_RULES') := 'FC_EXPORT_QA_RULES';
+  l_object_type('FC_EXPORT_QA_RULES') := 'FUNCTION';
   
   -- types
   l_object_name('VARCHAR2_TAB_T') := 'VARCHAR2_TAB_T';
