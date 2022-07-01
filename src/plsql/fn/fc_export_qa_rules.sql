@@ -13,23 +13,28 @@ begin
 
  if pi_client_name is not null
  then
-  select *
-    bulk collect into l_tab
-    from qa_rules qaru
-   where qaru.qaru_client_name = pi_client_name
+    select *
+      bulk collect into l_tab
+      from qa_rules qaru
+      where qaru.qaru_client_name = pi_client_name
+   order by qaru.qaru_id
   ;
  else
-  select *
-    bulk collect into l_tab
-    from qa_rules qaru
+     select *
+       bulk collect into l_tab
+       from qa_rules qaru
+   order by qaru.qaru_id
   ;
  end if;
 
  l_return := 'PROMPT >> Merging data into table ' || l_table_name || chr(10);
+ dbms_lob.append(l_return, 'declare' || chr(10));
+ dbms_lob.append(l_return, 'l_sql clob;' || chr(10));
  dbms_lob.append(l_return, 'begin' || chr(10) || chr(10));
 
  for i in 1 .. l_tab.count
  loop
+    dbms_lob.append(l_return, 'l_sql := ''' || replace(l_tab(i).qaru_sql, '''', '''''') || ''';' || chr(10) || chr(10));
     dbms_lob.append(l_return, 'merge into ' || l_table_name || ' a' || chr(10));
     dbms_lob.append(l_return, '  using (select ''' || replace(l_tab(i).qaru_client_name, '''', '''''')     || ''' as qaru_client_name,' || chr(10)); 
     dbms_lob.append(l_return, '                ''' || replace(l_tab(i).qaru_rule_number, '''', '''''')     || ''' as qaru_rule_number,' || chr(10)); 
@@ -41,7 +46,7 @@ begin
     dbms_lob.append(l_return, '                ''' || replace(l_tab(i).qaru_exclude_objects, '''', '''''') || ''' as qaru_exclude_objects,' || chr(10));
     dbms_lob.append(l_return, '                ''' || replace(l_tab(i).qaru_error_level, '''', '''''')     || ''' as qaru_error_level,' || chr(10));
     dbms_lob.append(l_return, '                ''' || replace(l_tab(i).qaru_is_active, '''', '''''')       || ''' as qaru_is_active,' || chr(10));
-    dbms_lob.append(l_return, '                ''' || replace(l_tab(i).qaru_sql, '''', '''''')             || ''' as qaru_sql,' || chr(10));
+    dbms_lob.append(l_return, '                l_sql as qaru_sql,' || chr(10));
     dbms_lob.append(l_return, '                ''' || replace(l_tab(i).qaru_predecessor_ids, '''', '''''') || ''' as qaru_predecessor_ids,' || chr(10));
     dbms_lob.append(l_return, '                ''' || replace(l_tab(i).qaru_layer, '''', '''''')           || ''' as qaru_layer,' || chr(10));
     dbms_lob.append(l_return, '                ''' || replace(l_tab(i).qaru_created_on, '''', '''''')      || ''' as qaru_created_on,' || chr(10));
@@ -78,6 +83,7 @@ begin
     dbms_lob.append(l_return, '             qaru_comment,' || chr(10));
     dbms_lob.append(l_return, '             qaru_exclude_objects,' || chr(10));
     dbms_lob.append(l_return, '             qaru_error_level,' || chr(10));
+    dbms_lob.append(l_return, '             qaru_is_active,' || chr(10));
     dbms_lob.append(l_return, '             qaru_sql,' || chr(10));
     dbms_lob.append(l_return, '             qaru_predecessor_ids,' || chr(10));
     dbms_lob.append(l_return, '             qaru_layer,' || chr(10));
@@ -94,6 +100,7 @@ begin
     dbms_lob.append(l_return, '             b.qaru_comment,' || chr(10));
     dbms_lob.append(l_return, '             b.qaru_exclude_objects,' || chr(10));
     dbms_lob.append(l_return, '             b.qaru_error_level,' || chr(10));
+    dbms_lob.append(l_return, '             b.qaru_is_active,' || chr(10));
     dbms_lob.append(l_return, '             b.qaru_sql,' || chr(10));
     dbms_lob.append(l_return, '             b.qaru_predecessor_ids,' || chr(10));
     dbms_lob.append(l_return, '             b.qaru_layer,' || chr(10));
@@ -104,8 +111,10 @@ begin
  end loop;
 
  dbms_lob.append(l_return, '  commit;' || chr(10) || chr(10));
+ dbms_lob.append(l_return, 'PROMPT >> Merging data into table ' || l_table_name || ' completed' || chr(10));
  dbms_lob.append(l_return, '  exception' || chr(10));
  dbms_lob.append(l_return, '    when others then' || chr(10));
+ dbms_lob.append(l_return, 'PROMPT >> Merging data into table ' || l_table_name || ' raised exception' || chr(10));
  dbms_lob.append(l_return, '      rollback;' || chr(10));
  dbms_lob.append(l_return, '      raise;' || chr(10));
  dbms_lob.append(l_return, 'end;' || chr(10) || '/' || chr(10));
@@ -116,3 +125,4 @@ exception
   when others then
     raise;
 end fc_export_qa_rules;
+/
