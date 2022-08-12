@@ -121,9 +121,7 @@ begin
       l_object := l_object_name.next(l_object);  
     end loop;
    
-   -- Syslobs bleiben liegen daher sollte man den recylclebin purgen
-   purge recyclebin;
-  
+
 exception
   when others then
     dbms_output.put_line('ERROR: ' || l_action || ' konnte NICHT ausgefuehrt werden!' || substr(sqlerrm
@@ -131,3 +129,6 @@ exception
                                                                                                ,200));
 end;
 /
+
+   -- Syslobs bleiben liegen daher sollte man den recylclebin purgen
+   purge recyclebin;
