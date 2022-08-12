@@ -122,7 +122,7 @@ begin
     end loop;
    
    -- Syslobs bleiben liegen daher sollte man den recylclebin purgen
-   --purge recyclebin;
+   purge recyclebin;
   
 exception
   when others then
