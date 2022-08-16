@@ -11,4 +11,5 @@ begin
   end if;
 end;
 /
+@src/install_utplsql_objects.sql
 @src/install_quasto_objects.sql
