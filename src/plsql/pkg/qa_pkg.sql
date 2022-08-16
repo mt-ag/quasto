@@ -1,22 +1,12 @@
 create or replace package qa_pkg as
-
-  c_qa_collection_name constant varchar2(30) := 'QA_COLLECTION';
-
-  -- Global Variables
-  g_edit_cookie_session_id number;
-
-  -- function for returning the collection name
-  function get_collection_name return varchar2;
-
   -- procedure for testing a qa rule
   procedure test_rule
   (
-    pi_qaru_id       in number
-   ,pi_app_id        in number
-   ,pi_app_page_id   in number
-   ,po_result        out number
-   ,po_object_names  out clob
-   ,po_error_message out varchar2
+    pi_qaru_client_name in qa_rules.qaru_client_name%type
+   ,pi_qaru_rule_number in qa_rules.qaru_rule_number%type
+   ,po_result           out number
+   ,po_object_names     out clob
+   ,po_error_message    out varchar2
   );
 
   -- function for inserting a new rule
@@ -37,276 +27,77 @@ create or replace package qa_pkg as
    ,pi_qaru_predecessor_ids in qa_rules.qaru_predecessor_ids%type default null
    ,pi_qaru_layer           in qa_rules.qaru_layer%type
   ) return qa_rules.qaru_id%type;
-
-  function run_rule
+  
+  -- Function to eveluate a rule for one client
+  function tf_run_rule
   (
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
-   ,pi_debug            in varchar2
-  ) return qa_rule_t
-  --pipelined
-  ;
-  function run_rules
-  (
-    pi_debug           in varchar2
-   ,pi_max_error_level in integer
   ) return qa_rules_t
     pipelined;
+  function run_rules(pi_qaru_client_name in qa_rules.qaru_client_name%type) return qa_rules_t;
 
 end qa_pkg;
 /
 create or replace package body qa_pkg as
 
-  -- same as qa_rule_t.qaru_object_type
-  subtype t_object_type is varchar2(30);
   c_cr constant varchar2(10) := utl_tcp.crlf;
 
-  -- @see table comment qa_rules.qaru_object_type
-  -- Values which are allowed for object_type
-  c_qaru_object_type_app         constant t_object_type := 'APPLICATION';
-  c_qaru_object_type_page        constant t_object_type := 'PAGE';
-  c_qaru_object_type_region      constant t_object_type := 'REGION';
-  c_qaru_object_type_item        constant t_object_type := 'ITEM';
-  c_qaru_object_type_rpt_col     constant t_object_type := 'RPT_COL';
-  c_qaru_object_type_button      constant t_object_type := 'BUTTON';
-  c_qaru_object_type_computation constant t_object_type := 'COMPUTATION';
-  c_qaru_object_type_validation  constant t_object_type := 'VALIDATION';
-  c_qaru_object_type_process     constant t_object_type := 'PROCESS';
-  c_qaru_object_type_branch      constant t_object_type := 'BRANCH';
-  c_qaru_object_type_da          constant t_object_type := 'DA';
-  c_qaru_object_type_da_action   constant t_object_type := 'DA_ACTION';
-
-  -- @see table comment qa_rules.qaru_category
-  c_qaru_category_apex constant qa_rules.qaru_category%type := 'APEX';
-
-  -- @see table comment qa_rules.qaru_error_level
-  c_qaru_error_level_error   constant qa_rules.qaru_error_level%type := 1;
-  c_qaru_error_level_warning constant qa_rules.qaru_error_level%type := 2;
-  c_qaru_error_level_info    constant qa_rules.qaru_error_level%type := 4;
-
-  -- @see spec
-  function get_collection_name return varchar2 is
-  begin
-    return c_qa_collection_name;
-  end get_collection_name;
-
-  -- Edit Link to jump directly into the Application Builder
-  -- Links based on the View wwv_flow_dictionary_views in column link_url
-  function get_edit_link(pi_qa_rule in qa_rule_t) return varchar2 is
-    l_url varchar2(1000 char);
-  begin
-    -- Application
-    if pi_qa_rule.qaru_object_type = c_qaru_object_type_app
-    then
-      l_url := 'f?p=4000:4001:%session%::::F4000_P1_FLOW,FB_FLOW_ID:%pk_value%,%pk_value%';
-    
-      l_url := replace(l_url
-                      ,'%pk_value%'
-                      ,pi_qa_rule.apex_app_id);
-    
-      -- Page
-    elsif pi_qa_rule.qaru_object_type = c_qaru_object_type_page
-    then
-      l_url := 'f?p=4000:4301:%session%::NO::F4000_P4301_ID,FB_FLOW_ID,FB_FLOW_PAGE_ID:%pk_value%,%application_id%,%page_id%';
-    
-      l_url := replace(l_url
-                      ,'%pk_value%'
-                      ,pi_qa_rule.apex_page_id);
-    
-      -- Page Regions
-    elsif pi_qa_rule.qaru_object_type = c_qaru_object_type_region
-    then
-      l_url := 'f?p=4000:4651:%session%:::4651,960,420:F4000_P4651_ID,FB_FLOW_ID,FB_FLOW_PAGE_ID:%pk_value%,%application_id%,%page_id%';
-    
-      l_url := replace(l_url
-                      ,'%pk_value%'
-                      ,pi_qa_rule.apex_region_id);
-    
-      -- Item
-    elsif pi_qa_rule.qaru_object_type = c_qaru_object_type_item
-    then
-      l_url := 'f?p=4000:4311:%session%::::F4000_P4311_ID,FB_FLOW_ID,FB_FLOW_PAGE_ID:%pk_value%,%application_id%,%page_id%';
-    
-      l_url := replace(l_url
-                      ,'%pk_value%'
-                      ,pi_qa_rule.object_id);
-    
-      -- Report Column
-    elsif pi_qa_rule.qaru_object_type = c_qaru_object_type_rpt_col
-    then
-      l_url := 'f?p=4000:422:%session%:::4651,960,420,422:P422_COLUMN_ID,P420_REGION_ID,F4000_P4651_ID,P960_ID,FB_FLOW_ID,FB_FLOW_PAGE_ID:%pk_value%,%parent_pk_value%,%parent_pk_value%,%parent_pk_value%,%application_id%,%page_id%';
-    
-      l_url := replace(l_url
-                      ,'%pk_value%'
-                      ,pi_qa_rule.object_id);
-    
-      l_url := replace(l_url
-                      ,'%parent_pk_value%'
-                      ,pi_qa_rule.apex_region_id);
-    
-      -- Button
-    elsif pi_qa_rule.qaru_object_type = c_qaru_object_type_button
-    then
-      l_url := 'f?p=4000:4314:%session%:::4314:F4000_P4314_ID,FB_FLOW_ID,FB_FLOW_PAGE_ID:%pk_value%,%application_id%,%page_id%';
-    
-      l_url := replace(l_url
-                      ,'%pk_value%'
-                      ,pi_qa_rule.object_id);
-    
-      -- Computation
-    elsif pi_qa_rule.qaru_object_type = c_qaru_object_type_computation
-    then
-      l_url := 'f?p=4000:4315:%session%::::F4000_P4315_ID,FB_FLOW_ID,FB_FLOW_PAGE_ID:%pk_value%,%application_id%,%page_id%';
-    
-      l_url := replace(l_url
-                      ,'%pk_value%'
-                      ,pi_qa_rule.object_id);
-    
-      -- Validation
-    elsif pi_qa_rule.qaru_object_type = c_qaru_object_type_validation
-    then
-      l_url := 'f?p=4000:4316:%session%::::F4000_P4316_ID,FB_FLOW_ID,FB_FLOW_PAGE_ID:%pk_value%,%application_id%,%page_id%';
-    
-      l_url := replace(l_url
-                      ,'%pk_value%'
-                      ,pi_qa_rule.object_id);
-    
-      -- Process
-    elsif pi_qa_rule.qaru_object_type = c_qaru_object_type_process
-    then
-      l_url := 'f?p=4000:4312:%session%::NO:4312:F4000_P4312_ID,FB_FLOW_ID,FB_FLOW_PAGE_ID:%pk_value%,%application_id%,%page_id%';
-    
-      l_url := replace(l_url
-                      ,'%pk_value%'
-                      ,pi_qa_rule.object_id);
-    
-      -- Branch
-    elsif pi_qa_rule.qaru_object_type = c_qaru_object_type_branch
-    then
-      l_url := 'f?p=4000:4313:%session%::::F4000_P4313_ID,FB_FLOW_ID,FB_FLOW_PAGE_ID:%pk_value%,%application_id%,%page_id%';
-    
-      l_url := replace(l_url
-                      ,'%pk_value%'
-                      ,pi_qa_rule.object_id);
-    
-      -- Dynamic Action
-    elsif pi_qa_rule.qaru_object_type = c_qaru_object_type_da
-    then
-      l_url := 'f?p=4000:793:%session%::::F4000_P793_ID,FB_FLOW_ID,FB_FLOW_PAGE_ID:%pk_value%,%application_id%,%page_id%';
-    
-      l_url := replace(l_url
-                      ,'%pk_value%'
-                      ,pi_qa_rule.object_id);
-    
-      -- Dynamic Action - Action
-    elsif pi_qa_rule.qaru_object_type = c_qaru_object_type_da_action
-    then
-      l_url := 'f?p=4000:591:%session%::::F4000_P591_ID,FB_FLOW_ID,FB_FLOW_PAGE_ID:%pk_value%,%application_id%,%page_id%';
-    
-      l_url := replace(l_url
-                      ,'%pk_value%'
-                      ,pi_qa_rule.object_id);
-    
-    
-    end if;
-  
-    l_url := replace(l_url
-                    ,'%application_id%'
-                    ,pi_qa_rule.apex_app_id);
-    l_url := replace(l_url
-                    ,'%page_id%'
-                    ,pi_qa_rule.apex_page_id);
-    l_url := replace(l_url
-                    ,'%session%'
-                    ,g_edit_cookie_session_id);
-  
-    return l_url;
-  
-  exception
-    when others then
-      raise;
-  end get_edit_link;
-
-
-  -- if function returns true the a message for the predecessor is added
-  -- the rule should be excluded in output
-  procedure remove_message_if_predecessor
+  -- merge rule results
+  -- $param pio_rule_results complete list of results
+  -- $param pi_rule_results2 talbe of one ruleset
+  procedure p_merge_rule_results
   (
-    pi_qa_rules      in qa_rules_t
-   ,pio_qa_rules_new in out qa_rules_t
+    pio_rule_results in out qa_rules_t
+   ,pi_rule_results2 in qa_rules_t
   ) is
+    l_next number;
   begin
-    for n in 1 .. pio_qa_rules_new.count
-    loop
-      for i in (select 1
-                from table(pi_qa_rules) rules
-                    ,qa_rules qaru
-                where pio_qa_rules_new(n).qaru_id = qaru.qaru_id
-                 and qaru.qaru_predecessor_ids is not null
-                 and pio_qa_rules_new(n).object_id = rules.object_id
-                 and pio_qa_rules_new(n).qaru_object_type = rules.qaru_object_type
-                 and instr(':' || qaru.qaru_predecessor_ids || ':'
-                         ,':' || rules.qaru_id || ':') > 0)
+    -- if first Result-Array is empty and second Result-Array is not, then assign the second Array to the first
+    if pio_rule_results is null and
+       pi_rule_results2 is not null and
+       pi_rule_results2.count > 0
+    then
+      pio_rule_results := pi_rule_results2;
+      -- if first and second Result-Array are not empty then merge both entrys
+    elsif pio_rule_results is not null and
+          pi_rule_results2 is not null and
+          pi_rule_results2.count > 0
+    then
+      for i in pi_rule_results2.first .. pi_rule_results2.last
       loop
-        pio_qa_rules_new.delete(n);
-        exit;
+        pio_rule_results.extend;
+        l_next := pio_rule_results.last;
+        pio_rule_results(l_next) := pi_rule_results2(i);
       end loop;
-    end loop;
-  
+    end if;
   exception
     when others then
+      dbms_output.put_line('could not merge rule results');
       raise;
-  end remove_message_if_predecessor;
-
+  end p_merge_rule_results;
   -- run a single rule
   -- %param pi_qaru_rule_number number to identify the rule combined with client name is unique
   -- %param pi_qaru_client_name client name 
-  -- %param pi_debug debug flag
-  -- %param pio_qa_rules all found rules and the new result
-  function run_rule
+  function tf_run_rule
   (
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
-   ,pi_debug            in varchar2
-  ) return qa_rule_t
-  --pipelined 
-   is
-    c_unit       constant varchar2(32767) := $$plsql_unit || '.run_rule';
+  ) return qa_rules_t
+    pipelined is
+    c_unit       constant varchar2(32767) := $$plsql_unit || '.tf_run_rule';
     c_param_list constant varchar2(32767) := 'pi_qaru_rule_number=' || pi_qaru_rule_number || c_cr || --
-                                             'pi_qaru_client_name=' || pi_qaru_client_name || c_cr || --
-                                             'pi_debug' || pi_debug;
+                                             'pi_qaru_client_name=' || pi_qaru_client_name;
   
     l_qaru_sql   varchar2(32767);
     l_qaru_layer qa_rules.qaru_layer%type;
-    l_qa_rule    qa_rule_t;
+    l_qa_rules   qa_rules_t;
   
-    l_qaru_id             number;
-    l_qaru_category       varchar2(10);
-    l_qaru_error_level    number;
-    l_qaru_object_type    varchar2(30);
-    l_qaru_error_message  varchar2(4000);
-    l_object_id           number;
-    l_object_name         varchar2(100);
-    l_object_value        varchar2(4000);
-    l_object_updated_user varchar2(50);
-    l_object_updated_date date;
-    l_apex_app_id         number;
-    l_apex_page_id        number;
-    l_apex_region_id      number;
+    l_qaru_id      number;
+    l_apex_app_id  number;
+    l_apex_page_id number;
   
-    /*l_qa_rule qa_rule_t := new qa_rule_t(qaru_id             => l_qaru_id
-    ,qaru_category       => l_qaru_category
-    ,qaru_error_level    => l_qaru_error_level
-    ,qaru_object_type    => l_qaru_object_type
-    ,qaru_error_message  => l_qaru_error_message
-    ,object_id           => l_object_id
-    ,object_name         => l_object_name
-    ,object_value        => l_object_value
-    ,object_updated_user => l_object_updated_user
-    ,object_updated_date => l_object_updated_date
-    ,apex_app_id         => l_apex_app_id
-    ,apex_page_id        => l_apex_page_id
-    ,apex_region_id      => l_apex_region_id); */
+  
   
   begin
   
@@ -320,210 +111,65 @@ create or replace package body qa_pkg as
     where qaru.qaru_rule_number = pi_qaru_rule_number
     and qaru.qaru_client_name = pi_qaru_client_name;
   
-  
-    if pi_debug = 'Y'
-    then
-      --dbms_output.put_line(length(l_qaru_sql));
-      --dbms_output.put_line(l_qaru_sql);
-      dbms_output.put_line(c_param_list);
-    end if;
-  
-    execute immediate l_qaru_sql
-      into l_qaru_id, l_qaru_category, l_qaru_error_level, l_qaru_object_type, l_qaru_error_message, l_object_id, l_object_name, l_object_value, l_object_updated_user, l_object_updated_date, l_apex_app_id, l_apex_page_id, l_apex_region_id
-      using l_qaru_id,l_apex_app_id,l_apex_page_id;
-  
-    l_qa_rule := new qa_rule_t(qaru_id             => l_qaru_id
-                              ,qaru_category       => l_qaru_category
-                              ,qaru_error_level    => l_qaru_error_level
-                              ,qaru_object_type    => l_qaru_object_type
-                              ,qaru_error_message  => l_qaru_error_message
-                              ,object_id           => l_object_id
-                              ,object_name         => l_object_name
-                              ,object_value        => l_object_value
-                              ,object_updated_user => l_object_updated_user
-                              ,object_updated_date => l_object_updated_date
-                              ,apex_app_id         => l_apex_app_id
-                              ,apex_page_id        => l_apex_page_id
-                              ,apex_region_id      => l_apex_region_id);
-  
-    /* l_qa_rule.qaru_id             := l_qaru_id;
-    l_qa_rule.qaru_category       := l_qaru_category;
-    l_qa_rule.qaru_error_level    := l_qaru_error_level;
-    l_qa_rule.qaru_object_type    := l_qaru_object_type;
-    l_qa_rule.qaru_error_message  := l_qaru_error_message;
-    l_qa_rule.object_id           := l_object_id;
-    l_qa_rule.object_name         := l_object_name;
-    l_qa_rule.object_value        := l_object_value;
-    l_qa_rule.object_updated_user := l_object_updated_user;
-    l_qa_rule.object_updated_date := l_object_updated_date;
-    l_qa_rule.apex_app_id         := l_apex_app_id;
-    l_qa_rule.apex_page_id        := l_apex_page_id;
-    l_qa_rule.apex_region_id      := l_apex_region_id; */
-    -- pipe row(l_qa_rule);
-    return l_qa_rule;
-  
-    /* if pio_qa_rules is not null
-    then
-      pio_qa_rules := pio_qa_rules multiset union l_qa_rule;
-    else
-      pio_qa_rules := l_qa_rules_new;
-    end if; */
-  
+    execute immediate l_qaru_sql bulk collect
+      into l_qa_rules
+      using l_qaru_id, l_apex_app_id, l_apex_page_id;
+    for i in 1 .. l_qa_rules.count
+    loop
+      pipe row(l_qa_rules(i));
+    end loop;
+    return;
   exception
     when no_data_needed then
       -- table function mit Zeilen die nicht benoetigt werden werfen diesen Fehler
       null;
     when others then
       dbms_output.put_line(l_qaru_sql);
+      dbms_output.put_line(c_unit);
       dbms_output.put_line(c_param_list);
       raise;
-  end run_rule;
+  end tf_run_rule;
 
   -- run all rules which are active
-  function run_rules
-  (
-    pi_debug           in varchar2
-   ,pi_max_error_level in integer
-  ) return qa_rules_t
-    pipelined is
-    l_qa_rules_t qa_rules_t := new qa_rules_t();
-    l_qa_rule    qa_rule_t;
-  
-    l_qaru_id             number;
-    l_qaru_category       varchar2(10);
-    l_qaru_error_level    number;
-    l_qaru_object_type    varchar2(30);
-    l_qaru_error_message  varchar2(4000);
-    l_object_id           number;
-    l_object_name         varchar2(100);
-    l_object_value        varchar2(4000);
-    l_object_updated_user varchar2(50);
-    l_object_updated_date date;
-    l_apex_app_id         number;
-    l_apex_page_id        number;
-    l_apex_region_id      number;
-  
+  function run_rules(pi_qaru_client_name in qa_rules.qaru_client_name%type) return qa_rules_t is
+    l_qa_rules      qa_rules_t := new qa_rules_t();
+    l_qa_rules_temp qa_rules_t := new qa_rules_t();
   begin
-  
-  
     for r in (select qaru.qaru_rule_number
                     ,qaru.qaru_client_name
               from qa_rules qaru
-              where qaru.qaru_is_active = 1
-              and qaru.qaru_error_level <= nvl(pi_max_error_level
-                                             ,4)
+              where qaru.qaru_client_name = pi_qaru_client_name
+              and qaru.qaru_is_active = 1
+              and qaru.qaru_error_level <= 4
               order by qaru.qaru_error_level
                       ,qaru.qaru_predecessor_ids nulls first)
     loop
-      /*l_qa_rules_t := l_qa_rules_t multiset union run_rule(pi_qaru_rule_number => r.qaru_rule_number
-      ,pi_qaru_client_name => r.qaru_client_name
-      ,pi_debug            => pi_debug);*/
-    
-      /*  l_qa_rule := new qa_rule_t(qaru_id             => l_qaru_id
-      ,qaru_category       => l_qaru_category
-      ,qaru_error_level    => l_qaru_error_level
-      ,qaru_object_type    => l_qaru_object_type
-      ,qaru_error_message  => l_qaru_error_message
-      ,object_id           => l_object_id
-      ,object_name         => l_object_name
-      ,object_value        => l_object_value
-      ,object_updated_user => l_object_updated_user
-      ,object_updated_date => l_object_updated_date
-      ,apex_app_id         => l_apex_app_id
-      ,apex_page_id        => l_apex_page_id
-      ,apex_region_id      => l_apex_region_id);*/
-      l_qa_rules_t := qa_rules_t(run_rule(pi_qaru_rule_number => r.qaru_rule_number
-                                         ,pi_qaru_client_name => r.qaru_client_name
-                                         ,pi_debug            => 1));
-    
-      pipe row(l_qa_rule);
+      select tf_run_rule(pi_qaru_rule_number => r.qaru_rule_number, pi_qaru_client_name => pi_qaru_client_name)
+      into l_qa_rules_temp
+      from dual;
+      p_merge_rule_results(pio_rule_results => l_qa_rules
+      ,pi_rule_results2 => l_qa_rules_temp);
+
     end loop;
+    return l_qa_rules;
   exception
     when others then
       raise;
   end run_rules;
 
-  -- HTML formated header for the region plugin
-  function get_html_region_header return varchar2 is
-    l_header varchar2(32767);
-  begin
-    l_header := '<table class="t-Report-report">' || --
-                '<tr><th class="t-Report-colHead"> # </th>' || --
-                '<th class="t-Report-colHead">Error Level</th>' || --
-                '<th class="t-Report-colHead">Objecttype</th>' || --
-                '<th class="t-Report-colHead">Objectname</th>' || --
-                '<th class="t-Report-colHead">Message</th>' || --
-                '<th class="t-Report-colHead">Objectvalue</th>' || --
-                '<th class="t-Report-colHead">Link</th>' || --
-                '</tr>';
-  
-    return l_header;
-  
-  exception
-    when others then
-      raise;
-  end get_html_region_header;
-
-  -- Footer for Region Plugin
-  function get_html_region_footer return varchar2 is
-    l_footer varchar2(32767);
-  begin
-    l_footer := '</table>';
-  
-    return l_footer;
-  end get_html_region_footer;
-
-  -- Converts the number into a readable text
-  function error_level_2_text(pi_error_level in integer) return varchar2 deterministic is
-  begin
-    if pi_error_level = c_qaru_error_level_error
-    then
-      return 'Error';
-    elsif pi_error_level = c_qaru_error_level_warning
-    then
-      return 'Warning';
-    elsif pi_error_level = c_qaru_error_level_info
-    then
-      return 'Info';
-    end if;
-  
-  exception
-    when others then
-      raise;
-  end error_level_2_text;
-
-  -- Every single line will be formated like this
-  function get_html_rule_line
-  (
-    pi_nr      in pls_integer
-   ,pi_qa_rule in qa_rule_t
-  ) return varchar2 is
-    l_line varchar2(32767);
-  begin
-    l_line := '<tr><td class="t-Report-cell">' || pi_nr || '</td>' || --
-              '<td class="t-Report-cell">' || error_level_2_text(pi_error_level => pi_qa_rule.qaru_error_level) || '</td>' || --
-              '<td class="t-Report-cell">' || pi_qa_rule.qaru_object_type || '</td>' || --
-              '<td class="t-Report-cell">' || pi_qa_rule.object_name || '</td>' || --
-              '<td class="t-Report-cell">' || pi_qa_rule.qaru_error_message || '</td>' || --
-              '<td class="t-Report-cell">' || pi_qa_rule.object_value || '</td>' || --
-              '<td class="t-Report-cell">' || case pi_qa_rule.qaru_category
-                when c_qaru_category_apex then
-                 '<a href="' || get_edit_link(pi_qa_rule => pi_qa_rule) || '">edit</a>'
-                else
-                 ' '
-              end || '</td>' || --
-              '</tr>';
-    return l_line;
-  end get_html_rule_line;
-
   -- get excluded objects for a rule
-  function fc_get_excluded_objects(pi_qaru_id in qa_rules.qaru_id%type) return qa_rules.qaru_exclude_objects%type result_cache is
+  function fc_get_excluded_objects
+  (
+    pi_qaru_rule_number in qa_rules.qaru_rule_number%type
+   ,pi_qaru_client_name in qa_rules.qaru_client_name%type
+  ) return qa_rules.qaru_exclude_objects%type result_cache is
     l_qaru_exclude_objects qa_rules.qaru_exclude_objects%type;
   begin
     select p.qaru_exclude_objects
     into l_qaru_exclude_objects
     from qa_rules p
-    where p.qaru_id = pi_qaru_id;
+    where p.qaru_rule_number = pi_qaru_rule_number
+    and p.qaru_client_name = pi_qaru_client_name;
   
     return l_qaru_exclude_objects;
   
@@ -535,27 +181,20 @@ create or replace package body qa_pkg as
   -- @see spec
   procedure test_rule
   (
-    pi_qaru_id       in number
-   ,pi_app_id        in number
-   ,pi_app_page_id   in number
-   ,po_result        out number
-   ,po_object_names  out clob
-   ,po_error_message out varchar2
+    pi_qaru_client_name in qa_rules.qaru_client_name%type
+   ,pi_qaru_rule_number in qa_rules.qaru_rule_number%type
+   ,po_result           out number
+   ,po_object_names     out clob
+   ,po_error_message    out varchar2
   ) is
     l_qa_rules             qa_rules_t;
     l_qaru_exclude_objects qa_rules.qaru_exclude_objects%type;
     l_count_objects        number;
     l_object_names         clob;
     l_qaru_error_message   qa_rules.qaru_error_message%type;
-  begin
-  
-    /*run_rule(pi_qaru_id     => pi_qaru_id
-    ,pi_app_id      => pi_app_id
-    ,pi_app_page_id => pi_app_page_id
-    ,pi_debug       => 'N'
-    ,pio_qa_rules   => l_qa_rules); */
-  
-    l_qaru_exclude_objects := fc_get_excluded_objects(pi_qaru_id => pi_qaru_id);
+  begin 
+    l_qaru_exclude_objects := fc_get_excluded_objects(pi_qaru_rule_number => pi_qaru_rule_number
+                                                     ,pi_qaru_client_name => pi_qaru_client_name);
   
     select count(1)
     into l_count_objects
