@@ -1,6 +1,22 @@
 create or replace package qa_pkg as
+
+  -- Function to eveluate a rule for one client
+  function tf_run_rule
+  (
+    pi_qaru_rule_number in qa_rules.qaru_rule_number%type
+   ,pi_qaru_client_name in qa_rules.qaru_client_name%type
+   ,pi_target_scheme    in varchar2 default user
+  ) return qa_rules_t
+    pipelined;
+
+  function tf_run_rules
+  (
+    pi_qaru_client_name in qa_rules.qaru_client_name%type
+   ,pi_target_scheme    in varchar2 default user
+  ) return qa_rules_t;
+
   -- procedure for testing a qa rule
-  procedure test_rule
+  procedure p_test_rule
   (
     pi_qaru_client_name in qa_rules.qaru_client_name%type
    ,pi_qaru_rule_number in qa_rules.qaru_rule_number%type
@@ -11,7 +27,7 @@ create or replace package qa_pkg as
 
   -- function for inserting a new rule
   -- the function determines the next id and encapsulates the insert operation for new rules
-  function insert_rule
+  function f_insert_rule
   (
     pi_qaru_rule_number     in qa_rules.qaru_rule_number%type
    ,pi_qaru_client_name     in qa_rules.qaru_client_name%type
@@ -27,15 +43,6 @@ create or replace package qa_pkg as
    ,pi_qaru_predecessor_ids in qa_rules.qaru_predecessor_ids%type default null
    ,pi_qaru_layer           in qa_rules.qaru_layer%type
   ) return qa_rules.qaru_id%type;
-  
-  -- Function to eveluate a rule for one client
-  function tf_run_rule
-  (
-    pi_qaru_rule_number in qa_rules.qaru_rule_number%type
-   ,pi_qaru_client_name in qa_rules.qaru_client_name%type
-  ) return qa_rules_t
-    pipelined;
-  function run_rules(pi_qaru_client_name in qa_rules.qaru_client_name%type) return qa_rules_t;
 
 end qa_pkg;
 /
@@ -76,6 +83,7 @@ create or replace package body qa_pkg as
       dbms_output.put_line('could not merge rule results');
       raise;
   end p_merge_rule_results;
+
   -- run a single rule
   -- %param pi_qaru_rule_number number to identify the rule combined with client name is unique
   -- %param pi_qaru_client_name client name 
@@ -83,41 +91,35 @@ create or replace package body qa_pkg as
   (
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
+   ,pi_target_scheme    in varchar2 default user
   ) return qa_rules_t
     pipelined is
     c_unit       constant varchar2(32767) := $$plsql_unit || '.tf_run_rule';
     c_param_list constant varchar2(32767) := 'pi_qaru_rule_number=' || pi_qaru_rule_number || c_cr || --
-                                             'pi_qaru_client_name=' || pi_qaru_client_name;
+                                             'pi_qaru_client_name=' || pi_qaru_client_name || c_cr || --
+                                             'pi_target_scheme=' || pi_target_scheme;
   
-    l_qaru_sql   varchar2(32767);
-    l_qaru_layer qa_rules.qaru_layer%type;
-    l_qa_rules   qa_rules_t;
-  
-    l_qaru_id      number;
-    l_apex_app_id  number;
-    l_apex_page_id number;
-  
-  
-  
+    l_qaru_id  qa_rules.qaru_id%type;
+    l_qaru_sql qa_rules.qaru_sql%type;
+    l_qa_rules qa_rules_t;
   begin
-  
     select qaru_id
           ,qaru.qaru_sql
-          ,qaru.qaru_layer
     into l_qaru_id
         ,l_qaru_sql
-        ,l_qaru_layer
     from qa_rules qaru
     where qaru.qaru_rule_number = pi_qaru_rule_number
     and qaru.qaru_client_name = pi_qaru_client_name;
   
     execute immediate l_qaru_sql bulk collect
       into l_qa_rules
-      using l_qaru_id, l_apex_app_id, l_apex_page_id;
+      using pi_target_scheme, l_qaru_id, to_number(null), to_number(null);
+  
     for i in 1 .. l_qa_rules.count
     loop
       pipe row(l_qa_rules(i));
     end loop;
+  
     return;
   exception
     when no_data_needed then
@@ -131,7 +133,11 @@ create or replace package body qa_pkg as
   end tf_run_rule;
 
   -- run all rules which are active
-  function run_rules(pi_qaru_client_name in qa_rules.qaru_client_name%type) return qa_rules_t is
+  function tf_run_rules
+  (
+    pi_qaru_client_name in qa_rules.qaru_client_name%type
+   ,pi_target_scheme    in varchar2 default user
+  ) return qa_rules_t is
     l_qa_rules      qa_rules_t := new qa_rules_t();
     l_qa_rules_temp qa_rules_t := new qa_rules_t();
   begin
@@ -144,21 +150,23 @@ create or replace package body qa_pkg as
               order by qaru.qaru_error_level
                       ,qaru.qaru_predecessor_ids nulls first)
     loop
-      select tf_run_rule(pi_qaru_rule_number => r.qaru_rule_number, pi_qaru_client_name => pi_qaru_client_name)
+      select tf_run_rule(pi_qaru_rule_number => r.qaru_rule_number
+                        ,pi_qaru_client_name => pi_qaru_client_name
+                        ,pi_target_scheme    => pi_target_scheme)
       into l_qa_rules_temp
       from dual;
       p_merge_rule_results(pio_rule_results => l_qa_rules
-      ,pi_rule_results2 => l_qa_rules_temp);
-
+                          ,pi_rule_results2 => l_qa_rules_temp);
+    
     end loop;
     return l_qa_rules;
   exception
     when others then
       raise;
-  end run_rules;
+  end tf_run_rules;
 
   -- get excluded objects for a rule
-  function fc_get_excluded_objects
+  function f_get_excluded_objects
   (
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
@@ -172,14 +180,13 @@ create or replace package body qa_pkg as
     and p.qaru_client_name = pi_qaru_client_name;
   
     return l_qaru_exclude_objects;
-  
   exception
     when others then
       raise;
-  end fc_get_excluded_objects;
+  end f_get_excluded_objects;
 
   -- @see spec
-  procedure test_rule
+  procedure p_test_rule
   (
     pi_qaru_client_name in qa_rules.qaru_client_name%type
    ,pi_qaru_rule_number in qa_rules.qaru_rule_number%type
@@ -192,9 +199,9 @@ create or replace package body qa_pkg as
     l_count_objects        number;
     l_object_names         clob;
     l_qaru_error_message   qa_rules.qaru_error_message%type;
-  begin 
-    l_qaru_exclude_objects := fc_get_excluded_objects(pi_qaru_rule_number => pi_qaru_rule_number
-                                                     ,pi_qaru_client_name => pi_qaru_client_name);
+  begin
+    l_qaru_exclude_objects := f_get_excluded_objects(pi_qaru_rule_number => pi_qaru_rule_number
+                                                    ,pi_qaru_client_name => pi_qaru_client_name);
   
     select count(1)
     into l_count_objects
@@ -247,10 +254,10 @@ create or replace package body qa_pkg as
   exception
     when others then
       raise;
-  end test_rule;
+  end p_test_rule;
 
   -- @see spec
-  function insert_rule
+  function f_insert_rule
   (
     pi_qaru_rule_number     in qa_rules.qaru_rule_number%type
    ,pi_qaru_client_name     in qa_rules.qaru_client_name%type
@@ -303,7 +310,7 @@ create or replace package body qa_pkg as
   exception
     when others then
       raise;
-  end insert_rule;
+  end f_insert_rule;
 
 end qa_pkg;
 /
