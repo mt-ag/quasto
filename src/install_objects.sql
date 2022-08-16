@@ -6,7 +6,8 @@ begin
   if  '&user_Input.' = 'J'
     then
     :script_name := 'install_utplsql_objects.sql';
-  else :script_name := 'null.sql'
+  else 
+    :script_name := 'null.sql';
   end if;
 end;
 /
