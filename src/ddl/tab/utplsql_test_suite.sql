@@ -37,7 +37,7 @@ begin
 	execute immediate q'#comment on table UTPLSQL_TEST_SUITE is 'table for test suite results'#';
 	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_id is 'primary key'#';
 	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_run_id is 'foreign key on utplsql_test_run'#';
-	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_package_path 'package name of the test suite'#';
+	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_package_path is 'package name of the test suite'#';
 	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_testsuite_name is 'name of test suite/package name'#';
 	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_testsuite_id is 'id of the testsuite'#';
 	execute immediate q'#comment on column UTPLSQL_TEST_SUITE.suite_total_tests is 'number of total tests in this test suite'#';
@@ -69,6 +69,6 @@ begin
   
 exception
   when others then
-    dbms_output.put_line('Table UTPLSQL_TEST_SUITE could not been created.' || SQLERRM);
+    dbms_output.put_line('Table UTPLSQL_TEST_SUITE could not be created.' || SQLERRM);
 end;
 /
