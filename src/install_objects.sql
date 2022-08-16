@@ -7,7 +7,7 @@ begin
   if  '&user_Input.' = 'J'
     then
       v_script_name := 'src/install_utplsql_objects.sql';
-      @v_script_name;
+      @&v_script_name;
   end if;
 end;
 /
