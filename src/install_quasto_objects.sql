@@ -1,4 +1,5 @@
 PROMPT Running SQL file for installing the QUASTO objects on the database. Called from install_objects.sql.
+PROMPT TABLE
 PROMPT src/ddl/tab/qa_rules.sql 
 @src/ddl/tab/qa_rules.sql
 
@@ -9,6 +10,10 @@ PROMPT src/ddl/ind/qa_rules.sql
 PROMPT CONSTRAINT
 PROMPT src/ddl/cons/qa_rules.sql
 @src/ddl/cons/qa_rules.sql
+
+PROMPT SEQUENCE
+PROMPT src/ddl/seq/qaru_seq.sql
+@src/ddl/seq/qaru_seq.sql
 
 PROMPT TYPE
 PROMPT src/plsql/typ/varchar2_tab_t.sql
