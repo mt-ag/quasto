@@ -1,21 +1,28 @@
-create or replace package qa_main_pkg authid current_user as
+create or replace package qa_main_pkg authid definer as
 
-  -- Function to eveluate a rule for one client
-  function tf_run_rule
+  -- get sql and id from rule
+  -- %param pi_qaru_rule_number 
+  -- %param pi_qaru_client_name 
+  -- %param po_qaru_id 
+  -- %param po_qaru_sql 
+  procedure p_get_rule_sql_and_id
   (
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
-   ,pi_target_scheme    in varchar2 default user
-  ) return qa_rules_t
-    pipelined;
+   ,po_qaru_id          out qa_rules.qaru_id%type
+   ,po_qaru_sql         out qa_rules.qaru_sql%type
+  );
 
-  function tf_run_rules
-  (
-    pi_qaru_client_name in qa_rules.qaru_client_name%type
-   ,pi_target_scheme    in varchar2 default user
-  ) return qa_rules_t;
+  -- get all rulenumbers from one client/project
+  -- %param pi_qaru_client_name 
+  function tf_get_rule_numbers(pi_qaru_client_name in qa_rules.qaru_client_name%type) return varchar2_tab_t;
 
   -- procedure for testing a qa rule
+  -- %param pi_qaru_client_name 
+  -- %param pi_qaru_rule_number 
+  -- %param po_result 
+  -- %param po_object_names 
+  -- %param po_error_message 
   procedure p_test_rule
   (
     pi_qaru_client_name in qa_rules.qaru_client_name%type
@@ -50,120 +57,66 @@ create or replace package body qa_main_pkg as
 
   c_cr constant varchar2(10) := utl_tcp.crlf;
 
-  -- merge rule results
-  -- $param pio_rule_results complete list of results
-  -- $param pi_rule_results2 talbe of one ruleset
-  procedure p_merge_rule_results
-  (
-    pio_rule_results in out qa_rules_t
-   ,pi_rule_results2 in qa_rules_t
-  ) is
-    l_next number;
-  begin
-    -- if first Result-Array is empty and second Result-Array is not, then assign the second Array to the first
-    if pio_rule_results is null and
-       pi_rule_results2 is not null and
-       pi_rule_results2.count > 0
-    then
-      pio_rule_results := pi_rule_results2;
-      -- if first and second Result-Array are not empty then merge both entrys
-    elsif pio_rule_results is not null and
-          pi_rule_results2 is not null and
-          pi_rule_results2.count > 0
-    then
-      for i in pi_rule_results2.first .. pi_rule_results2.last
-      loop
-        pio_rule_results.extend;
-        l_next := pio_rule_results.last;
-        pio_rule_results(l_next) := pi_rule_results2(i);
-      end loop;
-    end if;
-  exception
-    when others then
-      dbms_output.put_line('could not merge rule results');
-      raise;
-  end p_merge_rule_results;
-
-  -- run a single rule
-  -- %param pi_qaru_rule_number number to identify the rule combined with client name is unique
-  -- %param pi_qaru_client_name client name 
-  function tf_run_rule
+  procedure p_get_rule_sql_and_id
   (
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
-   ,pi_target_scheme    in varchar2 default user
-  ) return qa_rules_t
-    pipelined is
-    c_unit       constant varchar2(32767) := $$plsql_unit || '.tf_run_rule';
+   ,po_qaru_id          out qa_rules.qaru_id%type
+   ,po_qaru_sql         out qa_rules.qaru_sql%type
+  ) is
+    c_unit       constant varchar2(32767) := $$plsql_unit || '.p_get_rule_sql_and_id';
     c_param_list constant varchar2(32767) := 'pi_qaru_rule_number=' || pi_qaru_rule_number || c_cr || --
-                                             'pi_qaru_client_name=' || pi_qaru_client_name || c_cr || --
-                                             'pi_target_scheme=' || pi_target_scheme;
-  
-    l_qaru_id  qa_rules.qaru_id%type;
-    l_qaru_sql qa_rules.qaru_sql%type;
-    l_qa_rules qa_rules_t;
+                                             'pi_qaru_client_name=' || pi_qaru_client_name;
   begin
     select qaru_id
           ,qaru.qaru_sql
-    into l_qaru_id
-        ,l_qaru_sql
+    into po_qaru_id
+        ,po_qaru_sql
     from qa_rules qaru
     where qaru.qaru_rule_number = pi_qaru_rule_number
     and qaru.qaru_client_name = pi_qaru_client_name;
-  
-    execute immediate l_qaru_sql bulk collect
-      into l_qa_rules
-      using pi_target_scheme, l_qaru_id;
-  
-    for i in 1 .. l_qa_rules.count
-    loop
-      pipe row(l_qa_rules(i));
-    end loop;
-  
-    return;
   exception
-    when no_data_needed then
-      -- table function mit Zeilen die nicht benoetigt werden werfen diesen Fehler
-      null;
-    when others then
-      dbms_output.put_line(l_qaru_sql);
+    when no_data_found then
       dbms_output.put_line(c_unit);
+      dbms_output.put_line('Rule not found');
+      dbms_output.put_line(c_param_list);
+    when others then
+      dbms_output.put_line(c_unit);
+      dbms_output.put_line('Error by getting rule');
       dbms_output.put_line(c_param_list);
       raise;
-  end tf_run_rule;
+  end p_get_rule_sql_and_id;
 
-  -- run all rules which are active
-  function tf_run_rules
-  (
-    pi_qaru_client_name in qa_rules.qaru_client_name%type
-   ,pi_target_scheme    in varchar2 default user
-  ) return qa_rules_t is
-    l_qa_rules      qa_rules_t := new qa_rules_t();
-    l_qa_rules_temp qa_rules_t := new qa_rules_t();
+
+  function tf_get_rule_numbers(pi_qaru_client_name in qa_rules.qaru_client_name%type) return varchar2_tab_t is
+    c_unit       constant varchar2(32767) := $$plsql_unit || '.tf_get_rule_numbers';
+    c_param_list constant varchar2(32767) := 'pi_qaru_client_name=' || pi_qaru_client_name;
+  
+    l_qaru_rule_numbers varchar2_tab_t;
   begin
-    for r in (select qaru.qaru_rule_number
-                    ,qaru.qaru_client_name
-              from qa_rules qaru
-              where qaru.qaru_client_name = pi_qaru_client_name
-              and qaru.qaru_is_active = 1
-              and qaru.qaru_error_level <= 4
-              order by qaru.qaru_error_level
-                      ,qaru.qaru_predecessor_ids nulls first)
-    loop
-      select tf_run_rule(pi_qaru_rule_number => r.qaru_rule_number
-                        ,pi_qaru_client_name => pi_qaru_client_name
-                        ,pi_target_scheme    => pi_target_scheme)
-      into l_qa_rules_temp
-      from dual;
-      p_merge_rule_results(pio_rule_results => l_qa_rules
-                          ,pi_rule_results2 => l_qa_rules_temp);
-    
-    end loop;
-    return l_qa_rules;
+    select q.qaru_rule_number
+    bulk collect
+    into l_qaru_rule_numbers
+    from qa_rules q
+    where q.qaru_client_name = pi_qaru_client_name
+    and q.qaru_is_active = 1
+    and q.qaru_error_level <= 4
+    order by q.qaru_error_level
+            ,q.qaru_predecessor_ids nulls first;
+  
+    return l_qaru_rule_numbers;
   exception
-    when others then
+    when no_data_found then
+      dbms_output.put_line(c_unit);
+      dbms_output.put_line('No rules not found');
+      dbms_output.put_line(c_param_list);
       raise;
-  end tf_run_rules;
+    when others then
+      dbms_output.put_line(c_unit);
+      dbms_output.put_line('Error by getting rules from client/project');
+      dbms_output.put_line(c_param_list);
+      raise;
+  end tf_get_rule_numbers;
 
   -- get excluded objects for a rule
   function f_get_excluded_objects
