@@ -1,1 +1,4 @@
-null;
+begin
+  null;
+end;
+/
