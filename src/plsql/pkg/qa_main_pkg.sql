@@ -5,13 +5,11 @@ create or replace package qa_main_pkg authid definer as
   -- %param pi_qaru_client_name 
   -- %param po_qaru_id 
   -- %param po_qaru_sql 
-  procedure p_get_rule_sql_and_id
+  function f_get_rule
   (
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
-   ,po_qaru_id          out qa_rules.qaru_id%type
-   ,po_qaru_sql         out qa_rules.qaru_sql%type
-  );
+  ) return qa_rule_t;
 
   -- get all rulenumbers from one client/project
   -- %param pi_qaru_client_name 
@@ -57,24 +55,28 @@ create or replace package body qa_main_pkg as
 
   c_cr constant varchar2(10) := utl_tcp.crlf;
 
-  procedure p_get_rule_sql_and_id
+  function f_get_rule
   (
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
-   ,po_qaru_id          out qa_rules.qaru_id%type
-   ,po_qaru_sql         out qa_rules.qaru_sql%type
-  ) is
-    c_unit       constant varchar2(32767) := $$plsql_unit || '.p_get_rule_sql_and_id';
+  ) return qa_rule_t is
+    c_unit       constant varchar2(32767) := $$plsql_unit || '.f_get_rule';
     c_param_list constant varchar2(32767) := 'pi_qaru_rule_number=' || pi_qaru_rule_number || c_cr || --
                                              'pi_qaru_client_name=' || pi_qaru_client_name;
+    l_qa_rule qa_rule_t;
   begin
-    select qaru_id
-          ,qaru.qaru_sql
-    into po_qaru_id
-        ,po_qaru_sql
-    from qa_rules qaru
-    where qaru.qaru_rule_number = pi_qaru_rule_number
-    and qaru.qaru_client_name = pi_qaru_client_name;
+    select qa_rule_t(pi_qaru_id            => q.qaru_id
+                    ,pi_qaru_category      => q.qaru_category
+                    ,pi_qaru_error_level   => q.qaru_error_level
+                    ,pi_qaru_error_message => q.qaru_error_message
+                    ,pi_qaru_object_types  => q.qaru_object_types
+                    ,pi_qaru_sql           => q.qaru_sql)
+    into l_qa_rule
+    from qa_rules q
+    where q.qaru_rule_number = pi_qaru_rule_number
+    and q.qaru_client_name = pi_qaru_client_name;
+  
+    return l_qa_rule;
   exception
     when no_data_found then
       dbms_output.put_line(c_unit);
@@ -85,7 +87,7 @@ create or replace package body qa_main_pkg as
       dbms_output.put_line('Error by getting rule');
       dbms_output.put_line(c_param_list);
       raise;
-  end p_get_rule_sql_and_id;
+  end f_get_rule;
 
 
   function tf_get_rule_numbers(pi_qaru_client_name in qa_rules.qaru_client_name%type) return varchar2_tab_t is

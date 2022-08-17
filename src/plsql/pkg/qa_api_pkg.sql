@@ -3,6 +3,7 @@ create or replace package qa_api_pkg authid current_user as
   -- run a single rule and get for every mismatch one line back
   -- %param pi_qaru_rule_number number to identify the rule combined with client name is unique
   -- %param pi_qaru_client_name client or project name
+  -- %param pi_target_scheme should it run in one dedicated scheme
   function tf_run_rule
   (
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
@@ -36,24 +37,26 @@ create or replace package body qa_api_pkg as
                                              'pi_qaru_client_name=' || pi_qaru_client_name || c_cr || --
                                              'pi_target_scheme=' || pi_target_scheme;
   
-    l_qaru_id  qa_rules.qaru_id%type;
-    l_qaru_sql qa_rules.qaru_sql%type;
+    l_qa_rule  qa_rule_t;
     l_qa_rules qa_rules_t;
   begin
-    qa_main_pkg.p_get_rule_sql_and_id(pi_qaru_rule_number => pi_qaru_rule_number
-                                     ,pi_qaru_client_name => pi_qaru_client_name
-                                     ,po_qaru_id          => l_qaru_id
-                                     ,po_qaru_sql         => l_qaru_sql);
+    l_qa_rule := qa_main_pkg.f_get_rule(pi_qaru_rule_number => pi_qaru_rule_number
+                                       ,pi_qaru_client_name => pi_qaru_client_name);
   
-    execute immediate l_qaru_sql bulk collect
+    execute immediate l_qa_rule.qaru_sql bulk collect
       into l_qa_rules
-      using pi_target_scheme, l_qaru_id;
+    -- :1 scheme
+    -- :2 qaru_id
+    -- :3 qaru_category
+    -- :4 qaru_error_level
+    -- :5 qaru_error_message
+    -- :6 qaru_object_types
+      using pi_target_scheme, l_qa_rule.qaru_id, l_qa_rule.qaru_category, l_qa_rule.qaru_error_level, l_qa_rule.qaru_error_message, l_qa_rule.qaru_object_types;
   
     return l_qa_rules;
   exception
     when others then
       dbms_output.put_line(c_unit);
-      dbms_output.put_line(l_qaru_sql);
       dbms_output.put_line(c_param_list);
       raise;
   end tf_run_rule;
@@ -76,11 +79,9 @@ create or replace package body qa_api_pkg as
   
     for i in 1 .. l_qaru_rule_numbers.count
     loop
-      select tf_run_rule(pi_qaru_rule_number => l_qaru_rule_numbers(i)
-                        ,pi_qaru_client_name => pi_qaru_client_name
-                        ,pi_target_scheme    => pi_target_scheme)
-      into l_qa_rules_temp
-      from dual;
+      l_qa_rules_temp := tf_run_rule(pi_qaru_rule_number => l_qaru_rule_numbers(i)
+                                    ,pi_qaru_client_name => pi_qaru_client_name
+                                    ,pi_target_scheme    => pi_target_scheme);
     
       l_qa_rules := l_qa_rules multiset union l_qa_rules_temp;
     
