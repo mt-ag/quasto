@@ -1,16 +1,29 @@
 PROMPT SQL file for installing the utPLSQL and QUASTO objects on a database. Called from install.sql.
-variable script_name varchar2(100 char)
--- user_interface to determine if dependet objects should be installed or not
-accept user_input CHAR PROMPT 'Do you have ut_plsql installed? (J/N)' FORMAT 'A20' DEFAULT 'J';
+set define '^'
+set concat on
+set concat .
+set verify off
+
+COLUMN :script_name NEW_VALUE install_script NOPRINT
+VARIABLE script_name VARCHAR2(50)
+
+variable ut_plsql_installation varchar(30 char) = 'ut_plsql'
+
+declare
+    l_script_name varchar2(100);
 begin
-  if  '&user_Input.' = 'J'
+    if    :1 = ut_plsql_installation
     then
-    :script_name := 'install_utplsql_objects.sql';
-  else 
-    :script_name := 'null.sql';
-  end if;
+        l_script_name := 'src/install_utplsql_objects.sql';
+    else
+        l_script_name := 'null.sql';
+    end if;
+    :script_name := l_script_name;
 end;
 /
-print :script_name
---@src/:script_name
+print :1
+select :script_name from dual;
+
+@@^install_script
+
 --@src/install_quasto_objects.sql

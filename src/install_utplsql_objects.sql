@@ -7,13 +7,13 @@ PROMPT Running SQL file for installing the utPLSQL objects on the database. Call
 @src/ddl/seq/case_seq.sql
 @src/ddl/seq/run_seq.sql
 @src/ddl/seq/suite_seq.sql
+@src/ddl/ind/utplsql_test_case.sql
+@src/ddl/ind/utplsql_test_run.sql
+@src/ddl/ind/utplsql_test_suite.sql
 @src/ddl/cons/utplsql_calendar.sql
 @src/ddl/cons/utplsql_test_case.sql
 @src/ddl/cons/utplsql_test_run.sql
 @src/ddl/cons/utplsql_test_suite.sql
-@src/ddl/ind/utplsql_test_case.sql
-@src/ddl/ind/utplsql_test_run.sql
-@src/ddl/ind/utplsql_test_suite.sql
 @src/ddl/fk/utplsql_test_case.sql
 @src/ddl/fk/utplsql_test_suite.sql
 @src/plsql/typ/varchar2_tab_t.sql
