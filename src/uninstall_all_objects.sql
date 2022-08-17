@@ -35,6 +35,8 @@ begin
   l_object_type('QA_MAIN_PKG') := 'PACKAGE';
   l_object_name('QA_API_PKG') := 'QA_API_PKG';
   l_object_type('QA_API_PKG') := 'PACKAGE';
+  l_object_name('QA_APEX_PKG') := 'QA_APEX_PKG';
+  l_object_type('QA_APEX_PKG') := 'PACKAGE';
 
   -- functions
   l_object_name('FC_EXPORT_QA_RULES') := 'FC_EXPORT_QA_RULES';
@@ -47,7 +49,7 @@ begin
   l_object_type('QA_RULE_T') := 'TYPE';
   l_object_name('QA_RULES_T') := 'QA_RULES_T';
   l_object_type('QA_RULES_T') := 'TYPE';
-  
+
   -- sequences
   l_object_name('CLDR_SEQ') := 'CLDR_SEQ';
   l_object_type('CLDR_SEQ') := 'SEQUENCE';
@@ -59,19 +61,20 @@ begin
   l_object_type('QARU_SEQ') := 'SEQUENCE';
   l_object_name('SUITE_SEQ') := 'SUITE_SEQ';
   l_object_type('SUITE_SEQ') := 'SEQUENCE';
-  
+
   l_object := l_object_name.first;
   dbms_output.put_line(l_object);
   dbms_output.put_line(l_object_type(l_object));
-  dbms_output.put_line(l_object_name.next(l_object));    
+  dbms_output.put_line(l_object_name.next(l_object));
   dbms_output.put_line(l_object_name.last);
-  
-  
+
+
   while l_object is not null
-  loop 
+  loop
     if l_object is null
-      then return;
-     end if;
+    then
+      return;
+    end if;
     if l_object_type(l_object) = 'TABLE'
     then
       dbms_output.put_line(l_object);
@@ -88,8 +91,10 @@ begin
         if l_count <> 0
         then
           dbms_output.put_line(l_action);
-          execute immediate(l_action);
+          execute immediate (l_action);
           dbms_output.put_line('INFO: ' || i.constraint_name || ' dropped.');
+        else
+          dbms_output.put_line('WARNING: ' || i.constraint_name || ' does not exist.');
         end if;
         select count(1)
         into l_count
@@ -101,34 +106,44 @@ begin
         end if;
       
       end loop;
-    end if; 
+    end if;
     l_object := l_object_name.next(l_object);
-  end loop; 
-    
-    l_object := l_object_name.first;
-    while l_object is not null
-    loop
-      l_action := 'drop ' || l_object_type(l_object) || ' ' || l_object;
-      select count(1) into l_count from user_objects s  where object_name = l_object and object_type = l_object_type(l_object);
-      if l_count <> 0
-      then  
-        execute immediate(l_action);
-        dbms_output.put_line ('INFO: ' || l_object_type(l_object) || ' ' || l_object || ' dropped.');  
-      end if;
-      select count(1) into l_count from user_objects s  where object_name = l_object and object_type = l_object_type(l_object);
-      if l_count <> 0
-        then
-        dbms_output.put_line ('WARNING: ' || l_object_type(l_object) || ' ' || l_object || ' has not been dropped correctly.');  
-      end if;
-      l_object := l_object_name.next(l_object);  
-    end loop;
-   
+  end loop;
+
+  l_object := l_object_name.first;
+  while l_object is not null
+  loop
+    l_action := 'drop ' || l_object_type(l_object) || ' ' || l_object;
+    select count(1)
+    into l_count
+    from user_objects s
+    where object_name = l_object
+    and object_type = l_object_type(l_object);
+    if l_count <> 0
+    then
+      execute immediate (l_action);
+      dbms_output.put_line('INFO: ' || l_object_type(l_object) || ' ' || l_object || ' dropped.');
+    else
+      dbms_output.put_line('WARNING: ' || l_object_type(l_object) || ' ' || l_object || ' does not exist.');
+    end if;
+    select count(1)
+    into l_count
+    from user_objects s
+    where object_name = l_object
+    and object_type = l_object_type(l_object);
+    if l_count <> 0
+    then
+      dbms_output.put_line('WARNING: ' || l_object_type(l_object) || ' ' || l_object || ' has not been dropped correctly.');
+    end if;
+    l_object := l_object_name.next(l_object);
+  end loop;
+
 
 exception
   when others then
     dbms_output.put_line('ERROR: ' || l_action || ' drop failed!' || substr(sqlerrm
-                                                                                               ,0
-                                                                                               ,200));
+                                                                           ,0
+                                                                           ,200));
 end;
 /
 
