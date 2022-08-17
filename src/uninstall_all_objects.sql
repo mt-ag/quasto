@@ -31,8 +31,8 @@ begin
   l_object_type('PREPARE_TEST_RESULTS_PKG') := 'PACKAGE';
   l_object_name('CREATE_UT_TEST_PACKAGES_PKG') := 'CREATE_UT_TEST_PACKAGES_PKG';
   l_object_type('CREATE_UT_TEST_PACKAGES_PKG') := 'PACKAGE';
-  l_object_name('QA_PKG') := 'QA_PKG';
-  l_object_type('QA_PKG') := 'PACKAGE';
+  l_object_name('QA_MAIN_PKG') := 'QA_MAIN_PKG';
+  l_object_type('QA_MAIN_PKG') := 'PACKAGE';
 
   -- functions
   l_object_name('FC_EXPORT_QA_RULES') := 'FC_EXPORT_QA_RULES';
@@ -87,7 +87,7 @@ begin
         then
           dbms_output.put_line(l_action);
           execute immediate(l_action);
-          dbms_output.put_line('INFO: ' || i.constraint_name || ' wurde entfernt.');
+          dbms_output.put_line('INFO: ' || i.constraint_name || ' dropped.');
         end if;
         select count(1)
         into l_count
@@ -95,7 +95,7 @@ begin
         where constraint_name = i.constraint_name;
         if l_count <> 0
         then
-          dbms_output.put_line('WARNING: ' || i.constraint_name || ' konnte nicht entfernt werden.');
+          dbms_output.put_line('WARNING: ' || i.constraint_name || ' has not been dropped correctly.');
         end if;
       
       end loop;
@@ -111,12 +111,12 @@ begin
       if l_count <> 0
       then  
         execute immediate(l_action);
-        dbms_output.put_line ('INFO: ' || l_object_type(l_object) || ' ' || l_object || ' entfernt.');  
+        dbms_output.put_line ('INFO: ' || l_object_type(l_object) || ' ' || l_object || ' dropped.');  
       end if;
       select count(1) into l_count from user_objects s  where object_name = l_object and object_type = l_object_type(l_object);
       if l_count <> 0
         then
-        dbms_output.put_line ('WARNING: ' || l_object_type(l_object) || ' ' || l_object || ' konnte nicht entfernt werden.');  
+        dbms_output.put_line ('WARNING: ' || l_object_type(l_object) || ' ' || l_object || ' has not been dropped correctly.');  
       end if;
       l_object := l_object_name.next(l_object);  
     end loop;
@@ -124,11 +124,11 @@ begin
 
 exception
   when others then
-    dbms_output.put_line('ERROR: ' || l_action || ' konnte NICHT ausgefuehrt werden!' || substr(sqlerrm
+    dbms_output.put_line('ERROR: ' || l_action || ' drop failed!' || substr(sqlerrm
                                                                                                ,0
                                                                                                ,200));
 end;
 /
 
-   -- Syslobs bleiben liegen daher sollte man den recylclebin purgen
-   purge recyclebin;
+-- Empty recyclebin because of lobs in user_objects after dropping objects with lobs
+purge recyclebin;

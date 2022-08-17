@@ -1,4 +1,4 @@
-create or replace package qa_pkg as
+create or replace package qa_main_pkg authid current_user as
 
   -- Function to eveluate a rule for one client
   function tf_run_rule
@@ -44,9 +44,9 @@ create or replace package qa_pkg as
    ,pi_qaru_layer           in qa_rules.qaru_layer%type
   ) return qa_rules.qaru_id%type;
 
-end qa_pkg;
+end qa_main_pkg;
 /
-create or replace package body qa_pkg as
+create or replace package body qa_main_pkg as
 
   c_cr constant varchar2(10) := utl_tcp.crlf;
 
@@ -113,7 +113,7 @@ create or replace package body qa_pkg as
   
     execute immediate l_qaru_sql bulk collect
       into l_qa_rules
-      using pi_target_scheme, l_qaru_id, to_number(null), to_number(null);
+      using pi_target_scheme, l_qaru_id;
   
     for i in 1 .. l_qa_rules.count
     loop
@@ -312,5 +312,5 @@ create or replace package body qa_pkg as
       raise;
   end f_insert_rule;
 
-end qa_pkg;
+end qa_main_pkg;
 /

@@ -26,46 +26,6 @@ begin
   select count(1)
     into l_count
     from user_constraints
-   where constraint_name = 'QARU_RULE_NUMBER_UK';
-  if l_count = 0 then
-    l_sql := 'alter table QA_RULES add constraint QARU_RULE_NUMBER_UK unique (QARU_RULE_NUMBER)';
-    execute immediate l_sql;
-    select count(1)
-      into l_count
-      from user_constraints 
-     where constraint_name = 'QARU_RULE_NUMBER_UK';
-    if l_count = 0 then
-      dbms_output.put_line('Creation of constraint QARU_RULE_NUMBER_UK failed.');
-    else
-      dbms_output.put_line('Constraint QARU_RULE_NUMBER_UK has been created.');
-    end if;
-  else
-    dbms_output.put_line('Constraint QARU_RULE_NUMBER_UK was already created.');
-  end if;
-
-  select count(1)
-    into l_count
-    from user_constraints
-   where constraint_name = 'QARU_NAME_UK';
-  if l_count = 0 then
-    l_sql := 'alter table QA_RULES add constraint QARU_NAME_UK unique (QARU_NAME)';
-    execute immediate l_sql;
-    select count(1)
-      into l_count
-      from user_constraints 
-     where constraint_name = 'QARU_NAME_UK';
-    if l_count = 0 then
-      dbms_output.put_line('Creation of constraint QARU_NAME_UK failed.');
-    else
-      dbms_output.put_line('Constraint QARU_NAME_UK has been created.');
-    end if;
-  else
-    dbms_output.put_line('Constraint QARU_NAME_UK was already created.');
-  end if;
-
-  select count(1)
-    into l_count
-    from user_constraints
    where constraint_name = 'QARU_CHK_CATEGORY';
   if l_count = 0 then
     l_sql := q'#alter table QA_RULES add constraint QARU_CHK_CATEGORY check (QARU_CATEGORY in ('APEX','DDL','DATA'))#';
