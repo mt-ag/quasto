@@ -1,69 +1,93 @@
-PROMPT create indices QARU_PK_I, QARU_RULE_NUMBER_UK_I and QARU_NAME_UK_I for table QA_RULES
+PROMPT create indices for table QA_RULES
 declare
+  l_name  varchar2(100);
   l_count number;
   l_sql   varchar2(32767);
 begin
+  l_name := 'QARU_PK_I';
   select count(1)
+  into l_count
+  from user_indexes
+  where index_name = l_name;
+
+  if l_count = 0
+  then
+    l_sql := 'create unique index ' || l_name || ' on QA_RULES (QARU_ID)';
+    execute immediate l_sql;
+  
+    select count(1)
     into l_count
     from user_indexes
-   where index_name = 'QARU_PK_I';
-  if l_count = 0 then
-    l_sql := 'create unique index QARU_PK_I on QA_RULES (QARU_ID)';
-    execute immediate l_sql;
-    select count(1)
-      into l_count
-      from user_indexes
-     where index_name = 'QARU_PK_I';
-    if l_count = 0 THEN 
-      dbms_output.put_line('Creation of index QARU_PK_I failed.');
+    where index_name = l_name;
+  
+    if l_count = 0
+    then
+      dbms_output.put_line('Creation of index ' || l_name || ' failed.');
     else
-      dbms_output.put_line('Index QARU_PK_I has been created.');
+      dbms_output.put_line('Index ' || l_name || ' has been created.');
     end if;
   else
-    dbms_output.put_line('Index QARU_PK_I was already created.');
+    dbms_output.put_line('Index ' || l_name || ' was already created.');
   end if;
 
+  -- ################################
+
+  l_name := 'QARU_RULES_UNIQUE_I';
   select count(1)
+  into l_count
+  from user_indexes
+  where index_name = l_name;
+  
+  if l_count = 0
+  then
+    l_sql := 'create unique index ' || l_name || ' on QA_RULES (QARU_RULE_NUMBER, QARU_CLIENT_NAME)';
+    execute immediate l_sql;
+  
+    select count(1)
     into l_count
     from user_indexes
-   where index_name = 'QARU_RULE_NUMBER_UK_I';
-  if l_count = 0 then
-    l_sql := 'create unique index QARU_RULE_NUMBER_UK_I on QA_RULES (QARU_RULE_NUMBER)';
-    execute immediate l_sql;
-    select count(1)
-      into l_count
-      from user_indexes
-     where index_name = 'QARU_RULE_NUMBER_UK_I';
-    if l_count = 0 THEN 
-      dbms_output.put_line('Creation of index QARU_RULE_NUMBER_UK_I failed.');
+    where index_name = l_name;
+  
+    if l_count = 0
+    then
+      dbms_output.put_line('Creation of index ' || l_name || ' failed.');
     else
-      dbms_output.put_line('Index QARU_RULE_NUMBER_UK_I has been created.');
+      dbms_output.put_line('Index ' || l_name || ' has been created.');
     end if;
   else
-    dbms_output.put_line('Index QARU_RULE_NUMBER_UK_I was already created.');
+    dbms_output.put_line('Index ' || l_name || ' was already created.');
   end if;
 
+  -- ################################
+
+  l_name := 'QARU_RULES_UNIQUE_I';
   select count(1)
+  into l_count
+  from user_indexes
+  where index_name = l_name;
+  
+  if l_count = 0
+  then
+    l_sql := 'create unique index ' || l_name || ' on QA_RULES (QARU_NAME, QARU_CLIENT_NAME)';
+    execute immediate l_sql;
+    
+    select count(1)
     into l_count
     from user_indexes
-   where index_name = 'QARU_NAME_UK_I';
-  if l_count = 0 then
-    l_sql := 'create unique index QARU_NAME_UK_I on QA_RULES (QARU_NAME)';
-    execute immediate l_sql;
-    select count(1)
-      into l_count
-      from user_indexes
-     where index_name = 'QARU_NAME_UK_I';
-    if l_count = 0 THEN 
-      dbms_output.put_line('Creation of index QARU_NAME_UK_I failed.');
+    where index_name = l_name;
+    
+    if l_count = 0
+    then
+      dbms_output.put_line('Creation of index ' || l_name || ' failed.');
     else
-      dbms_output.put_line('Index QARU_NAME_UK_I has been created.');
+      dbms_output.put_line('Index ' || l_name || ' has been created.');
     end if;
   else
-    dbms_output.put_line('Index QARU_NAME_UK_I was already created.');
+    dbms_output.put_line('Index ' || l_name || ' was already created.');
   end if;
+  
 exception
   when others then
-    dbms_output.put_line('Indices could not been created. ' || SQLERRM);
+    dbms_output.put_line('Indices could not been created. ' || sqlerrm);
 end;
 /
