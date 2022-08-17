@@ -180,15 +180,3 @@ To uninstall the utPLSQL framework, run the script uninstall.sql in the source d
 ```
 sqlplus admin/admins_password@database @uninstall.sql ut3
 ```
-
-## Installing Guidelines for the QUASTO Quality Assurance Tool 
-
-### Installing utPLSQL and QUASTO objects
-
-To install the QUASTO Quality Assurance Tool on your oracle database from scratch, run the install.sql file in the root directory of the repository.
-
-This file will install all necessary objects for utPLSQL tests and QUASTO.
-
-### Uninstalling utPLSQL and QUASTO objects
-
-To uninstall the utPLSQL test and QUASTO objects, run the script uninstall.sql in the root directory of the repository.
