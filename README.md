@@ -29,7 +29,7 @@ It is not mandatory to install apex or ut_plsql. To avoid invalid objects tohugh
 Arguments that are required to be passed to the script:
 1. Is ut_plsql already installed? If not use 0 else 1.
 2. Is apex already installed? If not use 0 else 1.
-3. Do you want to pass custom Jenkins Parameters?
+3. Do you want to install objects support more jenkins features? if not use 0 else 1.
 
 It is possible to install the ut_plsql and apex dependet objects at a later point in time.
 To do this the user needs to move from the root Directory of the project into the /src directory.
