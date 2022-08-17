@@ -18,6 +18,20 @@ To start the Installation process you need to movee into the root directory of t
 In the next step the user connects to the database via sqlplus or sql cl.
 To ensure all tables and packages are installed into the correct schema make sure to check the current user and switch schema if required.
 
+### Minimal user rights
+If you install quasto in a blank new scheme the user needs the following rights:
+```
+grant create procedure to quasto;
+grant create public synonym to quasto;
+grant create sequence to quasto;
+grant create table to quasto;
+grant create trigger to quasto;
+grant create type to quasto;
+grant create view to quasto;
+
+grant create session to quasto;
+```
+
 #### Running the Install Script:
 ```
 @install [1/0] [1/0] [1/0]
