@@ -87,4 +87,4 @@ end;
 
 select :script_name from dual;
 @@~script_name2
---@src/install_quasto_objects.sql
+@src/install_quasto_objects.sql
