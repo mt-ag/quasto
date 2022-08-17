@@ -113,7 +113,7 @@ create or replace package body qa_pkg as
   
     execute immediate l_qaru_sql bulk collect
       into l_qa_rules
-      using pi_target_scheme, l_qaru_id, to_number(null), to_number(null);
+      using pi_target_scheme, l_qaru_id;
   
     for i in 1 .. l_qa_rules.count
     loop
