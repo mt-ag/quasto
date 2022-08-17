@@ -31,8 +31,8 @@ begin
   l_object_type('PREPARE_TEST_RESULTS_PKG') := 'PACKAGE';
   l_object_name('CREATE_UT_TEST_PACKAGES_PKG') := 'CREATE_UT_TEST_PACKAGES_PKG';
   l_object_type('CREATE_UT_TEST_PACKAGES_PKG') := 'PACKAGE';
-  l_object_name('QA_PKG') := 'QA_PKG';
-  l_object_type('QA_PKG') := 'PACKAGE';
+  l_object_name('QA_MAIN_PKG') := 'QA_MAIN_PKG';
+  l_object_type('QA_MAIN_PKG') := 'PACKAGE';
 
   -- functions
   l_object_name('FC_EXPORT_QA_RULES') := 'FC_EXPORT_QA_RULES';
