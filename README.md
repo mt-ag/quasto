@@ -20,8 +20,17 @@ To ensure all tables and packages are installed into the correct schema make sur
 
 ### Minimal user rights
 If you install quasto in a blank new scheme the user needs the following rights:
-- grant create procedure to quasto;
-- grant create public synonym to quasto;
+```
+grant create procedure to quasto;
+grant create public synonym to quasto;
+grant create sequence to quasto;
+grant create table to quasto;
+grant create trigger to quasto;
+grant create type to quasto;
+grant create view to quasto;
+
+grant create session to quasto;
+```
 
 #### Running the Install Script:
 ```
