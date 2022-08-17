@@ -20,7 +20,7 @@ create or replace type qa_rule_t force as object
   apex_page_id   number, -- page where component is placed
   apex_region_id number, -- region where component is placed
 
--- create object with minimal attributes
+-- create object with minimal attributes to query
   constructor function qa_rule_t
   (
     pi_qaru_id            in number
@@ -29,6 +29,23 @@ create or replace type qa_rule_t force as object
    ,pi_qaru_error_message in varchar2
    ,pi_qaru_object_types  in varchar2
    ,pi_qaru_sql           in clob
+  ) return self as result,
+
+-- create object with standard attributes
+  constructor function qa_rule_t
+  (
+    pi_qaru_id             in number
+   ,pi_qaru_category       in varchar2
+   ,pi_qaru_error_level    in number
+   ,pi_qaru_error_message  in varchar2
+   ,pi_qaru_object_types   in varchar2
+   ,pi_qaru_sql            in clob
+   ,pi_object_id           in number
+   ,pi_object_name         in varchar2
+   ,pi_object_type         in varchar2
+   ,pi_object_value        in varchar2
+   ,pi_object_updated_user in varchar2
+   ,pi_object_updated_date in date
   ) return self as result,
 
   member function to_string return varchar2
@@ -44,7 +61,7 @@ create or replace type body qa_rule_t is
    ,pi_qaru_error_level   in number
    ,pi_qaru_error_message in varchar2
    ,pi_qaru_object_types  in varchar2
-   ,pi_qaru_sql           in clob --
+   ,pi_qaru_sql           in clob
   ) return self as result is
   begin
     self.qaru_id            := pi_qaru_id;
@@ -53,6 +70,38 @@ create or replace type body qa_rule_t is
     self.qaru_error_message := pi_qaru_error_message;
     self.qaru_object_types  := pi_qaru_object_types;
     self.qaru_sql           := pi_qaru_sql;
+  
+    return;
+  end qa_rule_t;
+
+  constructor function qa_rule_t
+  (
+    pi_qaru_id             in number
+   ,pi_qaru_category       in varchar2
+   ,pi_qaru_error_level    in number
+   ,pi_qaru_error_message  in varchar2
+   ,pi_qaru_object_types   in varchar2
+   ,pi_qaru_sql            in clob
+   ,pi_object_id           in number
+   ,pi_object_name         in varchar2
+   ,pi_object_type         in varchar2
+   ,pi_object_value        in varchar2
+   ,pi_object_updated_user in varchar2
+   ,pi_object_updated_date in date
+  ) return self as result is
+  begin
+    self.qaru_id             := pi_qaru_id;
+    self.qaru_category       := pi_qaru_category;
+    self.qaru_error_level    := pi_qaru_error_level;
+    self.qaru_error_message  := pi_qaru_error_message;
+    self.qaru_object_types   := pi_qaru_object_types;
+    self.qaru_sql            := pi_qaru_sql;
+    self.object_id           := pi_object_id;
+    self.object_name         := pi_object_name;
+    self.object_type         := pi_object_type;
+    self.object_value        := pi_object_value;
+    self.object_updated_user := pi_object_updated_user;
+    self.object_updated_date := pi_object_updated_date;
   
     return;
   end qa_rule_t;

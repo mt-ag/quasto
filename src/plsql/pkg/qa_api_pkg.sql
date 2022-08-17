@@ -51,7 +51,8 @@ create or replace package body qa_api_pkg as
     -- :4 qaru_error_level
     -- :5 qaru_error_message
     -- :6 qaru_object_types
-      using pi_target_scheme, l_qa_rule.qaru_id, l_qa_rule.qaru_category, l_qa_rule.qaru_error_level, l_qa_rule.qaru_error_message, l_qa_rule.qaru_object_types;
+    -- :7 qaru_sql
+      using pi_target_scheme, l_qa_rule.qaru_id, l_qa_rule.qaru_category, l_qa_rule.qaru_error_level, l_qa_rule.qaru_error_message, l_qa_rule.qaru_object_types, l_qa_rule.qaru_sql;
   
     return l_qa_rules;
   exception
