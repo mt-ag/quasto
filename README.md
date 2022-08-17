@@ -3,7 +3,51 @@ A project for checking guidelines and code quality for oracle databases.
 
 Project uses the MIT License.
 
-Before you can run the install.sql file and install the QUASTO objects, you will need to install the utPLSQL framework first.
+### Installing utPLSQL and QUASTO objects
+
+To install the QUASTO Quality Assurance Tool on your oracle database from scratch, run the install.sql file in the root directory of the repository.
+
+This file will install all necessary objects for utPLSQL tests and QUASTO.
+
+## Installing Guidelines for the QUASTO Quality Assurance Tool 
+It is possible to run QUASTO standalone without a valid apex and ut-plsql Installation.
+In order to install the toll the user needs to move into the root directory of the downloaded folder. 
+You can either clone the repository on git itself or download a zip.file of the Project.
+
+To start the Installation process you need to movee into the root directory of the downloaded folder.
+In the next step the user connects to the database via sqlplus or sql cl.
+To ensure all tables and packages are installed into the correct schema make sure to check the current user and switch schema if required.
+
+#### Running the Install Script:
+```
+@install [1/0] [1/0] [1/0]
+```
+
+To ensure a clean installation it is important to decide what you want to install.
+It is not mandatory to install apex or ut_plsql. To avoid invalid objects tohugh it is recommend to skip the installation of ut_plsql or apex dependet objects.
+
+Arguments that are required to be passed to the script:
+1. Is ut_plsql already installed? If not use 0 else 1.
+2. Is apex already installed? If not use 0 else 1.
+3. Do you want to install objects support more jenkins features? if not use 0 else 1.
+
+It is possible to install the ut_plsql and apex dependet objects at a later point in time.
+To do this the user needs to move from the root Directory of the project into the /src directory.
+There are the two installer scripts:
+1. install_utplsql_objects.sql
+2. install_apex_objects.sql
+Both of these scripts can be run wtihout arguments and should be executed in the same shema as the original schema of Quasto.
+
+Example:
+```
+@nstall_utplsql_objects.sql
+```
+
+
+### Uninstalling utPLSQL and QUASTO objects
+
+To uninstall the utPLSQL test and QUASTO objects, run the script uninstall.sql in the root directory of the repository.
+
 
 ## Installing Guidelines and Specifications for the utPLSQL framework
 
@@ -136,15 +180,3 @@ To uninstall the utPLSQL framework, run the script uninstall.sql in the source d
 ```
 sqlplus admin/admins_password@database @uninstall.sql ut3
 ```
-
-## Installing Guidelines for the QUASTO Quality Assurance Tool 
-
-### Installing utPLSQL and QUASTO objects
-
-To install the QUASTO Quality Assurance Tool on your oracle database from scratch, run the install.sql file in the root directory of the repository.
-
-This file will install all necessary objects for utPLSQL tests and QUASTO.
-
-### Uninstalling utPLSQL and QUASTO objects
-
-To uninstall the utPLSQL test and QUASTO objects, run the script uninstall.sql in the root directory of the repository.
