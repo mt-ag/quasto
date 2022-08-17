@@ -45,10 +45,10 @@ begin
   -- types
   l_object_name('VARCHAR2_TAB_T') := 'VARCHAR2_TAB_T';
   l_object_type('VARCHAR2_TAB_T') := 'TYPE';
-  l_object_name('QA_RULE_T') := 'QA_RULE_T';
-  l_object_type('QA_RULE_T') := 'TYPE';
   l_object_name('QA_RULES_T') := 'QA_RULES_T';
   l_object_type('QA_RULES_T') := 'TYPE';
+  l_object_name('QA_RULE_T') := 'QA_RULE_T';
+  l_object_type('QA_RULE_T') := 'TYPE';  
 
   -- sequences
   l_object_name('CLDR_SEQ') := 'CLDR_SEQ';
@@ -63,8 +63,8 @@ begin
   l_object_type('SUITE_SEQ') := 'SEQUENCE';
   
   -- synonyms
-  l_object_name('QA_RULE_T') := 'QA_RULE_T';
-  l_object_type('QA_RULE_T') := 'SYNONYM';
+  l_object_name('QA_RULE_T_S') := 'QA_RULE_T';
+  l_object_type('QA_RULE_T_S') := 'SYNONYM';
 
   l_object := l_object_name.first;
   dbms_output.put_line(l_object);
@@ -117,27 +117,27 @@ begin
   l_object := l_object_name.first;
   while l_object is not null
   loop
-    l_action := 'drop ' || l_object_type(l_object) || ' ' || l_object;
+    l_action := 'drop ' || l_object_type(l_object) || ' ' || l_object_name(l_object);
     select count(1)
     into l_count
     from user_objects s
-    where object_name = l_object
+    where object_name = l_object_name(l_object)
     and object_type = l_object_type(l_object);
     if l_count <> 0
     then
       execute immediate (l_action);
-      dbms_output.put_line('INFO: ' || l_object_type(l_object) || ' ' || l_object || ' dropped.');
+      dbms_output.put_line('INFO: ' || l_object_type(l_object) || ' ' || l_object_name(l_object) || ' dropped.');
     else
-      dbms_output.put_line('WARNING: ' || l_object_type(l_object) || ' ' || l_object || ' does not exist.');
+      dbms_output.put_line('WARNING: ' || l_object_type(l_object) || ' ' || l_object_name(l_object) || ' does not exist.');
     end if;
     select count(1)
     into l_count
     from user_objects s
-    where object_name = l_object
+    where object_name = l_object_name(l_object)
     and object_type = l_object_type(l_object);
     if l_count <> 0
     then
-      dbms_output.put_line('WARNING: ' || l_object_type(l_object) || ' ' || l_object || ' has not been dropped correctly.');
+      dbms_output.put_line('WARNING: ' || l_object_type(l_object) || ' ' || l_object_name(l_object) || ' has not been dropped correctly.');
     end if;
     l_object := l_object_name.next(l_object);
   end loop;
