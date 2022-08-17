@@ -28,7 +28,7 @@ PROMPT Do you pass specific Jenkins parameters to the script?
 PROMPT (yes/no) (1/0)
 PROMPT '------------------------------------'
 
-
+SET SERVEROUTPUT ON
 -- Block to proceess first Argument
 declare
     l_script_name varchar2(100);
@@ -41,6 +41,9 @@ begin
     elsif 0 = l_arg
     then
         l_script_name := 'null.sql';
+    else
+        l_script_name := 'null.sql';
+        dbms_output.put_line('Wrong Argument! Please use either 1 or 0!');
     end if;
     :script_name := l_script_name;
 end;
@@ -84,4 +87,4 @@ end;
 
 select :script_name from dual;
 @@~script_name2
-@src/install_quasto_objects.sql
+--@src/install_quasto_objects.sql
