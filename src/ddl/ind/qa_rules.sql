@@ -32,7 +32,7 @@ begin
 
   -- ################################
 
-  l_name := 'QARU_RULES_UNIQUE_I';
+  l_name := 'QARU_RULE_UNIQUE_I';
   select count(1)
   into l_count
   from user_indexes
@@ -60,7 +60,7 @@ begin
 
   -- ################################
 
-  l_name := 'QARU_RULES_UNIQUE_I';
+  l_name := 'QARU_NAME_UNIQUE_I';
   select count(1)
   into l_count
   from user_indexes

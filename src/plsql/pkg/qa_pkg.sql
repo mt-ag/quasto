@@ -1,4 +1,4 @@
-create or replace package qa_pkg as
+create or replace package qa_pkg authid current_user as
 
   -- Function to eveluate a rule for one client
   function tf_run_rule
