@@ -61,6 +61,10 @@ begin
   l_object_type('QARU_SEQ') := 'SEQUENCE';
   l_object_name('SUITE_SEQ') := 'SUITE_SEQ';
   l_object_type('SUITE_SEQ') := 'SEQUENCE';
+  
+  -- synonyms
+  l_object_name('QA_RULE_T') := 'QA_RULE_T';
+  l_object_type('QA_RULE_T') := 'SYNONYM';
 
   l_object := l_object_name.first;
   dbms_output.put_line(l_object);
