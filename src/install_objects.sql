@@ -4,8 +4,12 @@ set concat on
 set concat .
 set verify off
 
-COLUMN :script_name NEW_VALUE script_name2 NOPRINT
-variable script_name VARCHAR2(50)
+COLUMN :script_ut_plsql NEW_VALUE script_name_utplsql NOPRINT
+variable script_ut_plsql VARCHAR2(50)
+
+-- Skript for QUASTO Objects
+COLUMN :script_quasto NEW_VALUE script_name_quasto NOPRINT
+variable script_quasto VARCHAR2(50)
 
 --Begin Instruction
 PROMPT '------------------------------------'
@@ -29,6 +33,10 @@ PROMPT (yes/no) (1/0)
 PROMPT '------------------------------------'
 
 SET SERVEROUTPUT ON
+
+variable flag char
+exec :flag := 'Y';
+
 -- Block to proceess first Argument
 declare
     l_script_name varchar2(100);
@@ -42,49 +50,27 @@ begin
     then
         l_script_name := 'null.sql';
     else
-        l_script_name := 'null.sql';
-        dbms_output.put_line('Wrong Argument! Please use either 1 or 0!');
+        :script_ut_plsql := 'null.sql';
+        :script_quasto   := 'null.sql';
+        :flag := 'N';
+        return;
     end if;
-    :script_name := l_script_name;
+    :script_ut_plsql := l_script_name;
+
 end;
 /
 
--- Block to proceess second Argument
-/*
-declare
-    l_script_name varchar2(100);
-    l_arg number;
-begin
-    l_arg := '~2';
-    if    1 = l_arg
-    then
-        l_script_name := 'install_apex_objects.sql';
-    elsif 0 = l_arg
-    then
-        l_script_name := 'null.sql';
-    end if;
-    :script_name := l_script_name;
-end;
-*/
+-- Optional status message at the end of the script, for DBA info
+set feedback off
+set head off
+select :script_ut_plsql from dual;
+select :script_quasto from dual;
+-- DML only does anything if flag stayed Y
+select sysdate from dual
+where :flag = 'Y';
+select 'Wrong Argument or no Argument has been passed correctly!' from dual where :flag != 'Y';
+set feedback on
+set head on
 
--- Block to proceess third Argument
-/*
-declare
-    l_script_name varchar2(100);
-    l_arg number;
-begin
-    l_arg := '~3';
-    if    1 = l_arg
-    then
-        l_script_name := 'install_apex_objects.sql';
-    elsif 0 = l_arg
-    then
-        l_script_name := 'null.sql';
-    end if;
-    :script_name := l_script_name;
-end;
-*/
-
-select :script_name from dual;
-@@~script_name2
-@src/install_quasto_objects.sql
+@@src/~script_name_utplsql
+@@src/~script_name_quasto
