@@ -40,6 +40,7 @@ exec :flag := 'Y';
 -- Block to proceess first Argument
 declare
     l_script_name varchar2(100);
+    l_script_name_quasto varchar2(100) := 'install_quasto_objects.sql';
     l_arg number;
 begin
     l_arg := '~1';
@@ -56,6 +57,7 @@ begin
         return;
     end if;
     :script_ut_plsql := l_script_name;
+    :script_quasto  := l_script_name_quasto;
 
 end;
 /
