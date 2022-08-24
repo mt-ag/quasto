@@ -36,9 +36,9 @@ begin
  loop
     dbms_lob.append(l_return, 'l_sql := ''' || replace(l_tab(i).qaru_sql, '''', '''''') || ''';' || chr(10) || chr(10));
     dbms_lob.append(l_return, 'merge into ' || l_table_name || ' a' || chr(10));
-    dbms_lob.append(l_return, '  using (select ''' || replace(l_tab(i).qaru_client_name, '''', '''''')     || ''' as qaru_client_name,' || chr(10)); 
-    dbms_lob.append(l_return, '                ''' || replace(l_tab(i).qaru_rule_number, '''', '''''')     || ''' as qaru_rule_number,' || chr(10)); 
-    dbms_lob.append(l_return, '                ''' || replace(l_tab(i).qaru_name, '''', '''''')            || ''' as qaru_name,' || chr(10)); 
+    dbms_lob.append(l_return, '  using (select ''' || replace(l_tab(i).qaru_client_name, '''', '''''')     || ''' as qaru_client_name,' || chr(10));
+    dbms_lob.append(l_return, '                ''' || replace(l_tab(i).qaru_rule_number, '''', '''''')     || ''' as qaru_rule_number,' || chr(10));
+    dbms_lob.append(l_return, '                ''' || replace(l_tab(i).qaru_name, '''', '''''')            || ''' as qaru_name,' || chr(10));
     dbms_lob.append(l_return, '                ''' || replace(l_tab(i).qaru_category, '''', '''''')        || ''' as qaru_category,' || chr(10));
     dbms_lob.append(l_return, '                ''' || replace(l_tab(i).qaru_object_types, '''', '''''')    || ''' as qaru_object_types,' || chr(10));
     dbms_lob.append(l_return, '                ''' || replace(l_tab(i).qaru_error_message, '''', '''''')   || ''' as qaru_error_message,' || chr(10));
@@ -66,13 +66,13 @@ begin
     dbms_lob.append(l_return, '           qaru_exclude_objects = b.qaru_exclude_objects,' || chr(10));
     dbms_lob.append(l_return, '           qaru_error_level     = b.qaru_error_level,' || chr(10));
     dbms_lob.append(l_return, '           qaru_is_active       = b.qaru_is_active,' || chr(10));
-    dbms_lob.append(l_return, '           qaru_sql             = b.qaru_sql,' || chr(10));
     dbms_lob.append(l_return, '           qaru_predecessor_ids = b.qaru_predecessor_ids,' || chr(10));
     dbms_lob.append(l_return, '           qaru_layer           = b.qaru_layer,' || chr(10));
     dbms_lob.append(l_return, '           qaru_created_on      = b.qaru_created_on,' || chr(10));
     dbms_lob.append(l_return, '           qaru_created_by      = b.qaru_created_by,' || chr(10));
     dbms_lob.append(l_return, '           qaru_updated_on      = b.qaru_updated_on,' || chr(10));
-    dbms_lob.append(l_return, '           qaru_updated_by      = b.qaru_updated_by' || chr(10));
+    dbms_lob.append(l_return, '           qaru_updated_by      = b.qaru_updated_by,' || chr(10));
+    dbms_lob.append(l_return, '           qaru_sql             = b.qaru_sql' || chr(10));
     dbms_lob.append(l_return, '  when not MATCHED then' || chr(10));
     dbms_lob.append(l_return, '    insert ( qaru_client_name,' || chr(10));
     dbms_lob.append(l_return, '             qaru_rule_number,' || chr(10));
@@ -84,13 +84,13 @@ begin
     dbms_lob.append(l_return, '             qaru_exclude_objects,' || chr(10));
     dbms_lob.append(l_return, '             qaru_error_level,' || chr(10));
     dbms_lob.append(l_return, '             qaru_is_active,' || chr(10));
-    dbms_lob.append(l_return, '             qaru_sql,' || chr(10));
     dbms_lob.append(l_return, '             qaru_predecessor_ids,' || chr(10));
     dbms_lob.append(l_return, '             qaru_layer,' || chr(10));
     dbms_lob.append(l_return, '             qaru_created_on,' || chr(10));
     dbms_lob.append(l_return, '             qaru_created_by,' || chr(10));
     dbms_lob.append(l_return, '             qaru_updated_on,' || chr(10));
-    dbms_lob.append(l_return, '             qaru_updated_by )' || chr(10));
+    dbms_lob.append(l_return, '             qaru_updated_by,' || chr(10));
+    dbms_lob.append(l_return, '             qaru_sql )' || chr(10));
     dbms_lob.append(l_return, '    values ( b.qaru_client_name,' || chr(10));
     dbms_lob.append(l_return, '             b.qaru_rule_number,' || chr(10));
     dbms_lob.append(l_return, '             b.qaru_name,' || chr(10));
@@ -101,13 +101,13 @@ begin
     dbms_lob.append(l_return, '             b.qaru_exclude_objects,' || chr(10));
     dbms_lob.append(l_return, '             b.qaru_error_level,' || chr(10));
     dbms_lob.append(l_return, '             b.qaru_is_active,' || chr(10));
-    dbms_lob.append(l_return, '             b.qaru_sql,' || chr(10));
     dbms_lob.append(l_return, '             b.qaru_predecessor_ids,' || chr(10));
     dbms_lob.append(l_return, '             b.qaru_layer,' || chr(10));
     dbms_lob.append(l_return, '             b.qaru_created_on,' || chr(10));
     dbms_lob.append(l_return, '             b.qaru_created_by,' || chr(10));
     dbms_lob.append(l_return, '             b.qaru_updated_on,' || chr(10));
-    dbms_lob.append(l_return, '             b.qaru_updated_by );' || chr(10) || chr(10));
+    dbms_lob.append(l_return, '             b.qaru_updated_by,' || chr(10));
+    dbms_lob.append(l_return, '             b.qaru_sql );' || chr(10) || chr(10));
  end loop;
 
  dbms_lob.append(l_return, '  commit;' || chr(10) || chr(10));
@@ -125,4 +125,3 @@ exception
   when others then
     raise;
 end fc_export_qa_rules;
-/
