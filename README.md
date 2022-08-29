@@ -54,7 +54,7 @@ Both of these scripts can be run wtihout arguments and should be executed in the
 
 Example:
 ```
-@nstall_utplsql_objects.sql
+@install_utplsql_objects.sql
 ```
 
 
