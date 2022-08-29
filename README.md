@@ -1,7 +1,7 @@
 # QUASTO Quality Assurance Tool
-[1. What is Quasto?](https://github.com/mt-ag/quasto#what-is-quasto)<br>
-[2. Installing Quasto](https://github.com/mt-ag/quasto/blob/dev/README.md#installing-quasto)<br>
-[3. Using Quasto](https://github.com/mt-ag/quasto#using-quasto)
+[1. What is Quasto?](https://github.com/mt-ag/quasto/edit/dev/README.md#1-what-is-quasto)<br>
+[2. Installing Quasto](https://github.com/mt-ag/quasto/edit/dev/README.md#2-installing-quasto)<br>
+[3. Using Quasto](https://github.com/mt-ag/quasto/edit/dev/README.md#3using-quasto)
 
 ## 1. What is Quasto?
 A project for checking guidelines and code quality for inside the oracle database.
