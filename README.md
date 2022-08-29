@@ -1,5 +1,8 @@
 # QUASTO Quality Assurance Tool
-A project for checking guidelines and code quality for oracle databases.
+A project for checking guidelines and code quality for inside the oracle database.
+The first version supports checks for your data model, PL/SQL code and data itself.
+Coming up releases will integrate utPLSQL and get an APEX Front-End.
+CI/CD support for jenkins/azure devops or gitlab/github are planned on the roadmap.
 
 Project uses the MIT License.
 
