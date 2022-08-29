@@ -4,9 +4,9 @@ declare
 'create table QA_RULES
 (
   qaru_id              NUMBER not null,
-  qaru_rule_number     NVARCHAR2(20) not null,
+  qaru_rule_number     VARCHAR2(20) not null,
   qaru_client_name     VARCHAR2(100 CHAR) not null,
-  qaru_name	       VARCHAR2(100 CHAR) not null,
+  qaru_name	       	   VARCHAR2(100 CHAR) not null,
   qaru_category	       VARCHAR2(100 CHAR) not null,
   qaru_object_types    VARCHAR2(4000 CHAR) not null,
   qaru_error_message   VARCHAR2(4000 CHAR) not null,
