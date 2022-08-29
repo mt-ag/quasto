@@ -10,13 +10,13 @@ To install the QUASTO Quality Assurance Tool on your oracle database from scratc
 This file will install all necessary objects for utPLSQL tests and QUASTO.
 
 ## Installing Guidelines for the QUASTO Quality Assurance Tool 
-It is possible to run QUASTO standalone without a valid apex and ut-plsql Installation.
-In order to install the toll the user needs to move into the root directory of the downloaded folder. 
-You can either clone the repository on git itself or download a zip.file of the Project.
+It is possible to run QUASTO standalone without a valid apex or utPLSQL Installation.
+In order to install the tool the user needs to move into the root directory of the downloaded folder. 
+You can either clone the repository on git itself or download a zip.file.
 
-To start the Installation process you need to movee into the root directory of the downloaded folder.
-In the next step the user connects to the database via sqlplus or sql cl.
-To ensure all tables and packages are installed into the correct schema make sure to check the current user and switch schema if required.
+To start the Installation process you need to move into the root directory of the downloaded folder.
+In the next step the user connects to the database via sqlplus or sqlCL.
+To ensure all tables and packages are installed into the right schema make sure to check the current user and switch schema if required.
 
 ### Minimal user rights
 If you install quasto in a blank new scheme the user needs the following rights:
@@ -38,30 +38,29 @@ grant create session to quasto;
 ```
 
 To ensure a clean installation it is important to decide what you want to install.
-It is not mandatory to install apex or ut_plsql. To avoid invalid objects tohugh it is recommend to skip the installation of ut_plsql or apex dependet objects.
+It is not mandatory to install APEX or utPLSQL. But if you have one or both of these, you get more features for your quality approach.
 
 Arguments that are required to be passed to the script:
-1. Is ut_plsql already installed? If not use 0 else 1.
-2. Is apex already installed? If not use 0 else 1.
-3. Do you want to install objects support more jenkins features? if not use 0 else 1.
+1. Do you want to install supporting objects for utPLSQL usage? 1=yes / 0=no (you need to install utPLSQL seperatly)
+2. Do you want to install supporting objects for APEX usage? 1=yes / 0=no (you need to install APEX seperatly)
+3. Do you want to install supporting objects for Jenkins usage? 1=yes / 0=no (you need to run Jenkins seperatly)
 
-It is possible to install the ut_plsql and apex dependet objects at a later point in time.
+It is possible to install utPLSQL, APEX or Jenkins objects later
 To do this the user needs to move from the root Directory of the project into the /src directory.
 There are the two installer scripts:
 1. install_utplsql_objects.sql
 2. install_apex_objects.sql
-Both of these scripts can be run wtihout arguments and should be executed in the same shema as the original schema of Quasto.
+3. install_jenkins_objects.sql
+All of these scripts can be run without arguments and should be executed in the same schema as the original schema of Quasto.
 
 Example:
 ```
 @install_utplsql_objects.sql
 ```
 
-
 ### Uninstalling utPLSQL and QUASTO objects
 
 To uninstall the utPLSQL test and QUASTO objects, run the script uninstall.sql in the root directory of the repository.
-
 
 ## Installing Guidelines and Specifications for the utPLSQL framework
 
