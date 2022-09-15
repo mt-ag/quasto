@@ -2,7 +2,7 @@
 [1. What is Quasto?](https://github.com/mt-ag/quasto#1-what-is-quasto)<br>
 [2. Installing Quasto](https://github.com/mt-ag/quasto#2-installing-quasto)<br>
 [3. Using Quasto](https://github.com/mt-ag/quasto#3using-quasto)<br>
-[4. Installing utPLSQL](https://github.com/mt-ag/quasto#installing-guidelines-and-specifications-for-the-utplsql-framework)
+[4. Installing utPLSQL](https://github.com/mt-ag/quasto/blob/dev/README.md#4-installing-guidelines-and-specifications-for-the-utplsql-framework)
 
 ## 1. What is Quasto?
 A project for checking guidelines and code quality for inside the oracle database.
