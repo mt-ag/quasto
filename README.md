@@ -1,7 +1,8 @@
-# QUASTO Quality Assurance Tool
+# Quasto - Quality Assurance Tool
 [1. What is Quasto?](https://github.com/mt-ag/quasto#1-what-is-quasto)<br>
 [2. Installing Quasto](https://github.com/mt-ag/quasto#2-installing-quasto)<br>
-[3. Using Quasto](https://github.com/mt-ag/quasto#3using-quasto)
+[3. Using Quasto](https://github.com/mt-ag/quasto#3using-quasto)<br>
+[4. Installing utPLSQL](https://github.com/mt-ag/quasto/blob/dev/README.md#4-installing-guidelines-and-specifications-for-the-utplsql-framework)
 
 ## 1. What is Quasto?
 A project for checking guidelines and code quality for inside the oracle database.
@@ -71,7 +72,65 @@ Example:
 
 To uninstall the utPLSQL test and QUASTO objects, run the script uninstall.sql in the root directory of the repository.
 
-## Installing Guidelines and Specifications for the utPLSQL framework
+## 3.Using Quasto
+### Define a rule
+For using quasto you have to define rules based on SQL queries which have to be saved inside the QA_RULES table.
+The query for every rule should name every object which does not match you quality standards.
+A first example could be, that every table needs to have a primary key.
+Here is an example for this rule:
+```
+with param as
+ (select :1 scheme
+        ,:2 qaru_id
+        ,:3 qaru_category
+        ,:4 qaru_error_level
+        ,:5 qaru_object_types
+        ,:6 qaru_error_message
+        ,:7 qaru_sql
+  from dual)
+select qa_rule_t(pi_qaru_id             => p.qaru_id
+                ,pi_qaru_category       => p.qaru_category
+                ,pi_qaru_error_level    => p.qaru_error_level
+                ,pi_qaru_error_message  => p.qaru_error_message
+                ,pi_qaru_object_types   => p.qaru_object_types
+                ,pi_qaru_sql            => p.qaru_sql
+                ,pi_object_id           => ao.object_id
+                ,pi_object_name         => ao.object_name
+                ,pi_object_type         => 'TABLE'
+                ,pi_object_value        => null
+                ,pi_object_updated_user => null
+                ,pi_object_updated_date => ao.last_ddl_time)
+from param p
+cross join all_tables at
+join all_objects ao on at.table_name = ao.object_name
+where (ao.owner = p.scheme or p.scheme is null)
+and not exists (select null
+       from all_constraints cons
+       join all_cons_columns cols on cols.constraint_name = cons.constraint_name
+       where cols.table_name = at.table_name
+       and cons.constraint_type = 'P'
+       and cons.status = 'ENABLED')
+```
+### Running rules
+After you defined one or more rules, you can run these rules. The easiest way is to call them in your SQL tool.
+The QA_API_PKG is the Package to run your rules. 
+You can run a single rule, or a complete rulesset for one project only with a single SQL query.
+For running one rule you need the rule number, the client name and the target schema
+```
+select *
+from qa_api_pkg.tf_run_rule(pi_qaru_rule_number => '23.1'
+                           ,pi_qaru_client_name => 'MT AG'
+                           ,pi_target_scheme    => 'QUASTO')
+```
+In this example the rule 23.1 from the client/project MT AG is used inside the schema Quasto. If you don't provide a schema, all Schemas are used which are able to reach. The sql output gives now every object in a row which is not matching your rule.
+If you wanna run all rules from one client/project simply call
+```
+select *
+from qa_api_pkg.tf_run_rules(pi_qaru_client_name => 'MT AG'
+                            ,pi_target_scheme    => 'QUASTO')
+```
+
+## 4. Installing Guidelines and Specifications for the utPLSQL framework
 
 These installation instructions are based on the installation instructions of the software provider: http://utplsql.org/utPLSQL/latest/userguide/install.html
 
@@ -202,60 +261,4 @@ To uninstall the utPLSQL framework, run the script uninstall.sql in the source d
 ```
 sqlplus admin/admins_password@database @uninstall.sql ut3
 ```
-## 3.Using Quasto
-### Define a rule
-For using quasto you have to define rules based on SQL queries which have to be saved inside the QA_RULES table.
-The query for every rule should name every object which does not match you quality standards.
-A first example could be, that every table needs to have a primary key.
-Here is an example for this rule:
-```
-with param as
- (select :1 scheme
-        ,:2 qaru_id
-        ,:3 qaru_category
-        ,:4 qaru_error_level
-        ,:5 qaru_object_types
-        ,:6 qaru_error_message
-        ,:7 qaru_sql
-  from dual)
-select qa_rule_t(pi_qaru_id             => p.qaru_id
-                ,pi_qaru_category       => p.qaru_category
-                ,pi_qaru_error_level    => p.qaru_error_level
-                ,pi_qaru_error_message  => p.qaru_error_message
-                ,pi_qaru_object_types   => p.qaru_object_types
-                ,pi_qaru_sql            => p.qaru_sql
-                ,pi_object_id           => ao.object_id
-                ,pi_object_name         => ao.object_name
-                ,pi_object_type         => 'TABLE'
-                ,pi_object_value        => null
-                ,pi_object_updated_user => null
-                ,pi_object_updated_date => ao.last_ddl_time)
-from param p
-cross join all_tables at
-join all_objects ao on at.table_name = ao.object_name
-where (ao.owner = p.scheme or p.scheme is null)
-and not exists (select null
-       from all_constraints cons
-       join all_cons_columns cols on cols.constraint_name = cons.constraint_name
-       where cols.table_name = at.table_name
-       and cons.constraint_type = 'P'
-       and cons.status = 'ENABLED')
-```
-### Running rules
-After you defined one or more rules, you can run these rules. The easiest way is to call them in your SQL tool.
-The QA_API_PKG is the Package to run your rules. 
-You can run a single rule, or a complete rulesset for one project only with a single SQL query.
-For running one rule you need the rule number, the client name and the target schema
-```
-select *
-from qa_api_pkg.tf_run_rule(pi_qaru_rule_number => '23.1'
-                           ,pi_qaru_client_name => 'MT AG'
-                           ,pi_target_scheme    => 'QUASTO')
-```
-In this example the rule 23.1 from the client/project MT AG is used inside the schema Quasto. If you don't provide a schema, all Schemas are used which are able to reach. The sql output gives now every object in a row which is not matching your rule.
-If you wanna run all rules from one client/project simply call
-```
-select *
-from qa_api_pkg.tf_run_rules(pi_qaru_client_name => 'MT AG'
-                            ,pi_target_scheme    => 'QUASTO')
-```
+
