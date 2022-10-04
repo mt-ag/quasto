@@ -32,6 +32,9 @@ PROMPT src/plsql/pkg/qa_main_pkg.sql
 PROMPT src/plsql/pkg/qa_api_pkg.sql
 @src/plsql/pkg/qa_api_pkg.sql
 
+PROMPT src/plsql/pkg/export_import_rules_pkg.sql
+@src/plsql/pkg/export_import_rules_pkg.sql
+
 PROMPT TRIGGER
 PROMPT src/plsql/trg/qaru_iu_trg.sql
 @src/plsql/trg/qaru_iu_trg.sql
@@ -39,10 +42,6 @@ PROMPT src/plsql/trg/qaru_iu_trg.sql
 PROMPT SYNONYM
 PROMPT src/plsql/syn/qa_rule_t.sql
 @src/plsql/syn/qa_rule_t.sql
-
-PROMPT FUNCTION
-PROMPT src/plsql/fn/fc_export_qa_rules.sql
-@src/plsql/fn/fc_export_qa_rules.sql
 
 PROMPT GRANT
 grant execute on qa_api_pkg to public;

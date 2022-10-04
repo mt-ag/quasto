@@ -31,16 +31,14 @@ begin
   l_object_type('PREPARE_TEST_RESULTS_PKG') := 'PACKAGE';
   l_object_name('CREATE_UT_TEST_PACKAGES_PKG') := 'CREATE_UT_TEST_PACKAGES_PKG';
   l_object_type('CREATE_UT_TEST_PACKAGES_PKG') := 'PACKAGE';
+  l_object_name('EXPORT_IMPORT_RULES_PKG') := 'EXPORT_IMPORT_RULES_PKG';
+  l_object_type('EXPORT_IMPORT_RULES_PKG') := 'PACKAGE';
   l_object_name('QA_MAIN_PKG') := 'QA_MAIN_PKG';
   l_object_type('QA_MAIN_PKG') := 'PACKAGE';
   l_object_name('QA_API_PKG') := 'QA_API_PKG';
   l_object_type('QA_API_PKG') := 'PACKAGE';
   l_object_name('QA_APEX_PKG') := 'QA_APEX_PKG';
   l_object_type('QA_APEX_PKG') := 'PACKAGE';
-
-  -- functions
-  l_object_name('FC_EXPORT_QA_RULES') := 'FC_EXPORT_QA_RULES';
-  l_object_type('FC_EXPORT_QA_RULES') := 'FUNCTION';
 
   -- types
   l_object_name('VARCHAR2_TAB_T') := 'VARCHAR2_TAB_T';
