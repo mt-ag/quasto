@@ -2,6 +2,10 @@ create or replace package qa_export_import_rules_pkg is
 
   gc_scope constant varchar2(100) := $$plsql_unit || '.';
 
+  -- if spool set to active, all outputs are deactivated 
+  -- otherwise you would get extra lines in your JSON
+  g_spool_active boolean := false;
+
   function f_export_rules_table_to_clob
   (
     pi_client_name in qa_rules.qaru_client_name%type
@@ -18,6 +22,14 @@ create or replace package qa_export_import_rules_pkg is
 end qa_export_import_rules_pkg;
 /
 create or replace package body qa_export_import_rules_pkg is
+
+  procedure p_print(pi_text in varchar2) is
+  begin
+    if not g_spool_active
+    then
+      dbms_output.put_line(pi_text);
+    end if;
+  end p_print;
 
   function f_export_rules_table_to_clob
   (
@@ -47,10 +59,10 @@ create or replace package body qa_export_import_rules_pkg is
   
     if l_count_rules = 0
     then
-      dbms_output.put_line('No rules found.');
+      p_print('No rules found.');
       return null;
     else
-      dbms_output.put_line('Exporting ' || l_count_rules || ' rules with CLIENT_NAME=' || pi_client_name || ' and CATEGORY=' || pi_category);
+      p_print('Exporting ' || l_count_rules || ' rules with CLIENT_NAME=' || pi_client_name || ' and CATEGORY=' || pi_category);
     
       -- for each client_name
       for client in (select qaru_client_name
@@ -154,7 +166,7 @@ create or replace package body qa_export_import_rules_pkg is
     l_offset int := 1;
     l_step   number := 32767;
   begin
-    dbms_output.put_line('Print CLOB');
+    dbms_output.enable(buffer_size => 10000000);
     loop
       exit when l_offset > dbms_lob.getlength(pi_clob);
       dbms_output.put_line(dbms_lob.substr(pi_clob
