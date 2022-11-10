@@ -8,6 +8,11 @@ create or replace package export_import_rules_pkg is
    ,pi_category    in qa_rules.qaru_category%type default null
   ) return clob;
 
+  procedure p_clob_to_output(pi_clob in clob);
+
+  procedure p_import_clob_to_rules_table(pi_clob in clob);
+
+  /* will be removed in future */
   function fc_export_qa_rules(pi_client_name in varchar2 default null) return clob;
 
 end export_import_rules_pkg;
@@ -144,21 +149,23 @@ create or replace package body export_import_rules_pkg is
     end if;
   end f_export_rules_table_to_clob;
 
+
   procedure p_clob_to_output(pi_clob in clob) is
     l_offset int := 1;
+    l_step   number := 32767;
   begin
     dbms_output.put_line('Print CLOB');
     loop
       exit when l_offset > dbms_lob.getlength(pi_clob);
       dbms_output.put_line(dbms_lob.substr(pi_clob
-                                          ,255
+                                          ,l_step
                                           ,l_offset));
-      l_offset := l_offset + 255;
+      l_offset := l_offset + l_step;
     end loop;
   end p_clob_to_output;
 
+
   procedure p_import_clob_to_rules_table(pi_clob in clob) is
-    l_sql_insert varchar(32767);
   begin
     if pi_clob is not null
     then
@@ -178,32 +185,53 @@ create or replace package body export_import_rules_pkg is
                                                                ,qaru_predecessor_ids varchar2(400 char) path '$.qaru_predecessor_ids'
                                                                ,qaru_layer varchar2(400 char) path '$.qaru_layer'))))))
       loop
-        l_sql_insert := 'insert into qa_rules ( qaru_client_name
-                                         ,qaru_name
-                                         ,qaru_category
-                                         ,qaru_object_types
-                                         ,qaru_error_message
-                                         ,qaru_error_message
-                                         ,qaru_comment
-                                         ,qaru_error_level
-                                         ,qaru_is_active
-                                         ,qaru_sql
-                                         ,qaru_predecessor_ids
-                                         ,qaru_layer
-                                         ,qaru_rule_number) values ( ' || i.qaru_client_name || '
-                                                                    ,' || i.qaru_name || '
-                                                                    ,' || i.qaru_category || '
-                                                                    ,' || i.qaru_object_types || '
-                                                                    ,' || i.qaru_error_message || '
-                                                                    ,' || i.qaru_comment || '
-                                                                    ,' || i.qaru_exclude_objects || '
-                                                                    ,' || i.qaru_error_level || '
-                                                                    ,' || i.qaru_is_active || '
-                                                                    ,' || i.qaru_sql || '
-                                                                    ,' || i.qaru_predecessor_ids || '
-                                                                    ,' || i.qaru_layer || '
-                                                                    ,' || i.qaru_rule_number || ')';
-        dbms_output.put_line(l_sql_insert);
+        dbms_output.put_line('MERGE CLIENT_NAME=' || i.qaru_client_name || ' RULE_NUMBER=' || i.qaru_rule_number);
+      
+        merge into qa_rules r
+        using dual
+        on (r.qaru_client_name = i.qaru_client_name and r.qaru_rule_number = i.qaru_rule_number)
+        when matched then
+          update
+          set r.qaru_category        = i.qaru_category
+             ,r.qaru_comment         = i.qaru_comment
+             ,r.qaru_error_level     = i.qaru_error_level
+             ,r.qaru_error_message   = i.qaru_error_message
+             ,r.qaru_exclude_objects = i.qaru_exclude_objects
+             ,r.qaru_is_active       = i.qaru_is_active
+             ,r.qaru_layer           = i.qaru_layer
+             ,r.qaru_name            = i.qaru_name
+             ,r.qaru_object_types    = i.qaru_object_types
+             ,r.qaru_predecessor_ids = i.qaru_predecessor_ids
+             ,r.qaru_sql             = i.qaru_sql
+        when not matched then
+          insert
+            (r.qaru_client_name
+            ,r.qaru_rule_number
+            ,r.qaru_category
+            ,r.qaru_comment
+            ,r.qaru_error_level
+            ,r.qaru_error_message
+            ,r.qaru_exclude_objects
+            ,r.qaru_is_active
+            ,r.qaru_layer
+            ,r.qaru_name
+            ,r.qaru_object_types
+            ,r.qaru_predecessor_ids
+            ,r.qaru_sql)
+          values
+            (i.qaru_client_name
+            ,i.qaru_rule_number
+            ,i.qaru_category
+            ,i.qaru_comment
+            ,i.qaru_error_level
+            ,i.qaru_error_message
+            ,i.qaru_exclude_objects
+            ,i.qaru_is_active
+            ,i.qaru_layer
+            ,i.qaru_name
+            ,i.qaru_object_types
+            ,i.qaru_predecessor_ids
+            ,i.qaru_sql);
       end loop;
     end if;
   end p_import_clob_to_rules_table;
