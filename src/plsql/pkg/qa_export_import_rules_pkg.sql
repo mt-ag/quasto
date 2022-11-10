@@ -1,4 +1,4 @@
-create or replace package export_import_rules_pkg is
+create or replace package qa_export_import_rules_pkg is
 
   gc_scope constant varchar2(100) := $$plsql_unit || '.';
 
@@ -15,9 +15,9 @@ create or replace package export_import_rules_pkg is
   /* will be removed in future */
   function fc_export_qa_rules(pi_client_name in varchar2 default null) return clob;
 
-end export_import_rules_pkg;
+end qa_export_import_rules_pkg;
 /
-create or replace package body export_import_rules_pkg is
+create or replace package body qa_export_import_rules_pkg is
 
   function f_export_rules_table_to_clob
   (
@@ -442,5 +442,5 @@ create or replace package body export_import_rules_pkg is
       raise;
   end fc_export_qa_rules;
 
-end export_import_rules_pkg;
+end qa_export_import_rules_pkg;
 /
