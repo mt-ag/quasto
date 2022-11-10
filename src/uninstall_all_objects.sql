@@ -33,6 +33,8 @@ begin
   l_object_type('CREATE_UT_TEST_PACKAGES_PKG') := 'PACKAGE';
   l_object_name('EXPORT_IMPORT_RULES_PKG') := 'EXPORT_IMPORT_RULES_PKG';
   l_object_type('EXPORT_IMPORT_RULES_PKG') := 'PACKAGE';
+  l_object_name('QA_EXPORT_IMPORT_RULES_PKG') := 'QA_EXPORT_IMPORT_RULES_PKG';
+  l_object_type('QA_EXPORT_IMPORT_RULES_PKG') := 'PACKAGE';
   l_object_name('QA_MAIN_PKG') := 'QA_MAIN_PKG';
   l_object_type('QA_MAIN_PKG') := 'PACKAGE';
   l_object_name('QA_API_PKG') := 'QA_API_PKG';
@@ -86,10 +88,12 @@ begin
                 and constraint_type = 'R')
       loop
         l_action := 'alter table ' || l_object_name(l_object) || ' drop constraint ' || i.constraint_name;
+		
         select count(1)
         into l_count
         from user_constraints s
         where constraint_name = i.constraint_name;
+		
         if l_count <> 0
         then
           dbms_output.put_line(l_action);
@@ -98,10 +102,12 @@ begin
         else
           dbms_output.put_line('WARNING: ' || i.constraint_name || ' does not exist.');
         end if;
+		
         select count(1)
         into l_count
         from user_constraints s
         where constraint_name = i.constraint_name;
+		
         if l_count <> 0
         then
           dbms_output.put_line('WARNING: ' || i.constraint_name || ' has not been dropped correctly.');
@@ -116,11 +122,13 @@ begin
   while l_object is not null
   loop
     l_action := 'drop ' || l_object_type(l_object) || ' ' || l_object_name(l_object);
+	
     select count(1)
     into l_count
     from user_objects s
     where object_name = l_object_name(l_object)
     and object_type = l_object_type(l_object);
+	
     if l_count <> 0
     then
       execute immediate (l_action);
@@ -128,11 +136,13 @@ begin
     else
       dbms_output.put_line('WARNING: ' || l_object_type(l_object) || ' ' || l_object_name(l_object) || ' does not exist.');
     end if;
+	
     select count(1)
     into l_count
     from user_objects s
     where object_name = l_object_name(l_object)
     and object_type = l_object_type(l_object);
+	
     if l_count <> 0
     then
       dbms_output.put_line('WARNING: ' || l_object_type(l_object) || ' ' || l_object_name(l_object) || ' has not been dropped correctly.');
