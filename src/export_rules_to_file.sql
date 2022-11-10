@@ -1,7 +1,10 @@
 set feedback off;
-define l_client_name = &client_name.
-define l_category = &category.
+-- Which project should be exported?
+define l_client_name = &client_name
+-- Would you like to filter a category. If using null than all categories will be exported
+define l_category = &category
 
+-- name of the file which will be created based on client_name and category
 spool qa_rules &l_client_name. &l_category..json
 declare
   c_client_name constant qa_rules.qaru_client_name%type := '&l_client_name.';
