@@ -120,10 +120,11 @@ create or replace package body qa_export_import_rules_pkg is
             l_rule_json.put('qaru_is_active'
                            ,rules.qaru_is_active);
             -- currently there is a problem formatting the sql
-            /*l_rule_json.put('qaru_sql'
-            ,s.qaru_sql);*/
             l_rule_json.put('qaru_sql'
-                           ,'');
+                           ,rules.qaru_sql);
+            /*
+            l_rule_json.put('qaru_sql'
+                           ,'');*/
             l_rule_json.put('qaru_predecessor_ids'
                            ,nvl(rules.qaru_predecessor_ids
                                ,''));
