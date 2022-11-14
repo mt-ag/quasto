@@ -1,24 +1,24 @@
 { "qa_rules" : 
 	[
-		{ "qaru_client_names" : 
+		{ "client_names" : 
 			[
-				{ "qaru_client_name" string,
-				  "qaru_categories" : 
+				{ "client_name" string,
+				  "categories" : 
 					[
-						{ "qaru_category" : string,
+						{ "category" : string,
 						  "rules" : 
 							[
-								{ "qaru_rule_number"     : string, 
-								  "qaru_name"            : string, 
-								  "qaru_error_message"   : string,
-								  "qaru_comment"         : string, 
-								  "qaru_exclude_objects" : string, 
-								  "qaru_error_level"     : number,
-								  "qaru_is_active"       : number,
-								  "qaru_sql"             : string,
-								  "qaru_predecessor_ids" : string, 
-								  "qaru_layer"           : string
-								  "qaru_object_types"	 : string
+								{ "rule_number"     : string,
+								  "name"            : string,
+								  "error_message"   : string,
+								  "comment"         : string,
+								  "exclude_objects" : string,
+								  "error_level"     : number,
+								  "is_active"       : number,
+								  "sql"             : string,
+								  "predecessor_ids" : string,
+								  "layer"           : string,
+								  "object_types"	: string
 								},...
 							]
 						},...
