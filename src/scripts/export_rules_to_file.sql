@@ -22,13 +22,13 @@ select 'qa_rules_' || lower(replace('&l_client_name.',' ','_')) || lower('_&l_ca
 
 variable contents  clob;
 declare
-  c_client_name constant qa_rules.qaru_client_name%type := '&l_client_name.';
+  c_client_name constant qa_rules.qaru_client_name%type := '&l_client_name';
   c_category    constant qa_rules.qaru_category%type := '&l_category.';
   l_clob clob;
 begin
   qa_export_import_rules_pkg.g_spool_active := true;
-  l_clob := qa_export_import_rules_pkg.f_export_rules_table_to_clob(pi_client_name => 'MT AG'--c_client_name
-                                                                      ,pi_category    => null);--c_category);
+  l_clob := qa_export_import_rules_pkg.f_export_rules_table_to_clob(pi_client_name => c_client_name
+                                                                   ,pi_category    => c_category);
   :contents := l_clob; 
 end;
 /
