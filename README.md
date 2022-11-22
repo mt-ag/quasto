@@ -224,7 +224,7 @@ To minimize startup time of the utPLSQL framework it is recommended to install D
 
 Example invocation:
 ```
-sqlplus admin/admins_password@database @install_ddl_trigger.sql ut3
+sqlplus ut3/ut3@database @install_ddl_trigger.sql ut3
 ```
 
 ### Allowing other users to access the utPLSQL framework
