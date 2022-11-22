@@ -215,7 +215,7 @@ To install the utPLSQL framework the script install.sql in the source directory 
 
 Example invocation:
 ```
-sqlplus admin/admins_password@database @install.sql ut3
+sqlplus ut3/ut3@database @install.sql ut3
 ```
 
 #### Installing utPLSQL DDL Trigger
@@ -224,7 +224,7 @@ To minimize startup time of the utPLSQL framework it is recommended to install D
 
 Example invocation:
 ```
-sqlplus admin/admins_password@database @install_ddl_trigger.sql ut3
+sqlplus ut3/ut3@database @install_ddl_trigger.sql ut3
 ```
 
 ### Allowing other users to access the utPLSQL framework
@@ -235,15 +235,15 @@ To grant access to all users, the script create_synonyms_and_grants_for_public.s
 
 Example invocation:
 ```
-sqlplus admin/admins_password@database @create_synonyms_and_grants_for_public.sql ut3  
+sqlplus ut3/ut3@database @create_synonyms_and_grants_for_public.sql ut3  
 ```
 
 To grant access only to specific users, the create_user_grants.sql and create_user_synonyms.sql scripts in the source directory must be run to create grants and synonyms for the utPLSQL schema.
 
 Example invocation for granting and creating synonyms for user hr:
 ```
-sqlplus ut3_user/ut3_password@database @create_user_grants.sql ut3 hr
-sqlplus user/user_password@database @create_user_synonyms.sql ut3 hr
+sqlplus ut3/ut3@database @create_user_grants.sql ut3 hr
+sqlplus ut3/ut3@database @create_user_synonyms.sql ut3 hr
 ```
 
 ### Checking environment and utPLSQL version
