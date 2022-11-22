@@ -18,7 +18,7 @@ select '' as "2"
 ;
 
 column filename new_value filename
-select 'qa_rules_' || lower(replace('&l_client_name.',' ','_')) || lower('_&l_category..json') as filename from sys.dual;
+select 'qa_rules_' || lower(replace('&l_client_name.',' ','_')) || case when '&l_category.' is null then '.json' else lower('_&l_category..json') end as filename from sys.dual;
 
 variable contents  clob;
 declare
