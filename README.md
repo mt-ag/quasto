@@ -215,7 +215,7 @@ To install the utPLSQL framework the script install.sql in the source directory 
 
 Example invocation:
 ```
-sqlplus admin/admins_password@database @install.sql ut3
+sqlplus ut3/ut3@database @install.sql ut3
 ```
 
 #### Installing utPLSQL DDL Trigger
