@@ -1,28 +1,36 @@
-PROMPT create or replace trigger RUN_IU_TRG
-CREATE OR REPLACE TRIGGER RUN_IU_TRG
-  BEFORE INSERT OR UPDATE ON utplsql_test_run
-  REFERENCING NEW AS NEW OLD AS OLD
-  FOR EACH ROW
-DECLARE
-  l_user VARCHAR2(255);
-BEGIN
-  SELECT coalesce(sys_context('apex$session','app_user') 
-        ,sys_context('userenv','os_user')
-	,sys_context('userenv','session_user'))
-    INTO l_user
-    FROM dual;
-  IF inserting AND :new.run_id IS NULL THEN
-    :new.run_id := run_seq.nextval;
-  END IF;
-  IF inserting THEN
-    :new.run_create_date := SYSDATE;
-    :new.run_create_user := l_user;
-  END IF;
-  IF updating OR inserting THEN
-    :new.run_change_date := SYSDATE;
-    :new.run_change_user := l_user;
-  END IF;
-END run_ui_trg;
+PROMPT create or replace trigger QAIF_IU_TRG
+create or replace trigger qaif_iu_trg
+  before insert or update on qa_import_files
+  referencing new as new old as old
+  for each row
+declare
+  l_user varchar2(255);
+begin
+  select coalesce(sys_context('apex$session'
+                             ,'app_user')
+                 ,sys_context('userenv'
+                             ,'os_user')
+                 ,sys_context('userenv'
+                             ,'session_user'))
+  into l_user
+  from dual;
+  if inserting and
+     :new.qaif_id is null
+  then
+    :new.qaif_id := qaif_seq.nextval;
+  end if;
+  if inserting
+  then
+    :new.qaif_created_on := sysdate;
+    :new.qaif_created_by := l_user;
+  end if;
+  if updating or
+     inserting
+  then
+    :new.qaif_updated_on := sysdate;
+    :new.qaif_updated_by := l_user;
+  end if;
+end qaif_iu_trg;
 /
 
-ALTER TRIGGER RUN_IU_TRG ENABLE;
+alter trigger qaif_iu_trg enable;
