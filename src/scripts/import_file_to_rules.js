@@ -10,7 +10,7 @@ function addBindToMap(map,bindName,fileName){
 
     var out = b.setBinaryStream(1);
 
-    var path = java.nio.file.FileSystems.getDefault().getPath("","qa_rules_mt_ag_ddl.json");
+    var path = java.nio.file.FileSystems.getDefault().getPath("",fileName);
 
     /* slurp the file over to the blob */
     java.nio.file.Files.copy(path, out);
@@ -27,11 +27,8 @@ return map;
 }
 
 /* File name */
-var dir =  args[2];
 var l_filename = args[1];
-var filepath = "qa_rules_mt_ag_ddl.json"
 var ext = '.' + l_filename.split('.')[1];
-print (filepath);
 var mime=""
 switch (ext){
   case '.js' :
@@ -61,6 +58,7 @@ var sql = [
     "begin",    
     /*"quasto.qa_export_import_rules_pkg.f_import_clob_to_qa_import_files(pi_clob => :b ,pi_filename => :filename ,pi_mimetype => :mime);",*/
     "insert into qa_import_files(qaif_filename,qaif_mimetype,qaif_clob_data)values(:filename,:mime,to_clob(:b)) returning qaif_id into :return_id;",
+    "commit;",
     "end;"
 ].join("\n");
 /* exec the insert and pass binds */
