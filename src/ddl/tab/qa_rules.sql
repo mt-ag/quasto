@@ -20,7 +20,8 @@ declare
   qaru_created_on      DATE not null,
   qaru_created_by      VARCHAR2(255 CHAR) not null,
   qaru_updated_on      DATE not null,
-  qaru_updated_by      VARCHAR2(255 CHAR) not null
+  qaru_updated_by      VARCHAR2(255 CHAR) not null,
+  qaru_failure_rate    NUMBER
 )';
   l_count number;
 begin
