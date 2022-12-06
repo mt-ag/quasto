@@ -18,7 +18,15 @@ create or replace package qa_export_import_rules_pkg is
 
   procedure p_clob_to_output(pi_clob in clob);
 
-  procedure p_import_clob_to_rules_table(pi_clob in clob);
+  -- Import to put Blob into qa_import_files table
+  procedure f_import_clob_to_qa_import_files
+  (
+    pi_clob      in blob
+   ,pi_filename  in qa_import_files.qaif_filename%type
+   ,pi_mimetype  in qa_import_files.qaif_mimetype%type
+  );
+
+  procedure p_import_clob_to_rules_table(pi_qaif_id in qa_import_files.qaif_id%type);
 
   /* will be removed in future */
   function fc_export_qa_rules(pi_client_name in varchar2 default null) return clob;
@@ -193,14 +201,14 @@ create or replace package body qa_export_import_rules_pkg is
                        ,'"sql" : "') > 0 --and 1=0
       then
         null;
-        l_sql := replace_with_clob(i_source  => f.line,
-                          i_search  => '\n',
-                          i_replace => 'chr(10)');
+        l_sql := replace_with_clob(i_source  => f.line
+                                  ,i_search  => '\n'
+                                  ,i_replace => 'chr(10)');
         /*select qaru_sql
-        into l_sql
-        from json_table(f.line
-                       ,'$.qa_rules[*]' columns(nested path '$.client_names[*]' columns(nested path '$.categories[*]' columns(nested path '$.rules[*]' columns(qaru_sql varchar2(400 char) path '$.sql')))));
-      */
+          into l_sql
+          from json_table(f.line
+                         ,'$.qa_rules[*]' columns(nested path '$.client_names[*]' columns(nested path '$.categories[*]' columns(nested path '$.rules[*]' columns(qaru_sql varchar2(400 char) path '$.sql')))));
+        */
         dbms_lob.append(l_clob
                        ,'dbms_lob.append(l_clob,' || 'q' || '''' || '[' || l_sql || ']' || ''');' || chr(10));
       else
@@ -231,21 +239,44 @@ create or replace package body qa_export_import_rules_pkg is
     end loop;
   end p_clob_to_output;
 
-
-  procedure p_import_clob_to_rules_table(pi_clob in clob) is
+  procedure f_import_clob_to_qa_import_files
+  (
+    pi_clob      in blob
+   ,pi_filename  in qa_import_files.qaif_filename%type
+   ,pi_mimetype  in qa_import_files.qaif_mimetype%type
+  ) is
+    l_ret number;
   begin
-    if pi_clob is not null
+    insert into qa_import_files
+      (qaif_filename
+      ,qaif_mimetype
+      ,qaif_clob_data)
+    values
+      (pi_filename
+      ,pi_mimetype
+      ,to_clob(pi_clob))
+    returning qaif_id into l_ret;
+--  return l_ret;
+  exception
+    when others then
+      raise;
+--      return null;
+  end f_import_clob_to_qa_import_files;
+
+
+
+  procedure p_import_clob_to_rules_table(pi_qaif_id in qa_import_files.qaif_id%type) is
+    l_clob clob;
+  begin
+    select q.qaif_clob_data
+    into l_clob
+    from qa_import_files q
+    where q.qaif_id = pi_qaif_id;
+  
+    if l_clob is not null
     then
-/*      insert into qa_import_files
-        (qaif_id
-        ,qaif_clob_data
-        ,qaif_import_date)
-      values
-        (null
-        ,pi_clob
-        ,trunc(sysdate));*/
       for i in (select *
-                from json_table(pi_clob
+                from json_table(l_clob
                                ,'$.qa_rules[*]' columns(nested path '$.client_names[*]' columns(qaru_client_name varchar2(400 char) path '$.client_name'
                                                ,nested path '$.categories[*]' columns(qaru_category varchar2(400 char) path '$.category'
                                                        ,nested path '$.rules[*]' columns(qaru_rule_number varchar2(400 char) path '$.rule_number'
@@ -256,7 +287,7 @@ create or replace package body qa_export_import_rules_pkg is
                                                                ,qaru_exclude_objects varchar2(400 char) path '$.exclude_objects'
                                                                ,qaru_error_level number path '$.error_level'
                                                                ,qaru_is_active number path '$.is_active'
-                                                               ,qaru_sql varchar2(400 char) path '$.sql'
+                                                               ,qaru_sql clob path '$.sql'
                                                                ,qaru_predecessor_ids varchar2(400 char) path '$.predecessor_ids'
                                                                ,qaru_layer varchar2(400 char) path '$.layer'))))))
       loop
