@@ -19,16 +19,16 @@ begin
 
     if l_count = 0
     then
-      dbms_output.put_line('Creation of sequence CASE_SEQ failed.');
+      dbms_output.put_line('ERROR: Creation of sequence CASE_SEQ failed.');
     else
-      dbms_output.put_line('Sequence CASE_SEQ has been created.');
+      dbms_output.put_line('INFO: Sequence CASE_SEQ has been created.');
     end if;
   else
-    dbms_output.put_line('Sequence CASE_SEQ was already created.');
+    dbms_output.put_line('WARNING: Sequence CASE_SEQ was already created.');
   end if;
 
 exception
   when others then
-    dbms_output.put_line('Sequence CASE_SEQ could not been created.' || SQLERRM);
+    dbms_output.put_line('ERROR: Sequence CASE_SEQ could not been created.' || SQLERRM);
 end;
 /

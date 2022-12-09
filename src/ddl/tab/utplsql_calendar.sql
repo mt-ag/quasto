@@ -43,16 +43,16 @@ begin
       from user_tables
      where table_name = 'UTPLSQL_CALENDAR';
     if l_count = 0 THEN 
-      dbms_output.put_line('Creation of table UTPLSQL_CALENDAR failed.');
+      dbms_output.put_line('ERROR: Creation of table UTPLSQL_CALENDAR failed.');
     else
-      dbms_output.put_line('Table UTPLSQL_CALENDAR has been created.');
+      dbms_output.put_line('INFO: Table UTPLSQL_CALENDAR has been created.');
     end if;
   else
-    dbms_output.put_line('Table UTPLSQL_CALENDAR was already created.');
+    dbms_output.put_line('WARNING: Table UTPLSQL_CALENDAR was already created.');
   end if;
   
 exception
   when others then
-    dbms_output.put_line('Table UTPLSQL_CALENDAR could not been created.' || SQLERRM);
+    dbms_output.put_line('ERROR: Table UTPLSQL_CALENDAR could not been created.' || SQLERRM);
 end;
 /

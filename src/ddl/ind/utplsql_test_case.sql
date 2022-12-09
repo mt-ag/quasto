@@ -15,12 +15,12 @@ begin
       from user_indexes
      where index_name = 'CASE_PK_I';
     if l_count = 0 THEN 
-      dbms_output.put_line('Creation of index CASE_PK_I failed.');
+      dbms_output.put_line('ERROR: Creation of index CASE_PK_I failed.');
     else
-      dbms_output.put_line('Index CASE_PK_I has been created.');
+      dbms_output.put_line('INFO: Index CASE_PK_I has been created.');
     end if;
   else
-    dbms_output.put_line('Index CASE_PK_I was already created.');
+    dbms_output.put_line('WARNING: Index CASE_PK_I was already created.');
   end if;
 
   select count(1)
@@ -35,15 +35,15 @@ begin
       from user_indexes
      where index_name = 'CASE_SUITE_FK_I';
     if l_count = 0 THEN 
-      dbms_output.put_line('Creation of index CASE_SUITE_FK_I failed.');
+      dbms_output.put_line('ERROR: Creation of index CASE_SUITE_FK_I failed.');
     else
-      dbms_output.put_line('Index CASE_SUITE_FK_I has been created.');
+      dbms_output.put_line('INFO: Index CASE_SUITE_FK_I has been created.');
     end if;
   else
-    dbms_output.put_line('Index CASE_SUITE_FK_I was already created.');
+    dbms_output.put_line('WARNING: Index CASE_SUITE_FK_I was already created.');
   end if;
 exception
   when others then
-    dbms_output.put_line('Indices could not been created. ' || SQLERRM);
+    dbms_output.put_line('ERROR: Indices could not been created. ' || SQLERRM);
 end;
 /

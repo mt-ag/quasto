@@ -49,16 +49,16 @@ begin
       from user_tables
      where table_name = 'UTPLSQL_TEST_RUN';
     if l_count = 0 THEN 
-      dbms_output.put_line('Creation of table UTPLSQL_TEST_RUN failed.');
+      dbms_output.put_line('ERROR: Creation of table UTPLSQL_TEST_RUN failed.');
     else
-      dbms_output.put_line('Table UTPLSQL_TEST_RUN has been created.');
+      dbms_output.put_line('INFO: Table UTPLSQL_TEST_RUN has been created.');
     end if;
   else
-    dbms_output.put_line('Table UTPLSQL_TEST_RUN was already created.');
+    dbms_output.put_line('WARNING: Table UTPLSQL_TEST_RUN was already created.');
   end if;
   
 exception
   when others then
-    dbms_output.put_line('Table UTPLSQL_TEST_RUN could not been created.' || SQLERRM);
+    dbms_output.put_line('ERROR: Table UTPLSQL_TEST_RUN could not been created.' || SQLERRM);
 end;
 /

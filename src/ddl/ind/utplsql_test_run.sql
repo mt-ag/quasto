@@ -15,15 +15,15 @@ begin
       from user_indexes
      where index_name = 'RUN_PK_I';
     if l_count = 0 THEN 
-      dbms_output.put_line('Creation of index RUN_PK_I failed.');
+      dbms_output.put_line('ERROR: Creation of index RUN_PK_I failed.');
     else
-      dbms_output.put_line('Index RUN_PK_I has been created.');
+      dbms_output.put_line('INFO: Index RUN_PK_I has been created.');
     end if;
   else
-    dbms_output.put_line('Index RUN_PK_I was already created.');
+    dbms_output.put_line('WARNING: Index RUN_PK_I was already created.');
   end if;
 exception
   when others then
-    dbms_output.put_line('Index RUN_PK_I could not been created. ' || SQLERRM);
+    dbms_output.put_line('ERROR: Index RUN_PK_I could not been created. ' || SQLERRM);
 end;
 /
