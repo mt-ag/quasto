@@ -59,16 +59,16 @@ begin
       from user_tables
      where table_name = 'UTPLSQL_TEST_SUITE';
     if l_count = 0 THEN 
-      dbms_output.put_line('Creation of table UTPLSQL_TEST_SUITE failed.');
+      dbms_output.put_line('ERROR: Creation of table UTPLSQL_TEST_SUITE failed.');
     else
-      dbms_output.put_line('Table UTPLSQL_TEST_SUITE has been created.');
+      dbms_output.put_line('INFO: Table UTPLSQL_TEST_SUITE has been created.');
     end if;
   else
-    dbms_output.put_line('Table UTPLSQL_TEST_SUITE was already created.');
+    dbms_output.put_line('WARNING: Table UTPLSQL_TEST_SUITE was already created.');
   end if;
   
 exception
   when others then
-    dbms_output.put_line('Table UTPLSQL_TEST_SUITE could not be created.' || SQLERRM);
+    dbms_output.put_line('ERROR: Table UTPLSQL_TEST_SUITE could not be created.' || SQLERRM);
 end;
 /

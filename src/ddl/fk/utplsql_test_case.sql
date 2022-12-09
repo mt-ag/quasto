@@ -15,15 +15,15 @@ begin
       from user_constraints 
      where constraint_name = 'CASE_SUITE_FK';
     if l_count = 0 then
-      dbms_output.put_line('Creation of constraint CASE_SUITE_FK failed.');
+      dbms_output.put_line('ERROR: Creation of constraint CASE_SUITE_FK failed.');
     else
-      dbms_output.put_line('Constraint CASE_SUITE_FK has been created.');
+      dbms_output.put_line('INFO: Constraint CASE_SUITE_FK has been created.');
     end if;
   else
-    dbms_output.put_line('Constraint CASE_SUITE_FK was already created.');
+    dbms_output.put_line('WARNING: Constraint CASE_SUITE_FK was already created.');
   end if;
 exception
   when others then
-    dbms_output.put_line('Constraint CASE_SUITE_FK could not been created. ' || SQLERRM);
+    dbms_output.put_line('ERROR: Constraint CASE_SUITE_FK could not been created. ' || SQLERRM);
 end;
 /

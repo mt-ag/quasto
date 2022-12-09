@@ -19,16 +19,16 @@ begin
 
     if l_count = 0
     then
-      dbms_output.put_line('Creation of sequence SUITE_SEQ failed.');
+      dbms_output.put_line('ERROR: Creation of sequence SUITE_SEQ failed.');
     else
-      dbms_output.put_line('Sequence SUITE_SEQ has been created.');
+      dbms_output.put_line('INFO: Sequence SUITE_SEQ has been created.');
     end if;
   else
-    dbms_output.put_line('Sequence SUITE_SEQ was already created.');
+    dbms_output.put_line('WARNING: Sequence SUITE_SEQ was already created.');
   end if;
 
 exception
   when others then
-    dbms_output.put_line('Sequence SUITE_SEQ could not been created.' || SQLERRM);
+    dbms_output.put_line('ERROR: Sequence SUITE_SEQ could not been created.' || SQLERRM);
 end;
 /

@@ -15,15 +15,15 @@ begin
       from user_constraints 
      where constraint_name = 'CLDR_PK';
     if l_count = 0 then
-      dbms_output.put_line('Creation of constraint CLDR_PK failed.');
+      dbms_output.put_line('ERROR: Creation of constraint CLDR_PK failed.');
     else
-      dbms_output.put_line('Constraint CLDR_PK has been created.');
+      dbms_output.put_line('INFO: Constraint CLDR_PK has been created.');
     end if;
   else
-    dbms_output.put_line('Constraint CLDR_PK was already created.');
+    dbms_output.put_line('WARNING: Constraint CLDR_PK was already created.');
   end if;
 exception
   when others then
-    dbms_output.put_line('Constraint CLDR_PK could not been created. ' || SQLERRM);
+    dbms_output.put_line('ERROR: Constraint CLDR_PK could not been created. ' || SQLERRM);
 end;
 /

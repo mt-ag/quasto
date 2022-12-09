@@ -35,12 +35,12 @@ begin
       from user_constraints 
      where constraint_name = 'QARU_CHK_CATEGORY';
     if l_count = 0 then
-      dbms_output.put_line('Creation of constraint QARU_CHK_CATEGORY failed.');
+      dbms_output.put_line('ERROR: Creation of constraint QARU_CHK_CATEGORY failed.');
     else
-      dbms_output.put_line('Constraint QARU_CHK_CATEGORY has been created.');
+      dbms_output.put_line('INFO: Constraint QARU_CHK_CATEGORY has been created.');
     end if;
   else
-    dbms_output.put_line('Constraint QARU_CHK_CATEGORY was already created.');
+    dbms_output.put_line('WARNING: Constraint QARU_CHK_CATEGORY was already created.');
   end if;
 
   select count(1)
@@ -55,12 +55,12 @@ begin
       from user_constraints 
      where constraint_name = 'QARU_CHK_ERROR_LEVEL';
     if l_count = 0 then
-      dbms_output.put_line('Creation of constraint QARU_CHK_ERROR_LEVEL failed.');
+      dbms_output.put_line('ERROR: Creation of constraint QARU_CHK_ERROR_LEVEL failed.');
     else
-      dbms_output.put_line('Constraint QARU_CHK_ERROR_LEVEL has been created.');
+      dbms_output.put_line('INFO: Constraint QARU_CHK_ERROR_LEVEL has been created.');
     end if;
   else
-    dbms_output.put_line('Constraint QARU_CHK_ERROR_LEVEL was already created.');
+    dbms_output.put_line('WARNING: Constraint QARU_CHK_ERROR_LEVEL was already created.');
   end if;
 
   select count(1)
@@ -75,12 +75,12 @@ begin
       from user_constraints 
      where constraint_name = 'QARU_CHK_IS_ACTIVE';
     if l_count = 0 then
-      dbms_output.put_line('Creation of constraint QARU_CHK_IS_ACTIVE failed.');
+      dbms_output.put_line('ERROR: Creation of constraint QARU_CHK_IS_ACTIVE failed.');
     else
-      dbms_output.put_line('Constraint QARU_CHK_IS_ACTIVE has been created.');
+      dbms_output.put_line('INFO: Constraint QARU_CHK_IS_ACTIVE has been created.');
     end if;
   else
-    dbms_output.put_line('Constraint QARU_CHK_IS_ACTIVE was already created.');
+    dbms_output.put_line('WARNING: Constraint QARU_CHK_IS_ACTIVE was already created.');
   end if;
 
   select count(1)
@@ -95,12 +95,12 @@ begin
       from user_constraints 
      where constraint_name = 'QARU_CHK_SQL';
     if l_count = 0 then
-      dbms_output.put_line('Creation of constraint QARU_CHK_SQL failed.');
+      dbms_output.put_line('ERROR: Creation of constraint QARU_CHK_SQL failed.');
     else
-      dbms_output.put_line('Constraint QARU_CHK_SQL has been created.');
+      dbms_output.put_line('INFO: Constraint QARU_CHK_SQL has been created.');
     end if;
   else
-    dbms_output.put_line('Constraint QARU_CHK_SQL was already created.');
+    dbms_output.put_line('WARNING: Constraint QARU_CHK_SQL was already created.');
   end if;
 
   select count(1)
@@ -115,15 +115,15 @@ begin
       from user_constraints 
      where constraint_name = 'QARU_CHK_LAYER';
     if l_count = 0 then
-      dbms_output.put_line('Creation of constraint QARU_CHK_LAYER failed.');
+      dbms_output.put_line('ERROR: Creation of constraint QARU_CHK_LAYER failed.');
     else
-      dbms_output.put_line('Constraint QARU_CHK_LAYER has been created.');
+      dbms_output.put_line('INFO: Constraint QARU_CHK_LAYER has been created.');
     end if;
   else
-    dbms_output.put_line('Constraint QARU_CHK_LAYER was already created.');
+    dbms_output.put_line('WARNING: Constraint QARU_CHK_LAYER was already created.');
   end if;
 exception
   when others then
-    dbms_output.put_line('Constraints could not been created. ' || SQLERRM);
+    dbms_output.put_line('ERROR: Constraints could not been created. ' || SQLERRM);
 end;
 /

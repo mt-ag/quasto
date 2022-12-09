@@ -21,16 +21,16 @@ begin
   
     if l_count = 0
     then
-      dbms_output.put_line('Creation of public synonym ' || c_syn_name || ' failed.');
+      dbms_output.put_line('ERROR: Creation of public synonym ' || c_syn_name || ' failed.');
     else
-      dbms_output.put_line('public synonym ' || c_syn_name || ' has been created.');
+      dbms_output.put_line('INFO: public synonym ' || c_syn_name || ' has been created.');
     end if;
   else
-    dbms_output.put_line('public synonym ' || c_syn_name || ' was already created.');
+    dbms_output.put_line('WARNING: public synonym ' || c_syn_name || ' was already created.');
   end if;
 
 exception
   when others then
-    dbms_output.put_line('public synonym ' || c_syn_name || ' could not been created.' || sqlerrm);
+    dbms_output.put_line('ERROR: public synonym ' || c_syn_name || ' could not been created.' || sqlerrm);
 end;
 /
