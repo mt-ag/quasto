@@ -55,7 +55,7 @@ begin
       dbms_output.put_line('INFO: Index ' || l_name || ' has been created.');
     end if;
   else
-    dbms_output.put_line('ERROR: Index ' || l_name || ' was already created.');
+    dbms_output.put_line('WARNING: Index ' || l_name || ' was already created.');
   end if;
 
   -- ################################
