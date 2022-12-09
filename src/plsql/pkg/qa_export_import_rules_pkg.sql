@@ -21,9 +21,9 @@ create or replace package qa_export_import_rules_pkg is
   -- Import to put Blob into qa_import_files table
   procedure f_import_clob_to_qa_import_files
   (
-    pi_clob      in blob
-   ,pi_filename  in qa_import_files.qaif_filename%type
-   ,pi_mimetype  in qa_import_files.qaif_mimetype%type
+    pi_clob     in blob
+   ,pi_filename in qa_import_files.qaif_filename%type
+   ,pi_mimetype in qa_import_files.qaif_mimetype%type
   );
 
   procedure p_import_clob_to_rules_table(pi_qaif_id in qa_import_files.qaif_id%type);
@@ -172,6 +172,27 @@ create or replace package body qa_export_import_rules_pkg is
     end if;
   end f_export_rules_table_to_clob;
 
+  -- Helper Function to replace json-control chars in our clob
+  function replace_with_clob
+  (
+    i_source  in clob
+   ,i_search  in varchar2
+   ,i_replace in clob
+  ) return clob is
+    l_pos pls_integer;
+  begin
+    l_pos := instr(i_source
+                  ,i_search);
+    if l_pos > 0
+    then
+      return substr(i_source
+                   ,1
+                   ,l_pos - 1) || i_replace || substr(i_source
+                                                     ,l_pos + length(i_search));
+    end if;
+    return i_source;
+  end replace_with_clob;
+
   -- Experimental Function to Export A Json as an executable script
   function f_export_rules_to_script_clob(pi_clob in clob) return clob is
     l_clob clob;
@@ -241,9 +262,9 @@ create or replace package body qa_export_import_rules_pkg is
 
   procedure f_import_clob_to_qa_import_files
   (
-    pi_clob      in blob
-   ,pi_filename  in qa_import_files.qaif_filename%type
-   ,pi_mimetype  in qa_import_files.qaif_mimetype%type
+    pi_clob     in blob
+   ,pi_filename in qa_import_files.qaif_filename%type
+   ,pi_mimetype in qa_import_files.qaif_mimetype%type
   ) is
     l_ret number;
   begin
@@ -256,11 +277,11 @@ create or replace package body qa_export_import_rules_pkg is
       ,pi_mimetype
       ,to_clob(pi_clob))
     returning qaif_id into l_ret;
---  return l_ret;
+    --  return l_ret;
   exception
     when others then
       raise;
---      return null;
+      --      return null;
   end f_import_clob_to_qa_import_files;
 
 
