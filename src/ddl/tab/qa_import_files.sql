@@ -44,16 +44,16 @@ begin
      where table_name = 'QA_IMPORT_FILES';
   
     if l_count = 0 then
-      dbms_output.put_line('Creation of table QA_IMPORT_FILES failed.');
+      dbms_output.put_line('ERROR: Creation of table QA_IMPORT_FILES failed.');
     else
-      dbms_output.put_line('Table QA_IMPORT_FILES has been created');
+      dbms_output.put_line('INFO: Table QA_IMPORT_FILES has been created');
     end if;
   else
-    dbms_output.put_line('Table QA_IMPORT_FILES was already created');
+    dbms_output.put_line('WARNING: Table QA_IMPORT_FILES was already created');
   end if;
 exception
   when others then
-    dbms_output.put_line('Table QA_IMPORT_FILES could not been created. '|| sqlerrm);
+    dbms_output.put_line('ERROR: Table QA_IMPORT_FILES could not been created. '|| sqlerrm);
 end;
 /
 
