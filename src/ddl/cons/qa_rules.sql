@@ -15,12 +15,12 @@ begin
       from user_constraints 
      where constraint_name = 'QARU_PK';
     if l_count = 0 then
-      dbms_output.put_line('Creation of constraint QARU_PK failed.');
+      dbms_output.put_line('ERROR: Creation of constraint QARU_PK failed.');
     else
-      dbms_output.put_line('Constraint QARU_PK has been created.');
+      dbms_output.put_line('INFO: Constraint QARU_PK has been created.');
     end if;
   else
-    dbms_output.put_line('Constraint QARU_PK was already created.');
+    dbms_output.put_line('WARNING: Constraint QARU_PK was already created.');
   end if;
 
   select count(1)

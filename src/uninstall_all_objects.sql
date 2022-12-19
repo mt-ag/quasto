@@ -15,20 +15,10 @@ begin
   dbms_output.enable(buffer_size => 10000000);
   -- objects:
   -- tables
-  l_object_name('UTPLSQL_CALENDAR') := 'UTPLSQL_CALENDAR';
-  l_object_type('UTPLSQL_CALENDAR') := 'TABLE';
-  l_object_name('UTPLSQL_TEST_CASE') := 'UTPLSQL_TEST_CASE';
-  l_object_type('UTPLSQL_TEST_CASE') := 'TABLE';
-  l_object_name('UTPLSQL_TEST_SUITE') := 'UTPLSQL_TEST_SUITE';
-  l_object_type('UTPLSQL_TEST_SUITE') := 'TABLE';
-  l_object_name('UTPLSQL_TEST_RUN') := 'UTPLSQL_TEST_RUN';
-  l_object_type('UTPLSQL_TEST_RUN') := 'TABLE';
   l_object_name('QA_RULES') := 'QA_RULES';
   l_object_type('QA_RULES') := 'TABLE';
 
   -- packages
-  l_object_name('PREPARE_TEST_RESULTS_PKG') := 'PREPARE_TEST_RESULTS_PKG';
-  l_object_type('PREPARE_TEST_RESULTS_PKG') := 'PACKAGE';
   l_object_name('CREATE_UT_TEST_PACKAGES_PKG') := 'CREATE_UT_TEST_PACKAGES_PKG';
   l_object_type('CREATE_UT_TEST_PACKAGES_PKG') := 'PACKAGE';
   l_object_name('EXPORT_IMPORT_RULES_PKG') := 'EXPORT_IMPORT_RULES_PKG';
@@ -51,16 +41,8 @@ begin
   l_object_type('QA_RULE_T') := 'TYPE';  
 
   -- sequences
-  l_object_name('CLDR_SEQ') := 'CLDR_SEQ';
-  l_object_type('CLDR_SEQ') := 'SEQUENCE';
-  l_object_name('CASE_SEQ') := 'CASE_SEQ';
-  l_object_type('CASE_SEQ') := 'SEQUENCE';
-  l_object_name('RUN_SEQ') := 'RUN_SEQ';
-  l_object_type('RUN_SEQ') := 'SEQUENCE';
   l_object_name('QARU_SEQ') := 'QARU_SEQ';
   l_object_type('QARU_SEQ') := 'SEQUENCE';
-  l_object_name('SUITE_SEQ') := 'SUITE_SEQ';
-  l_object_type('SUITE_SEQ') := 'SEQUENCE';
   
   -- synonyms
   l_object_name('QA_RULE_T_S') := 'QA_RULE_T';
