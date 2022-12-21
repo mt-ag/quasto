@@ -13,7 +13,7 @@ declare
   l_logger_flag  number := '~4';
   l_apex_version varchar2(50) := '~5';
 begin
-  l_action := 'create or replace package quasto_constant_pkg
+  l_action := 'create or replace package qa_constant_pkg
     authid definer
   as
     
@@ -22,7 +22,7 @@ begin
     gc_apex_flag      constant number           := ' || l_apex_flag || ';
     gc_logger_flag    constant number           := ' || l_logger_flag || ';
 
-end quasto_constant_pkg;
+end qa_constant_pkg;
 ';
 
     dbms_output.put_line(l_action);
