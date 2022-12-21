@@ -31,6 +31,10 @@ PROMPT Argument 3:
 PROMPT Do you pass specific Jenkins parameters to the script? 
 PROMPT (yes/no) (1/0)
 PROMPT '------------------------------------'
+PROMPT Argument 4:
+PROMPT Do you already have logger installed?
+PROMPT (yes/no) (1/0)
+PROMPT '------------------------------------'
 
 SET SERVEROUTPUT ON
 
@@ -57,8 +61,8 @@ begin
         return;
     end if;
     :script_ut_plsql := l_script_name;
-    :script_quasto  := l_script_name_quasto;
-
+    :script_quasto   := l_script_name_quasto;
+    :qa_version      := '1.2';
 end;
 /
 
@@ -74,5 +78,8 @@ select 'Wrong Argument or no Argument has been passed correctly!' from dual wher
 set feedback on
 set head on
 
-@@src/~script_name_quasto
-@@src/~script_name_utplsql
+-- Constant Package Generation with last argument as current Version
+@@src/scripts/install_constant_package '~1' '~2' '~3' '~4' '1.2'
+
+--@@src/~script_name_quasto
+--@@src/~script_name_utplsql
