@@ -17,6 +17,9 @@ begin
   -- tables
   l_object_name('QA_RULES') := 'QA_RULES';
   l_object_type('QA_RULES') := 'TABLE';
+  l_object_name('QA_IMPORT_FILES') := 'QA_IMPORT_FILES';
+  l_object_type('QA_IMPORT_FILES') := 'TABLE';
+  
 
   -- packages
   l_object_name('CREATE_UT_TEST_PACKAGES_PKG') := 'CREATE_UT_TEST_PACKAGES_PKG';
@@ -33,6 +36,9 @@ begin
   l_object_type('QA_APEX_PKG') := 'PACKAGE';
   l_object_name('QA_LOGGER_PKG') := 'QA_LOGGER_PKG';
   l_object_type('QA_LOGGER_PKG') := 'PACKAGE';
+  l_object_name('QA_CONSTANT_PKG') := 'QA_CONSTANT_PKG';
+  l_object_type('QA_CONSTANT_PKG') := 'PACKAGE';  
+  
 
 
   -- types
@@ -46,6 +52,9 @@ begin
   -- sequences
   l_object_name('QARU_SEQ') := 'QARU_SEQ';
   l_object_type('QARU_SEQ') := 'SEQUENCE';
+  l_object_name('QAIF_SEQ') := 'QAIF_SEQ';
+  l_object_type('QAIF_SEQ') := 'SEQUENCE';
+  
   
   -- synonyms
   l_object_name('QA_RULE_T_S') := 'QA_RULE_T';

@@ -62,7 +62,6 @@ begin
     end if;
     :script_ut_plsql := l_script_name;
     :script_quasto   := l_script_name_quasto;
-    :qa_version      := '1.2';
 end;
 /
 
