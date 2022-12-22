@@ -31,6 +31,9 @@ begin
   l_object_type('QA_API_PKG') := 'PACKAGE';
   l_object_name('QA_APEX_PKG') := 'QA_APEX_PKG';
   l_object_type('QA_APEX_PKG') := 'PACKAGE';
+  l_object_name('QA_LOGGER_PKG') := 'QA_LOGGER_PKG';
+  l_object_type('QA_LOGGER_PKG') := 'PACKAGE';
+
 
   -- types
   l_object_name('VARCHAR2_TAB_T') := 'VARCHAR2_TAB_T';

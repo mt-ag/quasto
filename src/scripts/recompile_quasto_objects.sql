@@ -23,6 +23,8 @@ begin
   l_object_type('QA_API_PKG') := 'PACKAGE';
   l_object_name('QA_EXPORT_IMPORT_RULES_PKG') := 'QA_EXPORT_IMPORT_RULES_PKG';
   l_object_type('QA_EXPORT_IMPORT_RULES_PKG') := 'PACKAGE';
+  l_object_name('QA_LOGGER_PKG') := 'QA_LOGGER_PKG';
+  l_object_type('QA_LOGGER_PKG') := 'PACKAGE';
   --trigger
   l_object_name('QARU_IU_TRG') := 'QARU_IU_TRG';
   l_object_type('QARU_IU_TRG') := 'TRIGGER';
