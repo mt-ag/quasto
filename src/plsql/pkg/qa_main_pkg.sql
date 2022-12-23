@@ -25,6 +25,7 @@ create or replace package qa_main_pkg authid definer as
   (
     pi_qaru_client_name in qa_rules.qaru_client_name%type
    ,pi_qaru_rule_number in qa_rules.qaru_rule_number%type
+   ,pi_schema_names     in varchar2_tab_t
    ,po_result           out number
    ,po_object_names     out clob
    ,po_error_message    out varchar2
@@ -53,18 +54,23 @@ end qa_main_pkg;
 /
 create or replace package body qa_main_pkg as
 
-  c_cr constant varchar2(10) := utl_tcp.crlf;
-
   function f_get_rule
   (
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
   ) return qa_rule_t is
-    c_unit       constant varchar2(32767) := $$plsql_unit || '.f_get_rule';
-    c_param_list constant varchar2(32767) := 'pi_qaru_rule_number=' || pi_qaru_rule_number || c_cr || --
-                                             'pi_qaru_client_name=' || pi_qaru_client_name;
-    l_qa_rule qa_rule_t;
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_rule';
+    l_param_list qa_logger_pkg.tab_param;
+    l_qa_rule    qa_rule_t;
   begin
+    -- Logging Paramter:
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name   => 'pi_qaru_rule_number'
+                              ,p_val    => pi_qaru_rule_number);
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name   => 'pi_qaru_client_name'
+                              ,p_val    => pi_qaru_client_name);
+  
     select qa_rule_t(pi_qaru_id            => q.qaru_id
                     ,pi_qaru_category      => q.qaru_category
                     ,pi_qaru_error_level   => q.qaru_error_level
@@ -79,23 +85,30 @@ create or replace package body qa_main_pkg as
     return l_qa_rule;
   exception
     when no_data_found then
-      dbms_output.put_line(c_unit);
-      dbms_output.put_line('Rule not found');
-      dbms_output.put_line(c_param_list);
+      qa_logger_pkg.p_qa_log(p_text   => 'No Data found while selecting from qa_rules'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
     when others then
-      dbms_output.put_line(c_unit);
-      dbms_output.put_line('Error by getting rule');
-      dbms_output.put_line(c_param_list);
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to select from qa_rules!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
       raise;
   end f_get_rule;
 
 
   function tf_get_rule_numbers(pi_qaru_client_name in qa_rules.qaru_client_name%type) return varchar2_tab_t is
-    c_unit       constant varchar2(32767) := $$plsql_unit || '.tf_get_rule_numbers';
-    c_param_list constant varchar2(32767) := 'pi_qaru_client_name=' || pi_qaru_client_name;
+    c_unit constant varchar2(32767) := $$plsql_unit || '.tf_get_rule_numbers';
+    l_param_list qa_logger_pkg.tab_param;
   
     l_qaru_rule_numbers varchar2_tab_t;
   begin
+    -- Logging Paramter:
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name   => 'pi_qaru_client_name'
+                              ,p_val    => pi_qaru_client_name);
+  
     select q.qaru_rule_number
     bulk collect
     into l_qaru_rule_numbers
@@ -109,14 +122,16 @@ create or replace package body qa_main_pkg as
     return l_qaru_rule_numbers;
   exception
     when no_data_found then
-      dbms_output.put_line(c_unit);
-      dbms_output.put_line('No rules not found');
-      dbms_output.put_line(c_param_list);
+      qa_logger_pkg.p_qa_log(p_text   => 'No Data found while selecting from qa_rules'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
       raise;
     when others then
-      dbms_output.put_line(c_unit);
-      dbms_output.put_line('Error by getting rules from client/project');
-      dbms_output.put_line(c_param_list);
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to select from qa_rules!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
       raise;
   end tf_get_rule_numbers;
 
@@ -126,8 +141,19 @@ create or replace package body qa_main_pkg as
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
   ) return qa_rules.qaru_exclude_objects%type result_cache is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_excluded_objects';
+    l_param_list qa_logger_pkg.tab_param;
+  
     l_qaru_exclude_objects qa_rules.qaru_exclude_objects%type;
   begin
+    -- Logging Paramter:
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name   => 'pi_qaru_rule_number'
+                              ,p_val    => pi_qaru_rule_number);
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name   => 'pi_qaru_client_name'
+                              ,p_val    => pi_qaru_client_name);
+  
     select p.qaru_exclude_objects
     into l_qaru_exclude_objects
     from qa_rules p
@@ -137,6 +163,10 @@ create or replace package body qa_main_pkg as
     return l_qaru_exclude_objects;
   exception
     when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to select from qaru_exclude_objects!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
       raise;
   end f_get_excluded_objects;
 
@@ -145,16 +175,48 @@ create or replace package body qa_main_pkg as
   (
     pi_qaru_client_name in qa_rules.qaru_client_name%type
    ,pi_qaru_rule_number in qa_rules.qaru_rule_number%type
+   ,pi_schema_names     in varchar2_tab_t
    ,po_result           out number
    ,po_object_names     out clob
    ,po_error_message    out varchar2
   ) is
-    l_qa_rules             qa_rules_t;
+    c_unit constant varchar2(32767) := $$plsql_unit || '.p_test_rule';
+    l_param_list   qa_logger_pkg.tab_param;
+    l_schema_names varchar2(32767);
+  
+    l_qa_rules             qa_rules_t := qa_rules_t();
     l_qaru_exclude_objects qa_rules.qaru_exclude_objects%type;
     l_count_objects        number;
     l_object_names         clob;
     l_qaru_error_message   qa_rules.qaru_error_message%type;
   begin
+    -- Logging Paramter:
+    -- build schema names string:
+    for i in pi_schema_names.first .. pi_schema_names.last
+    loop
+      l_schema_names := l_schema_names || pi_schema_names(i) || ',' || l_schema_names;
+    end loop;
+    l_schema_names := substr(l_schema_names,0,length(l_schema_names)-1);
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name   => 'pi_qaru_client_name'
+                              ,p_val    => pi_qaru_client_name);
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name   => 'pi_qaru_rule_number'
+                              ,p_val    => pi_qaru_rule_number);
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name   => 'pi_schema_names'
+                              ,p_val    => l_schema_names);
+  
+    for i in pi_schema_names.first .. pi_schema_names.last
+    loop
+    
+      l_qa_rules.extend;
+      l_qa_rules := qa_api_pkg.tf_run_rule(pi_qaru_client_name => pi_qaru_client_name
+                                          ,pi_qaru_rule_number => pi_qaru_rule_number
+                                          ,pi_target_scheme    => pi_schema_names(i));
+    
+    end loop;
+  
     l_qaru_exclude_objects := f_get_excluded_objects(pi_qaru_rule_number => pi_qaru_rule_number
                                                     ,pi_qaru_client_name => pi_qaru_client_name);
   
@@ -208,6 +270,10 @@ create or replace package body qa_main_pkg as
   
   exception
     when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to test a rule!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
       raise;
   end p_test_rule;
 
@@ -228,8 +294,51 @@ create or replace package body qa_main_pkg as
    ,pi_qaru_predecessor_ids in qa_rules.qaru_predecessor_ids%type default null
    ,pi_qaru_layer           in qa_rules.qaru_layer%type
   ) return qa_rules.qaru_id%type is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_insert_rule';
+    l_param_list qa_logger_pkg.tab_param;
+  
     l_qaru_id qa_rules.qaru_id%type;
   begin
+    -- Logging Paramter:
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name   => 'pi_qaru_rule_number'
+                              ,p_val    => pi_qaru_rule_number);
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name   => 'pi_qaru_client_name'
+                              ,p_val    => pi_qaru_client_name);
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name   => 'pi_qaru_name'
+                              ,p_val    => pi_qaru_name);
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name   => 'pi_qaru_category'
+                              ,p_val    => pi_qaru_category);
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name   => 'pi_qaru_object_types'
+                              ,p_val    => pi_qaru_object_types);
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name   => 'pi_qaru_error_message'
+                              ,p_val    => pi_qaru_error_message);
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name   => 'pi_qaru_comment'
+                              ,p_val    => pi_qaru_comment);
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name   => 'pi_qaru_exclude_objects'
+                              ,p_val    => pi_qaru_exclude_objects);
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name   => 'pi_qaru_error_level'
+                              ,p_val    => pi_qaru_error_level);
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name   => 'pi_qaru_is_active'
+                              ,p_val    => pi_qaru_is_active);
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name   => 'pi_qaru_sql'
+                              ,p_val    => pi_qaru_sql);
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name   => 'pi_qaru_predecessor_ids'
+                              ,p_val    => pi_qaru_predecessor_ids);
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name   => 'pi_qaru_layer'
+                              ,p_val    => pi_qaru_layer);
   
     insert into qa_rules
       (qaru_rule_number
@@ -264,6 +373,10 @@ create or replace package body qa_main_pkg as
     return l_qaru_id;
   exception
     when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to insert a rule!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
       raise;
   end f_insert_rule;
 
