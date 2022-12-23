@@ -1,3 +1,5 @@
+var DBUtil = Java.type("oracle.dbtools.db.DBUtil");
+var import_flag = args[2];
 print(java.nio.file.Paths.get(".").toAbsolutePath().normalize().toString());
 /*
 /*
@@ -48,30 +50,40 @@ switch (ext){
 }
 /* load binds */
 binds = addBindToMap(null,"b",l_filename);
-/*"quasto.qa_export_import_rules_pkg.f_import_clob_to_qa_import_files(pi_clob => :b ,pi_filename => :filename ,pi_mimetype => :mime);",*
 /* add more binds */
 binds.put("filename",l_filename);
 binds.put("mime",mime);
-binds.put("return_id","TEST");
 
-var sql = [
-    "begin",    
-    /*"quasto.qa_export_import_rules_pkg.f_import_clob_to_qa_import_files(pi_clob => :b ,pi_filename => :filename ,pi_mimetype => :mime);",*/
-    "insert into qa_import_files(qaif_filename,qaif_mimetype,qaif_clob_data)values(:filename,:mime,to_clob(:b)) returning qaif_id into :return_id;",
-    "commit;",
-    "end;"
-].join("\n");
-/* exec the insert and pass binds */
-var ret = util.execute(sql,binds);
-print(binds.get("return_id"));
+sql = "insert into qa_import_files(qaif_filename,qaif_mimetype,qaif_clob_data)values(:filename,:mime,to_clob(:b))";
+
+// String array of returning columns
+retCols = Java.to(["QAIF_ID",],"java.lang.String[]");
+
+// prep passing return cols
+var ps = conn.prepareStatement(sql,retCols);
+// helper class to do the binds
+ DBUtil.bind(ps,binds);
+
+ // execute
+if (ps.executeUpdate() > 0) {
+
+    // getGeneratedKeys() returns result set of keys that were auto
+    var generatedKeys = ps.getGeneratedKeys();
+
+    // generatedKeys is a resultSet when import_flag == 1 then import the file directly into the db
+    if (null != generatedKeys && generatedKeys.next() &&  (import_flag == 1) ){
+        // data type of return    
+        binds.put("QAIF_ID",generatedKeys.getInt(1));
+        sql_import = "@import_qa_import_file_to_qa_rules.sql " + binds.get("QAIF_ID");
+        sqlcl.setStmt(sql_import);
+        sqlcl.run();
+        
+    }
+}
 
 /* print the results */
 sqlcl.setStmt("select qaif_id,qaif_filename,qaif_created_on,qaif_mimetype from qa_import_files order by qaif_created_on desc;");
-
-if (!ret){
-    ctx.write("ERROR\n");
-    ctx.write(util.getLastException());
-    ctx.write("\n");
-  }
-
+sqlcl.run();
+/* Commit at the  End*/
+sqlcl.setStmt("commit;");
 sqlcl.run();
