@@ -194,7 +194,7 @@ create or replace package body qa_main_pkg as
     -- build schema names string:
     for i in pi_schema_names.first .. pi_schema_names.last
     loop
-      l_schema_names := l_schema_names || pi_schema_names(i) || ',' || l_schema_names;
+      l_schema_names :=  pi_schema_names(i) || ',' || l_schema_names;
     end loop;
     l_schema_names := substr(l_schema_names,0,length(l_schema_names)-1);
     qa_logger_pkg.append_param(p_params => l_param_list
