@@ -50,6 +50,9 @@ create or replace package qa_main_pkg authid definer as
    ,pi_qaru_layer           in qa_rules.qaru_layer%type
   ) return qa_rules.qaru_id%type;
 
+
+  procedure p_exclude_objects(pi_qa_rules in out nocopy qa_rules_t);
+
 end qa_main_pkg;
 /
 create or replace package body qa_main_pkg as
@@ -194,9 +197,11 @@ create or replace package body qa_main_pkg as
     -- build schema names string:
     for i in pi_schema_names.first .. pi_schema_names.last
     loop
-      l_schema_names :=  pi_schema_names(i) || ',' || l_schema_names;
+      l_schema_names := l_schema_names || pi_schema_names(i) || ',' || l_schema_names;
     end loop;
-    l_schema_names := substr(l_schema_names,0,length(l_schema_names)-1);
+    l_schema_names := substr(l_schema_names
+                            ,0
+                            ,length(l_schema_names) - 1);
     qa_logger_pkg.append_param(p_params => l_param_list
                               ,p_name   => 'pi_qaru_client_name'
                               ,p_val    => pi_qaru_client_name);
@@ -379,6 +384,57 @@ create or replace package body qa_main_pkg as
                             ,p_params => l_param_list);
       raise;
   end f_insert_rule;
+
+
+  -- deletes the entries in qa_rules_t for which exists an entry in quaru_excluded_ebjects for the belonging rule
+  procedure p_exclude_objects(pi_qa_rules in out nocopy qa_rules_t) is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.exclude_objects';
+    l_param_list qa_logger_pkg.tab_param;
+  
+    type t_exluded_obj is table of varchar2(32676) index by binary_integer;
+    l_excluded_objects t_exluded_obj;
+  
+    l_excluded varchar2(32676);
+  
+  begin
+  
+    for i in pi_qa_rules.first .. pi_qa_rules.last
+    loop
+      select qaru_exclude_objects
+      into l_excluded
+      from qa_rules q
+      where q.qaru_id = pi_qa_rules(i).qaru_id;
+    
+      select regexp_substr(l_excluded
+                          ,'[^:]+'
+                          ,1
+                          ,level)
+      bulk collect
+      into l_excluded_objects
+      from dual
+      connect by regexp_substr(l_excluded
+                              ,'[^:]+'
+                              ,1
+                              ,level) is not null;
+    
+      for excl in l_excluded_objects.first .. l_excluded_objects.last
+      loop
+        if upper(l_excluded_objects(excl)) = upper(pi_qa_rules(i).object_name)
+        then
+          pi_qa_rules.delete(i);
+          exit;
+        end if;
+      end loop;
+      l_excluded_objects.delete;
+    end loop;
+  
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while checking for excluded Objects!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+  end p_exclude_objects;
 
 end qa_main_pkg;
 /
