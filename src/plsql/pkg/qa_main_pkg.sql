@@ -50,6 +50,9 @@ create or replace package qa_main_pkg authid definer as
    ,pi_qaru_layer           in qa_rules.qaru_layer%type
   ) return qa_rules.qaru_id%type;
 
+
+  procedure p_exclude_objects(pi_qa_rules in out nocopy qa_rules_t);
+
 end qa_main_pkg;
 /
 create or replace package body qa_main_pkg as
@@ -64,12 +67,17 @@ create or replace package body qa_main_pkg as
     l_qa_rule    qa_rule_t;
   begin
     -- Logging Paramter:
-    qa_logger_pkg.append_param(p_params => l_param_list
+    /*    qa_logger_pkg.append_param(p_params => l_param_list
                               ,p_name   => 'pi_qaru_rule_number'
                               ,p_val    => pi_qaru_rule_number);
     qa_logger_pkg.append_param(p_params => l_param_list
                               ,p_name   => 'pi_qaru_client_name'
-                              ,p_val    => pi_qaru_client_name);
+                              ,p_val    => pi_qaru_client_name);*/
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qaru_rule_number'
+                              ,p_val_01  => pi_qaru_rule_number
+                              ,p_name_02 => 'pi_qaru_client_name'
+                              ,p_val_02  => pi_qaru_client_name);
   
     select qa_rule_t(pi_qaru_id            => q.qaru_id
                     ,pi_qaru_category      => q.qaru_category
@@ -147,12 +155,11 @@ create or replace package body qa_main_pkg as
     l_qaru_exclude_objects qa_rules.qaru_exclude_objects%type;
   begin
     -- Logging Paramter:
-    qa_logger_pkg.append_param(p_params => l_param_list
-                              ,p_name   => 'pi_qaru_rule_number'
-                              ,p_val    => pi_qaru_rule_number);
-    qa_logger_pkg.append_param(p_params => l_param_list
-                              ,p_name   => 'pi_qaru_client_name'
-                              ,p_val    => pi_qaru_client_name);
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qaru_rule_number'
+                              ,p_val_01  => pi_qaru_rule_number
+                              ,p_name_02 => 'pi_qaru_client_name'
+                              ,p_val_02  => pi_qaru_client_name);
   
     select p.qaru_exclude_objects
     into l_qaru_exclude_objects
@@ -194,18 +201,19 @@ create or replace package body qa_main_pkg as
     -- build schema names string:
     for i in pi_schema_names.first .. pi_schema_names.last
     loop
-      l_schema_names := l_schema_names || pi_schema_names(i) || ',' || l_schema_names;
+      l_schema_names := pi_schema_names(i) || ',' || l_schema_names;
+    
     end loop;
-    l_schema_names := substr(l_schema_names,0,length(l_schema_names)-1);
-    qa_logger_pkg.append_param(p_params => l_param_list
-                              ,p_name   => 'pi_qaru_client_name'
-                              ,p_val    => pi_qaru_client_name);
-    qa_logger_pkg.append_param(p_params => l_param_list
-                              ,p_name   => 'pi_qaru_rule_number'
-                              ,p_val    => pi_qaru_rule_number);
-    qa_logger_pkg.append_param(p_params => l_param_list
-                              ,p_name   => 'pi_schema_names'
-                              ,p_val    => l_schema_names);
+    l_schema_names := substr(l_schema_names
+                            ,0
+                            ,length(l_schema_names) - 1);
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qaru_client_name'
+                              ,p_val_01  => pi_qaru_client_name
+                              ,p_name_02 => 'pi_qaru_rule_number'
+                              ,p_val_02  => pi_qaru_rule_number
+                              ,p_name_03 => 'pi_schema_names'
+                              ,p_val_03  => l_schema_names);
   
     for i in pi_schema_names.first .. pi_schema_names.last
     loop
@@ -300,45 +308,33 @@ create or replace package body qa_main_pkg as
     l_qaru_id qa_rules.qaru_id%type;
   begin
     -- Logging Paramter:
-    qa_logger_pkg.append_param(p_params => l_param_list
-                              ,p_name   => 'pi_qaru_rule_number'
-                              ,p_val    => pi_qaru_rule_number);
-    qa_logger_pkg.append_param(p_params => l_param_list
-                              ,p_name   => 'pi_qaru_client_name'
-                              ,p_val    => pi_qaru_client_name);
-    qa_logger_pkg.append_param(p_params => l_param_list
-                              ,p_name   => 'pi_qaru_name'
-                              ,p_val    => pi_qaru_name);
-    qa_logger_pkg.append_param(p_params => l_param_list
-                              ,p_name   => 'pi_qaru_category'
-                              ,p_val    => pi_qaru_category);
-    qa_logger_pkg.append_param(p_params => l_param_list
-                              ,p_name   => 'pi_qaru_object_types'
-                              ,p_val    => pi_qaru_object_types);
-    qa_logger_pkg.append_param(p_params => l_param_list
-                              ,p_name   => 'pi_qaru_error_message'
-                              ,p_val    => pi_qaru_error_message);
-    qa_logger_pkg.append_param(p_params => l_param_list
-                              ,p_name   => 'pi_qaru_comment'
-                              ,p_val    => pi_qaru_comment);
-    qa_logger_pkg.append_param(p_params => l_param_list
-                              ,p_name   => 'pi_qaru_exclude_objects'
-                              ,p_val    => pi_qaru_exclude_objects);
-    qa_logger_pkg.append_param(p_params => l_param_list
-                              ,p_name   => 'pi_qaru_error_level'
-                              ,p_val    => pi_qaru_error_level);
-    qa_logger_pkg.append_param(p_params => l_param_list
-                              ,p_name   => 'pi_qaru_is_active'
-                              ,p_val    => pi_qaru_is_active);
-    qa_logger_pkg.append_param(p_params => l_param_list
-                              ,p_name   => 'pi_qaru_sql'
-                              ,p_val    => pi_qaru_sql);
-    qa_logger_pkg.append_param(p_params => l_param_list
-                              ,p_name   => 'pi_qaru_predecessor_ids'
-                              ,p_val    => pi_qaru_predecessor_ids);
-    qa_logger_pkg.append_param(p_params => l_param_list
-                              ,p_name   => 'pi_qaru_layer'
-                              ,p_val    => pi_qaru_layer);
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qaru_rule_number'
+                              ,p_val_01  => pi_qaru_rule_number
+                              ,p_name_02 => 'pi_qaru_client_name'
+                              ,p_val_02  => pi_qaru_client_name
+                              ,p_name_03 => 'pi_qaru_name'
+                              ,p_val_03  => pi_qaru_name
+                              ,p_name_04 => 'pi_qaru_category'
+                              ,p_val_04  => pi_qaru_category
+                              ,p_name_05 => 'pi_qaru_object_types'
+                              ,p_val_05  => pi_qaru_object_types
+                              ,p_name_06 => 'pi_qaru_error_message'
+                              ,p_val_06  => pi_qaru_error_message
+                              ,p_name_07 => 'pi_qaru_comment'
+                              ,p_val_07  => pi_qaru_comment
+                              ,p_name_08 => 'pi_qaru_exclude_objects'
+                              ,p_val_09  => pi_qaru_exclude_objects
+                              ,p_name_10 => 'pi_qaru_error_level'
+                              ,p_val_10  => pi_qaru_error_level
+                              ,p_name_11 => 'pi_qaru_is_active'
+                              ,p_val_11  => pi_qaru_is_active
+                              ,p_name_12 => 'pi_qaru_sql'
+                              ,p_val_12  => pi_qaru_sql
+                              ,p_name_13 => 'pi_qaru_predecessor_ids'
+                              ,p_val_13  => pi_qaru_predecessor_ids
+                              ,p_name_14 => 'pi_qaru_layer'
+                              ,p_val_14  => pi_qaru_layer);
   
     insert into qa_rules
       (qaru_rule_number
@@ -379,6 +375,67 @@ create or replace package body qa_main_pkg as
                             ,p_params => l_param_list);
       raise;
   end f_insert_rule;
+
+
+  -- deletes the entries in qa_rules_t for which exists an entry in quaru_excluded_ebjects for the belonging rule
+  procedure p_exclude_objects(pi_qa_rules in out nocopy qa_rules_t) is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.exclude_objects';
+  
+    type t_exluded_obj is table of varchar2(32676) index by binary_integer;
+    l_excluded_objects t_exluded_obj;
+    l_count            number;
+    l_excluded         varchar2(32676);
+  
+  begin
+    if pi_qa_rules.count > 0
+    then
+      for i in pi_qa_rules.first .. pi_qa_rules.last
+      loop
+        null;
+      
+        select qaru_exclude_objects
+        into l_excluded
+        from qa_rules q
+        where q.qaru_id = pi_qa_rules(i).qaru_id;
+      
+        select regexp_substr(l_excluded
+                            ,'[^:]+'
+                            ,1
+                            ,level)
+        bulk collect
+        into l_excluded_objects
+        from dual
+        connect by regexp_substr(l_excluded
+                                ,'[^:]+'
+                                ,1
+                                ,level) is not null;
+      
+        if l_excluded_objects.count > 0
+        then
+          for excl in l_excluded_objects.first .. l_excluded_objects.last
+          loop
+            if upper(l_excluded_objects(excl)) = upper(pi_qa_rules(i).object_name)
+            then
+              pi_qa_rules.delete(i);
+              exit;
+            end if;
+          
+          end loop;
+        end if;
+        l_excluded_objects.delete;
+        l_excluded := null;
+      
+      end loop;
+    end if;
+  exception
+    when others then
+      raise_application_error(-20001
+                             ,sqlerrm);
+      /* qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while checking for excluded Objects!'
+      ,p_scope  => c_unit
+      ,p_extra  => sqlerrm
+      ,p_params => NULL);*/
+  end p_exclude_objects;
 
 end qa_main_pkg;
 /
