@@ -24,16 +24,12 @@ begin
   -- packages
   l_object_name('CREATE_UT_TEST_PACKAGES_PKG') := 'CREATE_UT_TEST_PACKAGES_PKG';
   l_object_type('CREATE_UT_TEST_PACKAGES_PKG') := 'PACKAGE';
-  l_object_name('EXPORT_IMPORT_RULES_PKG') := 'EXPORT_IMPORT_RULES_PKG';
-  l_object_type('EXPORT_IMPORT_RULES_PKG') := 'PACKAGE';
   l_object_name('QA_EXPORT_IMPORT_RULES_PKG') := 'QA_EXPORT_IMPORT_RULES_PKG';
   l_object_type('QA_EXPORT_IMPORT_RULES_PKG') := 'PACKAGE';
   l_object_name('QA_MAIN_PKG') := 'QA_MAIN_PKG';
   l_object_type('QA_MAIN_PKG') := 'PACKAGE';
   l_object_name('QA_API_PKG') := 'QA_API_PKG';
   l_object_type('QA_API_PKG') := 'PACKAGE';
-  l_object_name('QA_APEX_PKG') := 'QA_APEX_PKG';
-  l_object_type('QA_APEX_PKG') := 'PACKAGE';
   l_object_name('QA_LOGGER_PKG') := 'QA_LOGGER_PKG';
   l_object_type('QA_LOGGER_PKG') := 'PACKAGE';
   l_object_name('QA_CONSTANT_PKG') := 'QA_CONSTANT_PKG';
@@ -57,7 +53,7 @@ begin
   
   
   -- synonyms
-  l_object_name('QA_RULE_T_S') := 'QA_RULE_T';
+  l_object_name('QA_RULE_T_S') := 'QA_RULE_T_S';
   l_object_type('QA_RULE_T_S') := 'SYNONYM';
 
   l_object := l_object_name.first;

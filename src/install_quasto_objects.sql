@@ -52,8 +52,8 @@ PROMPT src/plsql/trg/qaru_iu_trg.sql
 @src/plsql/trg/qaru_iu_trg.sql
 
 PROMPT SYNONYM
-PROMPT src/plsql/syn/qa_rule_t.sql
-@src/plsql/syn/qa_rule_t.sql
+PROMPT src/plsql/syn/qa_rule_t_s.sql
+@src/plsql/syn/qa_rule_t_s.sql
 
 PROMPT GRANT
 grant execute on qa_api_pkg to public;

@@ -222,9 +222,9 @@ create or replace package body qa_export_import_rules_pkg is
                        ,'"sql" : "') > 0 --and 1=0
       then
         null;
-        l_sql := replace_with_clob(i_source  => f.line
-                                  ,i_search  => '\n'
-                                  ,i_replace => 'chr(10)');
+        l_sql := f_export_rules_to_script_clob.replace_with_clob(i_source  => f.line
+                                                                ,i_search  => '\n'
+                                                                ,i_replace => 'chr(10)');
         /*select qaru_sql
           into l_sql
           from json_table(f.line
