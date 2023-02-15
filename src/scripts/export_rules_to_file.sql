@@ -3,7 +3,7 @@ set head off;
 set flush off;
 --set termout off;
 --set trimspool on;
-set feedback off;
+set feedback on;
 set linesize 32767;
 -- Which project should be exported?
 define l_client_name = "&1"

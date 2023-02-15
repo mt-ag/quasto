@@ -30,7 +30,7 @@ return map;
 
 /* File name */
 var l_filename = args[1];
-var ext = '.' + l_filename.split('.')[1];
+var ext = '.' + l_filename.split('.').pop();
 var mime=""
 switch (ext){
   case '.js' :
