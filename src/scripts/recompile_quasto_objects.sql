@@ -64,7 +64,7 @@ begin
     exception
       when others
         then
-          dbms_output.put_line('ERROR: There are ' || l_count || 'Invalid Quasto objects');
+          dbms_output.put_line('ERROR: There are ' || l_count || 'Invalid Quasto objects ' || SQLERRM);
           raise;
 end;
 /

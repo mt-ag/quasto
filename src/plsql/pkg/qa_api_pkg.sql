@@ -54,7 +54,7 @@ create or replace package body qa_api_pkg as
     -- :7 qaru_sql
       using pi_target_scheme, l_qa_rule.qaru_id, l_qa_rule.qaru_category, l_qa_rule.qaru_error_level, l_qa_rule.qaru_object_types, l_qa_rule.qaru_error_message, l_qa_rule.qaru_sql;
       
-       qa_main_pkg.exclude_objects(pi_qa_rules => l_qa_rules);
+       qa_main_pkg.p_exclude_objects(pi_qa_rules => l_qa_rules);
     return l_qa_rules;
   exception
     when others then

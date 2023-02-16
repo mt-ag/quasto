@@ -4,12 +4,13 @@ prompt uninstall all objects
 declare
   type t_vc2_array is table of varchar2(1000) index by varchar2(100);
 
-  l_object_name t_vc2_array;
-  l_object_type t_vc2_array;
-  l_object      varchar2(100 char);
-  l_key         varchar2(100 char);
-  l_action      varchar2(32767);
-  l_count       number;
+  l_object_name        t_vc2_array;
+  l_object_type        t_vc2_array;
+  l_object             varchar2(100 char);
+  l_object_type_substr varchar2(100 char);
+  l_key                varchar2(100 char);
+  l_action             varchar2(32767);
+  l_count              number;
 begin
   -- buffer size extend
   dbms_output.enable(buffer_size => 10000000);
@@ -22,8 +23,6 @@ begin
   
 
   -- packages
-  l_object_name('CREATE_UT_TEST_PACKAGES_PKG') := 'CREATE_UT_TEST_PACKAGES_PKG';
-  l_object_type('CREATE_UT_TEST_PACKAGES_PKG') := 'PACKAGE';
   l_object_name('QA_EXPORT_IMPORT_RULES_PKG') := 'QA_EXPORT_IMPORT_RULES_PKG';
   l_object_type('QA_EXPORT_IMPORT_RULES_PKG') := 'PACKAGE';
   l_object_name('QA_MAIN_PKG') := 'QA_MAIN_PKG';
@@ -50,11 +49,6 @@ begin
   l_object_type('QARU_SEQ') := 'SEQUENCE';
   l_object_name('QAIF_SEQ') := 'QAIF_SEQ';
   l_object_type('QAIF_SEQ') := 'SEQUENCE';
-  
-  
-  -- synonyms
-  l_object_name('QA_RULE_T_S') := 'QA_RULE_T_S';
-  l_object_type('QA_RULE_T_S') := 'SYNONYM';
 
   l_object := l_object_name.first;
   dbms_output.put_line(l_object);
@@ -112,7 +106,7 @@ begin
   while l_object is not null
   loop
     l_action := 'drop ' || l_object_type(l_object) || ' ' || l_object_name(l_object);
-	
+
     select count(1)
     into l_count
     from user_objects s
