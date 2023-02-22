@@ -28,6 +28,10 @@ To start the Installation process you need to move into the root directory of th
 In the next step the user connects to the database via sqlplus or sqlCL.
 To ensure all tables and packages are installed into the right schema make sure to check the current user and switch schema if required.
 
+In order to use quasto in other schemas a public synonym is required on the type "qa_rule_t".
+The user has to create this outside of the regular Quasto installation.
+Note: To drop a public synonym the user needs the drop any synonym grant!
+
 ### Minimal user rights
 If you install quasto in a blank new scheme the user needs the following rights:
 ```
@@ -44,7 +48,7 @@ grant create session to quasto;
 
 #### Running the Install Script:
 ```
-@install [1/0] [1/0] [1/0]
+@install [1/0] [1/0] [1/0] [1/0]
 ```
 
 To ensure a clean installation it is important to decide what you want to install.
@@ -54,10 +58,11 @@ Arguments that are required to be passed to the script:
 1. Do you want to install supporting objects for utPLSQL usage? 1=yes / 0=no (you need to install utPLSQL seperatly)
 2. Do you want to install supporting objects for APEX usage? 1=yes / 0=no (you need to install APEX seperatly)
 3. Do you want to install supporting objects for Jenkins usage? 1=yes / 0=no (you need to run Jenkins seperatly)
+4. Do you have the offical oracle logger framework installed? 1=yes / 0=no (required for conditional compilation of a package)
 
 It is possible to install utPLSQL, APEX or Jenkins objects later
 To do this the user needs to move from the root Directory of the project into the /src directory.
-There are the two installer scripts:
+There are the three installer scripts:
 1. install_utplsql_objects.sql
 2. install_apex_objects.sql
 3. install_jenkins_objects.sql
