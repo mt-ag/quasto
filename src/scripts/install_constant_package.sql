@@ -15,15 +15,14 @@ declare
 begin
   l_action := 'create or replace package qa_constant_pkg
     authid definer
-  as
+  is
     
     gc_quasto_version constant varchar(50 char) := ' || '''' || l_apex_version || '''' || ';
     gc_utplsql_flag   constant number           := ' || l_utplsql_flag || ';
     gc_apex_flag      constant number           := ' || l_apex_flag || ';
     gc_logger_flag    constant number           := ' || l_logger_flag || ';
 
-end qa_constant_pkg;
-';
+end;';
 
     dbms_output.put_line(l_action);
     execute immediate l_action;
@@ -31,7 +30,7 @@ end qa_constant_pkg;
     select count(1)
     into l_count
     from user_objects
-    where object_name = upper('quasto_constant_pkg');
+    where object_name = upper('qa_constant_pkg');
 
     if l_count = 0
       then
@@ -39,5 +38,8 @@ end qa_constant_pkg;
     else
         dbms_output.put_line('IFNO: Cosntants_Package was succesfully created');
     end if;
+  exception
+    when others then
+      raise;
 end;
 /

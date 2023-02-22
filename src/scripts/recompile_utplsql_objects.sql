@@ -15,7 +15,7 @@ begin
   dbms_output.enable(buffer_size => 10000000);
   -- objects:
   -- QASTO Objects
-  
+
   -- packages
   l_object_name('CREATE_UT_TEST_PACKAGES_PKG') := 'CREATE_UT_TEST_PACKAGES_PKG';
   l_object_type('CREATE_UT_TEST_PACKAGES_PKG') := 'PACKAGE';
@@ -55,7 +55,7 @@ begin
     exception
       when others
         then
-          dbms_output.put_line('ERROR: There are ' || l_count || 'Invalid UTPLSQL objects');
+          dbms_output.put_line('ERROR: There are ' || l_count || 'Invalid Utplsql objects ' || SQLERRM);
           raise;
 end;
 /
