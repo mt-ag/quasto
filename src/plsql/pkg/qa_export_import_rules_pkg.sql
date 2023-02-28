@@ -7,6 +7,12 @@ create or replace package qa_export_import_rules_pkg is
   -- otherwise you would get extra lines in your JSON
   g_spool_active boolean := false;
 
+  function replace_with_clob
+  (
+    i_source  in clob
+   ,i_search  in varchar2
+   ,i_replace in clob
+  ) return clob;
   function f_export_rules_table_to_clob
   (
     pi_client_name in qa_rules.qaru_client_name%type
@@ -36,11 +42,31 @@ end qa_export_import_rules_pkg;
 create or replace package body qa_export_import_rules_pkg is
 
   procedure p_print(pi_text in varchar2) is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.p_print';
+    l_param_list qa_logger_pkg.tab_param;
+  
   begin
+ 
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name_01 => 'pi_text'
+                              ,p_val_01 => pi_text);
+                                
     if not g_spool_active
     then
       dbms_output.put_line(pi_text);
     end if;
+  exception 
+    when no_data_found then 
+      qa_logger_pkg.p_qa_log(p_text   => 'No Data found from print'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+                            
+    when others then 
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to printing the Rules!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
   end p_print;
 
   function f_export_rules_table_to_clob
@@ -49,7 +75,8 @@ create or replace package body qa_export_import_rules_pkg is
    ,pi_category    in qa_rules.qaru_category%type default null
   ) return clob is
     c_scope constant varchar2(100) := gc_scope || 'f_export_rules_table_to_clob';
-  
+    l_param_list qa_logger_pkg.tab_param;
+    
     l_count_rules            number;
     l_pretty_print           clob;
     l_clob                   clob;
@@ -62,7 +89,17 @@ create or replace package body qa_export_import_rules_pkg is
     l_client_name_array_json json_array_t := json_array_t();
     l_client_name_json       json_object_t := json_object_t();
     l_client_names_json      json_object_t := json_object_t();
-  begin
+   
+  
+  begin    
+ 
+  
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_client_name'
+                              ,p_val_01  => pi_client_name
+                              ,p_name_02 => 'pi_category'
+                              ,p_val_02  =>pi_category);
+                            
     select count(1)
     into l_count_rules
     from qa_rules r
@@ -170,6 +207,19 @@ create or replace package body qa_export_import_rules_pkg is
       from dual;
       return l_pretty_print;
     end if;
+  exception
+    when no_data_found then
+      qa_logger_pkg.p_qa_log(p_text   => 'No Data found while exporting Rules from Table'
+                            ,p_scope  => c_scope
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+     when others then
+       qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to Export Rules from Table'
+                             ,p_scope  => c_scope
+                             ,p_extra  => sqlerrm
+                             ,p_params => l_param_list);
+      raise;
   end f_export_rules_table_to_clob;
 
   -- Helper Function to replace json-control chars in our clob
@@ -178,9 +228,28 @@ create or replace package body qa_export_import_rules_pkg is
     i_source  in clob
    ,i_search  in varchar2
    ,i_replace in clob
-  ) return clob is
+  ) return clob is      
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_replace_with_clob';
+    l_param_list qa_logger_pkg.tab_param;
+    
     l_pos pls_integer;
+    l_source_varchar varchar(32767); 
+    l_replace_varchar varchar(32767);
+ 
   begin
+ 
+    l_source_varchar := dbms_lob.substr(i_source,4000,1);
+    l_replace_varchar := dbms_lob.substr(i_replace,4000,1);
+  
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'i_source'
+                              ,p_val_01  => l_source_varchar
+                              ,p_name_02 => 'i_search'
+                              ,p_val_02  =>i_search
+                              ,p_name_03 => 'i_replace'
+                              ,p_val_03  => l_replace_varchar);
+                            
+                            
     l_pos := instr(i_source
                   ,i_search);
     if l_pos > 0
@@ -191,13 +260,37 @@ create or replace package body qa_export_import_rules_pkg is
                                                      ,l_pos + length(i_search));
     end if;
     return i_source;
+  exception
+    when no_data_found then
+      qa_logger_pkg.p_qa_log(p_text   => 'NoData found while replacing json-control chars in clob'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while replacing json_control chars in clob'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
   end replace_with_clob;
+  
 
   -- Experimental Function to Export A Json as an executable script
   function f_export_rules_to_script_clob(pi_clob in clob) return clob is
+    
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_export_rules_to_script_clob';
+    l_param_list qa_logger_pkg.tab_param;
+    
     l_clob clob;
     l_sql  clob;
+    l_clob_varchar varchar(32767); 
+ 
   begin
+    l_clob_varchar := dbms_lob.substr(pi_clob,4000,1);
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_clob'
+                              ,p_val_01  => l_clob_varchar);
+         
     l_clob := 'set serveroutput on;' || chr(10);
     dbms_lob.append(l_clob
                    ,'declare' || chr(10));
@@ -222,9 +315,9 @@ create or replace package body qa_export_import_rules_pkg is
                        ,'"sql" : "') > 0 --and 1=0
       then
         null;
-        l_sql := qa_export_import_rules_pkg.replace_with_clob(i_source  => f.line
-                                                             ,i_search  => '\n'
-                                                             ,i_replace => 'chr(10)');
+        l_sql := replace_with_clob(i_source  => f.line
+                                  ,i_search  => '\n'
+                                  ,i_replace => 'chr(10)');
         /*select qaru_sql
           into l_sql
           from json_table(f.line
@@ -243,13 +336,35 @@ create or replace package body qa_export_import_rules_pkg is
                    ,'end;' || chr(10) || '/');
   
     return l_clob;
+    
+  exception
+    when no_data_found then
+      qa_logger_pkg.p_qa_log(p_text   => 'No Data found at exporting Rules to Scripts'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while exporting Rules to Scripts'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
   end f_export_rules_to_script_clob;
 
 
   procedure p_clob_to_output(pi_clob in clob) is
     l_offset int := 1;
     l_step   number := 32767;
+    c_unit constant varchar2(32767) := $$plsql_unit || '.p_clob_to_output';
+    l_param_list qa_logger_pkg.tab_param;
+    l_clob_varchar varchar(32767); 
   begin
+ 
+    l_clob_varchar := dbms_lob.substr(pi_clob,4000,1);
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_clob'
+                              ,p_val_01  => l_clob_varchar);
+                              
     dbms_output.enable(buffer_size => 10000000);
     loop
       exit when l_offset > dbms_lob.getlength(pi_clob);
@@ -258,6 +373,18 @@ create or replace package body qa_export_import_rules_pkg is
                                           ,l_offset));
       l_offset := l_offset + l_step;
     end loop;
+  exception
+    when no_data_found then
+      qa_logger_pkg.p_qa_log(p_text   => 'No Data found for Output Clob'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while Output Clob'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
   end p_clob_to_output;
 
   procedure f_import_clob_to_qa_import_files
@@ -266,8 +393,21 @@ create or replace package body qa_export_import_rules_pkg is
    ,pi_filename in qa_import_files.qaif_filename%type
    ,pi_mimetype in qa_import_files.qaif_mimetype%type
   ) is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_Import_clob_to_qa_import_files';
+    l_param_list qa_logger_pkg.tab_param;
     l_ret number;
+    l_varchar_clob varchar(4000);
+  
   begin
+    l_varchar_clob := dbms_lob.substr(pi_clob);
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 =>'pi_clob' 
+                              ,p_val_01  => l_varchar_clob
+                              ,p_name_02 => 'pi_file_name'
+                              ,p_val_02  => pi_filename
+                              ,p_name_03 => 'pi_mimetype'
+                              ,p_val_03  => pi_mimetype);
+ 
     insert into qa_import_files
       (qaif_filename
       ,qaif_mimetype
@@ -279,16 +419,31 @@ create or replace package body qa_export_import_rules_pkg is
     returning qaif_id into l_ret;
     --  return l_ret;
   exception
-    when others then
+    when no_data_found then
+      qa_logger_pkg.p_qa_log(p_text   => 'No Data found while Importing clob to qa_import_files'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
       raise;
-      --      return null;
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while Importing clob to qa_import_files'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
   end f_import_clob_to_qa_import_files;
 
 
 
   procedure p_import_clob_to_rules_table(pi_qaif_id in qa_import_files.qaif_id%type) is
     l_clob clob;
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_Import_clob_to_rules_table';
+    l_param_list qa_logger_pkg.tab_param;
+    
   begin
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name_01 => 'pi_qaif_id'
+                              ,p_val_01  =>  pi_qaif_id);
+
     select q.qaif_clob_data
     into l_clob
     from qa_import_files q
@@ -361,17 +516,31 @@ create or replace package body qa_export_import_rules_pkg is
             ,i.qaru_sql);
       end loop;
     end if;
+  exception
+    when no_data_found then
+      qa_logger_pkg.p_qa_log(p_text   => 'No Data found while Importing Clob to QA_RULES Table'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while Importing clob to QA_RULES Table'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
   end p_import_clob_to_rules_table;
 
   function fc_export_qa_rules(pi_client_name in varchar2 default null) return clob is
     type tab_t is table of qa_rules%rowtype;
   
     l_table_name varchar2(50) := 'QA_RULES';
-  
+    c_unit constant varchar2(32767) := $$plsql_unit || '.fc_export_qa_rules';
+    l_param_list qa_logger_pkg.tab_param;
     l_tab    tab_t;
     l_return clob;
+
   begin
-  
+
     if pi_client_name is not null
     then
       select *
@@ -565,8 +734,18 @@ create or replace package body qa_export_import_rules_pkg is
     return l_return;
   
   exception
-    when others then
+    when no_data_found then
+   
+      qa_logger_pkg.p_qa_log(p_text   => 'No Data found while Exporting Rules from QA_RULES Table'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
       raise;
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while Exporting from QA_RULES Table'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
   end fc_export_qa_rules;
 
 end qa_export_import_rules_pkg;

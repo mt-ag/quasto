@@ -40,7 +40,7 @@ create or replace package body qa_api_pkg as
 l_param_list qa_logger_pkg.tab_param;
     l_qa_rule  qa_rule_t;
     l_qa_rules qa_rules_t;
-    l_varchar varchar2(100 char);
+  
   begin
   
 
@@ -95,7 +95,7 @@ l_param_list qa_logger_pkg.tab_param;
     l_qa_rules          qa_rules_t := new qa_rules_t();
     l_qa_rules_temp     qa_rules_t := new qa_rules_t();
     l_param_list qa_logger_pkg.tab_param;
-   
+    l_varchar varchar2(100 char); 
   begin
  
     l_qaru_rule_numbers := qa_main_pkg.tf_get_rule_numbers(pi_qaru_client_name => pi_qaru_client_name);
