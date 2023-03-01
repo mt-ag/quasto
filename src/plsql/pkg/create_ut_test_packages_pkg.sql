@@ -16,15 +16,15 @@ end create_ut_test_packages_pkg;
 /
 create or replace package body create_ut_test_packages_pkg is
 
-function f_get_logger_spec( pi_package_name in varchar2) return varchar2 is
-l_varchar varchar2(32767);
-begin
-l_varchar := q'{  c_unit constant varchar2(32767 char) := $$plsql_unit || '.}' ||pi_package_name || chr(39) || chr(59)|| chr(10);
+  function f_get_logger_spec( pi_package_name in varchar2) return varchar2 is
+    l_varchar varchar2(32767);
+  begin
+    l_varchar := q'{  c_unit constant varchar2(32767 char) := $$plsql_unit || '.}' ||pi_package_name || chr(39) || chr(59)|| chr(10);
 
-l_varchar := l_varchar || '  l_param_list qa_logger_pkg.tab_param' ||chr(59)|| chr(10);
+    l_varchar := l_varchar || '  l_param_list qa_logger_pkg.tab_param' ||chr(59)|| chr(10);
 
-return l_varchar;
-end f_get_logger_spec;
+    return l_varchar;
+  end f_get_logger_spec;
 
   function f_get_logger_exception (
   pi_package_name in varchar2
@@ -39,7 +39,7 @@ end f_get_logger_spec;
     l_varchar := l_varchar || '                            ,p_scope  => c_unit '  || chr(10);
     l_varchar := l_varchar || '                            ,p_extra  => sqlerrm'  ||chr (10);
     l_varchar := l_varchar || '                            ,p_params => l_param_list);' || chr(10);
-  return l_varchar;
+    return l_varchar;
   end f_get_logger_exception;
 
   procedure p_create_test_packages_for_qa_rules(
@@ -376,9 +376,9 @@ end f_get_logger_spec;
   exception
     when others then
          qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while generated the Rules!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
+                               ,p_scope  => c_unit
+                               ,p_extra  => sqlerrm
+                               ,p_params => l_param_list);
       raise;
   end p_create_test_packages_for_qa_rules;
 

@@ -353,10 +353,11 @@ create or replace package body qa_export_import_rules_pkg is
 
 
   procedure p_clob_to_output(pi_clob in clob) is
-    l_offset int := 1;
-    l_step   number := 32767;
     c_unit constant varchar2(32767) := $$plsql_unit || '.p_clob_to_output';
     l_param_list qa_logger_pkg.tab_param;
+    
+    l_offset int := 1;
+    l_step   number := 32767;
     l_clob_varchar varchar(32767); 
   begin
  
@@ -395,6 +396,7 @@ create or replace package body qa_export_import_rules_pkg is
   ) is
     c_unit constant varchar2(32767) := $$plsql_unit || '.f_Import_clob_to_qa_import_files';
     l_param_list qa_logger_pkg.tab_param;
+    
     l_ret number;
     l_varchar_clob varchar(4000);
   
@@ -435,10 +437,11 @@ create or replace package body qa_export_import_rules_pkg is
 
 
   procedure p_import_clob_to_rules_table(pi_qaif_id in qa_import_files.qaif_id%type) is
-    l_clob clob;
+  
     c_unit constant varchar2(32767) := $$plsql_unit || '.f_Import_clob_to_rules_table';
     l_param_list qa_logger_pkg.tab_param;
     
+    l_clob clob;
   begin
     qa_logger_pkg.append_param(p_params => l_param_list
                               ,p_name_01 => 'pi_qaif_id'
@@ -531,11 +534,11 @@ create or replace package body qa_export_import_rules_pkg is
   end p_import_clob_to_rules_table;
 
   function fc_export_qa_rules(pi_client_name in varchar2 default null) return clob is
-    type tab_t is table of qa_rules%rowtype;
-  
-    l_table_name varchar2(50) := 'QA_RULES';
     c_unit constant varchar2(32767) := $$plsql_unit || '.fc_export_qa_rules';
     l_param_list qa_logger_pkg.tab_param;
+    
+    type tab_t is table of qa_rules%rowtype;
+    l_table_name varchar2(50) := 'QA_RULES';
     l_tab    tab_t;
     l_return clob;
 

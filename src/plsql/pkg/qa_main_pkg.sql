@@ -65,6 +65,7 @@ create or replace package body qa_main_pkg as
   ) return qa_rule_t is
     c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_rule';
     l_param_list qa_logger_pkg.tab_param;
+    
     l_qa_rule    qa_rule_t;
   
   begin
@@ -185,8 +186,8 @@ create or replace package body qa_main_pkg as
   ) is
     c_unit constant varchar2(32767) := $$plsql_unit || '.p_test_rule';
     l_param_list   qa_logger_pkg.tab_param;
+    
     l_schema_names varchar2(32767);
-  
     l_qa_rules           qa_rules_t := qa_rules_t();
     l_qa_rules_temp      qa_rules_t := new qa_rules_t();
     l_count_objects      number;

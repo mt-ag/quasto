@@ -21,7 +21,6 @@ create or replace package qa_api_pkg authid current_user as
   ) return qa_rules_t;
 
 end qa_api_pkg;
-
 /
 create or replace package body qa_api_pkg as
 
@@ -33,11 +32,10 @@ create or replace package body qa_api_pkg as
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
    ,pi_target_scheme    in varchar2 default user
   ) return qa_rules_t is
+  
     c_unit       constant varchar2(32767) := $$plsql_unit || '.tf_run_rule';
-    c_param_list constant varchar2(32767) := 'pi_qaru_rule_number=' || pi_qaru_rule_number || c_cr || --
-                                             'pi_qaru_client_name=' || pi_qaru_client_name || c_cr || --
-                                             'pi_target_scheme=' || pi_target_scheme;
-l_param_list qa_logger_pkg.tab_param;
+    l_param_list qa_logger_pkg.tab_param;
+    
     l_qa_rule  qa_rule_t;
     l_qa_rules qa_rules_t;
   
@@ -73,7 +71,7 @@ l_param_list qa_logger_pkg.tab_param;
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
- when others then
+    when others then
       qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to select from qa_rules!'
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
@@ -88,16 +86,19 @@ l_param_list qa_logger_pkg.tab_param;
    ,pi_target_scheme    in varchar2 default user
   ) return qa_rules_t is
     c_unit       constant varchar2(32767) := $$plsql_unit || '.tf_run_rules';
-    c_param_list constant varchar2(32767) := 'pi_qaru_client_name=' || pi_qaru_client_name || c_cr || --
-                                             'pi_target_scheme=' || pi_target_scheme;
-
+    l_param_list qa_logger_pkg.tab_param;
+    
     l_qaru_rule_numbers varchar2_tab_t;
     l_qa_rules          qa_rules_t := new qa_rules_t();
     l_qa_rules_temp     qa_rules_t := new qa_rules_t();
-    l_param_list qa_logger_pkg.tab_param;
-    l_varchar varchar2(100 char); 
+    
   begin
- 
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qaru_client_name'
+                              ,p_val_01  => pi_qaru_client_name
+                              ,p_name_02 => 'pi_target_scheme'
+                              ,p_val_02  => pi_target_scheme);
+                              
     l_qaru_rule_numbers := qa_main_pkg.tf_get_rule_numbers(pi_qaru_client_name => pi_qaru_client_name);
 
     for i in 1 .. l_qaru_rule_numbers.count
@@ -112,12 +113,12 @@ l_param_list qa_logger_pkg.tab_param;
 
     return l_qa_rules;
   exception
-        when no_data_found then
+    when no_data_found then
       qa_logger_pkg.p_qa_log(p_text   => 'No Data found while Testing Rules'
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
- when others then
+    when others then
       qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to test Rules!'
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
