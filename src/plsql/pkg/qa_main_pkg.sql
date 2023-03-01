@@ -68,13 +68,6 @@ create or replace package body qa_main_pkg as
     l_qa_rule    qa_rule_t;
   
   begin
-    -- Logging Paramter:
-    /*    qa_logger_pkg.append_param(p_params => l_param_list
-                              ,p_name   => 'pi_qaru_rule_number'
-                              ,p_val    => pi_qaru_rule_number);
-    qa_logger_pkg.append_param(p_params => l_param_list
-                              ,p_name   => 'pi_qaru_client_name'
-                              ,p_val    => pi_qaru_client_name);*/
     qa_logger_pkg.append_param(p_params  => l_param_list
                               ,p_name_01 => 'pi_qaru_rule_number'
                               ,p_val_01  => pi_qaru_rule_number
@@ -111,7 +104,7 @@ create or replace package body qa_main_pkg as
   function tf_get_rule_numbers(pi_qaru_client_name in qa_rules.qaru_client_name%type) return varchar2_tab_t is
     c_unit constant varchar2(32767) := $$plsql_unit || '.tf_get_rule_numbers';
     l_param_list qa_logger_pkg.tab_param;
- 
+  
     l_qaru_rule_numbers varchar2_tab_t;
   begin
   
@@ -194,12 +187,12 @@ create or replace package body qa_main_pkg as
     l_param_list   qa_logger_pkg.tab_param;
     l_schema_names varchar2(32767);
   
-    l_qa_rules             qa_rules_t := qa_rules_t();
-    l_qaru_exclude_objects qa_rules.qaru_exclude_objects%type;
-    l_count_objects        number;
-    l_object_names         clob;
-    l_qaru_error_message   qa_rules.qaru_error_message%type;
-
+    l_qa_rules           qa_rules_t := qa_rules_t();
+    l_qa_rules_temp      qa_rules_t := new qa_rules_t();
+    l_count_objects      number;
+    l_object_names       clob;
+    l_qaru_error_message qa_rules.qaru_error_message%type;
+  
   begin
   
     -- Logging Paramter:
@@ -223,31 +216,19 @@ create or replace package body qa_main_pkg as
     then
       for i in pi_schema_names.first .. pi_schema_names.last
       loop
-        l_qa_rules.extend;
-        l_qa_rules := qa_api_pkg.tf_run_rule(pi_qaru_client_name => pi_qaru_client_name
-                                            ,pi_qaru_rule_number => pi_qaru_rule_number
-                                            ,pi_target_scheme    => pi_schema_names(i));
-      
+        l_qa_rules_temp := qa_api_pkg.tf_run_rule(pi_qaru_client_name => pi_qaru_client_name
+                                                 ,pi_qaru_rule_number => pi_qaru_rule_number
+                                                 ,pi_target_scheme    => pi_schema_names(i));
+        l_qa_rules      := l_qa_rules multiset union l_qa_rules_temp;
       end loop;
+      -- Exclude Objects is taking the Table Type in and deleting all Entries that need to be excluded
+      p_exclude_objects(pi_qa_rules => l_qa_rules);
     end if;
-  
-    l_qaru_exclude_objects := f_get_excluded_objects(pi_qaru_rule_number => pi_qaru_rule_number
-                                                    ,pi_qaru_client_name => pi_qaru_client_name);
   
     select count(1)
     into l_count_objects
     from table(l_qa_rules) rule
-    join qa_rules qaru on qaru.qaru_id = rule.qaru_id
-    where qaru.qaru_exclude_objects is null
-    or not (rule.object_name in (select regexp_substr(l_qaru_exclude_objects
-                                                    ,'[^,]+'
-                                                    ,1
-                                                    ,level) as data
-                                from dual
-                                connect by regexp_substr(l_qaru_exclude_objects
-                                                        ,'[^,]+'
-                                                        ,1
-                                                        ,level) is not null));
+    join qa_rules qaru on qaru.qaru_id = rule.qaru_id;
   
     if l_qa_rules is not null and
        l_qa_rules.count > 0 and
@@ -260,16 +241,6 @@ create or replace package body qa_main_pkg as
           ,l_qaru_error_message
       from table(l_qa_rules) rule
       join qa_rules qaru on qaru.qaru_id = rule.qaru_id
-      where qaru.qaru_exclude_objects is null
-      or not (rule.object_name in (select regexp_substr(l_qaru_exclude_objects
-                                                      ,'[^,]+'
-                                                      ,1
-                                                      ,level) as data
-                                  from dual
-                                  connect by regexp_substr(l_qaru_exclude_objects
-                                                          ,'[^,]+'
-                                                          ,1
-                                                          ,level) is not null))
       group by rule.qaru_id
               ,qaru.qaru_error_message;
     
@@ -387,15 +358,14 @@ create or replace package body qa_main_pkg as
   -- deletes the entries in qa_rules_t for which exists an entry in quaru_excluded_ebjects for the belonging rule
   procedure p_exclude_objects(pi_qa_rules in out nocopy qa_rules_t) is
     c_unit constant varchar2(32767) := $$plsql_unit || '.exclude_objects';
-  
+    l_param_list qa_logger_pkg.tab_param;
+    
     type t_exluded_obj is table of varchar2(32676) index by binary_integer;
     l_excluded_objects t_exluded_obj;
-    l_count            number;
     l_excluded         varchar2(32676);
-
-  l_param_list qa_logger_pkg.tab_param;
+  
   begin
-   
+  
     if pi_qa_rules.count > 0
     then
       for i in pi_qa_rules.first .. pi_qa_rules.last
@@ -438,12 +408,10 @@ create or replace package body qa_main_pkg as
     end if;
   exception
     when others then
-      /*raise_application_error(-20001
-                             ,sqlerrm);*/
-       qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while checking for excluded Objects!'
-      ,p_scope  => c_unit
-      ,p_extra  => sqlerrm
-      ,p_params => l_param_list);
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while checking for excluded Objects!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
   end p_exclude_objects;
 
 end qa_main_pkg;
