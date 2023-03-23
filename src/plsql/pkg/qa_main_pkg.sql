@@ -54,7 +54,6 @@ create or replace package qa_main_pkg authid definer as
   procedure p_exclude_objects(pi_qa_rules in out nocopy qa_rules_t);
 
 end qa_main_pkg;
-
 /
 create or replace package body qa_main_pkg as
 
@@ -114,15 +113,16 @@ create or replace package body qa_main_pkg as
                               ,p_name   => 'pi_qaru_client_name'
                               ,p_val    => pi_qaru_client_name);
   
+    --JOining with qaru_predecessor_order_v to get the right order based on predecessor list
     select q.qaru_rule_number
     bulk collect
     into l_qaru_rule_numbers
     from qa_rules q
+    JOIN qaru_predecessor_order_v p ON p.qaru_rule_number = q.qaru_rule_number
     where q.qaru_client_name = pi_qaru_client_name
     and q.qaru_is_active = 1
     and q.qaru_error_level <= 4
-    order by q.qaru_error_level
-            ,q.qaru_predecessor_ids nulls first;
+    order by p.step ASC;
   
     return l_qaru_rule_numbers;
   exception
