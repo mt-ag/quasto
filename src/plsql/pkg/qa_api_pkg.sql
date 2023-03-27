@@ -98,86 +98,83 @@ create or replace package body qa_api_pkg as
     
   BEGIN
   
-    SELECT running_rule(t.qaru_rule_number,
-           trim(regexp_substr(t.qaru_predecessor_ids, '[^:]+', 1, levels.column_value)),
-           CASE WHEN t.qaru_is_active <> 1 THEN 'N' ELSE NULL END,
-           rownum)
-      BULK COLLECT INTO l_running_rules
-      from qa_rules t,
-           table(cast(multiset(select level 
-                                 from dual 
-                              connect by  level <= length (regexp_replace(t.qaru_predecessor_ids, '[^:]+'))  + 1) as sys.OdciNumberList)) levels
-     where t.qaru_client_name = pi_qaru_client_name;                      
-                    
+select running_rule(t.qaru_rule_number
+                   ,trim(regexp_substr(t.qaru_predecessor_ids
+                                      ,'[^:]+'
+                                      ,1
+                                      ,levels.column_value))
+                   ,case
+                      when t.qaru_is_active <> 1 then
+                       'N'
+                      else
+                       null
+                    end
+                   ,rownum)
+bulk collect
+into l_running_rules
+from qa_rules t
+    ,table(cast(multiset (select level
+                 from dual
+                 connect by level <= length(regexp_replace(t.qaru_predecessor_ids
+                                                          ,'[^:]+')) + 1) as sys.odcinumberlist)) levels
+where t.qaru_client_name = pi_qaru_client_name;
+
+
+qa_logger_pkg.append_param(p_params  => l_param_list
+                          ,p_name_01 => 'pi_qaru_client_name'
+                          ,p_val_01  => pi_qaru_client_name
+                          ,p_name_02 => 'pi_target_scheme'
+                          ,p_val_02  => pi_target_scheme);
+
+l_qaru_rule_numbers := qa_main_pkg.tf_get_rule_numbers(pi_qaru_client_name => pi_qaru_client_name);
+
+for i in 1 .. l_qaru_rule_numbers.count
+loop
+  --count all predecessors that are not run now or where the run was not successfull
+  select count(1)
+  into l_allowed_to_run
+  from table(l_running_rules) r
+  where r.rule_number in (select t.predecessor
+                          from table(l_running_rules) t
+                          where t.rule_number = l_qaru_rule_numbers(i)
+                          and (success_run is null or success_run <> 'Y'));
+
+  -- if there is no predecessor not running or not being successfull, run this rule
+  if l_allowed_to_run = 0
+  then
+    l_qa_rules_temp := tf_run_rule(pi_qaru_rule_number => l_qaru_rule_numbers(i)
+                                  ,pi_qaru_client_name => pi_qaru_client_name
+                                  ,pi_target_scheme    => pi_target_scheme);
   
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_qaru_client_name'
-                              ,p_val_01  => pi_qaru_client_name
-                              ,p_name_02 => 'pi_target_scheme'
-                              ,p_val_02  => pi_target_scheme);
-                              
-    l_qaru_rule_numbers := qa_main_pkg.tf_get_rule_numbers(pi_qaru_client_name => pi_qaru_client_name);
-
-    for i in 1 .. l_qaru_rule_numbers.count
-    LOOP
-      --count all predecessors that are not run now or where the run was not successfull
-
-      SELECT COUNT(1) 
-        INTO l_allowed_to_run
-        FROM TABLE(l_running_rules) r
-       WHERE r.rule_number IN (SELECT  t.predecessor 
-                                 FROM TABLE(l_running_rules) t 
-                                WHERE t.rule_number = '29.13'
-                                  AND (success_run IS NULL OR success_run <> 'Y'));
-                                       
-      -- if there is no predecessor not running or not being successfull, run this rule
-      IF l_allowed_to_run = 0 THEN
-        l_qa_rules_temp := tf_run_rule(pi_qaru_rule_number => l_qaru_rule_numbers(i)
-                                      ,pi_qaru_client_name => pi_qaru_client_name
-                                      ,pi_target_scheme    => pi_target_scheme);
-
-        l_qa_rules := l_qa_rules multiset union l_qa_rules_temp;
-        
-        SELECT CASE WHEN qaru_error_message IS NULL THEN 'Y' ELSE 'N' END
-          INTO l_success
-          FROM TABLE(l_qa_rules_temp)
-         WHERE qaru_id = (SELECT qaru_id
-                            FROM qa_rules 
-                           WHERE qaru_rule_number = l_qaru_rule_numbers(i));
-        
-        --mark the running test as runned (successfull (Y) or not (N))
-        FOR upd IN (SELECT row_val
-                      FROM TABLE(l_running_rules) 
-                     WHERE rule_number = l_qaru_rule_numbers(i))
-        LOOP
-          l_running_rules(upd.row_val).success_run := l_success;
-        END LOOP;
-      ELSE
-        -- if this rule is not allowed to run, mark thi rule as not successfull (N)
-        FOR upd IN (SELECT row_val
-                      FROM TABLE(l_running_rules) 
-                     WHERE rule_number = l_qaru_rule_numbers(i))
-        LOOP
-          l_running_rules(upd.row_val).success_run := 'N';
-        END LOOP;
-      END IF; 
-
+    l_qa_rules := l_qa_rules multiset union l_qa_rules_temp;
+  
+    l_success := case
+                   when l_qa_rules.count = 0 then
+                    'Y'
+                   else
+                    'N'
+                 end;
+    --mark the running test as runned (successfull (Y) or not (N))
+    for upd in (select row_val
+                from table(l_running_rules)
+                where rule_number = l_qaru_rule_numbers(i))
+    loop
+      l_running_rules(upd.row_val).success_run := l_success;
     end loop;
+  else
+    -- if this rule is not allowed to run, mark thi rule as not successfull (N)
+    for upd in (select row_val
+                from table(l_running_rules)
+                where rule_number = l_qaru_rule_numbers(i))
+    loop
+      l_running_rules(upd.row_val).success_run := 'N';
+    end loop;
+  end if;
 
-    return l_qa_rules;
-  exception
-        when no_data_found then
-      qa_logger_pkg.p_qa_log(p_text   => 'No Data found while Testing Rules'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
- when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to test Rules!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-      raise;
-  end tf_run_rules;
+end loop;
+
+return l_qa_rules;
+exception when no_data_found then qa_logger_pkg.p_qa_log(p_text => 'No Data found while Testing Rules', p_scope => c_unit, p_extra => sqlerrm, p_params => l_param_list); when others then qa_logger_pkg.p_qa_log(p_text => 'There has been an error while trying to test Rules!', p_scope => c_unit, p_extra => sqlerrm, p_params => l_param_list); raise; end tf_run_rules;
 
 end qa_api_pkg;
 /

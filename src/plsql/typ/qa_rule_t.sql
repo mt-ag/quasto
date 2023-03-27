@@ -10,7 +10,7 @@ create or replace type qa_rule_t force as object
   qaru_sql           clob, -- sql query for this rule
 -- Information based on the query, related to the object which is checked
   object_id           number, -- object id if possible
-  object_name         varchar2(100), -- name of the object
+  object_name         varchar2(1000), -- name of the object
   object_type         varchar2(100), -- objecttype
   object_value        varchar2(4000), -- value of the object itself
   object_updated_user varchar2(50), -- last update user on object
@@ -70,7 +70,7 @@ create or replace type body qa_rule_t is
     self.qaru_error_message := pi_qaru_error_message;
     self.qaru_object_types  := pi_qaru_object_types;
     self.qaru_sql           := pi_qaru_sql;
-  
+
     return;
   end qa_rule_t;
 
@@ -102,7 +102,7 @@ create or replace type body qa_rule_t is
     self.object_value        := pi_object_value;
     self.object_updated_user := pi_object_updated_user;
     self.object_updated_date := pi_object_updated_date;
-  
+
     return;
   end qa_rule_t;
 
