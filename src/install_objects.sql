@@ -32,6 +32,9 @@ PROMPT Do you pass specific Jenkins parameters to the script?
 PROMPT (yes/no) (1/0)
 PROMPT '------------------------------------'
 
+ROMPT src/plsql/pkg/qa_logger_pkg.sql
+@src/plsql/pkg/qa_logger_pkg.sql
+
 SET SERVEROUTPUT ON
 
 variable flag char
