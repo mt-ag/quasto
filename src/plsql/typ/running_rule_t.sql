@@ -6,4 +6,4 @@ CREATE OR REPLACE TYPE running_rule_t AS OBJECT
 );
 
 
-CREATE OR REPLACE TYPE running_rules_t IS TABLE OF running_rule;
+CREATE OR REPLACE TYPE running_rules_t IS TABLE OF running_rule_t;
