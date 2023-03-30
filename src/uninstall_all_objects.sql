@@ -31,6 +31,8 @@ begin
   l_object_type('PREPARE_TEST_RESULTS_PKG') := 'PACKAGE';
   l_object_name('CREATE_UT_TEST_PACKAGES_PKG') := 'CREATE_UT_TEST_PACKAGES_PKG';
   l_object_type('CREATE_UT_TEST_PACKAGES_PKG') := 'PACKAGE';
+  l_object_name('QA_LOGGER_PKG') := 'QA_LOGGER_PKG';
+  l_object_type('QA_LOGGER_PKG') := 'PACKAGE';
   l_object_name('QA_MAIN_PKG') := 'QA_MAIN_PKG';
   l_object_type('QA_MAIN_PKG') := 'PACKAGE';
   l_object_name('QA_API_PKG') := 'QA_API_PKG';
