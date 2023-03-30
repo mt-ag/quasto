@@ -23,9 +23,6 @@ create or replace package qa_api_pkg authid current_user as
 end qa_api_pkg;
 /
 create or replace package body qa_api_pkg as
-
-  c_cr constant varchar2(10) := utl_tcp.crlf;
-
   function tf_run_rule
   (
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
@@ -95,8 +92,11 @@ create or replace package body qa_api_pkg as
   
     l_allowed_to_run number;
     l_success        varchar2(1);
+    l_no_loop        number;
   
   begin
+    --check for loops in predecessor order (raises error if cycle is detected so no if clause is needed)
+    l_no_loop := qa_main_pkg.f_check_for_loop(pi_qaru_client_name);
   
     select running_rule(t.qaru_rule_number
                        ,trim(regexp_substr(t.qaru_predecessor_ids

@@ -53,6 +53,8 @@ create or replace package qa_main_pkg authid definer as
 
   procedure p_exclude_objects(pi_qa_rules in out nocopy qa_rules_t);
 
+  function f_check_for_loop(pi_qaru_client_name in qa_rules.qaru_client_name%type) return number;
+
 end qa_main_pkg;
 /
 create or replace package body qa_main_pkg as
@@ -415,5 +417,53 @@ create or replace package body qa_main_pkg as
                             ,p_params => l_param_list);
   end p_exclude_objects;
 
+  function f_check_for_loop(pi_qaru_client_name in qa_rules.qaru_client_name%type) return number is
+    l_no_loop number;
+    loop_detect_e exception;
+    pragma exception_init(loop_detect_e
+                         ,-1436);
+  
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_check_for_loop';
+    l_param_list qa_logger_pkg.tab_param;
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qaru_client_name'
+                              ,p_val_01  => pi_qaru_client_name);
+    with splitted_pred as
+     (select distinct t.qaru_rule_number
+                     ,trim(regexp_substr(t.qaru_predecessor_ids
+                                        ,'[^:]+'
+                                        ,1
+                                        ,levels.column_value)) as predec
+      from qa_rules t
+          ,table(cast(multiset (select level
+                       from dual
+                       connect by level <= length(regexp_replace(t.qaru_predecessor_ids
+                                                                ,'[^:]+')) + 1) as sys.odcinumberlist)) levels
+      where qaru_client_name = pi_qaru_client_name
+      and qaru_is_active = 1
+      and qaru_error_level <= 4
+      order by qaru_rule_number)
+    select distinct 1
+    into l_no_loop
+    from splitted_pred
+    
+    connect by prior qaru_rule_number = predec
+    start with predec is null;
+    dbms_output.put_line('no loop');
+    return l_no_loop;
+  exception
+    when loop_detect_e then
+      qa_logger_pkg.p_qa_log(p_text   => 'A loop in the predecessor order is detected. Please resolve and start the testrun again!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'Something went wrong when searching for loops in the predecessor order.'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+  end f_check_for_loop;
 end qa_main_pkg;
 /
