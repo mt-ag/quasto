@@ -47,7 +47,13 @@ PROMPT src/plsql/pkg/qa_api_pkg.sql
 PROMPT src/plsql/pkg/qa_main_pkg.sql
 @src/plsql/pkg/qa_main_pkg.sql
 
-
+PROMPT src/plsql/pkg/qa_apex_pkg.sql
+if qa_constants_pkg.gc_apex_flag = 1
+  then
+    @src/plsql/pkg/qa_apex_pkg.sql
+  else
+    dbms_output.put_line('Skipped qa_apex_pkg.sql')
+end if;
 
 PROMPT src/plsql/pkg/qa_api_pkg.sql
 @src/plsql/pkg/qa_api_pkg.sql
