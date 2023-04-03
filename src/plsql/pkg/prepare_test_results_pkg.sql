@@ -32,7 +32,7 @@ END prepare_test_results_pkg;
 create or replace PACKAGE BODY PREPARE_TEST_RESULTS_PKG IS
     
   -- To concatinate the table data
-  FUNCTION tab_to_string (pi_varchar2_tab IN varchar2_tab_t,
+  FUNCTION tab_to_string (pi_varchar2_tab IN t_varchar2_tab,
                           pi_delimiter    IN VARCHAR2 DEFAULT ',')
   RETURN clob 
   IS
@@ -55,7 +55,7 @@ create or replace PACKAGE BODY PREPARE_TEST_RESULTS_PKG IS
   RETURN CLOB
   AS
     l_test_run_result_xml CLOB;
-    l_test_result varchar2_tab_t;
+    l_test_result t_varchar2_tab;
     l_pkg_name       VARCHAR2(32000 char);
   BEGIN
     IF pi_prc_name IS NULL THEN
