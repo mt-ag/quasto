@@ -23,6 +23,15 @@ create or replace package qa_api_pkg authid current_user as
 end qa_api_pkg;
 /
 create or replace package body qa_api_pkg as
+
+  -- Flag to filter out Apex Rules depending on constant package entry
+  gc_apex_flag varchar2(10 char) := case
+                                      when qa_constant_pkg.gc_apex_flag = 0 then
+                                       'APEX'
+                                      else
+                                       null
+                                    end;
+
   function tf_run_rule
   (
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
@@ -49,16 +58,33 @@ create or replace package body qa_api_pkg as
     l_qa_rule := qa_main_pkg.f_get_rule(pi_qaru_rule_number => pi_qaru_rule_number
                                        ,pi_qaru_client_name => pi_qaru_client_name);
   
-    execute immediate l_qa_rule.qaru_sql bulk collect
-      into l_qa_rules
-    -- :1 scheme
-    -- :2 qaru_id
-    -- :3 qaru_category
-    -- :4 qaru_error_level
-    -- :5 qaru_object_types
-    -- :6 qaru_error_message    
-    -- :7 qaru_sql
-      using pi_target_scheme, l_qa_rule.qaru_id, l_qa_rule.qaru_category, l_qa_rule.qaru_error_level, l_qa_rule.qaru_object_types, l_qa_rule.qaru_error_message, l_qa_rule.qaru_sql;
+    -- Fill Apex Type Attributes when its an Apex Rule
+    if l_qa_rule.qaru_category = 'APEX'
+    then
+      execute immediate l_qa_rule.qaru_sql bulk collect
+        into l_qa_rules
+      -- :1 scheme
+      -- :2 qaru_id
+      -- :3 qaru_category
+      -- :4 qaru_error_level
+      -- :5 qaru_object_types
+      -- :6 qaru_error_message    
+      -- :7 qaru_sql
+      -- :8 apex_app_id
+      -- :9 apex_page_id
+        using pi_target_scheme, l_qa_rule.qaru_id, l_qa_rule.qaru_category, l_qa_rule.qaru_error_level, l_qa_rule.qaru_object_types, l_qa_rule.qaru_error_message, l_qa_rule.qaru_sql, l_qa_rule.apex_app_id, l_qa_rule.apex_page_id;
+    else
+      execute immediate l_qa_rule.qaru_sql bulk collect
+        into l_qa_rules
+      -- :1 scheme
+      -- :2 qaru_id
+      -- :3 qaru_category
+      -- :4 qaru_error_level
+      -- :5 qaru_object_types
+      -- :6 qaru_error_message    
+      -- :7 qaru_sql
+        using pi_target_scheme, l_qa_rule.qaru_id, l_qa_rule.qaru_category, l_qa_rule.qaru_error_level, l_qa_rule.qaru_object_types, l_qa_rule.qaru_error_message, l_qa_rule.qaru_sql;
+    end if;
   
     qa_main_pkg.p_exclude_objects(pi_qa_rules => l_qa_rules);
     return l_qa_rules;
@@ -97,19 +123,20 @@ create or replace package body qa_api_pkg as
   begin
     --check for loops in predecessor order (raises error if cycle is detected so no if clause is needed)
     l_no_loop := qa_main_pkg.f_check_for_loop(pi_qaru_client_name);
+
   
     select running_rule_t(t.qaru_rule_number
-                       ,trim(regexp_substr(t.qaru_predecessor_ids
-                                          ,'[^:]+'
-                                          ,1
-                                          ,levels.column_value))
-                       ,case
-                          when t.qaru_is_active <> 1 then
-                           'N'
-                          else
-                           null
-                        end
-                       ,rownum)
+                         ,trim(regexp_substr(t.qaru_predecessor_ids
+                                            ,'[^:]+'
+                                            ,1
+                                            ,levels.column_value))
+                         ,case
+                            when t.qaru_is_active <> 1 then
+                             'N'
+                            else
+                             null
+                          end
+                         ,rownum)
     bulk collect
     into l_running_rules
     from qa_rules t

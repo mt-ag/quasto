@@ -58,6 +58,13 @@ create or replace package qa_main_pkg authid definer as
 end qa_main_pkg;
 /
 create or replace package body qa_main_pkg as
+  -- Flag to filter out Apex Rules depending on constant package entry
+  gc_apex_flag varchar2(10 char) := case
+                                      when qa_constant_pkg.gc_apex_flag = 0 then
+                                       'APEX'
+                                      else
+                                       null
+                                    end;
 
   function f_get_rule
   (
@@ -85,7 +92,8 @@ create or replace package body qa_main_pkg as
     into l_qa_rule
     from qa_rules q
     where q.qaru_rule_number = pi_qaru_rule_number
-    and q.qaru_client_name = pi_qaru_client_name;
+    and q.qaru_client_name = pi_qaru_client_name
+    and (q.qaru_category != gc_apex_flag or gc_apex_flag is null);
   
     return l_qa_rule;
   exception
@@ -115,7 +123,7 @@ create or replace package body qa_main_pkg as
                               ,p_name   => 'pi_qaru_client_name'
                               ,p_val    => pi_qaru_client_name);
   
-    --JOining with qaru_predecessor_order_v to get the right order based on predecessor list
+    --Joining with qaru_predecessor_order_v to get the right order based on predecessor list
     select q.qaru_rule_number
     bulk collect
     into l_qaru_rule_numbers
@@ -124,6 +132,7 @@ create or replace package body qa_main_pkg as
     where q.qaru_client_name = pi_qaru_client_name
     and q.qaru_is_active = 1
     and q.qaru_error_level <= 4
+    and (q.qaru_category != gc_apex_flag or gc_apex_flag is null)
     order by p.step asc;
   
     return l_qaru_rule_numbers;
@@ -164,7 +173,8 @@ create or replace package body qa_main_pkg as
     into l_qaru_exclude_objects
     from qa_rules p
     where p.qaru_rule_number = pi_qaru_rule_number
-    and p.qaru_client_name = pi_qaru_client_name;
+    and p.qaru_client_name = pi_qaru_client_name
+    and (p.qaru_category != gc_apex_flag or gc_apex_flag is null);
   
     return l_qaru_exclude_objects;
   exception
@@ -418,7 +428,7 @@ create or replace package body qa_main_pkg as
   end p_exclude_objects;
 
   function f_check_for_loop(pi_qaru_client_name in qa_rules.qaru_client_name%type) return number is
-    l_no_loop number;
+    l_no_loop     number;
     loop_detect_e exception;
     pragma exception_init(loop_detect_e
                          ,-1436);
