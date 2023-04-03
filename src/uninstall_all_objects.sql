@@ -31,8 +31,17 @@ begin
   l_object_type('QA_API_PKG') := 'PACKAGE';
   l_object_name('QA_LOGGER_PKG') := 'QA_LOGGER_PKG';
   l_object_type('QA_LOGGER_PKG') := 'PACKAGE';
+  if qa_constant_pkg.gc_apex_flag = 1
+    then
+      l_object_name('QA_APEX_PKG') := 'QA_APEX_PKG';
+      l_object_type('QA_APEX_PKG') := 'PACKAGE';
+    else
+      dbms_output.put_line('Skipped qa_apex_pkg.sql');
+  end if;
   l_object_name('QA_CONSTANT_PKG') := 'QA_CONSTANT_PKG';
-  l_object_type('QA_CONSTANT_PKG') := 'PACKAGE';  
+  l_object_type('QA_CONSTANT_PKG') := 'PACKAGE';
+  l_object_name('CREATE_UT_TEST_PACKAGES_PKG') := 'CREATE_UT_TEST_PACKAGES_PKG';
+  l_object_type('CREATE_UT_TEST_PACKAGES_PKG') := 'PACKAGE';
   
 
 

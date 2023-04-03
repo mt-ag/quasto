@@ -1,4 +1,13 @@
 PROMPT Running SQL file for installing the QUASTO objects on the database. Called from install_objects.sql.
+
+set define '~'
+set concat on
+set concat .
+set verify off
+
+COLUMN :script_apex NEW_VALUE script_name_apex NOPRINT
+variable script_apex VARCHAR2(50)
+
 PROMPT TABLE
 PROMPT src/ddl/tab/qa_rules.sql 
 @src/ddl/tab/qa_rules.sql
@@ -48,12 +57,21 @@ PROMPT src/plsql/pkg/qa_main_pkg.sql
 @src/plsql/pkg/qa_main_pkg.sql
 
 PROMPT src/plsql/pkg/qa_apex_pkg.sql
-if qa_constants_pkg.gc_apex_flag = 1
-  then
-    @src/plsql/pkg/qa_apex_pkg.sql
-  else
-    dbms_output.put_line('Skipped qa_apex_pkg.sql')
-end if;
+declare
+    l_script_name varchar2(100);
+begin
+  if qa_constant_pkg.gc_apex_flag = 1
+    then
+      l_script_name := 'qa_apex_pkg.sql';
+    else
+      l_script_name := 'null.sql';
+  end if;
+  :script_apex := l_script_name;
+end;
+/
+select :script_apex from dual;
+@@src/plsql/pkg/~script_name_apex
+
 
 PROMPT src/plsql/pkg/qa_api_pkg.sql
 @src/plsql/pkg/qa_api_pkg.sql
