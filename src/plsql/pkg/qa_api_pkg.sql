@@ -88,7 +88,7 @@ create or replace package body qa_api_pkg as
     l_qaru_rule_numbers varchar2_tab_t;
     l_qa_rules          qa_rules_t := new qa_rules_t();
     l_qa_rules_temp     qa_rules_t := new qa_rules_t();
-    l_running_rules     running_rule_t := new running_rule_t();
+    l_running_rules     running_rules_t := new running_rules_t();
   
     l_allowed_to_run number;
     l_success        varchar2(1);
@@ -98,7 +98,7 @@ create or replace package body qa_api_pkg as
     --check for loops in predecessor order (raises error if cycle is detected so no if clause is needed)
     l_no_loop := qa_main_pkg.f_check_for_loop(pi_qaru_client_name);
   
-    select running_rule(t.qaru_rule_number
+    select running_rule_t(t.qaru_rule_number
                        ,trim(regexp_substr(t.qaru_predecessor_ids
                                           ,'[^:]+'
                                           ,1
