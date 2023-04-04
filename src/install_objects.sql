@@ -17,7 +17,7 @@ PROMPT the install scripts expects 3 diffrent arguments!
 PROMPT these arguments are expected in a certain order
 PROMPT 
 PROMPT example Usage:
-PROMPT @install [1/0] [1/0] [1/0]
+PROMPT @install [1/0] [1/0] [1/0] [1/0]
 PROMPT 
 PROMPT Argument 1: 
 PROMPT Do you have  already ut_plsql installed?
@@ -40,28 +40,62 @@ SET SERVEROUTPUT ON
 
 variable flag char
 exec :flag := 'Y';
+-- installed Version
+variable version_old varchar2 (50 char)
+exec :version_old := '1.0';
+-- upgrade version
+variable version varchar2 (50 char)
+exec :version := '1.1';
 
 -- Block to proceess first Argument
 declare
-    l_script_name varchar2(100);
-    l_script_name_quasto varchar2(100) := 'install_quasto_objects.sql';
-    l_arg number;
+    l_script_name_utplsql         varchar2(100) := 'install_utplsql_objects.sql';
+    l_script_name_utplsql_upgrade varchar2(100) := 'install_utplsql_objects_' || replace(:version_old,'.','_') || '_to_' || replace(:version,'.','_') || '.sql';
+    l_script_name_quasto          varchar2(100) := 'install_quasto_objects.sql';
+    l_script_name_quasto_upgrade  varchar2(100) := 'install_quasto_objects_' || replace(:version_old,'.','_') || '_to_' || replace(:version,'.','_') || '.sql';
+    l_count                       number;
+    l_current_version             varchar2 (40 char) := :version;
+    l_version                     varchar2( 40 char);
+    l_arg                         number := '~1';
 begin
-    l_arg := '~1';
-    if    1 = l_arg
-    then
-        l_script_name := 'install_utplsql_objects.sql';
-    elsif 0 = l_arg
-    then
-        l_script_name := 'null.sql';
-    else
-        :script_ut_plsql := 'null.sql';
-        :script_quasto   := 'null.sql';
-        :flag := 'N';
+
+
+    -- Check if Pre Version exists
+    select count(1)
+    into l_count
+    from user_objects
+    where object_name = 'QA_CONSTANT_PKG';
+
+    if 1 = l_arg and l_count = 0
+      then
+        l_script_name_utplsql := 'install_utplsql_objects.sql';
+        dbms_output.put_line('Made it into right if!');
+    elsif 1 = l_arg and l_count > 0
+      then
+        dbms_output.put_line('Made it into wrong 2 if!');
+        l_script_name_utplsql := l_script_name_utplsql_upgrade;
+        l_script_name_quasto  := l_script_name_quasto_upgrade;
+    elsif 0 = l_arg and l_count = 0
+      then
+      dbms_output.put_line('Made it into wrong 3 if!');
+        l_script_name_utplsql := 'null.sql';    
+    elsif 0 = l_arg and l_count > 0
+      then
+        dbms_output.put_line('Made it into wrong 4 if!');
+        l_script_name_quasto := l_script_name_quasto_upgrade;
+    elsif l_arg is null
+      then
+        dbms_output.put_line('Made it into wrong last if!');
+        l_script_name_utplsql  := 'null.sql';
+        l_script_name_quasto   := 'null.sql';
+        :flag                  := 'N';
         return;
     end if;
-    :script_ut_plsql := l_script_name;
+
+    :script_ut_plsql := l_script_name_utplsql;
     :script_quasto   := l_script_name_quasto;
+    dbms_output.put_line('Skript UTPLSQL: ' || l_script_name_utplsql);
+    dbms_output.put_line('Skript QUASTO: ' || l_script_name_quasto);
 end;
 /
 
@@ -78,7 +112,7 @@ set feedback on
 set head on
 
 -- Constant Package Generation with last argument as current Version
-@@src/scripts/install_constant_package '~1' '~2' '~3' '~4' '1.2'
+@@src/scripts/install_constant_package '~1' '~2' '~3' '~4' '1.1'
 
 @@src/~script_name_quasto
 @@src/~script_name_utplsql
