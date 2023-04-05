@@ -18,6 +18,8 @@ PROMPT src/plsql/typ/varchar2_tab_t.sql
 @src/plsql/typ/varchar2_tab_t.sql
 
 PROMPT TABLES
+PROMPT src/ddl/qa_import_files.sql
+@src/ddl/qa_import_files.sql
 PROMPT src/ddl/utplsql_calendar_drop.sql
 @src/ddl/utplsql_calendar_drop.sql
 PROMPT src/ddl/utplsql_test_case_drop.sql
@@ -28,12 +30,12 @@ PROMPT src/ddl/utplsql_test_suite_drop.sql
 
 PROMPT SEQUENCES
 @src/ddl/utplsql_test_suite_drop.sql
-PROMPT src/ddl/case_seq_drop.sql
-@src/ddl/case_seq_drop.sql
 PROMPT src/ddl/cldr_seq_drop.sql
 @src/ddl/cldr_seq_drop.sql
 PROMPT src/ddl/run_seq_drop.sql
 @src/ddl/run_seq_drop.sql
+PROMPT src/ddl/case_seq_drop.sql
+@src/ddl/case_seq_drop.sql
 PROMPT src/ddl/suite_seq_drop.sql
 @src/ddl/suite_seq_drop.sql
 
