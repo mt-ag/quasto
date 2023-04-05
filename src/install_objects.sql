@@ -69,23 +69,24 @@ begin
     if 1 = l_arg and l_count = 0
       then
         l_script_name_utplsql := 'install_utplsql_objects.sql';
-        dbms_output.put_line('Made it into right if!');
     elsif 1 = l_arg and l_count > 0
       then
-        dbms_output.put_line('Made it into wrong 2 if!');
-        l_script_name_utplsql := l_script_name_utplsql_upgrade;
-        l_script_name_quasto  := l_script_name_quasto_upgrade;
+        if :version != '1.0'
+          then
+            l_script_name_utplsql := l_script_name_utplsql_upgrade;
+            l_script_name_quasto  := l_script_name_quasto_upgrade;
+        end if;
     elsif 0 = l_arg and l_count = 0
       then
-      dbms_output.put_line('Made it into wrong 3 if!');
         l_script_name_utplsql := 'null.sql';    
     elsif 0 = l_arg and l_count > 0
       then
-        dbms_output.put_line('Made it into wrong 4 if!');
-        l_script_name_quasto := l_script_name_quasto_upgrade;
+        if :version != '1.0'
+          then
+            l_script_name_quasto  := l_script_name_quasto_upgrade;
+        end if;
     elsif l_arg is null
       then
-        dbms_output.put_line('Made it into wrong last if!');
         l_script_name_utplsql  := 'null.sql';
         l_script_name_quasto   := 'null.sql';
         :flag                  := 'N';
@@ -94,8 +95,6 @@ begin
 
     :script_ut_plsql := l_script_name_utplsql;
     :script_quasto   := l_script_name_quasto;
-    dbms_output.put_line('Skript UTPLSQL: ' || l_script_name_utplsql);
-    dbms_output.put_line('Skript QUASTO: ' || l_script_name_quasto);
 end;
 /
 
