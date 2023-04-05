@@ -45,6 +45,8 @@ begin
   l_object_type('VARCHAR2_TAB_T') := 'TYPE';
   l_object_name('QA_RULES_T') := 'QA_RULES_T';
   l_object_type('QA_RULES_T') := 'TYPE';
+  l_object_name('QA_RULE_T') := 'QA_RULE_T';
+  l_object_type('QA_RULE_T') := 'TYPE';
   l_object_name('RUNNING_RULE_T') := 'RUNNING_RULE_T';
   l_object_type('RUNNING_RULE_T') := 'TYPE';
   l_object_name('RUNNING_RULES_T') := 'RUNNING_RULES_T';
