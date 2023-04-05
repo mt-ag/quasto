@@ -31,13 +31,8 @@ begin
   l_object_type('QA_API_PKG') := 'PACKAGE';
   l_object_name('QA_LOGGER_PKG') := 'QA_LOGGER_PKG';
   l_object_type('QA_LOGGER_PKG') := 'PACKAGE';
-  if qa_constant_pkg.gc_apex_flag = 1
-    then
-      l_object_name('QA_APEX_PKG') := 'QA_APEX_PKG';
-      l_object_type('QA_APEX_PKG') := 'PACKAGE';
-    else
-      dbms_output.put_line('Skipped qa_apex_pkg.sql');
-  end if;
+  l_object_name('QA_APEX_PKG') := 'QA_APEX_PKG';
+  l_object_type('QA_APEX_PKG') := 'PACKAGE';
   l_object_name('QA_CONSTANT_PKG') := 'QA_CONSTANT_PKG';
   l_object_type('QA_CONSTANT_PKG') := 'PACKAGE';
   l_object_name('CREATE_UT_TEST_PACKAGES_PKG') := 'CREATE_UT_TEST_PACKAGES_PKG';
@@ -50,14 +45,20 @@ begin
   l_object_type('VARCHAR2_TAB_T') := 'TYPE';
   l_object_name('QA_RULES_T') := 'QA_RULES_T';
   l_object_type('QA_RULES_T') := 'TYPE';
-  l_object_name('QA_RULE_T') := 'QA_RULE_T';
-  l_object_type('QA_RULE_T') := 'TYPE';  
+  l_object_name('RUNNING_RULE_T') := 'RUNNING_RULE_T';
+  l_object_type('RUNNING_RULE_T') := 'TYPE';
+  l_object_name('RUNNING_RULES_T') := 'RUNNING_RULES_T';
+  l_object_type('RUNNING_RULES_T') := 'TYPE';
 
   -- sequences
   l_object_name('QARU_SEQ') := 'QARU_SEQ';
   l_object_type('QARU_SEQ') := 'SEQUENCE';
   l_object_name('QAIF_SEQ') := 'QAIF_SEQ';
   l_object_type('QAIF_SEQ') := 'SEQUENCE';
+
+  -- views
+  l_object_name('QARU_PREDECESSOR_ORDER_V') := 'QARU_PREDECESSOR_ORDER_V';
+  l_object_type('QARU_PREDECESSOR_ORDER_V') := 'VIEW';
 
   l_object := l_object_name.first;
   dbms_output.put_line(l_object);
