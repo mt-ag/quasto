@@ -23,4 +23,3 @@ PROMPT Running SQL file for installing the utPLSQL objects on the database. Call
 @src/plsql/trg/case_iu_trg.sql
 @src/plsql/trg/run_iu_trg.sql
 @src/plsql/trg/suite_iu_trg.sql
-grant execute on ut to quasto;
