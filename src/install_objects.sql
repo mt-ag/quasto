@@ -55,7 +55,6 @@ declare
     l_script_name_quasto_upgrade  varchar2(100) := 'install_quasto_objects_' || replace(:version_old,'.','_') || '_to_' || replace(:version,'.','_') || '.sql';
     l_count                       number;
     l_current_version             varchar2 (40 char) := :version;
-    l_version                     varchar2( 40 char);
     l_arg                         number := '~1';
 begin
 
@@ -71,7 +70,7 @@ begin
         l_script_name_utplsql := 'install_utplsql_objects.sql';
     elsif 1 = l_arg and l_count > 0
       then
-        if :version != '1.0'
+        if l_current_version != '1.0'
           then
             l_script_name_utplsql := l_script_name_utplsql_upgrade;
             l_script_name_quasto  := l_script_name_quasto_upgrade;
@@ -81,7 +80,7 @@ begin
         l_script_name_utplsql := 'null.sql';    
     elsif 0 = l_arg and l_count > 0
       then
-        if :version != '1.0'
+        if l_current_version != '1.0'
           then
             l_script_name_quasto  := l_script_name_quasto_upgrade;
         end if;
@@ -95,6 +94,8 @@ begin
 
     :script_ut_plsql := l_script_name_utplsql;
     :script_quasto   := l_script_name_quasto;
+    dbms_output.put_line(l_script_name_utplsql);
+    dbms_output.put_line(l_script_name_quasto);
 end;
 /
 
