@@ -1,9 +1,9 @@
-CREATE OR REPLACE TYPE running_rule_t AS OBJECT
-( rule_number VARCHAR2(10),
-  predecessor VARCHAR2(100),
-  success_run VARCHAR2(1),
-  row_val     NUMBER
-);
-
-
-CREATE OR REPLACE TYPE running_rules_t IS TABLE OF running_rule_t;
+create or replace type running_rule_t as object
+(
+  rule_number varchar2(10),
+  predecessor varchar2(100),
+  success_run varchar2(1),
+  row_val     number
+)
+;
+/

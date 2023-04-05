@@ -45,7 +45,7 @@ variable version_old varchar2 (50 char)
 exec :version_old := '1.0';
 -- upgrade version
 variable version varchar2 (50 char)
-exec :version := '1.1';
+exec :version := '1.0';
 
 -- Block to proceess first Argument
 declare
