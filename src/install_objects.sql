@@ -63,7 +63,7 @@ begin
     select count(1)
     into l_count
     from user_objects
-    where object_name = 'QA_CONSTANT_PKG';
+    where object_name = 'QA_MAIN_PKG';
 
     if 1 = l_arg and l_count = 0
       then
