@@ -28,7 +28,7 @@ begin
   l_object_name('QA_LOGGER_PKG') := 'QA_LOGGER_PKG';
   l_object_type('QA_LOGGER_PKG') := 'PACKAGE';
   
-  if qa_constant_pkg.gc_apex_flag = 1
+  if QA_CONSTANT_PKG.gc_apex_flag = 1
     then
       l_object_name('QA_APEX_PKG') := 'QA_APEX_PKG';
       l_object_type('QA_APEX_PKG') := 'PACKAGE';
@@ -44,7 +44,7 @@ begin
   while l_object is not null
   loop
     l_action_2 := null;
-    if l_object_type(l_object) = 'PACKAGE'
+    if l_object_type(l_object) = 'PACKAGE' and l_object_name(l_object) != 'QA_CONSTANT_PKG'
       then
         l_action   := 'alter package ' || l_object_name(l_object) || ' compile';
         l_action_2 := 'alter package ' || l_object_name(l_object) || ' compile body';
