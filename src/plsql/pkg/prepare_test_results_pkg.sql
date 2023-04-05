@@ -1,5 +1,4 @@
-PROMPT create or replace package PREPARE_TEST_RESULTS_PKG
-create or replace PACKAGE PREPARE_TEST_RESULTS_PKG IS
+CREATE OR REPLACE PACKAGE PREPARE_TEST_RESULTS_PKG IS
 
   TYPE rec_sample_data IS RECORD(
     t_test_suite_name   VARCHAR2(50),
@@ -18,21 +17,21 @@ create or replace PACKAGE PREPARE_TEST_RESULTS_PKG IS
     pi_suite_path     IN  VARCHAR2 DEFAULT NULL,
     pi_owner          IN  VARCHAR2,
     po_errror_message OUT VARCHAR2);
-    
+
   FUNCTION clob2blob(pi_clob IN CLOB) RETURN BLOB;
-    
+
   FUNCTION get_test_results_per_day(pi_schema    IN VARCHAR2,
                                     pi_test_name IN VARCHAR2) 
   RETURN t_sample_data PIPELINED;
-  
+
   PROCEDURE create_calendar_entry(pi_testsuite_id IN NUMBER);
 
 END prepare_test_results_pkg;
 /
-create or replace PACKAGE BODY PREPARE_TEST_RESULTS_PKG IS
+CREATE OR REPLACE PACKAGE BODY PREPARE_TEST_RESULTS_PKG IS
     
   -- To concatinate the table data
-  FUNCTION tab_to_string (pi_varchar2_tab IN t_varchar2_tab,
+  FUNCTION tab_to_string (pi_varchar2_tab IN varchar2_tab_t,
                           pi_delimiter    IN VARCHAR2 DEFAULT ',')
   RETURN clob 
   IS
@@ -55,31 +54,31 @@ create or replace PACKAGE BODY PREPARE_TEST_RESULTS_PKG IS
   RETURN CLOB
   AS
     l_test_run_result_xml CLOB;
-    l_test_result t_varchar2_tab;
+    l_test_result varchar2_tab_t;
     l_pkg_name       VARCHAR2(32000 char);
   BEGIN
     IF pi_prc_name IS NULL THEN
       IF pi_suitepath IS NOT NULL THEN
-        
+
         SELECT * 
           BULK COLLECT INTO l_test_result
           FROM TABLE(ut.run(ut_varchar2_list(pi_pkg_name ||':'||pi_suitepath),ut_junit_reporter()));
-          
+
       ELSE
-        
+
         l_pkg_name :=REPLACE(pi_pkg_name,':',',');
         SELECT *
           BULK COLLECT INTO l_test_result
           FROM TABLE(ut.run(ut_varchar2_list(l_pkg_name),ut_junit_reporter()));
-          
+
       END IF;
     ELSE
-      
+
       l_pkg_name := REPLACE(pi_prc_name,':',',');
       SELECT * 
         BULK COLLECT INTO l_test_result
         FROM TABLE(ut.run(ut_varchar2_list(l_pkg_name),ut_junit_reporter()));
-        
+
     END IF;
     l_test_run_result_xml := trim(REPLACE(tab_to_string(l_test_result,''),'<?xml version="1.0"?>',''));
     RETURN l_test_run_result_xml;
@@ -99,7 +98,7 @@ create or replace PACKAGE BODY PREPARE_TEST_RESULTS_PKG IS
     RETURN run_id
       INTO po_test_run_id;
   END insert_test_run;
-  
+
   -- derive required values from test run result
   PROCEDURE derive_test_run_details (pi_test_run_id    IN  utplsql_test_run.run_id%type,
                                      po_total_tests    OUT utplsql_test_run.run_total_tests%type,
@@ -143,7 +142,7 @@ create or replace PACKAGE BODY PREPARE_TEST_RESULTS_PKG IS
            run_duration_sec      = pi_duration_sec
      WHERE run_id = pi_test_run_id;
   END update_test_run;
-  
+
   -- create an entry into the calendar for testsuite
   PROCEDURE create_calendar_entry(pi_testsuite_id IN NUMBER)
     IS
@@ -162,7 +161,7 @@ create or replace PACKAGE BODY PREPARE_TEST_RESULTS_PKG IS
                            AND s.suite_testsuite_name = c.cldr_title
                            AND to_date(r.run_start_date, 'DD.MM.YY') = to_date(c.cldr_start_date, 'DD.MM.YY')
                            AND to_date(r.run_end_date, 'DD.MM.YY') = to_date(c.cldr_end_date, 'DD.MM.YY'));
-      
+
         IF l_count = 0 THEN
           INSERT
             INTO utplsql_calendar
@@ -184,7 +183,7 @@ create or replace PACKAGE BODY PREPARE_TEST_RESULTS_PKG IS
       WHEN OTHERS THEN
         dbms_output.put_line('Es konnte kein Kalendereintrag erstellt werden!'||SQLERRM);
     END create_calendar_entry;
-  
+
   -- insert test_suite and test case details into utplsql_test_suite, utplsql_test_case tables
   PROCEDURE ins_test_suite_and_case(pi_testrun_id IN NUMBER)
   AS
@@ -193,7 +192,7 @@ create or replace PACKAGE BODY PREPARE_TEST_RESULTS_PKG IS
     l_error_message  VARCHAR2(32000 char);
     l_pkg_name       VARCHAR2(32000 char);
     l_count NUMBER;
-    
+
     CURSOR c_test_suite(pi_test_run_id NUMBER)
      IS
      WITH xml_tab AS (
@@ -246,7 +245,7 @@ create or replace PACKAGE BODY PREPARE_TEST_RESULTS_PKG IS
                  xt.system_out ,
                  xt.system_err
            ORDER BY testsuite_id;
-           
+
     CURSOR c_test_case(pi_test_suite_path VARCHAR2,pi_test_run_id NUMBER)
         IS
          SELECT xt.*
@@ -294,9 +293,9 @@ create or replace PACKAGE BODY PREPARE_TEST_RESULTS_PKG IS
              upper(SUBSTR(tsu_rec.testsuite_name, 6, INSTR(tsu_rec.testsuite_name, '_', 9)-6) ))
       RETURN suite_id
         INTO l_testsuite_id;
-      
+
       create_calendar_entry(pi_testsuite_id => l_testsuite_id);
-        
+
       l_tsu_id :=l_testsuite_id;
       FOR tc_rec IN c_test_case ( tsu_rec.package_path,pi_testrun_id )
       LOOP
@@ -308,7 +307,7 @@ create or replace PACKAGE BODY PREPARE_TEST_RESULTS_PKG IS
            AND uts.suite_run_id  = pi_testrun_id
            AND utc.case_testcase_path = tc_rec.testcase_path
            AND utc.case_testcase_name = tc_rec.testcase_name;
-           
+
         IF l_count = 0 THEN
           INSERT
             INTO utplsql_test_case 
@@ -345,7 +344,7 @@ create or replace PACKAGE BODY PREPARE_TEST_RESULTS_PKG IS
       l_error_message := 'Error occured while inserting test result into utplsql_test_suite, utplsql_test_case tables'||' '|| l_pkg_name;
       raise;
   END ins_test_suite_and_case;
-  
+
   -- Main Test run call for selected Packges or Procedures
   PROCEDURE utplsql_run ( pi_pkg_name       IN  VARCHAR2,
                           Pi_prc_name       IN  VARCHAR2 DEFAULT NULL,
@@ -370,7 +369,7 @@ create or replace PACKAGE BODY PREPARE_TEST_RESULTS_PKG IS
       po_errror_message := l_error_message;
       RAISE;
   END utplsql_run;
-  
+
   -- Main Test run call to execute all packages from given user and suitepath
   PROCEDURE utplsql_run_all (pi_suite_path     IN  VARCHAR2 DEFAULT NULL,
                              pi_owner          IN  VARCHAR2,
@@ -406,7 +405,7 @@ create or replace PACKAGE BODY PREPARE_TEST_RESULTS_PKG IS
     dbms_lob.convertToBlob(l_return, pi_clob, length(pi_clob), l_val1, l_val1, l_val0, l_val0, l_val0);
     RETURN l_return;
   END clob2blob;
-  
+
   FUNCTION get_test_results_per_day(pi_schema    IN VARCHAR2,
                                     pi_test_name IN VARCHAR2) 
   RETURN t_sample_data PIPELINED
@@ -414,9 +413,9 @@ create or replace PACKAGE BODY PREPARE_TEST_RESULTS_PKG IS
     l_min_date_all DATE;
     l_max_date_all DATE;
     l_diff_dates   NUMBER;
-    
+
     l_date_anz        NUMBER;
-    
+
     l_sample_data t_sample_data;
   BEGIN
     -- get max and min date of all tests
@@ -425,18 +424,18 @@ create or replace PACKAGE BODY PREPARE_TEST_RESULTS_PKG IS
       INTO l_max_date_all,
            l_min_date_all
       FROM utplsql_test_case c;
-    
+
     SELECT l_max_date_all - l_min_date_all 
        INTO l_diff_dates
        FROM dual;
-    
+
     FOR i IN 0..l_diff_dates 
     LOOP
       SELECT COUNT(1)
         INTO l_date_anz
         FROM utplsql_test_case c
        WHERE to_date(c.case_executed_on, 'DD.MM.YY') = l_min_date_all + i;
-      
+
       IF l_date_anz >= 1 THEN
         SELECT 'test_'||lower(pi_schema)||pi_test_name AS t_test_suite_name,
                (SUM(suite_disabled_tests) + SUM(suite_errored_tests) + SUM(suite_failed_tests)) /SUM(suite_total_tests)*100 AS t_total_fail_pct,
@@ -449,14 +448,14 @@ create or replace PACKAGE BODY PREPARE_TEST_RESULTS_PKG IS
            AND s.suite_id = c.case_suite_id
            AND to_date (c.case_executed_on, 'DD.MM.YY') = l_min_date_all + i
          GROUP BY to_date(c.case_executed_on, 'DD.MM.YY');
-         
+
          if sql%rowcount > 0 then
            for k in l_sample_data.first .. l_sample_data.last
            loop
              pipe row(l_sample_data(k));
            end loop;
          end if;
-         
+
      ELSE
         IF i = 0 THEN
           SELECT 'test_'||lower(pi_schema)||pi_test_name AS t_test_suite_name,
@@ -468,14 +467,14 @@ create or replace PACKAGE BODY PREPARE_TEST_RESULTS_PKG IS
          WHERE instr(s.suite_testsuite_name,pi_test_name) >0
            AND s.suite_schema = coalesce(upper(pi_schema), s.suite_schema)
            AND s.suite_id = c.case_suite_id;
-          
+
          if sql%rowcount > 0 then
            for k in l_sample_data.first .. l_sample_data.last
            loop
              pipe row(l_sample_data(k));
            end loop;
          end if;
-         
+
         ELSE
           FOR j IN 1..l_diff_dates
           LOOP
@@ -483,7 +482,7 @@ create or replace PACKAGE BODY PREPARE_TEST_RESULTS_PKG IS
               INTO l_date_anz
               FROM utplsql_test_case c
              WHERE to_date(c.case_executed_on, 'DD.MM.YY') = l_min_date_all + i -j;
-            
+
             IF l_date_anz >= 1 THEN
               SELECT 'test_'||lower(pi_schema)||pi_test_name AS t_test_suite_name,
                (SUM(suite_disabled_tests) + SUM(suite_errored_tests) + SUM(suite_failed_tests)) /SUM(suite_total_tests)*100 AS t_total_fail_pct,
@@ -496,14 +495,14 @@ create or replace PACKAGE BODY PREPARE_TEST_RESULTS_PKG IS
            AND s.suite_id = c.case_suite_id
            AND to_date(c.case_executed_on, 'DD.MM.YY') = l_min_date_all + i -j
          GROUP BY to_date(c.case_executed_on, 'DD.MM.YY');
-         
+
          if sql%rowcount > 0 then
            for k in l_sample_data.first .. l_sample_data.last
            loop
              pipe row(l_sample_data(k));
            end loop;
          end if;
-         
+
          EXIT;
          END IF;
           END LOOP;
