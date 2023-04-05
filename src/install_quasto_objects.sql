@@ -85,6 +85,10 @@ PROMPT TRIGGER
 PROMPT src/plsql/trg/qaru_iu_trg.sql
 @src/plsql/trg/qaru_iu_trg.sql
 
+PROMPT VIEWS
+PROMPT src/plsql/vw/qaru_predecessor_order_v.sql
+@src/plsql/vw/qaru_predecessor_order_v.sql
+
 PROMPT GRANT
 grant execute on qa_api_pkg to public;
 grant execute on qa_rule_t to public;
