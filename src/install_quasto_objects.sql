@@ -45,6 +45,10 @@ PROMPT src/plsql/typ/qa_rule_t.sql
 PROMPT src/plsql/typ/qa_rules_t.sql
 @src/plsql/typ/qa_rules_t.sql
 
+PROMPT src/plsql/typ/running_rule_t.sql
+@src/plsql/typ/running_rule_t.sql
+
+
 PROMPT PACKAGE
 
 PROMPT src/plsql/pkg/qa_logger_pkg.sql
