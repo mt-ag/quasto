@@ -7,5 +7,5 @@ set verify off
 
 PROMPT PACKAGES
 PROMPT src/plsql/pkg/create_ut_test_packages_pkg.sql
-@src/plsql/pkg/qa_acreate_ut_test_packages_pkgpex_pkg.sql
+@src/plsql/pkg/create_ut_test_packages_pkg.sql
 
