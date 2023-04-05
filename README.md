@@ -135,6 +135,22 @@ from qa_api_pkg.tf_run_rules(pi_qaru_client_name => 'MT AG'
                             ,pi_target_scheme    => 'QUASTO')
 ```
 
+### Exclude objects in rules
+Sometimes a rule is valid for all objects except one. For this object it is possible to exclude the run. In the Table QA_RULES there exists the column QARU_EXCLUDE_OBJECTS. In this column you can add all objects you want to exclude from this rule.
+If you want to enter more than one object, you have to separate them with a ':'. Example: OBJECT_ONE:OBJECT_TO
+When you test a rule, the specified Objects will not run for this test and therefore will not give any feedback of the test run. The adding or deleting in the QARU_EXCLUDE_OBJECTS column will have impact in the next run immediatly.
+
+
+### Defining a test-run-order
+With the Column QARU_PREDECESSOR_IDS in the table QA_RULES it is possible to give an order to the test run. In this Column You can define which rules have to run successful before another rule can start.
+Therefore You have to add the rule names separated with a ':'. You can add one or more rules. Example: 12.3:4:1
+Be careful, that there is no recursive connection between the rules. Otherwise an Exception is raised an the run is stopped immediatly.
+If You have defined predecessors, the rules will be ordered first and the will be run in the predefined order.
+If one or more predecessors of one rule failed, the rule will not run. You have to fix the errors first. Even if all predecessors of a rule run successfully this rule will also run.
+
+With this option you have the ability to controll, which rule will run under which circumstance. It can also protect you to get a big log of failures. For example There could be a rule to check if apex exists.
+All rules that belongs to an apex scheme have this rule as predecessor. So if this first rule fails, no other apex rules will run.
+
 ## 4. Installing Guidelines and Specifications for the utPLSQL framework
 
 These installation instructions are based on the installation instructions of the software provider: http://utplsql.org/utPLSQL/latest/userguide/install.html
