@@ -14,19 +14,22 @@ PROMPT src/plsql/typ/qa_rule_t.sql
 @src/plsql/typ/qa_rule_t.sql
 PROMPT src/plsql/typ/running_rule_t.sql
 @src/plsql/typ/running_rule_t.sql
+PROMPT src/plsql/typ/running_rules_t.sql
+@src/plsql/typ/running_rules_t.sql
 PROMPT src/plsql/typ/varchar2_tab_t.sql
 @src/plsql/typ/varchar2_tab_t.sql
 
 PROMPT TABLES
-PROMPT src/ddl/qa_import_files.sql
-@src/ddl/qa_import_files.sql
+PROMPT src/ddl/tab/qa_import_files.sql
+@src/ddl/tab/qa_import_files.sql
 PROMPT src/ddl/utplsql_calendar_drop.sql
 @src/ddl/utplsql_calendar_drop.sql
 PROMPT src/ddl/utplsql_test_case_drop.sql
 @src/ddl/utplsql_test_case_drop.sql
+PROMPT src/ddl/utplsql_test_suite_drop.sql
+@src/ddl/utplsql_test_suite_drop.sql
 PROMPT src/ddl/utplsql_test_run_drop.sql
 @src/ddl/utplsql_test_run_drop.sql
-PROMPT src/ddl/utplsql_test_suite_drop.sql
 
 PROMPT SEQUENCES
 @src/ddl/utplsql_test_suite_drop.sql
