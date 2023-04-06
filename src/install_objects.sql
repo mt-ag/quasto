@@ -74,5 +74,5 @@ select 'Wrong Argument or no Argument has been passed correctly!' from dual wher
 set feedback on
 set head on
 
-@@src/~script_name_utplsql
 @@src/~script_name_quasto
+@@src/~script_name_utplsql
