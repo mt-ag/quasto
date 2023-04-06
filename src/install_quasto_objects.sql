@@ -67,7 +67,7 @@ declare
 begin
   if qa_constant_pkg.gc_apex_flag = 1
     then
-      l_script_name := 'qa_apex_pkg.sql';
+      l_script_name := 'plsql/pkg/qa_apex_pkg.sql';
     else
       l_script_name := 'null.sql';
   end if;
@@ -75,7 +75,7 @@ begin
 end;
 /
 select :script_apex from dual;
-@@src/plsql/pkg/~script_name_apex
+@@src/~script_name_apex
 
 
 PROMPT src/plsql/pkg/qa_api_pkg.sql
