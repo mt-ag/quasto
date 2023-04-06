@@ -17,9 +17,9 @@ PROMPT Running SQL file for installing the utPLSQL objects on the database. Call
 @src/ddl/fk/utplsql_test_case.sql
 @src/ddl/fk/utplsql_test_suite.sql
 @src/plsql/typ/varchar2_tab_t.sql
-@src/plsql/pkg/prepare_test_results_pkg.sql
-@src/plsql/pkg/create_ut_test_packages_pkg.sql
 @src/plsql/trg/cldr_iu_trg.sql
 @src/plsql/trg/case_iu_trg.sql
 @src/plsql/trg/run_iu_trg.sql
 @src/plsql/trg/suite_iu_trg.sql
+@src/plsql/pkg/prepare_test_results_pkg.sql
+@src/plsql/pkg/create_ut_test_packages_pkg.sql
