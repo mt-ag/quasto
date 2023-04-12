@@ -1,4 +1,4 @@
-PROMPT Running SQL file for installing the UTPLSQL objects on the database. Called from install_objects.sql 
+PROMPT Running SQL file for installing the UTPLSQL objects on the database. Called from install_objects.sql
 
 set define '~'
 set concat on
