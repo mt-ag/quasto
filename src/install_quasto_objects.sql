@@ -55,11 +55,11 @@ PROMPT PACKAGE
 PROMPT src/plsql/pkg/qa_logger_pkg.sql
 @src/plsql/pkg/qa_logger_pkg.sql
 
-PROMPT src/plsql/pkg/qa_api_pkg.sql
-@src/plsql/pkg/qa_api_pkg.sql
-
 PROMPT src/plsql/pkg/qa_main_pkg.sql
 @src/plsql/pkg/qa_main_pkg.sql
+
+PROMPT src/plsql/pkg/qa_api_pkg.sql
+@src/plsql/pkg/qa_api_pkg.sql
 
 PROMPT src/plsql/pkg/qa_apex_pkg.sql
 declare
@@ -76,10 +76,6 @@ end;
 /
 select :script_apex from dual;
 @@src/~script_name_apex
-
-
-PROMPT src/plsql/pkg/qa_api_pkg.sql
-@src/plsql/pkg/qa_api_pkg.sql
 
 PROMPT src/plsql/pkg/qa_export_import_rules_pkg.sql
 @src/plsql/pkg/qa_export_import_rules_pkg.sql
