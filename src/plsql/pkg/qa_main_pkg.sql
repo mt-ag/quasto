@@ -467,7 +467,7 @@ create or replace package body qa_main_pkg as
             ,table(cast(multiset (select level
                          from dual
                          connect by level <= length(regexp_replace(t.qaru_predecessor_ids
-                                                                  ,'[^:]+')) + 1) as sys.odcinumberlist)) levels
+                                                                  ,'[^:]+')) + 1) as sys.odcinumberlist)) levels 
         order by qaru_rule_number)
       select distinct 1
       into l_no_loop
