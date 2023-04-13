@@ -482,17 +482,19 @@ create or replace package body qa_main_pkg as
   
   exception
     when loop_detect_e then
-      qa_logger_pkg.p_qa_log(p_text   => 'A loop in the predecessor order is detected. Please resolve and start the testrun again!'
+      qa_logger_pkg.p_qa_log(p_text   => 'A loop in the predecessor order is detected for the rule_number: ' || l_loop_rule_number || ' Please resolve and start the testrun again!'
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
       dbms_output.put_line('The Rule Number contains a predecessor Loop: ' || l_loop_rule_number);
+      raise;
       return l_loop_rule_number;
     when others then
       qa_logger_pkg.p_qa_log(p_text   => 'Something went wrong when searching for loops in the predecessor order.'
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
+      raise;
       return l_loop_rule_number;
   end f_check_for_loop;
 
