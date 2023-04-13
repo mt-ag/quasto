@@ -53,7 +53,13 @@ create or replace package qa_main_pkg authid definer as
 
   procedure p_exclude_objects(pi_qa_rules in out nocopy qa_rules_t);
 
-  function f_check_for_loop(pi_qaru_client_name in qa_rules.qaru_client_name%type) return number;
+  function f_check_for_loop
+  (
+    pi_qaru_rule_number in qa_rules.qaru_rule_number%type default null
+   ,pi_client_name      in qa_rules.qaru_client_name%type default null
+  ) return qa_rules.qaru_rule_number%type;
+
+  function f_get_full_rule_pred(pi_rule_number in qa_rules.qaru_rule_number%type) return varchar2;
 
 end qa_main_pkg;
 /
@@ -378,7 +384,6 @@ create or replace package body qa_main_pkg as
     l_excluded         varchar2(32676);
   
   begin
-  
     if pi_qa_rules.count > 0
     then
       for i in pi_qa_rules.first .. pi_qa_rules.last
@@ -427,53 +432,113 @@ create or replace package body qa_main_pkg as
                             ,p_params => l_param_list);
   end p_exclude_objects;
 
-  function f_check_for_loop(pi_qaru_client_name in qa_rules.qaru_client_name%type) return number is
-    l_no_loop     number;
-    loop_detect_e exception;
-    pragma exception_init(loop_detect_e
-                         ,-1436);
-  
+  function f_check_for_loop
+  (
+    pi_qaru_rule_number in qa_rules.qaru_rule_number%type default null
+   ,pi_client_name      in qa_rules.qaru_client_name%type default null
+  ) return qa_rules.qaru_rule_number%type is
     c_unit constant varchar2(32767) := $$plsql_unit || '.f_check_for_loop';
     l_param_list qa_logger_pkg.tab_param;
+  
+    l_no_loop          number;
+    l_loop_rule_number qa_rules.qaru_rule_number%type;
+    loop_detect_e      exception;
+    pragma exception_init(loop_detect_e
+                         ,-1436);
   begin
     qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_qaru_client_name'
-                              ,p_val_01  => pi_qaru_client_name);
-    with splitted_pred as
-     (select distinct t.qaru_rule_number
-                     ,trim(regexp_substr(t.qaru_predecessor_ids
-                                        ,'[^:]+'
-                                        ,1
-                                        ,levels.column_value)) as predec
-      from qa_rules t
-          ,table(cast(multiset (select level
-                       from dual
-                       connect by level <= length(regexp_replace(t.qaru_predecessor_ids
-                                                                ,'[^:]+')) + 1) as sys.odcinumberlist)) levels
-      where qaru_client_name = pi_qaru_client_name
-      and qaru_is_active = 1
-      and qaru_error_level <= 4
-      order by qaru_rule_number)
-    select distinct 1
-    into l_no_loop
-    from splitted_pred
+                              ,p_name_01 => 'pi_qaru_rule_number'
+                              ,p_val_01  => pi_qaru_rule_number);
+  
+    for i in (select qaru_rule_number as rule_number
+              from qa_rules q
+              where q.qaru_predecessor_ids is not null
+              and (pi_qaru_rule_number is null or pi_qaru_rule_number = q.qaru_rule_number)
+              and (pi_client_name is null or pi_client_name = q.qaru_client_name))
+    loop
+      l_loop_rule_number := i.rule_number;
+      with splitted_pred as
+       (select distinct t.qaru_rule_number
+                       ,trim(regexp_substr(t.qaru_predecessor_ids
+                                          ,'[^:]+'
+                                          ,1
+                                          ,levels.column_value)) as predec
+        from qa_rules t
+            ,table(cast(multiset (select level
+                         from dual
+                         connect by level <= length(regexp_replace(t.qaru_predecessor_ids
+                                                                  ,'[^:]+')) + 1) as sys.odcinumberlist)) levels
+        where qaru_is_active = 1
+        and qaru_error_level <= 4
+        order by qaru_rule_number)
+      select distinct 1
+      into l_no_loop
+      from splitted_pred
+      connect by prior qaru_rule_number = predec
+      start with qaru_rule_number = i.rule_number;
     
-    connect by prior qaru_rule_number = predec
-    start with predec is null;
-    dbms_output.put_line('no loop');
-    return l_no_loop;
+    end loop;
+    return null;
+  
   exception
     when loop_detect_e then
       qa_logger_pkg.p_qa_log(p_text   => 'A loop in the predecessor order is detected. Please resolve and start the testrun again!'
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
-      raise;
+      dbms_output.put_line('The Rule Number contains a predecessor Loop: ' || l_loop_rule_number);
+      return l_loop_rule_number;
     when others then
       qa_logger_pkg.p_qa_log(p_text   => 'Something went wrong when searching for loops in the predecessor order.'
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
+      return l_loop_rule_number;
   end f_check_for_loop;
+
+  function f_get_full_rule_pred(pi_rule_number in qa_rules.qaru_rule_number%type) return varchar2 is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_full_rule_pred';
+    l_param_list qa_logger_pkg.tab_param;
+  
+    l_rule_predecessors varchar2(4000 char);
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_rule_number'
+                              ,p_val_01  => pi_rule_number);
+    for i in (select distinct trim(regexp_substr(q.qaru_predecessor_ids
+                                                ,'[^:]+'
+                                                ,1
+                                                ,level)) pred
+              from qa_rules q
+              where qaru_rule_number = pi_rule_number
+              connect by nocycle instr(q.qaru_predecessor_ids
+                              ,':'
+                              ,1
+                              ,level - 1) > 0
+              order by pred desc)
+    loop
+      if i.pred is not null
+      then
+        if f_check_for_loop(pi_qaru_rule_number => pi_rule_number) is null
+        then
+          l_rule_predecessors := l_rule_predecessors || i.pred || ', ' || f_get_full_rule_pred(pi_rule_number => i.pred);
+        else
+          return null;
+        end if;
+      else
+        return null;
+      end if;
+    end loop;
+    return regexp_replace(l_rule_predecessors
+                         ,',[^[:digit:]]*$');
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'Could not create predecessor list!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_get_full_rule_pred;
+
 end qa_main_pkg;
 /

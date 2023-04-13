@@ -24,14 +24,6 @@ end qa_api_pkg;
 /
 create or replace package body qa_api_pkg as
 
-  -- Flag to filter out Apex Rules depending on constant package entry
-  gc_apex_flag varchar2(10 char) := case
-                                      when qa_constant_pkg.gc_apex_flag = 0 then
-                                       'APEX'
-                                      else
-                                       null
-                                    end;
-
   function tf_run_rule
   (
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
@@ -46,7 +38,6 @@ create or replace package body qa_api_pkg as
     l_qa_rules qa_rules_t;
   
   begin
-  
   
     qa_logger_pkg.append_param(p_params  => l_param_list
                               ,p_name_01 => 'pi_qaru_rule_number'
@@ -118,12 +109,15 @@ create or replace package body qa_api_pkg as
   
     l_allowed_to_run number;
     l_success        varchar2(1);
-    l_no_loop        number;
+    l_no_loop        qa_rules.qaru_rule_number%type;
   
   begin
     --check for loops in predecessor order (raises error if cycle is detected so no if clause is needed)
-    l_no_loop := qa_main_pkg.f_check_for_loop(pi_qaru_client_name);
-
+    l_no_loop := qa_main_pkg.f_check_for_loop(pi_qaru_rule_number => null, pi_client_name => pi_qaru_client_name);
+    if l_no_loop is not null
+    then
+      return null;
+    end if;
   
     select running_rule_t(t.qaru_rule_number
                          ,trim(regexp_substr(t.qaru_predecessor_ids
