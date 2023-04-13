@@ -468,8 +468,6 @@ create or replace package body qa_main_pkg as
                          from dual
                          connect by level <= length(regexp_replace(t.qaru_predecessor_ids
                                                                   ,'[^:]+')) + 1) as sys.odcinumberlist)) levels
-        where qaru_is_active = 1
-        and qaru_error_level <= 4
         order by qaru_rule_number)
       select distinct 1
       into l_no_loop
@@ -488,9 +486,9 @@ create or replace package body qa_main_pkg as
                             ,p_params => l_param_list);
       dbms_output.put_line('The Rule Number contains a predecessor Loop: ' || l_loop_rule_number);
       raise;
-      return l_loop_rule_number;
+      return l_loop_rule_number;      
     when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'Something went wrong when searching for loops in the predecessor order.'
+      qa_logger_pkg.p_qa_log(p_text   => 'Something went wrong when searching for loops in the predecessor order for rule_number: ' || l_loop_rule_number
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
