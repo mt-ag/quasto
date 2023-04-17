@@ -1,0 +1,50 @@
+QUASTO Release Update
+
+QUASTO - Quality Assurance Tool
+
+Release Date: 17.04.2023
+
+Release Version: 1.1
+
+
+Overview:
+Quasto is a project for checking guidelines and code quality for inside the oracle database. You can define rules for 
+your own projects to check the quality in different kind of Database Objects including APEX. It is possible to upload and download sets of
+rules and to define orders in which the rules will be processed.
+Project uses the MIT License.
+
+
+Features:
+
+Upload an Download rules in JSON format: Now it is possible to easily upload or download a bulk of rules in JSON format. With this option
+You do not have to upload rule by rule. You now can upload a set of rules. With this option it is also possible to download a set of rules of
+one project and install them in a nother project.
+
+Logging of Erros: A logger-processing is added now. This Includes the Oracle integrated logging and is added in every 
+Function and Procedure so that an easy analysing of Errors is now possible. The Logger will raise an Error including the Procedure name and the information of the Object that
+raises the error.
+
+Excluding Objects in rules: Now it is possible to define for which Objects a rule will not run. You can exclude Objects for example when you already
+know that an object does not fit a rule but have to keep as it is for reasons.
+
+Defining predecessors: It is now possible to define a predecessor order for rules if it is necessary that one or more rules
+have to run before a nother rule. You can build complete predecessor chains. There will be also a check for cycles in the chains that
+will stop the preocessing immediatly if a cycle is detected.
+
+
+Changes:
+
+Code Generation for Testpackages: The processing of generating the Test Packages ha been revised.
+
+Using Rules to Check APEX: The Structure of the rules is changed, that it is now possible to also check the APEX context. The rules for
+APEX differ in the parameters apex_app_id and apex_page_id to the existing rules.
+
+New rule processing order: The processing order of the rules has now changed. They will be processed now based on the predecessor order if defined.
+
+
+Notes:
+
+The Release 1.1 holds all relevant information for a full software install and for an update from Release 1.0 to 1.1
+Therefore if you have not installed QUASTO yet, you only need the installation for Release 1.1 to get a full instalaltion.
+
+Please read the installation instructions on github for furhter informtaion: https://github.com/mt-ag/quasto
