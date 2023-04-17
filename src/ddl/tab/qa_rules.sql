@@ -20,7 +20,8 @@ declare
   qaru_created_on      DATE not null,
   qaru_created_by      VARCHAR2(255 CHAR) not null,
   qaru_updated_on      DATE not null,
-  qaru_updated_by      VARCHAR2(255 CHAR) not null
+  qaru_updated_by      VARCHAR2(255 CHAR) not null,
+  qaru_failure_rate    NUMBER
 )';
   l_count number;
 begin
@@ -59,16 +60,16 @@ begin
       from user_tables
      where table_name = 'QA_RULES';
     if l_count = 0 THEN 
-      dbms_output.put_line('Creation of table QA_RULES failed.');
+      dbms_output.put_line('ERROR: Creation of table QA_RULES failed.');
     else
-      dbms_output.put_line('Table QA_RULES has been created.');
+      dbms_output.put_line('INFO: Table QA_RULES has been created.');
     end if;
   else
-    dbms_output.put_line('Table QA_RULES was already created.');
+    dbms_output.put_line('WARNING: Table QA_RULES was already created.');
   end if;
   
 exception
   when others then
-    dbms_output.put_line('Table QA_RULES could not been created.' || SQLERRM);
+    dbms_output.put_line('ERROR: Table QA_RULES could not been created.' || SQLERRM);
 end;
 /

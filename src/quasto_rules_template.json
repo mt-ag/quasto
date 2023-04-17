@@ -1,0 +1,31 @@
+{   "version"  : 1.1,
+	"qa_rules" : 
+	[
+		{ "client_names" : 
+			[
+				{ "client_name" string,
+				  "categories" : 
+					[
+						{ "category" : string,
+						  "rules" : 
+							[
+								{ "rule_number"     : string,
+								  "name"            : string,
+								  "error_message"   : string,
+								  "comment"         : string,
+								  "exclude_objects" : string,
+								  "error_level"     : number,
+								  "is_active"       : number,
+								  "sql"             : string,
+								  "predecessor_ids" : string,
+								  "layer"           : string,
+								  "object_types"	: string
+								},...
+							]
+						},...
+					]
+				},...
+			]
+		}
+	]
+}

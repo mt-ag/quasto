@@ -22,12 +22,12 @@ begin
   
     if l_count = 0
     then
-      dbms_output.put_line('Creation of index ' || l_name || ' failed.');
+      dbms_output.put_line('ERROR: Creation of index ' || l_name || ' failed.');
     else
-      dbms_output.put_line('Index ' || l_name || ' has been created.');
+      dbms_output.put_line('INFO: Index ' || l_name || ' has been created.');
     end if;
   else
-    dbms_output.put_line('Index ' || l_name || ' was already created.');
+    dbms_output.put_line('WARNING: Index ' || l_name || ' was already created.');
   end if;
 
   -- ################################
@@ -50,12 +50,12 @@ begin
   
     if l_count = 0
     then
-      dbms_output.put_line('Creation of index ' || l_name || ' failed.');
+      dbms_output.put_line('ERROR: Creation of index ' || l_name || ' failed.');
     else
-      dbms_output.put_line('Index ' || l_name || ' has been created.');
+      dbms_output.put_line('INFO: Index ' || l_name || ' has been created.');
     end if;
   else
-    dbms_output.put_line('Index ' || l_name || ' was already created.');
+    dbms_output.put_line('WARNING: Index ' || l_name || ' was already created.');
   end if;
 
   -- ################################
@@ -78,16 +78,16 @@ begin
     
     if l_count = 0
     then
-      dbms_output.put_line('Creation of index ' || l_name || ' failed.');
+      dbms_output.put_line('ERROR: Creation of index ' || l_name || ' failed.');
     else
-      dbms_output.put_line('Index ' || l_name || ' has been created.');
+      dbms_output.put_line('INFO: Index ' || l_name || ' has been created.');
     end if;
   else
-    dbms_output.put_line('Index ' || l_name || ' was already created.');
+    dbms_output.put_line('WARNING: Index ' || l_name || ' was already created.');
   end if;
   
 exception
   when others then
-    dbms_output.put_line('Indices could not been created. ' || sqlerrm);
+    dbms_output.put_line('ERROR: Indices could not been created. ' || sqlerrm);
 end;
 /
