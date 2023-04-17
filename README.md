@@ -287,7 +287,7 @@ Afterwards you connect to the DB via SQL-Plus and run the following command:
 @export_rules_to_file.sql "[Client Name]" "[Category (optional)]"
 ```
 Here we use two paramters.
-1. The name of the Client we want to export the rules.
+1. The name of the Client we want to export the rules. This name needs to be the exact entry of the Client Name inside the qa_rules table!
 2. The optional name of the Category for which rules we want to export.
 Note: Leaving the brackets empty is required in case the user wants to export all categories at once.
 
