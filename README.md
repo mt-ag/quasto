@@ -70,7 +70,7 @@ All of these scripts can be run without arguments and should be executed in the 
 
 Example:
 ```
-@install_utplsql_objects.sql
+@install_utplsql_objects.sql 1 1 0 0
 ```
 
 ### Uninstalling utPLSQL and QUASTO objects
@@ -273,6 +273,44 @@ To check the framework version the following query must be executed:
 
 ```
 select substr(ut.version(),1,60) as ut_version from dual;
+
+### Export- and Import-Rules
+
+## Exporting Rules:
+
+In order to export a JSON-File of the currently exisiting rules of the qa_rules table we need to connect to the database via SQL-Plus inside the Installation folder.
+For example open up cmd. And change with cd into the folder where your Quasto is located. It is required to be in the oracle-qa-tool\src\scripts Folder.
+Afterwards you connect to the DB via SQL-Plus and run the following command:
+
+```
+@export_rules_to_file.sql "[Client Name]" "[Category (optional)]"
+```
+Here we use two paramters.
+1. The name of the Client we want to export the rules.
+2. The optional name of the Category for which rules we want to export.
+Note: Leaving the brackets empty is required in case the user wants to export all categories at once.
+
+Example:
+```
+@export_rules_to_file.sql "MT IT-Solutions" ""
+```
+
+## Importing Rules:
+In order to import Rules SQL CL is required. The user has to either download it and unzip the client or can use any existing installation.
+We need to switch into the scripts folder in cmd again before connecting to the Database. Then we connect via SQL CL and issue the import command
+which is build as follows:
+
+
+```
+script import_file_to_rules.js "[Filename.json]" "[Flag 1/0 - to determine Full Import]"
+```
+1. First parameter defines the exact Json-Filename that is required
+2. Second Paramter defines if the File is only going to be imported into a table qa_import_files or fully migrated into the qa_rules table
+   To fully import the Rules choose the Flag 1. Remember that this parameter is always required to run the Script successfully
+  
+Example Script-Call:
+```
+script import_file_to_rules.js "qa_rules_MT_IT_Solutions.json" 1
 ```
 
 ### Uninstalling utPLSQL
