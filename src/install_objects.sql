@@ -13,7 +13,7 @@ variable script_quasto VARCHAR2(50)
 
 --Begin Instruction
 PROMPT '------------------------------------'
-PROMPT the install scripts expects 3 diffrent arguments!
+PROMPT the install scripts expects 4 diffrent arguments!
 PROMPT these arguments are expected in a certain order
 PROMPT 
 PROMPT example Usage:
