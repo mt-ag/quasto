@@ -273,6 +273,7 @@ To check the framework version the following query must be executed:
 
 ```
 select substr(ut.version(),1,60) as ut_version from dual;
+```
 
 ### Export- and Import-Rules
 
