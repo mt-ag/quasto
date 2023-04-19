@@ -21,7 +21,8 @@ create or replace package qa_api_pkg authid current_user as
   ) return qa_rules_t;
 
 end qa_api_pkg;
-/create or replace package body qa_api_pkg as
+/
+create or replace package body qa_api_pkg as
 
   function tf_run_rule
   (
