@@ -123,86 +123,35 @@ create or replace package body create_ut_test_packages_pkg is
           l_clob := l_clob || 'PROCEDURE p_ut_test_' || rec_rules.qaru_name_unified || chr(10);
           l_clob := l_clob || 'IS' || chr(10);
           l_clob := l_clob || '  l_schema_names VARCHAR2_TAB_T := VARCHAR2_TAB_T();' || chr(10);
-          l_clob := l_clob || '  l_app_id NUMBER;' || chr(10);
-          l_clob := l_clob || '  l_app_page_id NUMBER;' || chr(10);
           l_clob := l_clob || '  l_layer qa_rules.qaru_layer%type;' || chr(10);
           l_clob := l_clob || '  l_result NUMBER;' || chr(10);
           l_clob := l_clob || '  l_object_names CLOB;' || chr(10);
           l_clob := l_clob || '  l_error_message qa_rules.qaru_error_message%type;' || chr(10);
           l_clob := l_clob || f_get_logger_spec(l_package_name);
-          l_clob := l_clob || 'BEGIN' || chr(10);
         
-          if rec_rules.qaru_category = 'APEX'
-          then
-            if rec_rules.qaru_layer = 'PAGE'
-            then
-            
-              l_clob := l_clob || 'FOR rec IN (SELECT aapp.application_id' || chr(10);
-              l_clob := l_clob || '                 , aapp.page_id' || chr(10);
-              l_clob := l_clob || '              FROM apex_application_pages aapp' || chr(10);
-              l_clob := l_clob || '          ORDER BY aapp.application_id, aapp.page_id ASC)' || chr(10);
-              l_clob := l_clob || 'LOOP' || chr(10);
-              l_clob := l_clob || '  l_app_id := rec.application_id;' || chr(10);
-              l_clob := l_clob || '  l_app_page_id := rec.page_id;' || chr(10);
-              l_clob := l_clob || '  l_layer := ''' || rec_rules.qaru_layer || ' (Application: ''||rec.application_id||'' - Page: ''||rec.page_id||'')'';' || chr(10);
-            
-            elsif rec_rules.qaru_layer = 'APPLICATION'
-            then
-            
-              l_clob := l_clob || 'FOR rec IN (SELECT apap.application_id' || chr(10);
-              l_clob := l_clob || '              FROM apex_applications apap' || chr(10);
-              l_clob := l_clob || '          ORDER BY apap.application_id ASC)' || chr(10);
-              l_clob := l_clob || 'LOOP' || chr(10);
-              l_clob := l_clob || '  l_app_id := rec.application_id;' || chr(10);
-              l_clob := l_clob || '  l_app_page_id := null;' || chr(10);
-              l_clob := l_clob || '  l_layer := ''' || rec_rules.qaru_layer || ' (Application: ''||rec.application_id||'')'';' || chr(10);
-            
-            end if;
-          
-            l_clob := l_clob || '  qa_main_pkg.p_test_apex_rule(pi_qaru_client_name  => ''' || rec_clients.qaru_client_name || ''',' || chr(10);
-            l_clob := l_clob || '                               pi_qaru_rule_number  => ''' || rec_rules.qaru_rule_number || ''',' || chr(10);
-            l_clob := l_clob || '                               pi_schema_names      => l_schema_names,' || chr(10);
-            l_clob := l_clob || '                               pi_app_id            => l_app_id,' || chr(10);
-            l_clob := l_clob || '                               pi_app_page_id       => l_app_page_id,' || chr(10);
-            l_clob := l_clob || '                               po_result            => l_result,' || chr(10);
-            l_clob := l_clob || '                               po_object_names      => l_object_names,' || chr(10);
-            l_clob := l_clob || '                               po_error_message     => l_error_message);' || chr(10);
-          
-          else
-          
-            l_clob := l_clob || '  l_app_id := null;' || chr(10);
-            l_clob := l_clob || '  l_app_page_id := null;' || chr(10);
-            l_clob := l_clob || '  l_layer := ''' || rec_rules.qaru_layer || ''';' || chr(10);
-            l_clob := l_clob || '  for i in ( select au.username' || chr(10);
-            l_clob := l_clob || '               from all_users au' || chr(10);
-            l_clob := l_clob || '              where ( au.username not like ''%SYS%'' and au.username not like ''%APEX%'' )' || chr(10);
-            l_clob := l_clob || '           )' || chr(10);
-            l_clob := l_clob || '  loop' || chr(10);
-            l_clob := l_clob || '    l_schema_names.extend;' || chr(10);
-            l_clob := l_clob || '    l_schema_names(l_schema_names.last) := i.username;' || chr(10);
-            l_clob := l_clob || '  end loop;' || chr(10);
-          
-            l_clob := l_clob || '  qa_main_pkg.p_test_rule(pi_qaru_client_name  => ''' || rec_clients.qaru_client_name || ''',' || chr(10);
-            l_clob := l_clob || '                          pi_qaru_rule_number  => ''' || rec_rules.qaru_rule_number || ''',' || chr(10);
-            l_clob := l_clob || '                          pi_schema_names      => l_schema_names,' || chr(10);
-            l_clob := l_clob || '                          po_result            => l_result,' || chr(10);
-            l_clob := l_clob || '                          po_object_names      => l_object_names,' || chr(10);
-            l_clob := l_clob || '                          po_error_message     => l_error_message);' || chr(10);
-          
-          end if;
+          l_clob := l_clob || 'BEGIN' || chr(10);
+          l_clob := l_clob || '  l_layer := ''' || rec_rules.qaru_layer || ''';' || chr(10);
+          l_clob := l_clob || '  for i in ( select au.username' || chr(10);
+          l_clob := l_clob || '               from all_users au' || chr(10);
+          l_clob := l_clob || '              where ( au.username not like ''%SYS%'' and au.username not like ''%APEX%'' )' || chr(10);
+          l_clob := l_clob || '           )' || chr(10);
+          l_clob := l_clob || '  loop' || chr(10);
+          l_clob := l_clob || '    l_schema_names.extend;' || chr(10);
+          l_clob := l_clob || '    l_schema_names(l_schema_names.last) := i.username;' || chr(10);
+          l_clob := l_clob || '  end loop;' || chr(10);
+        
+          l_clob := l_clob || '  qa_main_pkg.p_test_rule(pi_qaru_client_name  => ''' || rec_clients.qaru_client_name || ''',' || chr(10);
+          l_clob := l_clob || '                          pi_qaru_rule_number  => ''' || rec_rules.qaru_rule_number || ''',' || chr(10);
+          l_clob := l_clob || '                          pi_schema_names      => l_schema_names,' || chr(10);
+          l_clob := l_clob || '                          po_result            => l_result,' || chr(10);
+          l_clob := l_clob || '                          po_object_names      => l_object_names,' || chr(10);
+          l_clob := l_clob || '                          po_error_message     => l_error_message);' || chr(10);
         
           l_clob := l_clob || '  ut.expect(l_result).to_(equal(1));' || chr(10);
           l_clob := l_clob || '  dbms_output.put_line(''  --INFO-- Test "' || rec_rules.qaru_test_name || '" completed with result ''||l_result);' || chr(10);
           l_clob := l_clob || '  dbms_output.put_line(''           Layer: ''||l_layer);' || chr(10);
           l_clob := l_clob || '  dbms_output.put_line(''           Error message: ''||l_error_message);' || chr(10);
           l_clob := l_clob || '  dbms_output.put_line(''           Invalid objects: ''||l_object_names);' || chr(10);
-        
-          if rec_rules.qaru_category = 'APEX'
-          then
-          
-            l_clob := l_clob || 'END LOOP;' || chr(10);
-          
-          end if;
         
           l_clob := l_clob || f_get_logger_exception(l_package_name);
           l_clob := l_clob || '    RAISE;' || chr(10);
@@ -269,8 +218,6 @@ create or replace package body create_ut_test_packages_pkg is
         l_clob := l_clob || 'PROCEDURE p_ut_test_' || rec_client_rules.qaru_name_unified || chr(10);
         l_clob := l_clob || 'IS' || chr(10);
         l_clob := l_clob || '  l_schema_names VARCHAR2_TAB_T := VARCHAR2_TAB_T();' || chr(10);
-        l_clob := l_clob || '  l_app_id NUMBER;' || chr(10);
-        l_clob := l_clob || '  l_app_page_id NUMBER;' || chr(10);
         l_clob := l_clob || '  l_layer qa_rules.qaru_layer%type;' || chr(10);
         l_clob := l_clob || '  l_result NUMBER;' || chr(10);
         l_clob := l_clob || '  l_object_names CLOB;' || chr(10);
@@ -278,9 +225,6 @@ create or replace package body create_ut_test_packages_pkg is
         l_clob := l_clob || f_get_logger_spec(l_package_name) || chr(10);
         l_clob := l_clob || 'BEGIN' || chr(10);
       
-      
-        l_clob := l_clob || '  l_app_id := null;' || chr(10);
-        l_clob := l_clob || '  l_app_page_id := null;' || chr(10);
         l_clob := l_clob || '  l_layer := ''' || rec_client_rules.qaru_layer || ''';' || chr(10);
         l_clob := l_clob || '  for i in ( select au.username' || chr(10);
         l_clob := l_clob || '               from all_users au' || chr(10);
