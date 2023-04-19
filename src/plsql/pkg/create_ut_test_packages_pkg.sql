@@ -54,7 +54,7 @@ create or replace package body create_ut_test_packages_pkg is
     qa_logger_pkg.append_param(p_params => l_param_list
                               ,p_name => 'pi_option'
                               ,p_val  => pi_option);
-                              
+
     if pi_option not in ( c_single_package
                         , c_single_package_per_rule
                         , c_single_rule_per_object
@@ -62,7 +62,7 @@ create or replace package body create_ut_test_packages_pkg is
     then
       raise_application_error(-20001, 'Invalid input parameter value: ' || pi_option);
     end if;
-    
+
     if pi_option = c_single_package
     then
 
@@ -163,7 +163,7 @@ create or replace package body create_ut_test_packages_pkg is
             l_clob := l_clob || '  l_layer := ''' || rec_rules.qaru_layer || ' (Application: ''||rec.application_id||'')'';' || chr(10);
 
           end if;
-          
+
           l_clob := l_clob || '  qa_main_pkg.p_test_apex_rule(pi_qaru_client_name  => ''' || rec_clients.qaru_client_name || ''',' || chr(10);
           l_clob := l_clob || '                               pi_qaru_rule_number  => ''' || rec_rules.qaru_rule_number || ''',' || chr(10);
           l_clob := l_clob || '                               pi_schema_names      => l_schema_names,' || chr(10);
@@ -172,7 +172,7 @@ create or replace package body create_ut_test_packages_pkg is
           l_clob := l_clob || '                               po_result            => l_result,' || chr(10);
           l_clob := l_clob || '                               po_object_names      => l_object_names,' || chr(10);
           l_clob := l_clob || '                               po_error_message     => l_error_message);' || chr(10);
-        
+
         else
 
           l_clob := l_clob || '  l_app_id := null;' || chr(10);
@@ -186,7 +186,7 @@ create or replace package body create_ut_test_packages_pkg is
           l_clob := l_clob || '    l_schema_names.extend;' || chr(10);
           l_clob := l_clob || '    l_schema_names(l_schema_names.last) := i.username;' || chr(10);
           l_clob := l_clob || '  end loop;' || chr(10);
-          
+
           l_clob := l_clob || '  qa_main_pkg.p_test_rule(pi_qaru_client_name  => ''' || rec_clients.qaru_client_name || ''',' || chr(10);
           l_clob := l_clob || '                          pi_qaru_rule_number  => ''' || rec_rules.qaru_rule_number || ''',' || chr(10);
           l_clob := l_clob || '                          pi_schema_names      => l_schema_names,' || chr(10);
@@ -218,13 +218,13 @@ create or replace package body create_ut_test_packages_pkg is
       l_clob := l_clob || 'END ' || l_package_name || ';';
 
     end loop;
-    
+
     execute immediate l_clob;
     dbms_output.put_line('Package body for ' || l_package_name || ' created.');
 
     elsif pi_option = c_single_package_per_rule
     then
-    
+
     for rec_client_rules in (select qaru_client_name
                                     ,qaru_rule_number
                                     ,qaru_name
@@ -309,7 +309,7 @@ create or replace package body create_ut_test_packages_pkg is
             l_clob := l_clob || '  l_layer := ''' || rec_client_rules.qaru_layer || ' (Application: ''||rec.application_id||'')'';' || chr(10);
 
           end if;
-          
+
           l_clob := l_clob || '  qa_main_pkg.p_test_apex_rule(pi_qaru_client_name  => ''' || rec_client_rules.qaru_client_name || ''',' || chr(10);
           l_clob := l_clob || '                               pi_qaru_rule_number  => ''' || rec_client_rules.qaru_rule_number || ''',' || chr(10);
           l_clob := l_clob || '                               pi_schema_names      => l_schema_names,' || chr(10);
@@ -318,7 +318,7 @@ create or replace package body create_ut_test_packages_pkg is
           l_clob := l_clob || '                               po_result            => l_result,' || chr(10);
           l_clob := l_clob || '                               po_object_names      => l_object_names,' || chr(10);
           l_clob := l_clob || '                               po_error_message     => l_error_message);' || chr(10);
-        
+
         else
 
           l_clob := l_clob || '  l_app_id := null;' || chr(10);
@@ -332,7 +332,7 @@ create or replace package body create_ut_test_packages_pkg is
           l_clob := l_clob || '    l_schema_names.extend;' || chr(10);
           l_clob := l_clob || '    l_schema_names(l_schema_names.last) := i.username;' || chr(10);
           l_clob := l_clob || '  end loop;' || chr(10);
-          
+
           l_clob := l_clob || '  qa_main_pkg.p_test_rule(pi_qaru_client_name  => ''' || rec_client_rules.qaru_client_name || ''',' || chr(10);
           l_clob := l_clob || '                          pi_qaru_rule_number  => ''' || rec_client_rules.qaru_rule_number || ''',' || chr(10);
           l_clob := l_clob || '                          pi_schema_names      => l_schema_names,' || chr(10);
@@ -360,17 +360,17 @@ create or replace package body create_ut_test_packages_pkg is
         l_clob := l_clob || 'END p_ut_test_' || rec_client_rules.qaru_name_unified || ';' || chr(10);
 
       l_clob := l_clob || 'END ' || l_package_name || ';';
-      
+
       execute immediate l_clob;
       dbms_output.put_line('Package body for ' || l_package_name || ' created.');
 
     end loop;
-    
+
     elsif pi_option = c_single_rule_per_object
     then
-    
+
         null;
-    
+
     end if;
 
   exception
