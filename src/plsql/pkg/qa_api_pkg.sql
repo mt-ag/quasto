@@ -33,38 +33,22 @@ create or replace package body qa_api_pkg as
   
     c_unit constant varchar2(32767) := $$plsql_unit || '.tf_run_rule';
     l_param_list qa_logger_pkg.tab_param;
-  
+
     l_qa_rule  qa_rule_t;
     l_qa_rules qa_rules_t;
-  
+
   begin
-  
+
     qa_logger_pkg.append_param(p_params  => l_param_list
                               ,p_name_01 => 'pi_qaru_rule_number'
                               ,p_val_01  => pi_qaru_rule_number
                               ,p_name_02 => 'pi_qaru_client_name'
                               ,p_val_02  => pi_qaru_client_name);
-  
-  
+
+
     l_qa_rule := qa_main_pkg.f_get_rule(pi_qaru_rule_number => pi_qaru_rule_number
                                        ,pi_qaru_client_name => pi_qaru_client_name);
-  
-    -- Fill Apex Type Attributes when its an Apex Rule
-    if l_qa_rule.qaru_category = 'APEX'
-    then
-      execute immediate l_qa_rule.qaru_sql bulk collect
-        into l_qa_rules
-      -- :1 scheme
-      -- :2 qaru_id
-      -- :3 qaru_category
-      -- :4 qaru_error_level
-      -- :5 qaru_object_types
-      -- :6 qaru_error_message    
-      -- :7 qaru_sql
-      -- :8 apex_app_id
-      -- :9 apex_page_id
-        using pi_target_scheme, l_qa_rule.qaru_id, l_qa_rule.qaru_category, l_qa_rule.qaru_error_level, l_qa_rule.qaru_object_types, l_qa_rule.qaru_error_message, l_qa_rule.qaru_sql, l_qa_rule.apex_app_id, l_qa_rule.apex_page_id;
-    else
+
       execute immediate l_qa_rule.qaru_sql bulk collect
         into l_qa_rules
       -- :1 scheme
@@ -75,8 +59,7 @@ create or replace package body qa_api_pkg as
       -- :6 qaru_error_message    
       -- :7 qaru_sql
         using pi_target_scheme, l_qa_rule.qaru_id, l_qa_rule.qaru_category, l_qa_rule.qaru_error_level, l_qa_rule.qaru_object_types, l_qa_rule.qaru_error_message, l_qa_rule.qaru_sql;
-    end if;
-  
+
     qa_main_pkg.p_exclude_objects(pi_qa_rules => l_qa_rules);
     return l_qa_rules;
   exception
@@ -101,16 +84,16 @@ create or replace package body qa_api_pkg as
   ) return qa_rules_t is
     c_unit constant varchar2(32767) := $$plsql_unit || '.tf_run_rules';
     l_param_list qa_logger_pkg.tab_param;
-  
+
     l_qaru_rule_numbers varchar2_tab_t;
     l_qa_rules          qa_rules_t := new qa_rules_t();
     l_qa_rules_temp     qa_rules_t := new qa_rules_t();
     l_running_rules     running_rules_t := new running_rules_t();
-  
+
     l_allowed_to_run number;
     l_success        varchar2(1);
     l_no_loop        qa_rules.qaru_rule_number%type;
-  
+
   begin
     --check for loops in predecessor order (raises error if cycle is detected so no if clause is needed)
     l_no_loop := qa_main_pkg.f_check_for_loop(pi_qaru_rule_number => null, pi_client_name => pi_qaru_client_name);
@@ -118,7 +101,7 @@ create or replace package body qa_api_pkg as
     then
       return null;
     end if;
-  
+
     select running_rule_t(t.qaru_rule_number
                          ,trim(regexp_substr(t.qaru_predecessor_ids
                                             ,'[^:]+'
@@ -139,16 +122,16 @@ create or replace package body qa_api_pkg as
                      connect by level <= length(regexp_replace(t.qaru_predecessor_ids
                                                               ,'[^:]+')) + 1) as sys.odcinumberlist)) levels
     where t.qaru_client_name = pi_qaru_client_name;
-  
-  
+
+
     qa_logger_pkg.append_param(p_params  => l_param_list
                               ,p_name_01 => 'pi_qaru_client_name'
                               ,p_val_01  => pi_qaru_client_name
                               ,p_name_02 => 'pi_target_scheme'
                               ,p_val_02  => pi_target_scheme);
-  
+
     l_qaru_rule_numbers := qa_main_pkg.tf_get_rule_numbers(pi_qaru_client_name => pi_qaru_client_name);
-  
+
     for i in 1 .. l_qaru_rule_numbers.count
     loop
       --count all predecessors that are not run now or where the run was not successfull
@@ -159,16 +142,16 @@ create or replace package body qa_api_pkg as
                               from table(l_running_rules) t
                               where t.rule_number = l_qaru_rule_numbers(i)
                               and (success_run is null or success_run <> 'Y'));
-    
+
       -- if there is no predecessor not running or not being successfull, run this rule
       if l_allowed_to_run = 0
       then
         l_qa_rules_temp := tf_run_rule(pi_qaru_rule_number => l_qaru_rule_numbers(i)
                                       ,pi_qaru_client_name => pi_qaru_client_name
                                       ,pi_target_scheme    => pi_target_scheme);
-      
+
         l_qa_rules := l_qa_rules multiset union l_qa_rules_temp;
-      
+
         l_success := case
                        when l_qa_rules.count = 0 then
                         'Y'
@@ -191,9 +174,9 @@ create or replace package body qa_api_pkg as
           l_running_rules(upd.row_val).success_run := 'N';
         end loop;
       end if;
-    
+
     end loop;
-  
+
     return l_qa_rules;
   exception
     when no_data_found then
