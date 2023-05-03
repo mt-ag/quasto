@@ -27,8 +27,16 @@ create or replace package body qa_unit_tests_pkg is
     pi_option         in number,
     pi_schema_names   in varchar2
   ) is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.p_validate_input';
+    l_param_list qa_logger_pkg.tab_param;
+
     l_schema_exist number;
   begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_option'
+                              ,p_val_01  => pi_option
+                              ,p_name_02 => 'pi_schema_names'
+                              ,p_val_02  => pi_schema_names);
 
     if pi_option not in ( qa_constant_pkg.gc_utplsql_single_package
                         , qa_constant_pkg.gc_utplsql_single_package_per_rule
@@ -59,21 +67,22 @@ create or replace package body qa_unit_tests_pkg is
         end if;
       end loop;
     end if;
-
   exception
     when others then
-      dbms_output.put_line('--ERROR--');
-      dbms_output.put_line('Validation of input pi_option=' || pi_option || ' and pi_schema_names=' || pi_schema_names || ' raised exception.');
-      dbms_output.put_line(sqlerrm);
-      dbms_output.put_line(dbms_utility.format_error_backtrace);
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while validating the input!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
       raise;
   end p_validate_input;
 
   procedure p_delete_test_packages
   is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.p_delete_test_packages';
+    l_param_list qa_logger_pkg.tab_param;
+
     l_package_name varchar2(255);
   begin
-
     for rec_packages in (select object_name
                          from user_objects
                          where object_type = 'PACKAGE'
@@ -83,13 +92,12 @@ create or replace package body qa_unit_tests_pkg is
       execute immediate 'DROP PACKAGE ' || l_package_name;
       dbms_output.put_line('Drop of package ' || l_package_name || ' successful.');
     end loop;
-
   exception
     when others then
-      dbms_output.put_line('--ERROR--');
-      dbms_output.put_line('Drop of package ' || l_package_name || ' raised exception.');
-      dbms_output.put_line(sqlerrm);
-      dbms_output.put_line(dbms_utility.format_error_backtrace);
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while deleting the packages!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
       raise;
   end p_delete_test_packages;
 
@@ -97,18 +105,24 @@ create or replace package body qa_unit_tests_pkg is
     pi_schema_names in varchar2
   ) return varchar2
   is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_transform_schema_names';
+    l_param_list qa_logger_pkg.tab_param;
+
     l_return varchar2(255);
   begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_schema_names'
+                              ,p_val_01  => pi_schema_names);
 
     l_return := REPLACE(upper(pi_schema_names), ',', ''',''');
-    return l_return;
 
+    return l_return;
   exception
     when others then
-      dbms_output.put_line('--ERROR--');
-      dbms_output.put_line('Transforming of schema names ' || pi_schema_names || ' raised exception.');
-      dbms_output.put_line(sqlerrm);
-      dbms_output.put_line(dbms_utility.format_error_backtrace);
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while transforming the schema names!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
       raise;
   end f_transform_schema_names;
   
@@ -116,9 +130,15 @@ create or replace package body qa_unit_tests_pkg is
     pi_object_types in qa_rules.qaru_object_types%type
   ) return VARCHAR2_TAB_T
   is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_generate_table_of_vc_object_types';
+    l_param_list qa_logger_pkg.tab_param;
+
     l_object_types VARCHAR2_TAB_T := VARCHAR2_TAB_T();
     l_return varchar2(255);
   begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_object_types'
+                              ,p_val_01  => pi_object_types);
 
     for i in (select regexp_substr(pi_object_types, '[^:]+', 1, level ) as object_type
               from dual
@@ -127,14 +147,14 @@ create or replace package body qa_unit_tests_pkg is
       l_object_types.extend;
       l_object_types(l_object_types.last) := i.object_type;
     end loop;
-    return l_object_types;
 
+    return l_object_types;
   exception
     when others then
-      dbms_output.put_line('--ERROR--');
-      dbms_output.put_line('Generating table of varchar for object names ' || pi_object_types || ' raised exception.');
-      dbms_output.put_line(sqlerrm);
-      dbms_output.put_line(dbms_utility.format_error_backtrace);
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while creating table of varchar2 for the object types!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
       raise;
   end f_generate_table_of_vc_object_types;
 
@@ -142,12 +162,21 @@ create or replace package body qa_unit_tests_pkg is
     pi_option         in number,
     pi_schema_names   in varchar2 default null
   ) is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.p_create_unit_test_packages';
+    l_param_list qa_logger_pkg.tab_param;
+
     l_package_name varchar2(255);
     l_clob         clob;
     l_schema_names varchar2(32672);
     l_object_number number;
     l_object_types VARCHAR2_TAB_T := VARCHAR2_TAB_T();
   begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_option'
+                              ,p_val_01  => pi_option
+                              ,p_name_02 => 'pi_schema_names'
+                              ,p_val_02  => pi_schema_names);
+
     dbms_output.enable(buffer_size => 10000000);
 
     p_validate_input(pi_option               => pi_option,
@@ -565,16 +594,19 @@ create or replace package body qa_unit_tests_pkg is
 
   exception
     when others then
-      dbms_output.put_line('--ERROR--');
-      dbms_output.put_line('Creation of package ' || l_package_name || ' raised exception.');
-      dbms_output.put_line(sqlerrm);
-      dbms_output.put_line(dbms_utility.format_error_backtrace);
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while creating the unit test packages!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
       raise;
   end p_create_unit_test_packages;
 
   procedure p_run_unit_tests(
     po_result out varchar2
   ) is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.p_run_unit_tests';
+    l_param_list qa_logger_pkg.tab_param;
+
     l_xml_result clob;
     l_timestamp_begin timestamp(6);
     l_timestamp_end timestamp(6);
@@ -593,6 +625,10 @@ create or replace package body qa_unit_tests_pkg is
     po_result := 'Execution of unit tests finished successful after ' || l_running_time_seconds || ' seconds';
   exception
     when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while running the unit test packages!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
       po_result := 'Execution of unit tests failed with error ' || sqlerrm || ' - ' || dbms_utility.format_error_backtrace;
       raise;
   end p_run_unit_tests;
