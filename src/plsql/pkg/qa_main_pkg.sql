@@ -61,6 +61,14 @@ create or replace package qa_main_pkg authid definer as
 
   function f_get_full_rule_pred(pi_rule_number in qa_rules.qaru_rule_number%type) return varchar2;
 
+  procedure p_exclude_not_owned_entries
+  (
+    pi_current_user in varchar2
+   ,pi_qa_rules_t   in out qa_rules_t
+  );
+
+  function f_is_owner_black_listed(pi_user_name varchar2) return boolean;
+
 end qa_main_pkg;
 /
 create or replace package body qa_main_pkg as
@@ -467,7 +475,7 @@ create or replace package body qa_main_pkg as
             ,table(cast(multiset (select level
                          from dual
                          connect by level <= length(regexp_replace(t.qaru_predecessor_ids
-                                                                  ,'[^:]+')) + 1) as sys.odcinumberlist)) levels 
+                                                                  ,'[^:]+')) + 1) as sys.odcinumberlist)) levels
         order by qaru_rule_number)
       select distinct 1
       into l_no_loop
@@ -486,7 +494,7 @@ create or replace package body qa_main_pkg as
                             ,p_params => l_param_list);
       dbms_output.put_line('The Rule Number contains a predecessor Loop: ' || l_loop_rule_number);
       raise;
-      return l_loop_rule_number;      
+      return l_loop_rule_number;
     when others then
       qa_logger_pkg.p_qa_log(p_text   => 'Something went wrong when searching for loops in the predecessor order for rule_number: ' || l_loop_rule_number
                             ,p_scope  => c_unit
@@ -539,6 +547,91 @@ create or replace package body qa_main_pkg as
                             ,p_params => l_param_list);
       raise;
   end f_get_full_rule_pred;
+
+  procedure p_exclude_not_owned_entries
+  (
+    pi_current_user in varchar2
+   ,pi_qa_rules_t   in out qa_rules_t
+  ) is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.p_exclude_not_owned_entries';
+  
+    l_param_list qa_logger_pkg.tab_param;
+    l_count      number;
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_current_user'
+                              ,p_val_01  => pi_current_user);
+  
+    if pi_qa_rules_t.count > 0
+    then
+      for i in pi_qa_rules_t.first .. pi_qa_rules_t.last
+      loop
+        select count(1)
+        into l_count
+        from all_objects
+        where object_name = pi_qa_rules_t(i).object_name
+        and owner = upper(pi_current_user);
+        if l_count = 0
+        then
+          dbms_output.put_line('remove obsolete entries');
+          pi_qa_rules_t.delete(i);
+        end if;
+      end loop;
+    end if;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'Cant remove Objects from qa_rules Table Record that dont belong to the current owner!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end p_exclude_not_owned_entries;
+
+  function f_is_owner_black_listed(pi_user_name varchar2) return boolean is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_is_owner_black_listed';
+  
+    l_param_list qa_logger_pkg.tab_param;
+  
+    l_count            number;
+    l_result           boolean;
+    e_user_blacklisted exception;
+    pragma exception_init(e_user_blacklisted
+                         ,-20006);
+  begin
+  
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_user_name'
+                              ,p_val_01  => pi_user_name);
+  
+    select count(1)
+    into l_count
+    from qa_schema_names_for_testing_v v
+    where upper(v.username) = upper(pi_user_name);
+  
+    if l_count = 0
+    then
+      l_result := true;
+      raise e_user_blacklisted;
+    else
+      l_result := false;
+    end if;
+  
+    return l_result;
+  exception
+    when e_user_blacklisted then
+      raise_application_error(-20007
+                             ,qa_constant_pkg.gc_black_list_exception_text || pi_user_name);
+      qa_logger_pkg.p_qa_log(p_text   => qa_constant_pkg.gc_black_list_exception_text || pi_user_name
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error trying to determine if a User is Blacklisted'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_is_owner_black_listed;
 
 end qa_main_pkg;
 /
