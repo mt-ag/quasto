@@ -132,7 +132,7 @@ create or replace package body create_ut_test_packages_pkg is
           l_clob := l_clob || 'BEGIN' || chr(10);
           l_clob := l_clob || '  l_layer := ''' || rec_rules.qaru_layer || ''';' || chr(10);
           l_clob := l_clob || '  for i in ( select au.username' || chr(10);
-          l_clob := l_clob || '               from all_users au' || chr(10);
+          l_clob := l_clob || '               from qa_schema_names_for_testing_v au' || chr(10);
           l_clob := l_clob || '              where ( au.username not like ''%SYS%'' and au.username not like ''%APEX%'' )' || chr(10);
           l_clob := l_clob || '           )' || chr(10);
           l_clob := l_clob || '  loop' || chr(10);
@@ -227,7 +227,7 @@ create or replace package body create_ut_test_packages_pkg is
       
         l_clob := l_clob || '  l_layer := ''' || rec_client_rules.qaru_layer || ''';' || chr(10);
         l_clob := l_clob || '  for i in ( select au.username' || chr(10);
-        l_clob := l_clob || '               from all_users au' || chr(10);
+        l_clob := l_clob || '               from qa_schema_names_for_testing_v au' || chr(10);
         l_clob := l_clob || '              where ( au.username not like ''%SYS%'' and au.username not like ''%APEX%'' )' || chr(10);
         l_clob := l_clob || '           )' || chr(10);
         l_clob := l_clob || '  loop' || chr(10);
