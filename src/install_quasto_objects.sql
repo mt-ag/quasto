@@ -89,6 +89,9 @@ PROMPT src/plsql/trg/qaru_iu_trg.sql
 PROMPT VIEWS
 PROMPT src/plsql/vw/qaru_predecessor_order_v.sql
 @src/plsql/vw/qaru_predecessor_order_v.sql
+PROMPT src/plsql/vw/qa_schema_names_for_testing_v.sql
+@src/plsql/vw/qa_schema_names_for_testing_v.sql
+
 
 PROMPT GRANT
 grant execute on qa_api_pkg to public;
