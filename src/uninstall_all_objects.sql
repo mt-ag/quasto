@@ -61,6 +61,8 @@ begin
   -- views
   l_object_name('QARU_PREDECESSOR_ORDER_V') := 'QARU_PREDECESSOR_ORDER_V';
   l_object_type('QARU_PREDECESSOR_ORDER_V') := 'VIEW';
+  l_object_name('QARU_SCHEMA_NAMES_FOR_TESTING_V') := 'QARU_SCHEMA_NAMES_FOR_TESTING_V';
+  l_object_type('QARU_SCHEMA_NAMES_FOR_TESTING_V') := 'VIEW';
 
   l_object := l_object_name.first;
   dbms_output.put_line(l_object);

@@ -17,11 +17,11 @@ begin
     authid definer
   is
     
-    gc_quasto_version            constant varchar(50 char) := ' || '''' || l_apex_version || '''' || ';
-    gc_utplsql_flag              constant number           := ' || l_utplsql_flag || ';
-    gc_apex_flag                 constant number           := ' || l_apex_flag || ';
-    gc_logger_flag               constant number           := ' || l_logger_flag || ';
-    gc_black_list_exception_text constant varchar2         := ' || '''' || 'A User has tried to be tested that is blacklisted in the View qa_schema_names_for_testing_v!' || '''' || '|| chr(13) ||' || '''' || 'To edit blacklisted users please edit the View mentioned above!' || '''' || ' || chr(13) ||' || '''' || 'User:;
+    gc_quasto_version            constant varchar(50 char)     := ' || '''' || l_apex_version || '''' || ';
+    gc_utplsql_flag              constant number               := ' || l_utplsql_flag || ';
+    gc_apex_flag                 constant number               := ' || l_apex_flag || ';
+    gc_logger_flag               constant number               := ' || l_logger_flag || ';
+    gc_black_list_exception_text constant varchar2 (5000 char) := ' || '''' || 'A User has tried to be tested that is blacklisted in the View qa_schema_names_for_testing_v!' || '''' || '|| chr(13) ||' || '''' || 'To edit blacklisted users please edit the View mentioned above!' || '''' || ' || chr(13) ||' || '''' || 'User:' || '''' || ';
 
 end;';
 

@@ -605,7 +605,7 @@ create or replace package body qa_main_pkg as
   
     select count(1)
     into l_count
-    from qa_schema_names_for_testing_v v
+    from qaru_schema_names_for_testing_v v
     where upper(v.username) = upper(pi_user_name);
   
     if l_count = 0
