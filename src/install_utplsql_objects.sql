@@ -19,9 +19,6 @@ PROMPT TYPE
 PROMPT src/plsql/typ/qa_schema_object_amount_t.sql
 @src/plsql/typ/qa_schema_object_amount_t.sql
 
-PROMPT src/plsql/typ/qa_schema_object_amounts_t.sql
-@src/plsql/typ/qa_schema_object_amounts_t.sql
-
 PROMPT PACKAGE
 @src/plsql/pkg/qa_unit_tests_pkg.sql
 

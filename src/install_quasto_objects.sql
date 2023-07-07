@@ -39,6 +39,9 @@ PROMPT TYPE
 PROMPT src/plsql/typ/varchar2_tab_t.sql
 @src/plsql/typ/varchar2_tab_t.sql
 
+PROMPT src/plsql/typ/qa_schema_object_amounts_t.sql
+@src/plsql/typ/qa_schema_object_amounts_t.sql
+
 PROMPT src/plsql/typ/qa_rule_t.sql
 @src/plsql/typ/qa_rule_t.sql
 
