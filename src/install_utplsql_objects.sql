@@ -15,10 +15,6 @@ PROMPT SEQUENCE
 PROMPT src/ddl/seq/qatr_seq.sql
 @src/ddl/seq/qatr_seq.sql
 
-PROMPT TYPE
-PROMPT src/plsql/typ/qa_schema_object_amount_t.sql
-@src/plsql/typ/qa_schema_object_amount_t.sql
-
 PROMPT PACKAGE
 @src/plsql/pkg/qa_unit_tests_pkg.sql
 
