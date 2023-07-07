@@ -1,4 +1,5 @@
 PROMPT create or replace package QA_UNIT_TESTS_PKG
+
 create or replace package qa_unit_tests_pkg is
 
 /**
@@ -18,6 +19,11 @@ create or replace package qa_unit_tests_pkg is
   procedure p_run_unit_tests(
     po_result out varchar2
   );
+
+/**
+* wrapper for scheduler job
+*/
+  procedure p_run_unit_test_job;
 
 end qa_unit_tests_pkg;
 /
@@ -449,10 +455,10 @@ create or replace package body qa_unit_tests_pkg is
     elsif pi_option = qa_constant_pkg.gc_utplsql_single_rule_per_object
     then
 
-	  for rec_client_rules in (select qaru_client_name
+    for rec_client_rules in (select qaru_client_name
                                      ,qaru_rule_number
                                      ,qaru_name
-									 ,qaru_object_types
+                   ,qaru_object_types
                                      ,regexp_replace(replace(lower(qaru_client_name)
                                                             ,' '
                                                             ,'_')
@@ -478,10 +484,10 @@ create or replace package body qa_unit_tests_pkg is
                                        ,qaru_client_name
                                        ,qaru_rule_number
                                        ,qaru_name
-									   ,qaru_object_types
+                     ,qaru_object_types
                                        ,qaru_layer
                                order by qaru_id asc)
-	  loop
+    loop
         l_object_types := f_generate_table_of_vc_object_types(pi_object_types => rec_client_rules.qaru_object_types);
 
         l_package_name := 'qa_ut_' || rec_client_rules.qaru_client_name_unified || '_' || rec_client_rules.qaru_name_unified ||'_pkg';
@@ -493,7 +499,7 @@ create or replace package body qa_unit_tests_pkg is
 
         l_object_number := 1;
         for rec_rule_objects in (select lower(ao.owner) as owner_unified
-	                                   ,lower(ao.object_name) as object_name_unified
+                                     ,lower(ao.object_name) as object_name_unified
                                  from all_objects ao
                                  join qaru_schema_names_for_testing_v qa
                                  on qa.username = ao.owner
@@ -501,16 +507,16 @@ create or replace package body qa_unit_tests_pkg is
                                  and ((l_schema_names is not null and qa.username in (l_schema_names))
                                       or l_schema_names is null
                                      )
-						         order by ao.owner asc)    
+                     order by ao.owner asc)    
         loop
 
-	      l_clob := l_clob || '--%test(quasto_test_rule_' || rec_client_rules.qaru_rule_number_unified || '_for_"' || rec_rule_objects.owner_unified || '"."' || rec_rule_objects.object_name_unified || '")' || chr(10);
+        l_clob := l_clob || '--%test(quasto_test_rule_' || rec_client_rules.qaru_rule_number_unified || '_for_"' || rec_rule_objects.owner_unified || '"."' || rec_rule_objects.object_name_unified || '")' || chr(10);
         l_clob := l_clob || 'PROCEDURE p_ut_rule_' || rec_client_rules.qaru_rule_number_unified || '_for_object_no_' || to_char(l_object_number) || ';' || chr(10);
-	      l_object_number := l_object_number + 1;
+        l_object_number := l_object_number + 1;
 
-	    end loop;
+      end loop;
 
-	    l_clob := l_clob || 'END ' || l_package_name || ';';
+      l_clob := l_clob || 'END ' || l_package_name || ';';
 
       execute immediate l_clob;
       dbms_output.put_line('Package specification for ' || l_package_name || ' created.');
@@ -518,10 +524,10 @@ create or replace package body qa_unit_tests_pkg is
       l_clob := 'CREATE OR REPLACE PACKAGE BODY ' || l_package_name || ' IS' || chr(10);
 
       l_object_number := 1;
-	    for rec_rule_objects in (select ao.owner
+      for rec_rule_objects in (select ao.owner
                                       , lower(ao.owner) as owner_unified
-	                                  , ao.object_name
-	                                   ,lower(ao.object_name) as object_name_unified
+                                    , ao.object_name
+                                     ,lower(ao.object_name) as object_name_unified
                                  from all_objects ao
                                  join qaru_schema_names_for_testing_v qa
                                  on qa.username = ao.owner
@@ -529,7 +535,7 @@ create or replace package body qa_unit_tests_pkg is
                                  and ((l_schema_names is not null and qa.username in (l_schema_names))
                                       or l_schema_names is null
                                      )
-						         order by ao.owner asc)
+                     order by ao.owner asc)
         loop
 
           l_clob := l_clob || 'PROCEDURE p_ut_rule_' || rec_client_rules.qaru_rule_number_unified || '_for_object_no_' || to_char(l_object_number) || chr(10);
@@ -579,7 +585,7 @@ create or replace package body qa_unit_tests_pkg is
           l_clob := l_clob || '    dbms_output.put_line(DBMS_UTILITY.format_error_backtrace);' || chr(10);
           l_clob := l_clob || '    RAISE;' || chr(10);
           l_clob := l_clob || 'END p_ut_rule_' || rec_client_rules.qaru_rule_number_unified || '_for_object_no_' || to_char(l_object_number) || ';' || chr(10);
-		    l_object_number := l_object_number + 1;
+        l_object_number := l_object_number + 1;
 
         end loop;
 
@@ -588,7 +594,7 @@ create or replace package body qa_unit_tests_pkg is
         execute immediate l_clob;
         dbms_output.put_line('Package body for ' || l_package_name || ' created.');
 
-	  end loop;
+    end loop;
 
     end if;
 
@@ -632,6 +638,13 @@ create or replace package body qa_unit_tests_pkg is
       po_result := 'Execution of unit tests failed with error ' || sqlerrm || ' - ' || dbms_utility.format_error_backtrace;
       raise;
   end p_run_unit_tests;
+
+  procedure p_run_unit_test_job
+  is 
+    l_result varchar2(4000 char);
+  begin
+    p_run_unit_tests(l_result);
+  end p_run_unit_test_job;
 
 end qa_unit_tests_pkg;
 /

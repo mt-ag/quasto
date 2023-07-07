@@ -15,6 +15,10 @@ begin
   dbms_output.enable(buffer_size => 10000000);
   -- objects:
   -- QASTO Objects
+
+  -- Views:
+  l_object_name('QARU_PREDECESSOR_ORDER_V') := 'QARU_PREDECESSOR_ORDER_V';
+  l_object_type('QARU_PREDECESSOR_ORDER_V') := 'VIEW';
   
   -- packages
   l_object_name('QA_CONSTANT_PKG') := 'QA_CONSTANT_PKG';
