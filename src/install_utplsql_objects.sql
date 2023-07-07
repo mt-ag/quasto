@@ -43,7 +43,8 @@ PROMPT src/scripts/create_schedule_plan_for_unit_tests.sql
 
 PROMPT SCHEDULER JOBS
 PROMPT src/scripts/create_scheduler_job_for_unit_tests.sql
-@src/scripts/create_scheduler_job_for_unit_tests.sql
+-- Asugeklammert weil keine Berechtigung zum Erstellen von Jobs vorhanden ist
+--@src/scripts/create_scheduler_job_for_unit_tests.sql
 
 prompt recompile_utplsql_objects.sql 
 @src/scripts/recompile_utplsql_objects.sql

@@ -28,7 +28,7 @@ begin
     from user_constraints
    where constraint_name = 'QATR_CHK_ADDED_ON';
   if l_count = 0 then
-    l_sql := 'alter table QA_TEST_RESULTS add constraint QATR_CHK_ADDED_ON UNIQUE (QATR_CHK_ADDED_ON)';
+    l_sql := 'alter table QA_TEST_RESULTS add constraint QATR_CHK_ADDED_ON UNIQUE (QATR_ADDED_ON)';
     execute immediate l_sql;
     select count(1)
       into l_count
