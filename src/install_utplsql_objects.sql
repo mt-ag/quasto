@@ -22,10 +22,6 @@ PROMPT TRIGGER
 PROMPT src/plsql/trg/qatr_i_trg.sql
 @src/plsql/trg/qatr_i_trg.sql
 
-PROMPT VIEWS
-PROMPT src/plsql/vw/qa_schema_names_for_testing_v.sql
-@src/plsql/vw/qa_schema_names_for_testing_v.sql
-
 PROMPT PROGRAMS
 PROMPT src/scripts/create_program_for_unit_tests.sql
 --@src/scripts/create_program_for_unit_tests.sql
