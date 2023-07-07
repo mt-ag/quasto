@@ -58,7 +58,7 @@ create or replace package body qa_unit_tests_pkg is
         into l_schema_exist
         from dual
         where exists (select null
-                      from qa_schema_names_for_testing_v
+                      from qaru_schema_names_for_testing_v
                       where username = rec_schema_names.schema_name
                      );
         if l_schema_exist = 0
@@ -261,12 +261,12 @@ create or replace package body qa_unit_tests_pkg is
         if l_schema_names is not null
         then
           l_clob := l_clob || '  for rec_users in ( select username' || chr(10);
-          l_clob := l_clob || '                       from qa_schema_names_for_testing_v' || chr(10);
+          l_clob := l_clob || '                       from qaru_schema_names_for_testing_v' || chr(10);
           l_clob := l_clob || '                      where username in (''' || l_schema_names || ''')' || chr(10);
           l_clob := l_clob || '                   )' || chr(10);
         else
           l_clob := l_clob || '  for rec_users in ( select username' || chr(10);
-          l_clob := l_clob || '                       from qa_schema_names_for_testing_v' || chr(10);
+          l_clob := l_clob || '                       from qaru_schema_names_for_testing_v' || chr(10);
           l_clob := l_clob || '                   )' || chr(10);
         end if;
 
@@ -391,12 +391,12 @@ create or replace package body qa_unit_tests_pkg is
       if l_schema_names is not null
       then
         l_clob := l_clob || '  for i in ( select username' || chr(10);
-        l_clob := l_clob || '               from qa_schema_names_for_testing_v' || chr(10);
+        l_clob := l_clob || '               from qaru_schema_names_for_testing_v' || chr(10);
         l_clob := l_clob || '              where username in (''' || l_schema_names || ''')' || chr(10);
         l_clob := l_clob || '           )' || chr(10);
       else
         l_clob := l_clob || '  for i in ( select username' || chr(10);
-        l_clob := l_clob || '               from qa_schema_names_for_testing_v' || chr(10);
+        l_clob := l_clob || '               from qaru_schema_names_for_testing_v' || chr(10);
         l_clob := l_clob || '           )' || chr(10);
       end if;
 
@@ -495,7 +495,7 @@ create or replace package body qa_unit_tests_pkg is
         for rec_rule_objects in (select lower(ao.owner) as owner_unified
 	                                   ,lower(ao.object_name) as object_name_unified
                                  from all_objects ao
-                                 join qa_schema_names_for_testing_v qa
+                                 join qaru_schema_names_for_testing_v qa
                                  on qa.username = ao.owner
                                  where ao.object_type member of (l_object_types)
                                  and ((l_schema_names is not null and qa.username in (l_schema_names))
@@ -523,7 +523,7 @@ create or replace package body qa_unit_tests_pkg is
 	                                  , ao.object_name
 	                                   ,lower(ao.object_name) as object_name_unified
                                  from all_objects ao
-                                 join qa_schema_names_for_testing_v qa
+                                 join qaru_schema_names_for_testing_v qa
                                  on qa.username = ao.owner
                                  where ao.object_type member of (l_object_types)
                                  and ((l_schema_names is not null and qa.username in (l_schema_names))
