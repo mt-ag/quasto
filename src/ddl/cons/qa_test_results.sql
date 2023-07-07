@@ -8,7 +8,7 @@ begin
     from user_constraints
    where constraint_name = 'QATR_PK';
   if l_count = 0 then
-    l_sql := 'alter table QA_TEST_RESULTS add constraint QATR_PK primary key (QATR_PK)';
+    l_sql := 'alter table QA_TEST_RESULTS add constraint QATR_PK primary key (QATR_ID)';
     execute immediate l_sql;
     select count(1)
       into l_count
