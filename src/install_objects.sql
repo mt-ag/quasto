@@ -42,10 +42,10 @@ variable flag char
 exec :flag := 'Y';
 -- installed Version
 variable version_old varchar2 (50 char)
-exec :version_old := '1.0';
+exec :version_old := '1.1';
 -- upgrade version
 variable version varchar2 (50 char)
-exec :version := '1.1';
+exec :version := '23.2';
 
 -- Block to proceess first Argument
 declare
@@ -117,7 +117,7 @@ set feedback on
 set head on
 
 -- Constant Package Generation with last argument as current Version
-@@src/scripts/install_constant_package '~1' '~2' '~3' '~4' '1.1'
+@@src/scripts/install_constant_package '~1' '~2' '~3' '~4' '23.2'
 
 @@src/~script_name_quasto
 @@src/~script_name_utplsql
