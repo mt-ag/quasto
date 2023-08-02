@@ -64,7 +64,7 @@ declare
     function get_version_constant return varchar2 as
       l_ret varchar2 (50 char);
     begin
-      select replace(REGEXP_SUBSTR(text, ':=(.*?);', 1, 1, NULL, 1),'''','') AS version_old
+      select trim(replace(REGEXP_SUBSTR(text, ':=(.*?);', 1, 1, NULL, 1),'''','')) AS version_old
       into l_ret
       from user_source
       where type = 'PACKAGE'
@@ -84,6 +84,10 @@ declare
 begin
     
     l_version_old := get_version_constant;
+    if l_version_old = :version
+      then 
+      l_version_old := '1.1';
+    end if;
 
     l_script_name_utplsql_upgrade := 'install_utplsql_objects_' || replace(l_version_old,'.','_') || '_to_' || replace(:version,'.','_') || '.sql';
     l_script_name_quasto_upgrade  := 'install_quasto_objects_' || replace(l_version_old,'.','_') || '_to_' || replace(:version,'.','_') || '.sql';
