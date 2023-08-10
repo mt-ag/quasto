@@ -5,10 +5,6 @@ set concat on
 set concat .
 set verify off
 
-PROMPT PACKAGES
-PROMPT src/plsql/pkg/create_ut_test_packages_pkg_drop.sql
-@src/plsql/pkg/create_ut_test_packages_pkg_drop.sql
-
 PROMPT TABLE
 PROMPT src/ddl/tab/qa_test_results.sql 
 @src/ddl/tab/qa_test_results.sql
