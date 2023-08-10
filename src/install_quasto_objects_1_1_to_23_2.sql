@@ -19,6 +19,5 @@ PROMPT src/plsql/typ/qa_schema_object_amount_t.sql
 PROMPT src/plsql/typ/qa_schema_object_amounts_t.sql
 @src/plsql/typ/qa_schema_object_amounts_t.sql
 
-
-
-
+prompt recompile_quasto_objects.sql 
+@src/scripts/recompile_quasto_objects.sql
