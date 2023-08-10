@@ -13,6 +13,12 @@ PROMPT src/plsql/vw/qaru_schema_names_for_testing_v.sql
 PROMPT src/plsql/pkg/qa_main_pkg.sql
 @src/plsql/pkg/qa_main_pkg.sql
 
+PROMPT TYPE
+PROMPT src/plsql/typ/qa_schema_object_amount_t.sql
+@src/plsql/typ/qa_schema_object_amount_t.sql
+PROMPT src/plsql/typ/qa_schema_object_amounts_t.sql
+@src/plsql/typ/qa_schema_object_amounts_t.sql
+
 
 
 
