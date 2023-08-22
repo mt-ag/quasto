@@ -31,9 +31,7 @@ procedure compare_synonyms;
 
 end compare_schema_obj_pkg;
 /
-
-
-reate or replace package body compare_schema_obj_pkg 
+create or replace package body compare_schema_obj_pkg 
 as
 
 procedure compare_tables
@@ -239,25 +237,25 @@ end compare_sequences;
 
 procedure compare_indexes
 is
-  l_count number;
+  l_count number := 0;
 
   cursor cur_index_dev is
-    select object_name 
-      from user_objects
-     where object_type = 'INDEX'
+    select index_name 
+      from user_indexes
+     where index_type <> 'LOB'
    minus
-    select object_name
-      from user_objects@QUASTO_TEST
-     where object_name = 'INDEX';
+    select index_name
+      from user_indexes@QUASTO_TEST
+     where index_type <> 'LOB';
 
   cursor cur_index_test is
-    select object_name
-      from user_objects@QUASTO_TEST
-     where object_type = 'INDEX'
+    select index_name
+      from user_indexes@QUASTO_TEST
+     where index_type <> 'LOB'
    minus 
-    select object_name
-      from user_objects
-     where object_type = 'INDEX';
+    select index_name
+      from user_indexes
+     where index_type <> 'LOB';
 begin
   for dev in cur_index_dev loop
     if l_count = 0 then
@@ -266,7 +264,7 @@ begin
       l_count := 1;
     end if;
     
-    dbms_output.put_line('--->  '||dev.object_name);
+    dbms_output.put_line('--->  '||dev.index_name);
   end loop;
   
   l_count := 0;
@@ -278,7 +276,7 @@ begin
       l_count := 1;
     end if;
     
-    dbms_output.put_line('--->  '||tst.object_name);
+    dbms_output.put_line('--->  '||tst.index_name);
   end loop;
   
   l_count := 0;
@@ -289,25 +287,21 @@ end compare_indexes;
 
 procedure compare_constraints
 is
-  l_count number;
+  l_count number := 0;
 
   cursor cur_constraint_dev is
-    select object_name 
-      from user_objects
-     where object_type = 'CONSTRAINT'
+    select constraint_name 
+      from user_constraints
    minus
-    select object_name
-      from user_objects@QUASTO_TEST
-     where object_type = 'CONSTRAINT';
+    select constraint_name
+      from user_constraints@QUASTO_TEST;
 
   cursor cur_constraint_test is
-    select object_name
-      from user_objects@QUASTO_TEST
-     where object_type = 'CONSTRAINT'
+    select constraint_name
+      from user_constraints@QUASTO_TEST
    minus
-    select object_name
-      from user_objects
-     where object_type = 'CONSTRAINT';
+    select constraint_name
+      from user_constraints;
 begin
   for dev in cur_constraint_dev loop
     if l_count = 0 then
@@ -316,7 +310,7 @@ begin
       l_count := 1;
     end if;
     
-    dbms_output.put_line('--->  '||dev.object_name);
+    dbms_output.put_line('--->  '||dev.constraint_name);
   end loop;
   
   l_count := 0;
@@ -328,7 +322,7 @@ begin
       l_count := 1;
     end if;
     
-    dbms_output.put_line('--->  '||tst.object_name);
+    dbms_output.put_line('--->  '||tst.constraint_name);
   end loop;
   
   l_count := 0;
@@ -340,24 +334,32 @@ end compare_constraints;
 procedure compare_packages
 is
   l_count number := 0;
+  
+  l_test_pkg varchar2(100) := 'QA_UT_MT_AG_%'; --diese Packages werden automatisch generiert und sollten nicht mit verglichen werden
 
   cursor cur_package_dev is
     select object_name 
       from user_objects
      where object_type = 'PACKAGE'
+       and object_name not like l_test_pkg
+       and object_name not in ('COMPARE_SCHEMA_OBJ_PKG', 'COMPARE_SOURCE_PKG') --compare-packages -> nur auf DEV
    minus
     select object_name
       from user_objects@QUASTO_TEST
-     where object_type = 'PACKAGE';
+     where object_type = 'PACKAGE'
+       and object_name not like l_test_pkg;
 
   cursor cur_package_test is
     select object_name
       from user_objects@QUASTO_TEST
      where object_type = 'PACKAGE'
+       and object_name not like l_test_pkg
    minus
     select object_name
       from user_objects
-     where object_type = 'PACKAGE';
+     where object_type = 'PACKAGE'
+       and object_name not like l_test_pkg
+       and object_name not in ('COMPARE_SCHEMA_OBJ_PKG', 'COMPARE_SOURCE_PKG'); --compare-packages -> nur auf DEV
 begin
   for dev in cur_Package_dev loop
     if l_count = 0 then
@@ -389,25 +391,33 @@ end compare_packages;
 
 procedure compare_package_bodies
 is
-  l_count number;
+  l_count number := 0;
+  
+  l_test_pkg varchar2(100) := 'QA_UT_MT_AG_%';--wird automatisch generiert
 
   cursor cur_package_body_dev is
     select object_name
       from user_objects
      where object_type = 'PACKAGE BODY'
+       and object_name not like l_test_pkg
+       and object_name not in ('COMPARE_SCHEMA_OBJ_PKG', 'COMPARE_SOURCE_PKG') --nur auf DEV -> Zum Vergleichen der Objekte
    minus
     select object_name
       from user_objects@QUASTO_TEST
-     where object_type = 'PACKAGE BODY';
+     where object_type = 'PACKAGE BODY'
+       and object_name not like l_test_pkg;
 
   cursor cur_package_body_test is
     select object_name
       from user_objects@QUASTO_TEST
-     where object_type = 'PACLKAGE BODY'
+     where object_type = 'PACKAGE BODY'
+       and object_name not like l_test_pkg
    minus
     select object_name
       from user_objects
-     where object_type = 'PACKAGE BODY';
+     where object_type = 'PACKAGE BODY'
+       and object_name not like l_test_pkg
+       and object_name not in ('COMPARE_SCHEMA_OBJ_PKG', 'COMPARE_SOURCE_PKG'); --nur auf DEV -> Zum Vergleichen der Objekte
 begin
   for dev in cur_package_body_dev loop
     if l_count = 0 then
@@ -543,20 +553,20 @@ is
 
   cursor cur_procedure_dev is
     select object_name 
-      from user_objects
-     where object_type = 'PROCEDUE'
+      from user_procedures
+     where object_type = 'PROCEDURE'
    minus
     select object_name
-      from user_objects@QUASTO_TEST
+      from user_procedures@QUASTO_TEST
      where object_type = 'PROCEDURE';
      
    cursor cur_procedure_test is
      select object_name 
-       from user_objects@QUASTO_TEST
+       from user_procedures@QUASTO_TEST
      where object_type = 'PROCEDURE'
    minus 
     select object_name 
-      from user_objects
+      from user_procedures
      where object_type = 'PROCEDURE';
 begin
   for dev in cur_procedure_dev loop
