@@ -42,6 +42,7 @@ grant create table to quasto;
 grant create trigger to quasto;
 grant create type to quasto;
 grant create view to quasto;
+grant create job to quasto;
 
 grant create session to quasto;
 ```

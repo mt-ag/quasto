@@ -18,17 +18,18 @@ create or replace package qa_main_pkg authid definer as
   -- procedure for testing a qa rule
   -- %param pi_qaru_client_name 
   -- %param pi_qaru_rule_number 
+  -- %param pi_schema_names 
   -- %param po_result 
-  -- %param po_object_names 
-  -- %param po_error_message 
+  -- %param po_schema_objects 
+  -- %param po_invalid_objects 
   procedure p_test_rule
   (
     pi_qaru_client_name in qa_rules.qaru_client_name%type
    ,pi_qaru_rule_number in qa_rules.qaru_rule_number%type
    ,pi_schema_names     in varchar2_tab_t
    ,po_result           out number
-   ,po_object_names     out clob
-   ,po_error_message    out varchar2
+   ,po_schema_objects   out qa_schema_object_amounts_t
+   ,po_invalid_objects  out qa_rules_t
   );
 
   -- function for inserting a new rule
@@ -200,6 +201,133 @@ create or replace package body qa_main_pkg as
       raise;
   end f_get_excluded_objects;
 
+  -- get invalid objects for a rule by providing one or more schema
+  function f_get_invalid_objects
+  (
+    pi_qaru_client_name in qa_rules.qaru_client_name%type
+   ,pi_qaru_rule_number in qa_rules.qaru_rule_number%type
+   ,pi_schema_names     in varchar2_tab_t
+  ) return qa_rules_t
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_invalid_objects';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_schema_names          varchar2(32767);
+    l_qa_rules_temp        qa_rules_t := new qa_rules_t();
+    l_qa_rules             qa_rules_t := new qa_rules_t();
+    l_invalid_objects      qa_rules_t := new qa_rules_t();
+    l_qaru_exclude_objects qa_rules.qaru_exclude_objects%type;
+  begin
+
+    -- Logging Parameter:
+    -- build schema names string:
+    for i in pi_schema_names.first .. pi_schema_names.last
+    loop
+      l_schema_names := pi_schema_names(i) || ',' || l_schema_names;
+    end loop;
+    l_schema_names := substr(l_schema_names
+                            ,0
+                            ,length(l_schema_names) - 1);
+
+    -- Logging Parameter:
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qaru_client_name'
+                              ,p_val_01  => pi_qaru_client_name
+                              ,p_name_02 => 'pi_qaru_rule_number'
+                              ,p_val_02  => pi_qaru_rule_number
+                              ,p_name_03 => 'pi_schema_names'
+                              ,p_val_03  => l_schema_names);
+
+
+    for i in pi_schema_names.first .. pi_schema_names.last
+    loop
+      l_qa_rules_temp := qa_api_pkg.tf_run_rule(pi_qaru_client_name => pi_qaru_client_name
+                                               ,pi_qaru_rule_number => pi_qaru_rule_number
+                                               ,pi_target_scheme    => pi_schema_names(i));
+                                          
+      l_qa_rules := l_qa_rules multiset union l_qa_rules_temp;
+    end loop;
+    
+    l_qaru_exclude_objects := f_get_excluded_objects(pi_qaru_rule_number => pi_qaru_rule_number
+                                                    ,pi_qaru_client_name => pi_qaru_client_name);
+
+    select qa_rule_t(pi_schema_name       => schema_name
+                    ,pi_object_name       => object_name
+                    ,pi_object_path       => object_path
+                    ,pi_object_details    => object_details
+                    ,pi_error_message     => error_message)
+      bulk collect into l_invalid_objects
+      from (select rule.schema_name as schema_name
+                 , rule.object_name as object_name
+                 , rule.object_path as object_path
+                 , rule.object_details as object_details
+                 , rule.qaru_error_message as error_message
+            from table(l_qa_rules) rule
+            join qa_rules qaru on qaru.qaru_id = rule.qaru_id
+            where qaru.qaru_exclude_objects is null
+            or not (rule.object_path in (select regexp_substr(l_qaru_exclude_objects
+                                                             ,'[^:]+'
+                                                             ,1
+                                                             ,level) as data
+                                         from dual
+                                         connect by regexp_substr(l_qaru_exclude_objects
+                                                                 ,'[^:]+'
+                                                                 ,1
+                                                                 ,level) is not null
+                                        )
+                   )
+            group by rule.qaru_id
+                    ,rule.schema_name
+                    ,rule.object_name
+                    ,rule.object_path
+                    ,rule.object_details
+                    ,rule.qaru_error_message
+    );
+
+    return l_invalid_objects;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get invalid schema objects!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_get_invalid_objects;
+  
+  -- get invalid objects for a rule by providing one or more schemas
+  function f_get_amount_invalid_objects_per_schema
+  (
+    pi_qa_rules      in qa_rules_t
+   ,pi_schema_names  in varchar2_tab_t
+  ) return qa_schema_object_amounts_t
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_amount_invalid_objects_per_schema';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_schema_object_amounts_temp qa_schema_object_amounts_t := new qa_schema_object_amounts_t();
+    l_schema_object_amounts      qa_schema_object_amounts_t := new qa_schema_object_amounts_t();
+  begin
+    
+    for i in pi_schema_names.first .. pi_schema_names.last
+    loop
+
+    select qa_schema_object_amount_t(pi_schema_name   => pi_schema_names(i)
+                                    ,pi_object_amount => object_amount)
+      bulk collect into l_schema_object_amounts_temp
+      from (select count(1) as object_amount
+            from table(pi_qa_rules) rule
+            where rule.schema_name = pi_schema_names(i)
+           );
+      
+      l_schema_object_amounts := l_schema_object_amounts multiset union l_schema_object_amounts_temp;
+    end loop;
+
+    return l_schema_object_amounts;
+  exception
+    when others then
+      raise;
+  end f_get_amount_invalid_objects_per_schema;
+
   -- @see spec
   procedure p_test_rule
   (
@@ -207,18 +335,16 @@ create or replace package body qa_main_pkg as
    ,pi_qaru_rule_number in qa_rules.qaru_rule_number%type
    ,pi_schema_names     in varchar2_tab_t
    ,po_result           out number
-   ,po_object_names     out clob
-   ,po_error_message    out varchar2
+   ,po_schema_objects   out qa_schema_object_amounts_t
+   ,po_invalid_objects  out qa_rules_t
   ) is
     c_unit constant varchar2(32767) := $$plsql_unit || '.p_test_rule';
     l_param_list qa_logger_pkg.tab_param;
   
-    l_schema_names       varchar2(32767);
-    l_qa_rules           qa_rules_t := qa_rules_t();
-    l_qa_rules_temp      qa_rules_t := new qa_rules_t();
-    l_count_objects      number;
-    l_object_names       clob;
-    l_qaru_error_message qa_rules.qaru_error_message%type;
+    l_schema_names          varchar2(32767);
+    l_qa_rules              qa_rules_t := new qa_rules_t();
+    l_schema_object_amounts qa_schema_object_amounts_t := new qa_schema_object_amounts_t();
+    l_count_objects         number;
   
   begin
   
@@ -239,46 +365,29 @@ create or replace package body qa_main_pkg as
                               ,p_val_02  => pi_qaru_rule_number
                               ,p_name_03 => 'pi_schema_names'
                               ,p_val_03  => l_schema_names);
-    if pi_schema_names.count <> 0
-    then
-      for i in pi_schema_names.first .. pi_schema_names.last
-      loop
-        l_qa_rules_temp := qa_api_pkg.tf_run_rule(pi_qaru_client_name => pi_qaru_client_name
-                                                 ,pi_qaru_rule_number => pi_qaru_rule_number
-                                                 ,pi_target_scheme    => pi_schema_names(i));
-        l_qa_rules      := l_qa_rules multiset union l_qa_rules_temp;
-      end loop;
-      -- Exclude Objects is taking the Table Type in and deleting all Entries that need to be excluded
-      p_exclude_objects(pi_qa_rules => l_qa_rules);
-    end if;
-  
+
+    l_qa_rules := f_get_invalid_objects(pi_qaru_client_name => pi_qaru_client_name
+                                       ,pi_qaru_rule_number => pi_qaru_rule_number
+                                       ,pi_schema_names     => pi_schema_names);
+                                       
+    l_schema_object_amounts := f_get_amount_invalid_objects_per_schema(pi_qa_rules     => l_qa_rules
+                                                                      ,pi_schema_names => pi_schema_names);
+                                                                      
     select count(1)
     into l_count_objects
-    from table(l_qa_rules) rule
-    join qa_rules qaru on qaru.qaru_id = rule.qaru_id;
-  
+    from table(l_qa_rules);
+    
     if l_qa_rules is not null and
        l_qa_rules.count > 0 and
        l_count_objects > 0
     then
-      select rtrim(xmlagg(xmlelement(e, rule.object_name, '; ').extract('//text()') order by rule.object_name).getclobval()
-                  ,'; ') as object_names
-            ,qaru.qaru_error_message
-      into l_object_names
-          ,l_qaru_error_message
-      from table(l_qa_rules) rule
-      join qa_rules qaru on qaru.qaru_id = rule.qaru_id
-      group by rule.qaru_id
-              ,qaru.qaru_error_message;
-    
-      po_result        := 0;
-      po_object_names  := l_object_names;
-      po_error_message := l_qaru_error_message;
+      po_result  := 0;
     else
-      po_result        := 1;
-      po_object_names  := 'None.';
-      po_error_message := 'No Errors.';
+      po_result  := 1;
     end if;
+    
+    po_schema_objects := l_schema_object_amounts;
+    po_invalid_objects := l_qa_rules;
   
   exception
     when others then

@@ -17,8 +17,8 @@ begin
   -- QASTO Objects
 
   -- packages
-  l_object_name('CREATE_UT_TEST_PACKAGES_PKG') := 'CREATE_UT_TEST_PACKAGES_PKG';
-  l_object_type('CREATE_UT_TEST_PACKAGES_PKG') := 'PACKAGE';
+  l_object_name('QA_UNIT_TESTS_PKG') := 'QA_UNIT_TESTS_PKG';
+  l_object_type('QA_UNIT_TESTS_PKG') := 'PACKAGE';
 
   l_object := l_object_name.first;
   while l_object is not null
