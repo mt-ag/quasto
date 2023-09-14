@@ -8,8 +8,9 @@ create or replace package qa_unit_tests_pkg is
 * @param pi_schema_names specifies the comma-separated schema names to be tested
 */
   procedure p_create_unit_test_packages(
-    pi_option         in number,
-    pi_schema_names   in varchar2 default null
+    pi_option               in number,
+    pi_schema_names         in varchar2 default null,
+    pi_delete_test_packages in varchar2 default 'N'
   );
 
 /**
@@ -21,28 +22,30 @@ create or replace package qa_unit_tests_pkg is
   );
 
 /**
-* wrapper for scheduler job
+* returns if scheduler job for execution of unit tests is enabled
 */
-  procedure p_run_unit_test_job;
+  function f_is_scheduler_job_enabled
+  return varchar2;
+  
+/**
+* enable or disable the scheduler job
+* @param pi_status defines the enable status of the scheduler job
+*/
+  procedure p_enable_scheduler_job(
+    pi_status in varchar2
+  );
 
 end qa_unit_tests_pkg;
 /
 create or replace package body qa_unit_tests_pkg is
 
   procedure p_validate_input(
-    pi_option         in number,
-    pi_schema_names   in varchar2
+    pi_option               in number,
+    pi_schema_names         in varchar2,
+    pi_delete_test_packages in varchar2
   ) is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.p_validate_input';
-    l_param_list qa_logger_pkg.tab_param;
-
     l_schema_exist number;
   begin
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_option'
-                              ,p_val_01  => pi_option
-                              ,p_name_02 => 'pi_schema_names'
-                              ,p_val_02  => pi_schema_names);
 
     if pi_option not in ( qa_constant_pkg.gc_utplsql_single_package
                         , qa_constant_pkg.gc_utplsql_single_package_per_rule
@@ -72,38 +75,67 @@ create or replace package body qa_unit_tests_pkg is
           raise_application_error(-20001, 'Invalid input parameter value for pi_schema_names: ' || rec_schema_names.schema_name || ' - schema name does not exist');
         end if;
       end loop;
+    elsif pi_delete_test_packages not in ( 'Y'
+                                         , 'N'
+                                         )
+    then
+      raise_application_error(-20001, 'Invalid input parameter value for pi_delete_test_packages: ' || pi_delete_test_packages);
     end if;
+
   exception
     when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while validating the input!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
+      dbms_output.put_line('--ERROR--');
+      dbms_output.put_line('Validation of input pi_option=' || pi_option || ' and pi_schema_names=' || pi_schema_names || ' raised exception.');
+      dbms_output.put_line(sqlerrm);
+      dbms_output.put_line(dbms_utility.format_error_backtrace);
       raise;
   end p_validate_input;
 
-  procedure p_delete_test_packages
-  is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.p_delete_test_packages';
-    l_param_list qa_logger_pkg.tab_param;
-
+  procedure p_delete_test_packages(
+    pi_schema_names         in varchar2,
+    pi_delete_test_packages in varchar2
+  ) is
     l_package_name varchar2(255);
   begin
-    for rec_packages in (select object_name
-                         from user_objects
-                         where object_type = 'PACKAGE'
-                         and object_name like upper(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix) || '%')
-    loop
-      l_package_name := rec_packages.object_name;
-      execute immediate 'DROP PACKAGE ' || l_package_name;
-      dbms_output.put_line('Drop of package ' || l_package_name || ' successful.');
-    end loop;
+    
+    if pi_delete_test_packages = 'Y'
+    then
+      if pi_schema_names is not null
+      then
+        for rec_schema_names in (select trim(regexp_substr(upper(pi_schema_names), '[^,]+', 1, level)) as schema_name
+                                 from dual
+                                 connect by level <= regexp_count(upper(pi_schema_names), ',')+1
+                                )
+        loop
+          for rec_packages in (select object_name
+                               from user_objects
+                               where object_type = 'PACKAGE'
+                               and object_name like upper(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix) || '_' || rec_schema_names.schema_name || '_%')
+          loop
+            l_package_name := rec_packages.object_name;
+            execute immediate 'DROP PACKAGE ' || l_package_name;
+            dbms_output.put_line('Drop of package ' || l_package_name || ' successful.');
+          end loop;
+        end loop;
+      else
+        for rec_packages in (select object_name
+                             from user_objects
+                             where object_type = 'PACKAGE'
+                             and object_name like upper(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix) || '_%')
+        loop
+          l_package_name := rec_packages.object_name;
+          execute immediate 'DROP PACKAGE ' || l_package_name;
+          dbms_output.put_line('Drop of package ' || l_package_name || ' successful.');
+        end loop;
+      end if;
+    end if;
+
   exception
     when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while deleting the packages!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
+      dbms_output.put_line('--ERROR--');
+      dbms_output.put_line('Drop of package ' || l_package_name || ' raised exception.');
+      dbms_output.put_line(sqlerrm);
+      dbms_output.put_line(dbms_utility.format_error_backtrace);
       raise;
   end p_delete_test_packages;
 
@@ -111,24 +143,18 @@ create or replace package body qa_unit_tests_pkg is
     pi_schema_names in varchar2
   ) return varchar2
   is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.f_transform_schema_names';
-    l_param_list qa_logger_pkg.tab_param;
-
     l_return varchar2(255);
   begin
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_schema_names'
-                              ,p_val_01  => pi_schema_names);
 
     l_return := REPLACE(upper(pi_schema_names), ',', ''',''');
-
     return l_return;
+
   exception
     when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while transforming the schema names!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
+      dbms_output.put_line('--ERROR--');
+      dbms_output.put_line('Transforming of schema names ' || pi_schema_names || ' raised exception.');
+      dbms_output.put_line(sqlerrm);
+      dbms_output.put_line(dbms_utility.format_error_backtrace);
       raise;
   end f_transform_schema_names;
   
@@ -136,15 +162,9 @@ create or replace package body qa_unit_tests_pkg is
     pi_object_types in qa_rules.qaru_object_types%type
   ) return VARCHAR2_TAB_T
   is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.f_generate_table_of_vc_object_types';
-    l_param_list qa_logger_pkg.tab_param;
-
     l_object_types VARCHAR2_TAB_T := VARCHAR2_TAB_T();
     l_return varchar2(255);
   begin
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_object_types'
-                              ,p_val_01  => pi_object_types);
 
     for i in (select regexp_substr(pi_object_types, '[^:]+', 1, level ) as object_type
               from dual
@@ -153,42 +173,36 @@ create or replace package body qa_unit_tests_pkg is
       l_object_types.extend;
       l_object_types(l_object_types.last) := i.object_type;
     end loop;
-
     return l_object_types;
+
   exception
     when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while creating table of varchar2 for the object types!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
+      dbms_output.put_line('--ERROR--');
+      dbms_output.put_line('Generating table of varchar for object names ' || pi_object_types || ' raised exception.');
+      dbms_output.put_line(sqlerrm);
+      dbms_output.put_line(dbms_utility.format_error_backtrace);
       raise;
   end f_generate_table_of_vc_object_types;
 
   procedure p_create_unit_test_packages(
-    pi_option         in number,
-    pi_schema_names   in varchar2 default null
+    pi_option               in number,
+    pi_schema_names         in varchar2 default null,
+    pi_delete_test_packages in varchar2 default 'N'
   ) is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.p_create_unit_test_packages';
-    l_param_list qa_logger_pkg.tab_param;
-
     l_package_name varchar2(255);
     l_clob         clob;
     l_schema_names varchar2(32672);
     l_object_number number;
     l_object_types VARCHAR2_TAB_T := VARCHAR2_TAB_T();
   begin
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_option'
-                              ,p_val_01  => pi_option
-                              ,p_name_02 => 'pi_schema_names'
-                              ,p_val_02  => pi_schema_names);
-
     dbms_output.enable(buffer_size => 10000000);
 
     p_validate_input(pi_option               => pi_option,
-                     pi_schema_names         => pi_schema_names);
+                     pi_schema_names         => pi_schema_names,
+                     pi_delete_test_packages => pi_delete_test_packages);
 
-    p_delete_test_packages;
+    p_delete_test_packages(pi_schema_names         => pi_schema_names,
+                           pi_delete_test_packages => pi_delete_test_packages);
 
     if pi_schema_names is not null
     then
@@ -315,6 +329,25 @@ create or replace package body qa_unit_tests_pkg is
         l_clob := l_clob || '    end if;' || chr(10);
         l_clob := l_clob || '  end loop;' || chr(10);
         l_clob := l_clob || '  dbms_output.put_line(''</Results>'');' || chr(10);
+
+       /*l_clob := l_clob || '  dbms_output.put_line(''<Results rulenumber="' || rec_rules.qaru_rule_number || '" layer="' || rec_rules.qaru_layer || '" result="''||l_result||''">'');' || chr(10);
+        l_clob := l_clob || '  if l_result != 1' || chr(10);
+        l_clob := l_clob || '  then' || chr(10);
+        l_clob := l_clob || '  l_object_names := replace(l_object_names, ''; '', '';'');' || chr(10);
+        l_clob := l_clob || '  l_object_details := replace(l_object_details, ''; '', '';'');' || chr(10);
+        l_clob := l_clob || '  for i in ( select trim(regexp_substr(l_object_names, ''[^;]+'', 1, level)) as object_name' || chr(10);
+        l_clob := l_clob || '                   ,trim(regexp_substr(l_object_details, ''[^;]+'', 1, level)) as object_details' || chr(10);
+        l_clob := l_clob || '               from dual' || chr(10);
+        l_clob := l_clob || '            connect by level <= regexp_count(l_object_names, '';'')+1' || chr(10);
+        l_clob := l_clob || '           )' || chr(10);
+        l_clob := l_clob || '  loop' || chr(10);
+        l_clob := l_clob || '    dbms_output.put_line(''<Object objectpath="''||i.object_name||''" objectdetails="''||i.object_details||''">''||l_error_message||''</Object>'');' || chr(10);
+        --l_clob := l_clob || '    dbms_output.put_line(''<ResultMessage>Test "' || rec_rules.qaru_test_name || '" completed with result ''||l_result||''</ResultMessage>'');' || chr(10);
+        --l_clob := l_clob || '    dbms_output.put_line(''<ErrorMessage>''||l_error_message||''</ErrorMessage>'');' || chr(10);
+        --l_clob := l_clob || '    dbms_output.put_line(''<InvalidObjects>''||l_object_names||''</InvalidObjects>'');' || chr(10);
+        l_clob := l_clob || '  end loop;' || chr(10);
+        l_clob := l_clob || '  end if;' || chr(10);
+        l_clob := l_clob || '  dbms_output.put_line(''</Results>'');' || chr(10);*/
 
         l_clob := l_clob || 'EXCEPTION' || chr(10);
         l_clob := l_clob || '  WHEN OTHERS THEN' || chr(10);
@@ -455,10 +488,10 @@ create or replace package body qa_unit_tests_pkg is
     elsif pi_option = qa_constant_pkg.gc_utplsql_single_rule_per_object
     then
 
-    for rec_client_rules in (select qaru_client_name
+	  for rec_client_rules in (select qaru_client_name
                                      ,qaru_rule_number
                                      ,qaru_name
-                   ,qaru_object_types
+									 ,qaru_object_types
                                      ,regexp_replace(replace(lower(qaru_client_name)
                                                             ,' '
                                                             ,'_')
@@ -484,10 +517,10 @@ create or replace package body qa_unit_tests_pkg is
                                        ,qaru_client_name
                                        ,qaru_rule_number
                                        ,qaru_name
-                     ,qaru_object_types
+									   ,qaru_object_types
                                        ,qaru_layer
                                order by qaru_id asc)
-    loop
+	  loop
         l_object_types := f_generate_table_of_vc_object_types(pi_object_types => rec_client_rules.qaru_object_types);
 
         l_package_name := 'qa_ut_' || rec_client_rules.qaru_client_name_unified || '_' || rec_client_rules.qaru_name_unified ||'_pkg';
@@ -499,43 +532,45 @@ create or replace package body qa_unit_tests_pkg is
 
         l_object_number := 1;
         for rec_rule_objects in (select lower(ao.owner) as owner_unified
-                                     ,lower(ao.object_name) as object_name_unified
+	                                   ,lower(ao.object_name) as object_name_unified
                                  from all_objects ao
                                  join qaru_schema_names_for_testing_v qa
                                  on qa.username = ao.owner
+						         --where ao.object_type = rec_client_rules.qaru_object_types
                                  where ao.object_type member of (l_object_types)
                                  and ((l_schema_names is not null and qa.username in (l_schema_names))
                                       or l_schema_names is null
                                      )
-                     order by ao.owner asc)    
+						         order by ao.owner asc)    
         loop
 
-        l_clob := l_clob || '--%test(quasto_test_rule_' || rec_client_rules.qaru_rule_number_unified || '_for_"' || rec_rule_objects.owner_unified || '"."' || rec_rule_objects.object_name_unified || '")' || chr(10);
-        l_clob := l_clob || 'PROCEDURE p_ut_rule_' || rec_client_rules.qaru_rule_number_unified || '_for_object_no_' || to_char(l_object_number) || ';' || chr(10);
-        l_object_number := l_object_number + 1;
+	      l_clob := l_clob || '--%test(quasto_test_rule_' || rec_client_rules.qaru_rule_number_unified || '_for_"' || rec_rule_objects.owner_unified || '"."' || rec_rule_objects.object_name_unified || '")' || chr(10);
+          l_clob := l_clob || 'PROCEDURE p_ut_rule_' || rec_client_rules.qaru_rule_number_unified || '_for_object_no_' || to_char(l_object_number) || ';' || chr(10);
+	      l_object_number := l_object_number + 1;
 
-      end loop;
+	    end loop;
 
-      l_clob := l_clob || 'END ' || l_package_name || ';';
+	    l_clob := l_clob || 'END ' || l_package_name || ';';
 
-      execute immediate l_clob;
-      dbms_output.put_line('Package specification for ' || l_package_name || ' created.');
+        execute immediate l_clob;
+        dbms_output.put_line('Package specification for ' || l_package_name || ' created.');
 
-      l_clob := 'CREATE OR REPLACE PACKAGE BODY ' || l_package_name || ' IS' || chr(10);
+        l_clob := 'CREATE OR REPLACE PACKAGE BODY ' || l_package_name || ' IS' || chr(10);
 
-      l_object_number := 1;
-      for rec_rule_objects in (select ao.owner
+        l_object_number := 1;
+	    for rec_rule_objects in (select ao.owner
                                       , lower(ao.owner) as owner_unified
-                                    , ao.object_name
-                                     ,lower(ao.object_name) as object_name_unified
+	                                  , ao.object_name
+	                                   ,lower(ao.object_name) as object_name_unified
                                  from all_objects ao
                                  join qaru_schema_names_for_testing_v qa
                                  on qa.username = ao.owner
+						         --where ao.object_type = rec_client_rules.qaru_object_types
                                  where ao.object_type member of (l_object_types)
                                  and ((l_schema_names is not null and qa.username in (l_schema_names))
                                       or l_schema_names is null
                                      )
-                     order by ao.owner asc)
+						         order by ao.owner asc)
         loop
 
           l_clob := l_clob || 'PROCEDURE p_ut_rule_' || rec_client_rules.qaru_rule_number_unified || '_for_object_no_' || to_char(l_object_number) || chr(10);
@@ -585,7 +620,7 @@ create or replace package body qa_unit_tests_pkg is
           l_clob := l_clob || '    dbms_output.put_line(DBMS_UTILITY.format_error_backtrace);' || chr(10);
           l_clob := l_clob || '    RAISE;' || chr(10);
           l_clob := l_clob || 'END p_ut_rule_' || rec_client_rules.qaru_rule_number_unified || '_for_object_no_' || to_char(l_object_number) || ';' || chr(10);
-        l_object_number := l_object_number + 1;
+		  l_object_number := l_object_number + 1;
 
         end loop;
 
@@ -594,25 +629,22 @@ create or replace package body qa_unit_tests_pkg is
         execute immediate l_clob;
         dbms_output.put_line('Package body for ' || l_package_name || ' created.');
 
-    end loop;
+	  end loop;
 
     end if;
 
   exception
     when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while creating the unit test packages!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
+      dbms_output.put_line('--ERROR--');
+      dbms_output.put_line('Creation of package ' || l_package_name || ' raised exception.');
+      dbms_output.put_line(sqlerrm);
+      dbms_output.put_line(dbms_utility.format_error_backtrace);
       raise;
   end p_create_unit_test_packages;
 
   procedure p_run_unit_tests(
     po_result out varchar2
   ) is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.p_run_unit_tests';
-    l_param_list qa_logger_pkg.tab_param;
-
     l_xml_result clob;
     l_timestamp_begin timestamp(6);
     l_timestamp_end timestamp(6);
@@ -631,20 +663,56 @@ create or replace package body qa_unit_tests_pkg is
     po_result := 'Execution of unit tests finished successful after ' || l_running_time_seconds || ' seconds';
   exception
     when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while running the unit test packages!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
       po_result := 'Execution of unit tests failed with error ' || sqlerrm || ' - ' || dbms_utility.format_error_backtrace;
       raise;
   end p_run_unit_tests;
-
-  procedure p_run_unit_test_job
-  is 
-    l_result varchar2(4000 char);
+  
+  function f_is_scheduler_job_enabled
+  return varchar2
+  is
+    l_result number;
   begin
-    p_run_unit_tests(l_result);
-  end p_run_unit_test_job;
+    select decode(count(1), 0, 0, 1)
+    into l_result
+    from dual
+    where exists (select null
+                  from user_scheduler_jobs 
+                  where job_name = 'JOB_RUN_UNIT_TESTS'
+                  and enabled = 'TRUE'
+                 );
+                 
+    if l_result = 1
+    then
+      return 'Y';
+    else
+      return 'N';
+    end if;
+  exception
+    when others then
+      raise;
+  end f_is_scheduler_job_enabled;
+  
+  procedure p_enable_scheduler_job(
+    pi_status in varchar2
+  ) is
+  begin
+    if pi_status not in ( 'Y'
+                        , 'N'
+                        )
+    then
+      raise_application_error(-20001, 'Invalid input parameter value for pi_status: ' || pi_status);
+    end if;
+
+    if pi_status = 'Y'
+    then
+      dbms_scheduler.enable('JOB_RUN_UNIT_TESTS');
+    else
+      dbms_scheduler.disable('JOB_RUN_UNIT_TESTS');
+    end if;
+  exception
+    when others then
+      raise;
+  end p_enable_scheduler_job;
 
 end qa_unit_tests_pkg;
 /

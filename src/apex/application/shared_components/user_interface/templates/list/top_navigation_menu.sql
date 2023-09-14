@@ -5,14 +5,14 @@ begin
 --   Manifest End
 wwv_flow_imp.component_begin (
  p_version_yyyy_mm_dd=>'2022.10.07'
-,p_release=>'22.2.0'
-,p_default_workspace_id=>17000820229357378
-,p_default_application_id=>108
-,p_default_id_offset=>0
+,p_release=>'22.2.5'
+,p_default_workspace_id=>33657925800256602
+,p_default_application_id=>141
+,p_default_id_offset=>33662320935301187
 ,p_default_owner=>'QUASTO'
 );
 wwv_flow_imp_shared.create_list_template(
- p_id=>wwv_flow_imp.id(17169026422373971)
+ p_id=>wwv_flow_imp.id(50831347357675158)
 ,p_list_template_current=>'<li class="a-MenuBar-item a-Menu--current" data-current="true" data-id="#A01#" data-disabled="#A02#" data-hide="#A03#" data-shortcut="#A05#" data-icon="#ICON_CSS_CLASSES#"><a class="a-MenuBar-label" href="#LINK#" title="#A04#" target="#A06#">#TEXT_ES'
 ||'C_SC#</a></li>'
 ,p_list_template_noncurrent=>'<li class="a-MenuBar-item" data-id="#A01#" data-disabled="#A02#" data-hide="#A03#" data-shortcut="#A05#" data-icon="#ICON_CSS_CLASSES#"><a class="a-MenuBar-label" href="#LINK#" title="#A04#" target="#A06#">#TEXT_ESC_SC#</a></li>'

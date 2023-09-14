@@ -5,14 +5,14 @@ begin
 --   Manifest End
 wwv_flow_imp.component_begin (
  p_version_yyyy_mm_dd=>'2022.10.07'
-,p_release=>'22.2.0'
-,p_default_workspace_id=>17000820229357378
-,p_default_application_id=>108
-,p_default_id_offset=>0
+,p_release=>'22.2.5'
+,p_default_workspace_id=>33657925800256602
+,p_default_application_id=>141
+,p_default_id_offset=>33662320935301187
 ,p_default_owner=>'QUASTO'
 );
 wwv_flow_imp_shared.create_menu_template(
- p_id=>wwv_flow_imp.id(17184013727373982)
+ p_id=>wwv_flow_imp.id(50846334662675169)
 ,p_name=>'Breadcrumb'
 ,p_internal_name=>'BREADCRUMB'
 ,p_before_first=>'<ul class="t-Breadcrumb #COMPONENT_CSS_CLASSES#">'

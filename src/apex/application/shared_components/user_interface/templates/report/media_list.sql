@@ -5,14 +5,14 @@ begin
 --   Manifest End
 wwv_flow_imp.component_begin (
  p_version_yyyy_mm_dd=>'2022.10.07'
-,p_release=>'22.2.0'
-,p_default_workspace_id=>17000820229357378
-,p_default_application_id=>108
-,p_default_id_offset=>0
+,p_release=>'22.2.5'
+,p_default_workspace_id=>33657925800256602
+,p_default_application_id=>141
+,p_default_id_offset=>33662320935301187
 ,p_default_owner=>'QUASTO'
 );
 wwv_flow_imp_shared.create_row_template(
- p_id=>wwv_flow_imp.id(17133088056373952)
+ p_id=>wwv_flow_imp.id(50795408991675139)
 ,p_row_template_name=>'Media List'
 ,p_internal_name=>'MEDIA_LIST'
 ,p_row_template1=>wwv_flow_string.join(wwv_flow_t_varchar2(

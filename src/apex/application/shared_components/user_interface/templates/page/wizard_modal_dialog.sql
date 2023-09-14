@@ -5,14 +5,14 @@ begin
 --   Manifest End
 wwv_flow_imp.component_begin (
  p_version_yyyy_mm_dd=>'2022.10.07'
-,p_release=>'22.2.0'
-,p_default_workspace_id=>17000820229357378
-,p_default_application_id=>108
-,p_default_id_offset=>0
+,p_release=>'22.2.5'
+,p_default_workspace_id=>33657925800256602
+,p_default_application_id=>141
+,p_default_id_offset=>33662320935301187
 ,p_default_owner=>'QUASTO'
 );
 wwv_flow_imp_shared.create_template(
- p_id=>wwv_flow_imp.id(17018647228373903)
+ p_id=>wwv_flow_imp.id(50680968163675090)
 ,p_theme_id=>42
 ,p_name=>'Wizard Modal Dialog'
 ,p_internal_name=>'WIZARD_MODAL_DIALOG'
@@ -143,8 +143,8 @@ wwv_flow_imp_shared.create_template(
 ,p_reference_id=>2120348229686426515
 );
 wwv_flow_imp_shared.create_page_tmpl_display_point(
- p_id=>wwv_flow_imp.id(17018915388373903)
-,p_page_template_id=>wwv_flow_imp.id(17018647228373903)
+ p_id=>wwv_flow_imp.id(50681236323675090)
+,p_page_template_id=>wwv_flow_imp.id(50680968163675090)
 ,p_name=>'Wizard Body'
 ,p_placeholder=>'BODY'
 ,p_has_grid_support=>true
@@ -155,8 +155,8 @@ wwv_flow_imp_shared.create_page_tmpl_display_point(
 ,p_max_fixed_grid_columns=>12
 );
 wwv_flow_imp_shared.create_page_tmpl_display_point(
- p_id=>wwv_flow_imp.id(17019226457373903)
-,p_page_template_id=>wwv_flow_imp.id(17018647228373903)
+ p_id=>wwv_flow_imp.id(50681547392675090)
+,p_page_template_id=>wwv_flow_imp.id(50680968163675090)
 ,p_name=>'Wizard Progress Bar'
 ,p_placeholder=>'REGION_POSITION_01'
 ,p_has_grid_support=>false
@@ -166,8 +166,8 @@ wwv_flow_imp_shared.create_page_tmpl_display_point(
 ,p_glv_new_row=>true
 );
 wwv_flow_imp_shared.create_page_tmpl_display_point(
- p_id=>wwv_flow_imp.id(17019550509373903)
-,p_page_template_id=>wwv_flow_imp.id(17018647228373903)
+ p_id=>wwv_flow_imp.id(50681871444675090)
+,p_page_template_id=>wwv_flow_imp.id(50680968163675090)
 ,p_name=>'Wizard Buttons'
 ,p_placeholder=>'REGION_POSITION_03'
 ,p_has_grid_support=>false

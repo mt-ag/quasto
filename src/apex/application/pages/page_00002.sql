@@ -5,10 +5,10 @@ begin
 --   Manifest End
 wwv_flow_imp.component_begin (
  p_version_yyyy_mm_dd=>'2022.10.07'
-,p_release=>'22.2.0'
-,p_default_workspace_id=>17000820229357378
-,p_default_application_id=>108
-,p_default_id_offset=>0
+,p_release=>'22.2.5'
+,p_default_workspace_id=>33657925800256602
+,p_default_application_id=>141
+,p_default_id_offset=>33662320935301187
 ,p_default_owner=>'QUASTO'
 );
 wwv_flow_imp_page.create_page(
@@ -25,10 +25,10 @@ wwv_flow_imp_page.create_page(
 ,p_last_upd_yyyymmddhh24miss=>'20230312133849'
 );
 wwv_flow_imp_page.create_page_plug(
- p_id=>wwv_flow_imp.id(19581696241015701)
+ p_id=>wwv_flow_imp.id(53244017176316888)
 ,p_plug_name=>'utPLSQL Failure Backtrace'
 ,p_region_template_options=>'#DEFAULT#'
-,p_plug_template=>wwv_flow_imp.id(17127821905373949)
+,p_plug_template=>wwv_flow_imp.id(50790142840675136)
 ,p_plug_display_sequence=>10
 ,p_include_in_reg_disp_sel_yn=>'Y'
 ,p_plug_query_options=>'DERIVED_REPORT_COLUMNS'
@@ -36,18 +36,18 @@ wwv_flow_imp_page.create_page_plug(
 ,p_attribute_02=>'HTML'
 );
 wwv_flow_imp_page.create_page_item(
- p_id=>wwv_flow_imp.id(19581746029015702)
+ p_id=>wwv_flow_imp.id(53244066964316889)
 ,p_name=>'P2_QUASTO_TESTCASE_NAME'
 ,p_item_sequence=>10
-,p_item_plug_id=>wwv_flow_imp.id(19581696241015701)
+,p_item_plug_id=>wwv_flow_imp.id(53244017176316888)
 ,p_display_as=>'NATIVE_HIDDEN'
 ,p_attribute_01=>'Y'
 );
 wwv_flow_imp_page.create_page_item(
- p_id=>wwv_flow_imp.id(19581810038015703)
+ p_id=>wwv_flow_imp.id(53244130973316890)
 ,p_name=>'P2_UTPLSQL_FAILURE'
 ,p_item_sequence=>30
-,p_item_plug_id=>wwv_flow_imp.id(19581696241015701)
+,p_item_plug_id=>wwv_flow_imp.id(53244017176316888)
 ,p_prompt=>'utPLSQL Failure Backtrace'
 ,p_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
 'with xml_result as',
@@ -79,7 +79,7 @@ wwv_flow_imp_page.create_page_item(
 ')'))
 ,p_source_type=>'QUERY'
 ,p_display_as=>'NATIVE_DISPLAY_ONLY'
-,p_field_template=>wwv_flow_imp.id(17179955866373977)
+,p_field_template=>wwv_flow_imp.id(50842276801675164)
 ,p_item_template_options=>'#DEFAULT#'
 ,p_attribute_01=>'Y'
 ,p_attribute_02=>'VALUE'
@@ -87,10 +87,10 @@ wwv_flow_imp_page.create_page_item(
 ,p_attribute_05=>'PLAIN'
 );
 wwv_flow_imp_page.create_page_item(
- p_id=>wwv_flow_imp.id(19581953205015704)
+ p_id=>wwv_flow_imp.id(53244274140316891)
 ,p_name=>'P2_QATR_ID'
 ,p_item_sequence=>20
-,p_item_plug_id=>wwv_flow_imp.id(19581696241015701)
+,p_item_plug_id=>wwv_flow_imp.id(53244017176316888)
 ,p_display_as=>'NATIVE_HIDDEN'
 ,p_attribute_01=>'Y'
 );
