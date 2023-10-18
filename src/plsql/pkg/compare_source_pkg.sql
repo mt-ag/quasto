@@ -30,7 +30,7 @@ is
               from user_source
              where type = 'PACKAGE'
                and name not like l_test_pkg
-               and name not in ('COMPARE_SCHEMA_OBJ_PKG', 'COMPARE_SOURCE_PKG')
+               and name not in ('COMPARE_SCHEME_OBJ_PKG', 'COMPARE_SOURCE_PKG')
              minus
             select line, text, name
               from user_source@QUASTO_TEST
@@ -52,7 +52,7 @@ is
               from user_source
              where type = 'PACKAGE'
                and name not like l_test_pkg
-               and name not in ('COMPARE_SCHEMA_OBJ_PKG', 'COMPARE_SOURCE_PKG')
+               and name not in ('COMPARE_SCHEME_OBJ_PKG', 'COMPARE_SOURCE_PKG')
            )
      where name in (select object_name from user_objects where object_type = 'PACKAGE')
        and name in (select object_name from user_objects@QUASTO_TEST where object_type = 'PACKAGE')
@@ -98,7 +98,7 @@ is
               from user_source
              where type = 'PACKAGE BODY'
                and name not like l_test_pkg
-               and name not in ('COMPARE_SCHEMA_OBJ_PKG', 'COMPARE_SOURCE_PKG')
+               and name not in ('COMPARE_SCHEME_OBJ_PKG', 'COMPARE_SOURCE_PKG')
              minus
             select name, line, text
               from user_source@QUASTO_TEST
@@ -120,7 +120,7 @@ is
               from user_source
              where type = 'PACKAGE BODY'
                and name not like l_test_pkg
-               and name not in ('COMPARE_SCHEMA_OBJ_PKG', 'COMPARE_SOURCE_PKG')
+               and name not in ('COMPARE_SCHEME_OBJ_PKG', 'COMPARE_SOURCE_PKG')
            )
      where name in (select object_name from user_objects where object_type = 'PACKAGE BODY')
        and name in (select object_name from user_objects@QUASTO_TEST where object_type = 'PACKAGE BODY')

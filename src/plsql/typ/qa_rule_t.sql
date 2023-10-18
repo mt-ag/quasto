@@ -9,7 +9,7 @@ create or replace type qa_rule_t force as object
   qaru_object_types  varchar2(4000), -- object types which
   qaru_sql           clob, -- sql query for this rule
 -- Information based on the query, related to the object which is checked
-  schema_name         varchar2(100), -- owner of the object
+  scheme_name         varchar2(100), -- owner of the object
   object_id           number, -- object id if possible
   object_name         varchar2(1000), -- name of the object
   object_path         varchar2(500), -- identifier path of the object
@@ -21,7 +21,7 @@ create or replace type qa_rule_t force as object
 -- apex specific parameters for buildung edit links
   apex_app_id    number, -- application where component is placed
   apex_page_id   number, -- page where component is placed
-
+    
 -- create object with minimal attributes to query
   constructor function qa_rule_t
   (
@@ -42,11 +42,11 @@ create or replace type qa_rule_t force as object
    ,pi_qaru_error_message  in varchar2
    ,pi_qaru_object_types   in varchar2
    ,pi_qaru_sql            in clob
-   ,pi_schema_name         in varchar2
+   ,pi_scheme_name         in varchar2
    ,pi_object_id           in number
    ,pi_object_name         in varchar2
-   ,pi_object_path         in varchar2
-   ,pi_object_details      in varchar2
+   --,pi_object_path         in varchar2
+   --,pi_object_details      in varchar2
    ,pi_object_type         in varchar2
    ,pi_object_value        in varchar2
    ,pi_object_updated_user in varchar2
@@ -56,7 +56,7 @@ create or replace type qa_rule_t force as object
 -- create object with attributes for unit tests
   constructor function qa_rule_t
   (
-    pi_schema_name         in varchar2
+    pi_scheme_name         in varchar2
    ,pi_object_name         in varchar2
    ,pi_object_path         in varchar2
    ,pi_object_details      in varchar2
@@ -72,6 +72,7 @@ create or replace type qa_rule_t force as object
    ,pi_qaru_error_message  in varchar2
    ,pi_qaru_object_types   in varchar2
    ,pi_qaru_sql            in clob
+   ,pi_scheme_name         in varchar2
    ,pi_object_id           in number
    ,pi_object_name         in varchar2
    ,pi_object_type         in varchar2
@@ -80,6 +81,7 @@ create or replace type qa_rule_t force as object
    ,pi_object_updated_date in date
    ,pi_apex_app_id         in number
    ,pi_apex_page_id        in number
+   
   ) return self as result,
 
   member function to_string return varchar2
@@ -116,11 +118,11 @@ create or replace type body qa_rule_t is
    ,pi_qaru_error_message  in varchar2
    ,pi_qaru_object_types   in varchar2
    ,pi_qaru_sql            in clob
-   ,pi_schema_name         in varchar2
+   ,pi_scheme_name         in varchar2
    ,pi_object_id           in number
    ,pi_object_name         in varchar2
-   ,pi_object_path         in varchar2
-   ,pi_object_details      in varchar2
+   --,pi_object_path         in varchar2
+   --,pi_object_details      in varchar2
    ,pi_object_type         in varchar2
    ,pi_object_value        in varchar2
    ,pi_object_updated_user in varchar2
@@ -133,11 +135,11 @@ create or replace type body qa_rule_t is
     self.qaru_error_message  := pi_qaru_error_message;
     self.qaru_object_types   := pi_qaru_object_types;
     self.qaru_sql            := pi_qaru_sql;
-    self.schema_name         := pi_schema_name;
+    self.scheme_name         := pi_scheme_name;
     self.object_id           := pi_object_id;
     self.object_name         := pi_object_name;
-    self.object_path         := pi_object_path;
-    self.object_details      := pi_object_details;
+    --self.object_path         := pi_object_path;
+    --self.object_details      := pi_object_details;
     self.object_type         := pi_object_type;
     self.object_value        := pi_object_value;
     self.object_updated_user := pi_object_updated_user;
@@ -148,14 +150,14 @@ create or replace type body qa_rule_t is
 
   constructor function qa_rule_t
   (
-    pi_schema_name         in varchar2
+    pi_scheme_name         in varchar2
    ,pi_object_name         in varchar2
    ,pi_object_path         in varchar2
    ,pi_object_details      in varchar2
    ,pi_error_message       in varchar2
   ) return self as result is
   begin
-    self.schema_name         := pi_schema_name;
+    self.scheme_name         := pi_scheme_name;
     self.object_name         := pi_object_name;
     self.object_path         := pi_object_path;
     self.object_details      := pi_object_details;
@@ -173,6 +175,7 @@ create or replace type body qa_rule_t is
    ,pi_qaru_error_message  in varchar2
    ,pi_qaru_object_types   in varchar2
    ,pi_qaru_sql            in clob
+   ,pi_scheme_name         in varchar2
    ,pi_object_id           in number
    ,pi_object_name         in varchar2
    ,pi_object_type         in varchar2
@@ -181,6 +184,7 @@ create or replace type body qa_rule_t is
    ,pi_object_updated_date in date
    ,pi_apex_app_id         in number
    ,pi_apex_page_id        in number
+   
   ) return self as result is
   begin
     self.qaru_id             := pi_qaru_id;
@@ -189,6 +193,7 @@ create or replace type body qa_rule_t is
     self.qaru_error_message  := pi_qaru_error_message;
     self.qaru_object_types   := pi_qaru_object_types;
     self.qaru_sql            := pi_qaru_sql;
+    self.scheme_name         := pi_scheme_name;
     self.object_id           := pi_object_id;
     self.object_name         := pi_object_name;
     self.object_type         := pi_object_type;
@@ -197,7 +202,7 @@ create or replace type body qa_rule_t is
     self.object_updated_date := pi_object_updated_date;
     self.apex_app_id         := pi_apex_app_id;
     self.apex_page_id        := pi_apex_page_id;
-    
+     
     return;
   end qa_rule_t;
 

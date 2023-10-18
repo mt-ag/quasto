@@ -2,11 +2,19 @@ create or replace package qa_export_import_rules_pkg is
 
   gc_scope constant varchar2(100) := $$plsql_unit || '.';
   g_version_number number := 1.1;
-
+/**
+@param g_spool_active if spool set to active, all outputs are deactivated
+** otherwise you would get extra lines in your JSON 
+*/
   -- if spool set to active, all outputs are deactivated
   -- otherwise you would get extra lines in your JSON
   g_spool_active boolean := false;
-
+/**
+*@param i_source takes the source to read the data
+*@param i_search search your Rule in i_source
+* @param i_replace replacing the searched value
+*
+*/
   function replace_with_clob
   (
     i_source  in clob
@@ -44,13 +52,13 @@ create or replace package body qa_export_import_rules_pkg is
   procedure p_print(pi_text in varchar2) is
     c_unit constant varchar2(32767) := $$plsql_unit || '.p_print';
     l_param_list qa_logger_pkg.tab_param;
-  
+
   begin
- 
+
     qa_logger_pkg.append_param(p_params => l_param_list
                               ,p_name_01 => 'pi_text'
                               ,p_val_01 => pi_text);
-                                
+
     if not g_spool_active
     then
       dbms_output.put_line(pi_text);
@@ -61,7 +69,7 @@ create or replace package body qa_export_import_rules_pkg is
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
-                            
+
     when others then 
       qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to printing the Rules!'
                             ,p_scope  => c_unit
@@ -76,7 +84,7 @@ create or replace package body qa_export_import_rules_pkg is
   ) return clob is
     c_scope constant varchar2(100) := gc_scope || 'f_export_rules_table_to_clob';
     l_param_list qa_logger_pkg.tab_param;
-    
+
     l_count_rules            number;
     l_pretty_print           clob;
     l_clob                   clob;
@@ -89,30 +97,30 @@ create or replace package body qa_export_import_rules_pkg is
     l_client_name_array_json json_array_t := json_array_t();
     l_client_name_json       json_object_t := json_object_t();
     l_client_names_json      json_object_t := json_object_t();
-   
-  
+
+
   begin    
- 
-  
+
+
     qa_logger_pkg.append_param(p_params  => l_param_list
                               ,p_name_01 => 'pi_client_name'
                               ,p_val_01  => pi_client_name
                               ,p_name_02 => 'pi_category'
                               ,p_val_02  =>pi_category);
-                            
+
     select count(1)
     into l_count_rules
     from qa_rules r
     where (pi_client_name is null or pi_client_name = r.qaru_client_name)
     and (pi_category is null or pi_category = r.qaru_category);
-  
+
     if l_count_rules = 0
     then
       p_print('No rules found.');
       return null;
     else
       p_print('Exporting ' || l_count_rules || ' rules with CLIENT_NAME=' || pi_client_name || ' and CATEGORY=' || pi_category);
-    
+
       -- for each client_name
       for client in (select qaru_client_name
                      from qa_rules
@@ -120,7 +128,7 @@ create or replace package body qa_export_import_rules_pkg is
                      or qaru_client_name = pi_client_name
                      group by qaru_client_name
                      order by qaru_client_name)
-      
+
       loop
         -- for each category
         for category in (select qaru_category
@@ -178,20 +186,20 @@ create or replace package body qa_export_import_rules_pkg is
                            ,rules.qaru_layer);
             l_rules_array_json.append(l_rule_json);
           end loop;
-        
+
           l_category_json.put('category'
                              ,category.qaru_category);
           l_category_json.put('rules'
                              ,l_rules_array_json);
           l_category_array_json.append(l_category_json);
         end loop;
-      
+
         l_client_name_json.put('client_name'
                               ,client.qaru_client_name);
         l_client_name_json.put('categories'
                               ,l_category_array_json);
       end loop;
-    
+
       l_client_name_array_json.append(l_client_name_json);
       l_client_names_json.put('client_names'
                              ,l_client_name_array_json);
@@ -200,7 +208,7 @@ create or replace package body qa_export_import_rules_pkg is
                      ,g_version_number);
       l_main_json.put('qa_rules'
                      ,l_main_array_json);
-    
+
       l_clob := l_main_json.to_clob;
       select json_serialize(l_clob returning clob pretty)
       into l_pretty_print
@@ -231,16 +239,16 @@ create or replace package body qa_export_import_rules_pkg is
   ) return clob is      
     c_unit constant varchar2(32767) := $$plsql_unit || '.f_replace_with_clob';
     l_param_list qa_logger_pkg.tab_param;
-    
+
     l_pos pls_integer;
     l_source_varchar varchar(32767); 
     l_replace_varchar varchar(32767);
- 
+
   begin
- 
+
     l_source_varchar := dbms_lob.substr(i_source,4000,1);
     l_replace_varchar := dbms_lob.substr(i_replace,4000,1);
-  
+
     qa_logger_pkg.append_param(p_params  => l_param_list
                               ,p_name_01 => 'i_source'
                               ,p_val_01  => l_source_varchar
@@ -248,8 +256,8 @@ create or replace package body qa_export_import_rules_pkg is
                               ,p_val_02  =>i_search
                               ,p_name_03 => 'i_replace'
                               ,p_val_03  => l_replace_varchar);
-                            
-                            
+
+
     l_pos := instr(i_source
                   ,i_search);
     if l_pos > 0
@@ -273,24 +281,24 @@ create or replace package body qa_export_import_rules_pkg is
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
   end replace_with_clob;
-  
+
 
   -- Experimental Function to Export A Json as an executable script
   function f_export_rules_to_script_clob(pi_clob in clob) return clob is
-    
+
     c_unit constant varchar2(32767) := $$plsql_unit || '.f_export_rules_to_script_clob';
     l_param_list qa_logger_pkg.tab_param;
-    
+
     l_clob clob;
     l_sql  clob;
     l_clob_varchar varchar(32767); 
- 
+
   begin
     l_clob_varchar := dbms_lob.substr(pi_clob,4000,1);
     qa_logger_pkg.append_param(p_params  => l_param_list
                               ,p_name_01 => 'pi_clob'
                               ,p_val_01  => l_clob_varchar);
-         
+
     l_clob := 'set serveroutput on;' || chr(10);
     dbms_lob.append(l_clob
                    ,'declare' || chr(10));
@@ -334,9 +342,9 @@ create or replace package body qa_export_import_rules_pkg is
                    ,chr(10) || 'quasto.qa_export_import_rules_pkg.p_import_clob_to_rules_table(pi_clob => l_clob);' || chr(10));
     dbms_lob.append(l_clob
                    ,'end;' || chr(10) || '/');
-  
+
     return l_clob;
-    
+
   exception
     when no_data_found then
       qa_logger_pkg.p_qa_log(p_text   => 'No Data found at exporting Rules to Scripts'
@@ -355,17 +363,17 @@ create or replace package body qa_export_import_rules_pkg is
   procedure p_clob_to_output(pi_clob in clob) is
     c_unit constant varchar2(32767) := $$plsql_unit || '.p_clob_to_output';
     l_param_list qa_logger_pkg.tab_param;
-    
+
     l_offset int := 1;
     l_step   number := 32767;
     l_clob_varchar varchar(32767); 
   begin
- 
+
     l_clob_varchar := dbms_lob.substr(pi_clob,4000,1);
     qa_logger_pkg.append_param(p_params  => l_param_list
                               ,p_name_01 => 'pi_clob'
                               ,p_val_01  => l_clob_varchar);
-                              
+
     dbms_output.enable(buffer_size => 10000000);
     loop
       exit when l_offset > dbms_lob.getlength(pi_clob);
@@ -396,10 +404,10 @@ create or replace package body qa_export_import_rules_pkg is
   ) is
     c_unit constant varchar2(32767) := $$plsql_unit || '.f_Import_clob_to_qa_import_files';
     l_param_list qa_logger_pkg.tab_param;
-    
+
     l_ret number;
     l_varchar_clob varchar(4000);
-  
+
   begin
     l_varchar_clob := dbms_lob.substr(pi_clob);
     qa_logger_pkg.append_param(p_params  => l_param_list
@@ -409,7 +417,7 @@ create or replace package body qa_export_import_rules_pkg is
                               ,p_val_02  => pi_filename
                               ,p_name_03 => 'pi_mimetype'
                               ,p_val_03  => pi_mimetype);
- 
+
     insert into qa_import_files
       (qaif_filename
       ,qaif_mimetype
@@ -437,10 +445,10 @@ create or replace package body qa_export_import_rules_pkg is
 
 
   procedure p_import_clob_to_rules_table(pi_qaif_id in qa_import_files.qaif_id%type) is
-  
+
     c_unit constant varchar2(32767) := $$plsql_unit || '.f_Import_clob_to_rules_table';
     l_param_list qa_logger_pkg.tab_param;
-    
+
     l_clob clob;
   begin
     qa_logger_pkg.append_param(p_params => l_param_list
@@ -451,7 +459,7 @@ create or replace package body qa_export_import_rules_pkg is
     into l_clob
     from qa_import_files q
     where q.qaif_id = pi_qaif_id;
-  
+
     if l_clob is not null
     then
       for i in (select *
@@ -471,7 +479,7 @@ create or replace package body qa_export_import_rules_pkg is
                                                                ,qaru_layer varchar2(400 char) path '$.layer'))))))
       loop
         dbms_output.put_line('MERGE CLIENT_NAME=' || i.qaru_client_name || ' RULE_NUMBER=' || i.qaru_rule_number);
-      
+
         merge into qa_rules r
         using dual
         on (r.qaru_client_name = i.qaru_client_name and r.qaru_rule_number = i.qaru_rule_number)
@@ -536,7 +544,7 @@ create or replace package body qa_export_import_rules_pkg is
   function fc_export_qa_rules(pi_client_name in varchar2 default null) return clob is
     c_unit constant varchar2(32767) := $$plsql_unit || '.fc_export_qa_rules';
     l_param_list qa_logger_pkg.tab_param;
-    
+
     type tab_t is table of qa_rules%rowtype;
     l_table_name varchar2(50) := 'QA_RULES';
     l_tab    tab_t;
@@ -559,7 +567,7 @@ create or replace package body qa_export_import_rules_pkg is
       from qa_rules qaru
       order by qaru.qaru_id;
     end if;
-  
+
     l_return := 'SET SERVEROUTPUT ON' || chr(10);
     dbms_lob.append(l_return
                    ,'declare' || chr(10));
@@ -567,10 +575,10 @@ create or replace package body qa_export_import_rules_pkg is
                    ,'  l_sql clob;' || chr(10));
     dbms_lob.append(l_return
                    ,'begin' || chr(10) || chr(10));
-  
+
     dbms_lob.append(l_return
                    ,'  dbms_output.put_line(''Merging data into table ' || l_table_name || ' started.'');' || chr(10) || chr(10));
-  
+
     for i in 1 .. l_tab.count
     loop
       dbms_lob.append(l_return
@@ -716,7 +724,7 @@ create or replace package body qa_export_import_rules_pkg is
       dbms_lob.append(l_return
                      ,'               b.qaru_layer );' || chr(10) || chr(10));
     end loop;
-  
+
     dbms_lob.append(l_return
                    ,'  commit;' || chr(10));
     dbms_lob.append(l_return
@@ -733,12 +741,12 @@ create or replace package body qa_export_import_rules_pkg is
                    ,'      raise;' || chr(10));
     dbms_lob.append(l_return
                    ,'end;' || chr(10) || '/' || chr(10));
-  
+
     return l_return;
-  
+
   exception
     when no_data_found then
-   
+
       qa_logger_pkg.p_qa_log(p_text   => 'No Data found while Exporting Rules from QA_RULES Table'
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm

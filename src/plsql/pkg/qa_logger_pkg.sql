@@ -127,8 +127,8 @@ create or replace package body qa_logger_pkg as
                       $THEN
     l_params logger.tab_param default logger.gc_empty_tab_param;
     $END
-  
-  
+
+
   begin
     $IF qa_constant_pkg.gc_logger_flag = 1
                         $THEN
@@ -141,7 +141,7 @@ create or replace package body qa_logger_pkg as
                            ,p_name   => (p_params(i).name)
                            ,p_val    => nvl(p_params(i).val
                                            ,''));
-      
+
       end loop;
     end if;
     logger.log(p_text   => p_text

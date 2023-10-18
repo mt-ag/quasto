@@ -5,7 +5,7 @@ set long 50000;
 declare
   
 begin
-  compare_schema_obj_pkg.compare_objects;
+  compare_scheme_obj_pkg.compare_objects;
   compare_source_pkg.compare_all;
 end;
 /

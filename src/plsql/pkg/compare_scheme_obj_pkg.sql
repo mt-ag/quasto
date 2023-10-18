@@ -1,4 +1,4 @@
-create or replace package compare_schema_obj_pkg 
+create or replace package compare_scheme_obj_pkg 
 as
 
 procedure compare_tables;
@@ -29,9 +29,9 @@ procedure compare_materialized_views;
 
 procedure compare_synonyms;
 
-end compare_schema_obj_pkg;
+end compare_scheme_obj_pkg;
 /
-create or replace package body compare_schema_obj_pkg 
+create or replace package body compare_scheme_obj_pkg 
 as
 
 procedure compare_tables
@@ -342,7 +342,7 @@ is
       from user_objects
      where object_type = 'PACKAGE'
        and object_name not like l_test_pkg
-       and object_name not in ('COMPARE_SCHEMA_OBJ_PKG', 'COMPARE_SOURCE_PKG') --compare-packages -> nur auf DEV
+       and object_name not in ('COMPARE_scheme_OBJ_PKG', 'COMPARE_SOURCE_PKG') --compare-packages -> nur auf DEV
    minus
     select object_name
       from user_objects@QUASTO_TEST
@@ -359,7 +359,7 @@ is
       from user_objects
      where object_type = 'PACKAGE'
        and object_name not like l_test_pkg
-       and object_name not in ('COMPARE_SCHEMA_OBJ_PKG', 'COMPARE_SOURCE_PKG'); --compare-packages -> nur auf DEV
+       and object_name not in ('COMPARE_scheme_OBJ_PKG', 'COMPARE_SOURCE_PKG'); --compare-packages -> nur auf DEV
 begin
   for dev in cur_Package_dev loop
     if l_count = 0 then
@@ -400,7 +400,7 @@ is
       from user_objects
      where object_type = 'PACKAGE BODY'
        and object_name not like l_test_pkg
-       and object_name not in ('COMPARE_SCHEMA_OBJ_PKG', 'COMPARE_SOURCE_PKG') --nur auf DEV -> Zum Vergleichen der Objekte
+       and object_name not in ('COMPARE_scheme_OBJ_PKG', 'COMPARE_SOURCE_PKG') --nur auf DEV -> Zum Vergleichen der Objekte
    minus
     select object_name
       from user_objects@QUASTO_TEST
@@ -417,7 +417,7 @@ is
       from user_objects
      where object_type = 'PACKAGE BODY'
        and object_name not like l_test_pkg
-       and object_name not in ('COMPARE_SCHEMA_OBJ_PKG', 'COMPARE_SOURCE_PKG'); --nur auf DEV -> Zum Vergleichen der Objekte
+       and object_name not in ('COMPARE_scheme_OBJ_PKG', 'COMPARE_SOURCE_PKG'); --nur auf DEV -> Zum Vergleichen der Objekte
 begin
   for dev in cur_package_body_dev loop
     if l_count = 0 then
@@ -719,5 +719,5 @@ exception
     raise_application_error(-20001, sqlerrm);
 end compare_objects;
 
-end compare_schema_obj_pkg;
+end compare_scheme_obj_pkg;
 /
