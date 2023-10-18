@@ -100,6 +100,7 @@ select qa_rule_t(pi_qaru_id             => p.qaru_id
                 ,pi_qaru_error_message  => p.qaru_error_message
                 ,pi_qaru_object_types   => p.qaru_object_types
                 ,pi_qaru_sql            => p.qaru_sql
+                ,pi_scheme_name         => p-scheme
                 ,pi_object_id           => ao.object_id
                 ,pi_object_name         => ao.object_name
                 ,pi_object_type         => 'TABLE'
@@ -322,4 +323,45 @@ To uninstall the utPLSQL framework, run the script uninstall.sql in the source d
 ```
 sqlplus admin/admins_password@database @uninstall.sql ut3
 ```
+
+### Upcoming Features of our new Version 23.2
+1. ## Schema and Object Blacklisting:
+   We are implementing a schema and object based blacklisting.
+
+3. ## Exclusion of objects which are not owned by a the testing schema
+   To avoid testing objects that are granted access by public synonyms or belong to other schemas, we are introducing a mechanism to exclude such objects from unit testing. This further refines your testing processes.
+
+3. ## New table for Unit Test Results
+   In order to store unit test results, we are implementing a table to hold this data to be further analzyed and processed.
+
+5. ## Improved Unit Test Package Generation
+   The create_ut_test_packages_pkg will be renamed to QA_UNIT_TESTS_PKG, and it will offer the option to create unit test packages per rule or as a single package containing all active rules. Additionally, we want to enhanced the naming convention, including the schema in the package names for more straightforward multiple schema management.
+
+5. ## new Data type for holding additional information such as invalid schema objects
+
+6. ## Oracle Apex Application
+   One major component of the next update will be an apex application to add new rules or configure existing ones and run them.
+   We will also introduce the support for apex based rules to check the integrety of apex objects.
+
+8. ## automated daily Unit Testing
+   We are planning to implement a new scheduler Job which runs all the activated Rules on a daily basis.
+
+8. ## Installation Process will be adapted to be able to upgrade from any released version to the latest one
+
+9. ## Version Naming has been changed to standard Oracle Format
+   The new Format for our upcoming and later releases will be changed to the standard that oracle uses for their relases as well.
+   The first part is always the year of release and the second part will be in our case the incremental number of an increnmental release cycle during the year.
+   In Our Case we already released a Version this year so we are jumping to the Version #23.2
+
+
+Beware that these features may be subject to change in the final release.
+The final release Notes will be released with the upcoming Version 23.2
+
+### Lates Releases
+## Version 1.1
+[Release 1.1](https://github.com/mt-ag/quasto/releases/tag/v1.1)
+
+## Version 1.0
+[Release 1.0](https://github.com/mt-ag/quasto/releases/tag/v1.0)
+
 
