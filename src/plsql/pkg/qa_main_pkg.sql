@@ -53,6 +53,7 @@ create or replace package qa_main_pkg authid definer as
 
 
   procedure p_exclude_objects(pi_qa_rules in out nocopy qa_rules_t);
+  procedure p_exclude_not_whitelisted_apex_entries(pi_qa_rules_t in out qa_rules_t);
 
   function f_check_for_loop
   (
@@ -88,16 +89,16 @@ create or replace package body qa_main_pkg as
   ) return qa_rule_t is
     c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_rule';
     l_param_list qa_logger_pkg.tab_param;
-
+  
     l_qa_rule qa_rule_t;
-
+  
   begin
     qa_logger_pkg.append_param(p_params  => l_param_list
                               ,p_name_01 => 'pi_qaru_rule_number'
                               ,p_val_01  => pi_qaru_rule_number
                               ,p_name_02 => 'pi_qaru_client_name'
                               ,p_val_02  => pi_qaru_client_name);
-
+  
     select qa_rule_t(pi_qaru_id            => q.qaru_id
                     ,pi_qaru_category      => q.qaru_category
                     ,pi_qaru_error_level   => q.qaru_error_level
@@ -109,7 +110,7 @@ create or replace package body qa_main_pkg as
     where q.qaru_rule_number = pi_qaru_rule_number
     and q.qaru_client_name = pi_qaru_client_name
     and (q.qaru_category != gc_apex_flag or gc_apex_flag is null);
-
+  
     return l_qa_rule;
   exception
     when no_data_found then
@@ -129,15 +130,15 @@ create or replace package body qa_main_pkg as
   function tf_get_rule_numbers(pi_qaru_client_name in qa_rules.qaru_client_name%type) return varchar2_tab_t is
     c_unit constant varchar2(32767) := $$plsql_unit || '.tf_get_rule_numbers';
     l_param_list qa_logger_pkg.tab_param;
-
+  
     l_qaru_rule_numbers varchar2_tab_t;
   begin
-
+  
     -- Logging Paramter:
     qa_logger_pkg.append_param(p_params => l_param_list
                               ,p_name   => 'pi_qaru_client_name'
                               ,p_val    => pi_qaru_client_name);
-
+  
     --Joining with qaru_predecessor_order_v to get the right order based on predecessor list
     select q.qaru_rule_number
     bulk collect
@@ -149,7 +150,7 @@ create or replace package body qa_main_pkg as
     and q.qaru_error_level <= 4
     and (q.qaru_category != gc_apex_flag or gc_apex_flag is null)
     order by p.step asc;
-
+  
     return l_qaru_rule_numbers;
   exception
     when no_data_found then
@@ -174,7 +175,7 @@ create or replace package body qa_main_pkg as
   ) return qa_rules.qaru_exclude_objects%type result_cache is
     c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_excluded_objects';
     l_param_list qa_logger_pkg.tab_param;
-
+  
     l_qaru_exclude_objects qa_rules.qaru_exclude_objects%type;
   begin
     -- Logging Paramter:
@@ -183,14 +184,14 @@ create or replace package body qa_main_pkg as
                               ,p_val_01  => pi_qaru_rule_number
                               ,p_name_02 => 'pi_qaru_client_name'
                               ,p_val_02  => pi_qaru_client_name);
-
+  
     select p.qaru_exclude_objects
     into l_qaru_exclude_objects
     from qa_rules p
     where p.qaru_rule_number = pi_qaru_rule_number
     and p.qaru_client_name = pi_qaru_client_name
     and (p.qaru_category != gc_apex_flag or gc_apex_flag is null);
-
+  
     return l_qaru_exclude_objects;
   exception
     when others then
@@ -207,18 +208,17 @@ create or replace package body qa_main_pkg as
     pi_qaru_client_name in qa_rules.qaru_client_name%type
    ,pi_qaru_rule_number in qa_rules.qaru_rule_number%type
    ,pi_scheme_names     in varchar2_tab_t
-  ) return qa_rules_t
-  is
+  ) return qa_rules_t is
     c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_invalid_objects';
     l_param_list qa_logger_pkg.tab_param;
-
-    l_scheme_names          varchar2(32767);
+  
+    l_scheme_names         varchar2(32767);
     l_qa_rules_temp        qa_rules_t := new qa_rules_t();
     l_qa_rules             qa_rules_t := new qa_rules_t();
     l_invalid_objects      qa_rules_t := new qa_rules_t();
     l_qaru_exclude_objects qa_rules.qaru_exclude_objects%type;
   begin
-
+  
     -- Logging Parameter:
     -- build scheme names string:
     for i in pi_scheme_names.first .. pi_scheme_names.last
@@ -228,7 +228,7 @@ create or replace package body qa_main_pkg as
     l_scheme_names := substr(l_scheme_names
                             ,0
                             ,length(l_scheme_names) - 1);
-
+  
     -- Logging Parameter:
     qa_logger_pkg.append_param(p_params  => l_param_list
                               ,p_name_01 => 'pi_qaru_client_name'
@@ -237,53 +237,51 @@ create or replace package body qa_main_pkg as
                               ,p_val_02  => pi_qaru_rule_number
                               ,p_name_03 => 'pi_scheme_names'
                               ,p_val_03  => l_scheme_names);
-
-
+  
+  
     for i in pi_scheme_names.first .. pi_scheme_names.last
     loop
       l_qa_rules_temp := qa_api_pkg.tf_run_rule(pi_qaru_client_name => pi_qaru_client_name
                                                ,pi_qaru_rule_number => pi_qaru_rule_number
                                                ,pi_target_scheme    => pi_scheme_names(i));
-
+    
       l_qa_rules := l_qa_rules multiset union l_qa_rules_temp;
     end loop;
-
+  
     l_qaru_exclude_objects := f_get_excluded_objects(pi_qaru_rule_number => pi_qaru_rule_number
                                                     ,pi_qaru_client_name => pi_qaru_client_name);
-
-    select qa_rule_t(pi_scheme_name       => scheme_name
-                    ,pi_object_name       => object_name
-                    ,pi_object_path       => object_path
-                    ,pi_object_details    => object_details
-                    ,pi_error_message     => error_message)
-      bulk collect into l_invalid_objects
-      from (select rule.scheme_name as scheme_name
-                 , rule.object_name as object_name
-                 , rule.object_path as object_path
-                 , rule.object_details as object_details
-                 , rule.qaru_error_message as error_message
-            from table(l_qa_rules) rule
-            join qa_rules qaru on qaru.qaru_id = rule.qaru_id
-            where qaru.qaru_exclude_objects is null
-            or not (rule.object_path in (select regexp_substr(l_qaru_exclude_objects
-                                                             ,'[^:]+'
-                                                             ,1
-                                                             ,level) as data
-                                         from dual
-                                         connect by regexp_substr(l_qaru_exclude_objects
-                                                                 ,'[^:]+'
-                                                                 ,1
-                                                                 ,level) is not null
-                                        )
-                   )
-            group by rule.qaru_id
-                    ,rule.scheme_name
-                    ,rule.object_name
-                    ,rule.object_path
-                    ,rule.object_details
-                    ,rule.qaru_error_message
-    );
-
+  
+    select qa_rule_t(pi_scheme_name    => scheme_name
+                    ,pi_object_name    => object_name
+                    ,pi_object_path    => object_path
+                    ,pi_object_details => object_details
+                    ,pi_error_message  => error_message)
+    bulk collect
+    into l_invalid_objects
+    from (select rule.scheme_name        as scheme_name
+                ,rule.object_name        as object_name
+                ,rule.object_path        as object_path
+                ,rule.object_details     as object_details
+                ,rule.qaru_error_message as error_message
+          from table(l_qa_rules) rule
+          join qa_rules qaru on qaru.qaru_id = rule.qaru_id
+          where qaru.qaru_exclude_objects is null
+          or not (rule.object_path in (select regexp_substr(l_qaru_exclude_objects
+                                                          ,'[^:]+'
+                                                          ,1
+                                                          ,level) as data
+                                      from dual
+                                      connect by regexp_substr(l_qaru_exclude_objects
+                                                              ,'[^:]+'
+                                                              ,1
+                                                              ,level) is not null))
+          group by rule.qaru_id
+                  ,rule.scheme_name
+                  ,rule.object_name
+                  ,rule.object_path
+                  ,rule.object_details
+                  ,rule.qaru_error_message);
+  
     return l_invalid_objects;
   exception
     when others then
@@ -297,31 +295,30 @@ create or replace package body qa_main_pkg as
   -- get invalid objects for a rule by providing one or more schemes
   function f_get_amount_invalid_objects_per_scheme
   (
-    pi_qa_rules      in qa_rules_t
-   ,pi_scheme_names  in varchar2_tab_t
-  ) return qa_scheme_object_amounts_t
-  is
+    pi_qa_rules     in qa_rules_t
+   ,pi_scheme_names in varchar2_tab_t
+  ) return qa_scheme_object_amounts_t is
     c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_amount_invalid_objects_per_scheme';
     l_param_list qa_logger_pkg.tab_param;
-
+  
     l_scheme_object_amounts_temp qa_scheme_object_amounts_t := new qa_scheme_object_amounts_t();
     l_scheme_object_amounts      qa_scheme_object_amounts_t := new qa_scheme_object_amounts_t();
   begin
-
+  
     for i in pi_scheme_names.first .. pi_scheme_names.last
     loop
-
-    select qa_scheme_object_amount_t(pi_scheme_name   => pi_scheme_names(i)
-                                    ,pi_object_amount => object_amount)
-      bulk collect into l_scheme_object_amounts_temp
+    
+      select qa_scheme_object_amount_t(pi_scheme_name   => pi_scheme_names(i)
+                                      ,pi_object_amount => object_amount)
+      bulk collect
+      into l_scheme_object_amounts_temp
       from (select count(1) as object_amount
             from table(pi_qa_rules) rule
-            where rule.scheme_name = pi_scheme_names(i)
-           );
-
+            where rule.scheme_name = pi_scheme_names(i));
+    
       l_scheme_object_amounts := l_scheme_object_amounts multiset union l_scheme_object_amounts_temp;
     end loop;
-
+  
     return l_scheme_object_amounts;
   exception
     when others then
@@ -340,20 +337,20 @@ create or replace package body qa_main_pkg as
   ) is
     c_unit constant varchar2(32767) := $$plsql_unit || '.p_test_rule';
     l_param_list qa_logger_pkg.tab_param;
-
+  
     l_scheme_names          varchar2(32767);
     l_qa_rules              qa_rules_t := new qa_rules_t();
     l_scheme_object_amounts qa_scheme_object_amounts_t := new qa_scheme_object_amounts_t();
     l_count_objects         number;
-
+  
   begin
-
+  
     -- Logging Paramter:
     -- build scheme names string:
     for i in pi_scheme_names.first .. pi_scheme_names.last
     loop
       l_scheme_names := pi_scheme_names(i) || ',' || l_scheme_names;
-
+    
     end loop;
     l_scheme_names := substr(l_scheme_names
                             ,0
@@ -365,30 +362,30 @@ create or replace package body qa_main_pkg as
                               ,p_val_02  => pi_qaru_rule_number
                               ,p_name_03 => 'pi_scheme_names'
                               ,p_val_03  => l_scheme_names);
-
+  
     l_qa_rules := f_get_invalid_objects(pi_qaru_client_name => pi_qaru_client_name
                                        ,pi_qaru_rule_number => pi_qaru_rule_number
                                        ,pi_scheme_names     => pi_scheme_names);
-
+  
     l_scheme_object_amounts := f_get_amount_invalid_objects_per_scheme(pi_qa_rules     => l_qa_rules
                                                                       ,pi_scheme_names => pi_scheme_names);
-
+  
     select count(1)
     into l_count_objects
     from table(l_qa_rules);
-
+  
     if l_qa_rules is not null and
        l_qa_rules.count > 0 and
        l_count_objects > 0
     then
-      po_result  := 0;
+      po_result := 0;
     else
-      po_result  := 1;
+      po_result := 1;
     end if;
-
-    po_scheme_objects := l_scheme_object_amounts;
+  
+    po_scheme_objects  := l_scheme_object_amounts;
     po_invalid_objects := l_qa_rules;
-
+  
   exception
     when others then
       qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to test a rule!'
@@ -417,7 +414,7 @@ create or replace package body qa_main_pkg as
   ) return qa_rules.qaru_id%type is
     c_unit constant varchar2(32767) := $$plsql_unit || '.f_insert_rule';
     l_param_list qa_logger_pkg.tab_param;
-
+  
     l_qaru_id qa_rules.qaru_id%type;
   begin
     -- Logging Paramter:
@@ -448,8 +445,8 @@ create or replace package body qa_main_pkg as
                               ,p_val_13  => pi_qaru_predecessor_ids
                               ,p_name_14 => 'pi_qaru_layer'
                               ,p_val_14  => pi_qaru_layer);
-
-
+  
+  
     insert into qa_rules
       (qaru_rule_number
       ,qaru_client_name
@@ -479,7 +476,7 @@ create or replace package body qa_main_pkg as
       ,pi_qaru_predecessor_ids
       ,pi_qaru_layer)
     returning qaru_id into l_qaru_id;
-
+  
     return l_qaru_id;
   exception
     when others then
@@ -495,23 +492,23 @@ create or replace package body qa_main_pkg as
   procedure p_exclude_objects(pi_qa_rules in out nocopy qa_rules_t) is
     c_unit constant varchar2(32767) := $$plsql_unit || '.exclude_objects';
     l_param_list qa_logger_pkg.tab_param;
-
+  
     type t_exluded_obj is table of varchar2(32676) index by binary_integer;
     l_excluded_objects t_exluded_obj;
     l_excluded         varchar2(32676);
-
+  
   begin
     if pi_qa_rules.count > 0
     then
       for i in pi_qa_rules.first .. pi_qa_rules.last
       loop
         null;
-
+      
         select qaru_exclude_objects
         into l_excluded
         from qa_rules q
         where q.qaru_id = pi_qa_rules(i).qaru_id;
-
+      
         select regexp_substr(l_excluded
                             ,'[^:]+'
                             ,1
@@ -523,7 +520,7 @@ create or replace package body qa_main_pkg as
                                 ,'[^:]+'
                                 ,1
                                 ,level) is not null;
-
+      
         if l_excluded_objects.count > 0
         then
           for excl in l_excluded_objects.first .. l_excluded_objects.last
@@ -533,12 +530,12 @@ create or replace package body qa_main_pkg as
               pi_qa_rules.delete(i);
               exit;
             end if;
-
+          
           end loop;
         end if;
         l_excluded_objects.delete;
         l_excluded := null;
-
+      
       end loop;
     end if;
   exception
@@ -556,7 +553,7 @@ create or replace package body qa_main_pkg as
   ) return qa_rules.qaru_rule_number%type is
     c_unit constant varchar2(32767) := $$plsql_unit || '.f_check_for_loop';
     l_param_list qa_logger_pkg.tab_param;
-
+  
     l_no_loop          number;
     l_loop_rule_number qa_rules.qaru_rule_number%type;
     loop_detect_e      exception;
@@ -566,7 +563,7 @@ create or replace package body qa_main_pkg as
     qa_logger_pkg.append_param(p_params  => l_param_list
                               ,p_name_01 => 'pi_qaru_rule_number'
                               ,p_val_01  => pi_qaru_rule_number);
-
+  
     for i in (select qaru_rule_number as rule_number
               from qa_rules q
               where q.qaru_predecessor_ids is not null
@@ -591,10 +588,10 @@ create or replace package body qa_main_pkg as
       from splitted_pred
       connect by prior qaru_rule_number = predec
       start with qaru_rule_number = i.rule_number;
-
+    
     end loop;
     return null;
-
+  
   exception
     when loop_detect_e then
       qa_logger_pkg.p_qa_log(p_text   => 'A loop in the predecessor order is detected for the rule_number: ' || l_loop_rule_number || ' Please resolve and start the testrun again!'
@@ -616,7 +613,7 @@ create or replace package body qa_main_pkg as
   function f_get_full_rule_pred(pi_rule_number in qa_rules.qaru_rule_number%type) return varchar2 is
     c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_full_rule_pred';
     l_param_list qa_logger_pkg.tab_param;
-
+  
     l_rule_predecessors varchar2(4000 char);
   begin
     qa_logger_pkg.append_param(p_params  => l_param_list
@@ -663,14 +660,14 @@ create or replace package body qa_main_pkg as
    ,pi_qa_rules_t   in out qa_rules_t
   ) is
     c_unit constant varchar2(32767) := $$plsql_unit || '.p_exclude_not_owned_entries';
-
+  
     l_param_list qa_logger_pkg.tab_param;
     l_count      number;
   begin
     qa_logger_pkg.append_param(p_params  => l_param_list
                               ,p_name_01 => 'pi_current_user'
                               ,p_val_01  => pi_current_user);
-
+  
     if pi_qa_rules_t.count > 0
     then
       for i in pi_qa_rules_t.first .. pi_qa_rules_t.last
@@ -696,27 +693,74 @@ create or replace package body qa_main_pkg as
       raise;
   end p_exclude_not_owned_entries;
 
+  procedure p_exclude_not_whitelisted_apex_entries(pi_qa_rules_t in out qa_rules_t) is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.p_exclude_not_whitelisted_apex_entries';
+  
+    l_param_list qa_logger_pkg.tab_param;
+    l_count      number;
+    l_app_ids    varchar2(4000 char);
+    l_page_ids   varchar2(4000 char);
+  begin
+  
+    if pi_qa_rules_t.count > 0
+    then
+      select q.qaru_app_id
+            ,q.qaru_page_id
+      into l_app_ids
+          ,l_page_ids
+      from qa_rules q
+      where q.qaru_id = pi_qa_rules_t(1).qaru_id;    
+    
+      if (l_app_ids is not null or l_page_ids is not null)
+      then
+        for i in pi_qa_rules_t.first .. pi_qa_rules_t.last
+        loop
+          if l_app_ids is not null and
+             instr(',' || l_app_ids || ','
+                  ,',' || pi_qa_rules_t(i).apex_app_id || ',') = 0
+          then
+            pi_qa_rules_t.delete(i);
+          elsif l_page_ids is not null and
+                instr(',' || l_page_ids || ','
+                     ,',' || nvl(pi_qa_rules_t(i).apex_page_id
+                                ,'-9999999') || ',') = 0
+          then
+            pi_qa_rules_t.delete(i);
+          end if;
+        
+        end loop;
+      end if;
+    end if;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'Cant remove Apex App or Pages from qa_rules Table Record that dont belong to the current owner!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end p_exclude_not_whitelisted_apex_entries;
+
   function f_is_owner_black_listed(pi_user_name varchar2) return boolean is
     c_unit constant varchar2(32767) := $$plsql_unit || '.f_is_owner_black_listed';
-
+  
     l_param_list qa_logger_pkg.tab_param;
-
+  
     l_count            number;
     l_result           boolean;
     e_user_blacklisted exception;
     pragma exception_init(e_user_blacklisted
                          ,-20006);
   begin
-
+  
     qa_logger_pkg.append_param(p_params  => l_param_list
                               ,p_name_01 => 'pi_user_name'
                               ,p_val_01  => pi_user_name);
-
+  
     select count(1)
     into l_count
     from qaru_scheme_names_for_testing_v v
     where upper(v.username) = upper(pi_user_name);
-
+  
     if l_count = 0
     then
       l_result := true;
@@ -724,7 +768,7 @@ create or replace package body qa_main_pkg as
     else
       l_result := false;
     end if;
-
+  
     return l_result;
   exception
     when e_user_blacklisted then

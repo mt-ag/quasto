@@ -21,7 +21,9 @@ declare
   qaru_created_by      VARCHAR2(255 CHAR) not null,
   qaru_updated_on      DATE not null,
   qaru_updated_by      VARCHAR2(255 CHAR) not null,
-  qaru_failure_rate    NUMBER
+  qaru_failure_rate    NUMBER,
+  qaru_app_id          VARCHAR2(4000 CHAR),
+  qaru_page_id         VARCHAR2(4000 CHAR)
 )';
   l_count number;
 begin
@@ -54,6 +56,8 @@ begin
 	execute immediate q'#comment on column QA_RULES.qaru_created_by is 'who has the rule created'#';
 	execute immediate q'#comment on column QA_RULES.qaru_updated_on is 'when is the rule updated'#';
 	execute immediate q'#comment on column QA_RULES.qaru_updated_by is 'who has the rule updated'#';
+  execute immediate q'#comment on column QA_RULES.qaru_app_id is 'Comma Seprated List containing all App_ids that will get tested- If the Value is Null all Applications will get tested'#';
+  execute immediate q'#comment on column QA_RULES.qaru_page_id is 'Comma Seprated List containing all Page_ids that will get tested. If the Value is Null all Pages will get tested'#';
 	
     select count(1)
       into l_count

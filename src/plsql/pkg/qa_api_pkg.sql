@@ -6,8 +6,8 @@ create or replace package qa_api_pkg authid current_user as
   -- %param pi_target_scheme should it run in one dedicated scheme
   /** 
 * run a single rule and get for every mismatch one line back
-* @param pi_qaru_rule_number is the number of the Rule from Table <a href =QA_RULES.html>QA_RULES </a>
-* @param pi_qaru_client_name client or project name
+*  @param pi_qaru_rule_number is the number of the Rule from Table <a href =QA_RULES.html>QA_RULES </a>
+*  @param pi_qaru_client_name client or project name
 * @param pi_target_scheme should it run in one dedicated scheme
 */
   function tf_run_rule
@@ -24,7 +24,7 @@ create or replace package qa_api_pkg authid current_user as
   
     /** 
 * run all rules in the selected Scheme from Table <a href =QA_RULES.html>QA_RULES </a>
-* @param pi_qaru_client_name client or project name
+*  @param pi_qaru_client_name client or project name
 * @param pi_target_scheme should it run in one dedicated scheme
 */
   function tf_run_rules
@@ -74,8 +74,15 @@ create or replace package body qa_api_pkg as
       -- :7 qaru_sql
         using pi_target_scheme, l_qa_rule.qaru_id, l_qa_rule.qaru_category, l_qa_rule.qaru_error_level, l_qa_rule.qaru_object_types, l_qa_rule.qaru_error_message, l_qa_rule.qaru_sql;
       --Remove entries that dont belong to the current owner
-     /* qa_main_pkg.p_exclude_not_owned_entries(pi_current_user => pi_target_scheme
-                                             ,pi_qa_rules_t   => l_qa_rules);                                           */
+      if l_qa_rule.qaru_category != 'APEX'
+      then
+        qa_main_pkg.p_exclude_not_owned_entries(pi_current_user => pi_target_scheme
+                                               ,pi_qa_rules_t   => l_qa_rules);
+      end if;
+      if l_qa_rule.qaru_category = 'APEX'
+      then
+        qa_main_pkg.p_exclude_not_whitelisted_apex_entries(pi_qa_rules_t => l_qa_rules);
+      end if;
       qa_main_pkg.p_exclude_objects(pi_qa_rules => l_qa_rules);
       return l_qa_rules;
     else
