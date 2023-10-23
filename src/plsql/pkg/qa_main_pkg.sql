@@ -253,20 +253,18 @@ create or replace package body qa_main_pkg as
   
     select qa_rule_t(pi_scheme_name    => scheme_name
                     ,pi_object_name    => object_name
-                    ,pi_object_path    => object_path
                     ,pi_object_details => object_details
                     ,pi_error_message  => error_message)
     bulk collect
     into l_invalid_objects
     from (select rule.scheme_name        as scheme_name
                 ,rule.object_name        as object_name
-                ,rule.object_path        as object_path
                 ,rule.object_details     as object_details
                 ,rule.qaru_error_message as error_message
           from table(l_qa_rules) rule
           join qa_rules qaru on qaru.qaru_id = rule.qaru_id
           where qaru.qaru_exclude_objects is null
-          or not (rule.object_path in (select regexp_substr(l_qaru_exclude_objects
+          or not (rule.object_name in (select regexp_substr(l_qaru_exclude_objects
                                                           ,'[^:]+'
                                                           ,1
                                                           ,level) as data
@@ -278,7 +276,6 @@ create or replace package body qa_main_pkg as
           group by rule.qaru_id
                   ,rule.scheme_name
                   ,rule.object_name
-                  ,rule.object_path
                   ,rule.object_details
                   ,rule.qaru_error_message);
   

@@ -12,8 +12,7 @@ create or replace type qa_rule_t force as object
   scheme_name         varchar2(100), -- owner of the object
   object_id           number, -- object id if possible
   object_name         varchar2(1000), -- name of the object
-  object_path         varchar2(500), -- identifier path of the object
-  object_details      varchar2(100), -- details about the object
+  object_details      varchar2(2000), -- details about the object and where to find it
   object_type         varchar2(100), -- objecttype
   object_value        varchar2(4000), -- value of the object itself
   object_updated_user varchar2(50), -- last update user on object
@@ -33,7 +32,7 @@ create or replace type qa_rule_t force as object
    ,pi_qaru_sql           in clob
   ) return self as result,
 
--- create object with standard attributes
+-- Database objects
   constructor function qa_rule_t
   (
     pi_qaru_id             in number
@@ -45,25 +44,23 @@ create or replace type qa_rule_t force as object
    ,pi_scheme_name         in varchar2
    ,pi_object_id           in number
    ,pi_object_name         in varchar2
-   --,pi_object_path         in varchar2
-   --,pi_object_details      in varchar2
+   ,pi_object_details      in varchar2
    ,pi_object_type         in varchar2
    ,pi_object_value        in varchar2
    ,pi_object_updated_user in varchar2
    ,pi_object_updated_date in date
   ) return self as result,
 
--- create object with attributes for unit tests
+-- Unit tests
   constructor function qa_rule_t
   (
     pi_scheme_name         in varchar2
    ,pi_object_name         in varchar2
-   ,pi_object_path         in varchar2
    ,pi_object_details      in varchar2
    ,pi_error_message       in varchar2
   ) return self as result,
   
--- create object with standard apex attributes
+-- APEX rules
   constructor function qa_rule_t
   (
     pi_qaru_id             in number
@@ -121,8 +118,7 @@ create or replace type body qa_rule_t is
    ,pi_scheme_name         in varchar2
    ,pi_object_id           in number
    ,pi_object_name         in varchar2
-   --,pi_object_path         in varchar2
-   --,pi_object_details      in varchar2
+   ,pi_object_details      in varchar2
    ,pi_object_type         in varchar2
    ,pi_object_value        in varchar2
    ,pi_object_updated_user in varchar2
@@ -138,8 +134,7 @@ create or replace type body qa_rule_t is
     self.scheme_name         := pi_scheme_name;
     self.object_id           := pi_object_id;
     self.object_name         := pi_object_name;
-    --self.object_path         := pi_object_path;
-    --self.object_details      := pi_object_details;
+    self.object_details      := pi_object_details;
     self.object_type         := pi_object_type;
     self.object_value        := pi_object_value;
     self.object_updated_user := pi_object_updated_user;
@@ -152,21 +147,18 @@ create or replace type body qa_rule_t is
   (
     pi_scheme_name         in varchar2
    ,pi_object_name         in varchar2
-   ,pi_object_path         in varchar2
    ,pi_object_details      in varchar2
    ,pi_error_message       in varchar2
   ) return self as result is
   begin
     self.scheme_name         := pi_scheme_name;
     self.object_name         := pi_object_name;
-    self.object_path         := pi_object_path;
     self.object_details      := pi_object_details;
     self.qaru_error_message  := pi_error_message;
 
     return;
   end qa_rule_t;
-  
--- create object with standard apex attributes
+
   constructor function qa_rule_t
   (
     pi_qaru_id             in number

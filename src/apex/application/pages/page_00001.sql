@@ -21,7 +21,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'13'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20230914142611'
+,p_last_upd_yyyymmddhh24miss=>'20231020142409'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(53668689025955104)
@@ -1193,7 +1193,7 @@ wwv_flow_imp_page.create_page_item(
 ,p_lov=>wwv_flow_string.join(wwv_flow_t_varchar2(
 'select username as d',
 '      ,username as r',
-'from QARU_SCHEMA_NAMES_FOR_TESTING_V'))
+'from QARU_SCHEME_NAMES_FOR_TESTING_V'))
 ,p_lov_display_null=>'YES'
 ,p_lov_null_text=>'- All -'
 ,p_cHeight=>1

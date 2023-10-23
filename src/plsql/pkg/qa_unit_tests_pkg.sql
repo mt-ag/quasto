@@ -1,6 +1,8 @@
 PROMPT create or replace package QA_UNIT_TESTS_PKG
 
-create or replace package qa_unit_tests_pkg is
+create or replace package qa_unit_tests_pkg 
+  authid definer
+is
 
 /**
 * create unit test packages
@@ -227,6 +229,7 @@ create or replace package body qa_unit_tests_pkg is
 
       l_clob := 'CREATE OR REPLACE PACKAGE ' || l_package_name || ' IS' || chr(10);
       l_clob := l_clob || '--THIS PACKAGE IS GENERATED AUTOMATICALLY. DO NOT MAKE ANY MANUAL CHANGES.' || chr(10);
+      l_clob := l_clob || '--TIMESTAMP: ' || systimestamp || chr(10);
       l_clob := l_clob || '--%suite(' || rec_clients.qaru_client_name || ')' || chr(10);
       l_clob := l_clob || '--%suitepath(' || rec_clients.qaru_client_name_unified || ')' || chr(10) || chr(10);
 
@@ -316,14 +319,13 @@ create or replace package body qa_unit_tests_pkg is
         l_clob := l_clob || '    else' || chr(10);
         l_clob := l_clob || '      dbms_output.put_line(''<scheme name="''||rec_scheme_objects.scheme_name||''" result="0">'');' || chr(10);
         l_clob := l_clob || '      for rec_scheme_invalid_objects in ( select object_name' || chr(10);
-        l_clob := l_clob || '                                               , object_path' || chr(10);
         l_clob := l_clob || '                                               , object_details' || chr(10);
         l_clob := l_clob || '                                               , qaru_error_message' || chr(10);
         l_clob := l_clob || '                                            from table(l_invalid_objects)' || chr(10);
         l_clob := l_clob || '                                           where scheme_name = rec_scheme_objects.scheme_name' || chr(10);
         l_clob := l_clob || '                                        )' || chr(10);
         l_clob := l_clob || '      loop' || chr(10);
-        l_clob := l_clob || '        dbms_output.put_line(''<Object name="''||rec_scheme_invalid_objects.object_name||''" path="''||rec_scheme_invalid_objects.object_path||''" details="''||rec_scheme_invalid_objects.object_details||''">''||rec_scheme_invalid_objects.qaru_error_message||''</Object>'');' || chr(10);
+        l_clob := l_clob || '        dbms_output.put_line(''<Object name="''||rec_scheme_invalid_objects.object_name||''" details="''||rec_scheme_invalid_objects.object_details||''">''||rec_scheme_invalid_objects.qaru_error_message||''</Object>'');' || chr(10);
         l_clob := l_clob || '      end loop;' || chr(10);
         l_clob := l_clob || '      dbms_output.put_line(''</scheme>'');' || chr(10);
         l_clob := l_clob || '    end if;' || chr(10);
@@ -405,6 +407,7 @@ create or replace package body qa_unit_tests_pkg is
 
       l_clob := 'CREATE OR REPLACE PACKAGE ' || l_package_name || ' IS' || chr(10);
       l_clob := l_clob || '--THIS PACKAGE IS GENERATED AUTOMATICALLY. DO NOT MAKE ANY MANUAL CHANGES.' || chr(10);
+      l_clob := l_clob || '--TIMESTAMP: ' || systimestamp || chr(10);
       l_clob := l_clob || '--%suite(' || rec_client_rules.qaru_client_name || ')' || chr(10);
       l_clob := l_clob || '--%suitepath(' || rec_client_rules.qaru_client_name_unified || ')' || chr(10) || chr(10);
 
@@ -459,13 +462,12 @@ create or replace package body qa_unit_tests_pkg is
       l_clob := l_clob || '  then' || chr(10);
       l_clob := l_clob || '  l_object_names := replace(l_object_names, ''; '', '';'');' || chr(10);
       l_clob := l_clob || '  l_object_details := replace(l_object_details, ''; '', '';'');' || chr(10);
-      l_clob := l_clob || '  for i in ( select trim(regexp_substr(l_object_names, ''[^;]+'', 1, level)) as object_name' || chr(10);
-      l_clob := l_clob || '                   ,trim(regexp_substr(l_object_details, ''[^;]+'', 1, level)) as object_details' || chr(10);
+      l_clob := l_clob || '  for i in ( select trim(regexp_substr(l_object_details, ''[^;]+'', 1, level)) as object_details' || chr(10);
       l_clob := l_clob || '               from dual' || chr(10);
       l_clob := l_clob || '            connect by level <= regexp_count(l_object_names, '';'')+1' || chr(10);
       l_clob := l_clob || '           )' || chr(10);
       l_clob := l_clob || '  loop' || chr(10);
-      l_clob := l_clob || '    dbms_output.put_line(''<Object objectpath="''||i.object_name||''" objectdetails="''||i.object_details||''">''||l_error_message||''</Object>'');' || chr(10);
+      l_clob := l_clob || '    dbms_output.put_line(''<Object objectdetails="''||i.object_details||''">''||l_error_message||''</Object>'');' || chr(10);
       l_clob := l_clob || '  end loop;' || chr(10);
       l_clob := l_clob || '  end if;' || chr(10);
       l_clob := l_clob || '  dbms_output.put_line(''</Results>'');' || chr(10);
@@ -527,6 +529,7 @@ create or replace package body qa_unit_tests_pkg is
 
         l_clob := 'CREATE OR REPLACE PACKAGE ' || l_package_name || ' IS' || chr(10);
         l_clob := l_clob || '--THIS PACKAGE IS GENERATED AUTOMATICALLY. DO NOT MAKE ANY MANUAL CHANGES.' || chr(10);
+        l_clob := l_clob || '--TIMESTAMP: ' || systimestamp || chr(10);
         l_clob := l_clob || '--%suite(' || rec_client_rules.qaru_client_name || ')' || chr(10);
         l_clob := l_clob || '--%suitepath(' || rec_client_rules.qaru_client_name_unified || ')' || chr(10) || chr(10);
 
@@ -602,13 +605,12 @@ create or replace package body qa_unit_tests_pkg is
           l_clob := l_clob || '  then' || chr(10);
           l_clob := l_clob || '  l_object_names := replace(l_object_names, ''; '', '';'');' || chr(10);
           l_clob := l_clob || '  l_object_details := replace(l_object_details, ''; '', '';'');' || chr(10);
-          l_clob := l_clob || '  for i in ( select trim(regexp_substr(l_object_names, ''[^;]+'', 1, level)) as object_name' || chr(10);
-          l_clob := l_clob || '                   ,trim(regexp_substr(l_object_details, ''[^;]+'', 1, level)) as object_details' || chr(10);
+          l_clob := l_clob || '  for i in ( select trim(regexp_substr(l_object_details, ''[^;]+'', 1, level)) as object_details' || chr(10);
           l_clob := l_clob || '               from dual' || chr(10);
           l_clob := l_clob || '            connect by level <= regexp_count(l_object_names, '';'')+1' || chr(10);
           l_clob := l_clob || '           )' || chr(10);
           l_clob := l_clob || '  loop' || chr(10);
-          l_clob := l_clob || '    dbms_output.put_line(''<Object objectpath="''||i.object_name||''" objectdetails="''||i.object_details||''">''||l_error_message||''</Object>'');' || chr(10);
+          l_clob := l_clob || '    dbms_output.put_line(''<Object objectdetails="''||i.object_details||''">''||l_error_message||''</Object>'');' || chr(10);
           l_clob := l_clob || '  end loop;' || chr(10);
           l_clob := l_clob || '  end if;' || chr(10);
           l_clob := l_clob || '  dbms_output.put_line(''</Results>'');' || chr(10);
