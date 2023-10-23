@@ -47,6 +47,12 @@ grant create job to quasto;
 grant create session to quasto;
 ```
 
+### Optional user rights
+If you want to run Apex-Tests, you should grant the Apex Administrator Role to QUASTO. Otherwise QUASTO has no rights to see APEX Objects from other schemes:
+```
+grant APEX_ADMINISTRATOR_ROLE to quasto;
+```
+
 #### Running the Install Script:
 ```
 @install [1/0] [1/0] [1/0] [1/0]
