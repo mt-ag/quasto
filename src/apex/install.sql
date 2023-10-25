@@ -16,6 +16,7 @@ prompt --install
 @@application/shared_components/navigation/tabs/parent.sql
 @@application/shared_components/user_interface/lovs/category_lov.sql
 @@application/shared_components/user_interface/lovs/error_level_lov.sql
+@@application/shared_components/user_interface/lovs/layer_lov.sql
 @@application/shared_components/user_interface/lovs/yes_no_lov.sql
 @@application/pages/page_groups.sql
 @@application/comments.sql

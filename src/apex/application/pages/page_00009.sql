@@ -5,7 +5,7 @@ begin
 --   Manifest End
 wwv_flow_imp.component_begin (
  p_version_yyyy_mm_dd=>'2022.10.07'
-,p_release=>'22.2.5'
+,p_release=>'22.2.11'
 ,p_default_workspace_id=>33657925800256602
 ,p_default_application_id=>141
 ,p_default_id_offset=>33662320935301187
@@ -22,7 +22,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'16'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20230503164033'
+,p_last_upd_yyyymmddhh24miss=>'20231025133759'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(63080644826391011)
@@ -121,6 +121,14 @@ wwv_flow_imp_page.create_page_process(
 ,p_error_display_location=>'INLINE_IN_NOTIFICATION'
 ,p_process_when_button_id=>wwv_flow_imp.id(59677201614121593)
 ,p_process_success_message=>'Saved.'
+);
+wwv_flow_imp_page.create_page_process(
+ p_id=>wwv_flow_imp.id(42250288169031712)
+,p_process_sequence=>20
+,p_process_point=>'AFTER_SUBMIT'
+,p_process_type=>'NATIVE_CLOSE_WINDOW'
+,p_process_name=>'Close Dialog'
+,p_error_display_location=>'INLINE_IN_NOTIFICATION'
 );
 wwv_flow_imp.component_end;
 end;

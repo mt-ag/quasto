@@ -5,7 +5,7 @@ begin
 --   Manifest End
 wwv_flow_imp.component_begin (
  p_version_yyyy_mm_dd=>'2022.10.07'
-,p_release=>'22.2.5'
+,p_release=>'22.2.11'
 ,p_default_workspace_id=>33657925800256602
 ,p_default_application_id=>141
 ,p_default_id_offset=>33662320935301187
@@ -48,7 +48,7 @@ wwv_flow_imp.create_flow(
 ,p_substitution_string_01=>'APP_NAME'
 ,p_substitution_value_01=>'QUASTO'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20231020142409'
+,p_last_upd_yyyymmddhh24miss=>'20231025170018'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_files_version=>4
 ,p_print_server_type=>'NATIVE'

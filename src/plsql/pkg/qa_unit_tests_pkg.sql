@@ -315,9 +315,9 @@ create or replace package body qa_unit_tests_pkg is
 
         l_clob := l_clob || '  loop' || chr(10);
         l_clob := l_clob || '    if rec_scheme_objects.object_amount = 0 then' || chr(10);
-        l_clob := l_clob || '      dbms_output.put_line(''<scheme name="''||rec_scheme_objects.scheme_name||''" result="1"></scheme>'');' || chr(10);
+        l_clob := l_clob || '      dbms_output.put_line(''<Scheme name="''||rec_scheme_objects.scheme_name||''" result="1"></Scheme>'');' || chr(10);
         l_clob := l_clob || '    else' || chr(10);
-        l_clob := l_clob || '      dbms_output.put_line(''<scheme name="''||rec_scheme_objects.scheme_name||''" result="0">'');' || chr(10);
+        l_clob := l_clob || '      dbms_output.put_line(''<Scheme name="''||rec_scheme_objects.scheme_name||''" result="0">'');' || chr(10);
         l_clob := l_clob || '      for rec_scheme_invalid_objects in ( select object_name' || chr(10);
         l_clob := l_clob || '                                               , object_details' || chr(10);
         l_clob := l_clob || '                                               , qaru_error_message' || chr(10);
@@ -327,7 +327,7 @@ create or replace package body qa_unit_tests_pkg is
         l_clob := l_clob || '      loop' || chr(10);
         l_clob := l_clob || '        dbms_output.put_line(''<Object name="''||rec_scheme_invalid_objects.object_name||''" details="''||rec_scheme_invalid_objects.object_details||''">''||rec_scheme_invalid_objects.qaru_error_message||''</Object>'');' || chr(10);
         l_clob := l_clob || '      end loop;' || chr(10);
-        l_clob := l_clob || '      dbms_output.put_line(''</scheme>'');' || chr(10);
+        l_clob := l_clob || '      dbms_output.put_line(''</Scheme>'');' || chr(10);
         l_clob := l_clob || '    end if;' || chr(10);
         l_clob := l_clob || '  end loop;' || chr(10);
         l_clob := l_clob || '  dbms_output.put_line(''</Results>'');' || chr(10);

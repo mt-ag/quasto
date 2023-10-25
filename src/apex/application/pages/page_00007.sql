@@ -5,7 +5,7 @@ begin
 --   Manifest End
 wwv_flow_imp.component_begin (
  p_version_yyyy_mm_dd=>'2022.10.07'
-,p_release=>'22.2.5'
+,p_release=>'22.2.11'
 ,p_default_workspace_id=>33657925800256602
 ,p_default_application_id=>141
 ,p_default_id_offset=>33662320935301187
@@ -22,7 +22,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'02'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20230328223829'
+,p_last_upd_yyyymmddhh24miss=>'20231025170018'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(54280765006258501)
@@ -349,17 +349,21 @@ wwv_flow_imp_page.create_page_item(
 ,p_prompt=>'Layer'
 ,p_source=>'QARU_LAYER'
 ,p_source_type=>'REGION_SOURCE_COLUMN'
-,p_display_as=>'NATIVE_TEXT_FIELD'
+,p_display_as=>'NATIVE_POPUP_LOV'
+,p_named_lov=>'LAYER_LOV'
+,p_lov=>'.'||wwv_flow_imp.id(42333993626488557)||'.'
 ,p_cSize=>30
 ,p_cMaxlength=>400
 ,p_colspan=>6
 ,p_field_template=>wwv_flow_imp.id(50842276801675164)
 ,p_item_template_options=>'#DEFAULT#'
 ,p_is_persistent=>'N'
-,p_attribute_01=>'N'
-,p_attribute_02=>'N'
-,p_attribute_04=>'TEXT'
-,p_attribute_05=>'BOTH'
+,p_lov_display_extra=>'NO'
+,p_attribute_01=>'POPUP'
+,p_attribute_02=>'FIRST_ROWSET'
+,p_attribute_03=>'N'
+,p_attribute_04=>'N'
+,p_attribute_05=>'N'
 );
 wwv_flow_imp_page.create_page_item(
  p_id=>wwv_flow_imp.id(54281035237258504)
@@ -462,6 +466,14 @@ wwv_flow_imp_page.create_page_process(
 ,p_attribute_08=>'Y'
 ,p_error_display_location=>'INLINE_IN_NOTIFICATION'
 ,p_process_success_message=>'Changes saved.'
+);
+wwv_flow_imp_page.create_page_process(
+ p_id=>wwv_flow_imp.id(42249416368031704)
+,p_process_sequence=>20
+,p_process_point=>'AFTER_SUBMIT'
+,p_process_type=>'NATIVE_CLOSE_WINDOW'
+,p_process_name=>'Close Dialog'
+,p_error_display_location=>'INLINE_IN_NOTIFICATION'
 );
 wwv_flow_imp_page.create_page_process(
  p_id=>wwv_flow_imp.id(54073597837447837)

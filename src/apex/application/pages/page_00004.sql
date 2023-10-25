@@ -5,7 +5,7 @@ begin
 --   Manifest End
 wwv_flow_imp.component_begin (
  p_version_yyyy_mm_dd=>'2022.10.07'
-,p_release=>'22.2.5'
+,p_release=>'22.2.11'
 ,p_default_workspace_id=>33657925800256602
 ,p_default_application_id=>141
 ,p_default_id_offset=>33662320935301187
@@ -23,7 +23,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'21'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20230627001113'
+,p_last_upd_yyyymmddhh24miss=>'20231025152413'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(54068725227447789)
@@ -53,9 +53,8 @@ wwv_flow_imp_page.create_page_plug(
 'select * from ',
 '(',
 '    select t.qatr_id',
-'         , schemas.schemaname',
+'         , schemes.schemename',
 '         , objects.objectname',
-'         , objects.objectpath',
 '         , objects.objectdetails',
 '         , objects.error_message',
 '    from xml_result t',
@@ -63,24 +62,23 @@ wwv_flow_imp_page.create_page_plug(
 '         PASSING XMLTYPE( t.xml_raw )',
 '         COLUMNS',
 '           quasto_test_name VARCHAR2(50) PATH ''@name'',',
-'           schemas xmltype path ''system-out/Results/Schema''',
+'           schemes xmltype path ''system-out/Results/Scheme''',
 '         ) testcase on 1=1',
-'         join XMLTABLE(''/Schema''',
-'         PASSING testcase.schemas',
+'         join XMLTABLE(''/Scheme''',
+'         PASSING testcase.schemes',
 '         COLUMNS',
-'           schemaname VARCHAR2(50) PATH ''@name'',',
+'           schemename VARCHAR2(50) PATH ''@name'',',
 '           objects xmltype path ''Object''',
-'         ) schemas on 1=1',
+'         ) schemes on 1=1',
 '         join XMLTABLE(''/Object''',
-'         PASSING schemas.objects',
+'         PASSING schemes.objects',
 '         COLUMNS',
 '           objectname VARCHAR2(50) PATH ''@name'',',
-'           objectpath VARCHAR2(100) PATH ''@path'',',
 '           objectdetails VARCHAR2(500) PATH ''@details'',',
 '           error_message VARCHAR2(500) PATH ''text()''',
 '         ) objects on 1=1',
 '         where (to_date(t.qatr_added_on) = :P4_DATE or :P4_DATE is null)',
-'         and (:P4_SCHEMA = schemas.schemaname or :P4_SCHEMA is null)',
+'         and (:P4_SCHEME = schemes.schemename or :P4_SCHEME is null)',
 '         and testcase.quasto_test_name = :P4_TESTCASE_NAME',
 '         order by t.qatr_added_on desc',
 ')'))
@@ -116,6 +114,35 @@ wwv_flow_imp_page.create_page_plug(
 ,p_prn_border_color=>'#666666'
 );
 wwv_flow_imp_page.create_region_column(
+ p_id=>wwv_flow_imp.id(42249234753031702)
+,p_name=>'SCHEMENAME'
+,p_source_type=>'DB_COLUMN'
+,p_source_expression=>'SCHEMENAME'
+,p_data_type=>'VARCHAR2'
+,p_is_query_only=>false
+,p_item_type=>'NATIVE_TEXT_FIELD'
+,p_heading=>'Scheme Name'
+,p_heading_alignment=>'LEFT'
+,p_display_sequence=>20
+,p_value_alignment=>'LEFT'
+,p_attribute_05=>'BOTH'
+,p_is_required=>false
+,p_max_length=>50
+,p_enable_filter=>true
+,p_filter_operators=>'C:S:CASE_INSENSITIVE:REGEXP'
+,p_filter_is_required=>false
+,p_filter_text_case=>'MIXED'
+,p_filter_exact_match=>true
+,p_filter_lov_type=>'DISTINCT'
+,p_use_as_row_header=>false
+,p_enable_sort_group=>true
+,p_enable_control_break=>true
+,p_enable_hide=>true
+,p_is_primary_key=>false
+,p_duplicate_value=>true
+,p_include_in_export=>true
+);
+wwv_flow_imp_page.create_region_column(
  p_id=>wwv_flow_imp.id(54070650975447808)
 ,p_name=>'QATR_ID'
 ,p_source_type=>'DB_COLUMN'
@@ -138,12 +165,11 @@ wwv_flow_imp_page.create_region_column(
 ,p_source_type=>'DB_COLUMN'
 ,p_source_expression=>'OBJECTNAME'
 ,p_data_type=>'VARCHAR2'
-,p_session_state_data_type=>'VARCHAR2'
 ,p_is_query_only=>false
 ,p_item_type=>'NATIVE_TEXT_FIELD'
 ,p_heading=>'Name'
 ,p_heading_alignment=>'LEFT'
-,p_display_sequence=>20
+,p_display_sequence=>30
 ,p_value_alignment=>'LEFT'
 ,p_attribute_05=>'BOTH'
 ,p_is_required=>false
@@ -157,37 +183,6 @@ wwv_flow_imp_page.create_region_column(
 ,p_use_as_row_header=>false
 ,p_enable_sort_group=>true
 ,p_enable_control_break=>true
-,p_enable_hide=>true
-,p_is_primary_key=>false
-,p_duplicate_value=>true
-,p_include_in_export=>true
-);
-wwv_flow_imp_page.create_region_column(
- p_id=>wwv_flow_imp.id(54070884780447810)
-,p_name=>'OBJECTPATH'
-,p_source_type=>'DB_COLUMN'
-,p_source_expression=>'OBJECTPATH'
-,p_data_type=>'VARCHAR2'
-,p_session_state_data_type=>'VARCHAR2'
-,p_is_query_only=>false
-,p_item_type=>'NATIVE_TEXTAREA'
-,p_heading=>'Path'
-,p_heading_alignment=>'LEFT'
-,p_display_sequence=>30
-,p_value_alignment=>'LEFT'
-,p_attribute_01=>'Y'
-,p_attribute_02=>'N'
-,p_attribute_03=>'N'
-,p_attribute_04=>'BOTH'
-,p_is_required=>false
-,p_max_length=>100
-,p_enable_filter=>true
-,p_filter_operators=>'C:S:CASE_INSENSITIVE:REGEXP'
-,p_filter_is_required=>false
-,p_filter_text_case=>'MIXED'
-,p_filter_lov_type=>'NONE'
-,p_use_as_row_header=>false
-,p_enable_sort_group=>false
 ,p_enable_hide=>true
 ,p_is_primary_key=>false
 ,p_duplicate_value=>true
@@ -255,36 +250,6 @@ wwv_flow_imp_page.create_region_column(
 ,p_duplicate_value=>true
 ,p_include_in_export=>true
 );
-wwv_flow_imp_page.create_region_column(
- p_id=>wwv_flow_imp.id(54071159095447813)
-,p_name=>'SCHEMANAME'
-,p_source_type=>'DB_COLUMN'
-,p_source_expression=>'SCHEMANAME'
-,p_data_type=>'VARCHAR2'
-,p_session_state_data_type=>'VARCHAR2'
-,p_is_query_only=>false
-,p_item_type=>'NATIVE_TEXT_FIELD'
-,p_heading=>'Schema'
-,p_heading_alignment=>'LEFT'
-,p_display_sequence=>60
-,p_value_alignment=>'LEFT'
-,p_attribute_05=>'BOTH'
-,p_is_required=>false
-,p_max_length=>50
-,p_enable_filter=>true
-,p_filter_operators=>'C:S:CASE_INSENSITIVE:REGEXP'
-,p_filter_is_required=>false
-,p_filter_text_case=>'MIXED'
-,p_filter_exact_match=>true
-,p_filter_lov_type=>'DISTINCT'
-,p_use_as_row_header=>false
-,p_enable_sort_group=>true
-,p_enable_control_break=>true
-,p_enable_hide=>true
-,p_is_primary_key=>false
-,p_duplicate_value=>true
-,p_include_in_export=>true
-);
 wwv_flow_imp_page.create_interactive_grid(
  p_id=>wwv_flow_imp.id(54070552353447807)
 ,p_internal_uid=>20408231418146620
@@ -326,6 +291,15 @@ wwv_flow_imp_page.create_ig_report_view(
 ,p_edit_mode=>false
 );
 wwv_flow_imp_page.create_ig_report_column(
+ p_id=>wwv_flow_imp.id(42262970342054315)
+,p_view_id=>wwv_flow_imp.id(54151458871844955)
+,p_display_seq=>2
+,p_column_id=>wwv_flow_imp.id(42249234753031702)
+,p_is_visible=>true
+,p_is_frozen=>false
+,p_width=>150
+);
+wwv_flow_imp_page.create_ig_report_column(
  p_id=>wwv_flow_imp.id(54151995935844956)
 ,p_view_id=>wwv_flow_imp.id(54151458871844955)
 ,p_display_seq=>1
@@ -340,21 +314,12 @@ wwv_flow_imp_page.create_ig_report_column(
 ,p_column_id=>wwv_flow_imp.id(54070722137447809)
 ,p_is_visible=>true
 ,p_is_frozen=>false
-,p_width=>100
-);
-wwv_flow_imp_page.create_ig_report_column(
- p_id=>wwv_flow_imp.id(54153769923844962)
-,p_view_id=>wwv_flow_imp.id(54151458871844955)
-,p_display_seq=>4
-,p_column_id=>wwv_flow_imp.id(54070884780447810)
-,p_is_visible=>true
-,p_is_frozen=>false
-,p_width=>250
+,p_width=>140
 );
 wwv_flow_imp_page.create_ig_report_column(
  p_id=>wwv_flow_imp.id(54154708650844965)
 ,p_view_id=>wwv_flow_imp.id(54151458871844955)
-,p_display_seq=>5
+,p_display_seq=>4
 ,p_column_id=>wwv_flow_imp.id(54070948478447811)
 ,p_is_visible=>true
 ,p_is_frozen=>false
@@ -362,19 +327,10 @@ wwv_flow_imp_page.create_ig_report_column(
 wwv_flow_imp_page.create_ig_report_column(
  p_id=>wwv_flow_imp.id(54155535766844968)
 ,p_view_id=>wwv_flow_imp.id(54151458871844955)
-,p_display_seq=>6
+,p_display_seq=>5
 ,p_column_id=>wwv_flow_imp.id(54071027552447812)
 ,p_is_visible=>true
 ,p_is_frozen=>false
-);
-wwv_flow_imp_page.create_ig_report_column(
- p_id=>wwv_flow_imp.id(54180009744017437)
-,p_view_id=>wwv_flow_imp.id(54151458871844955)
-,p_display_seq=>2
-,p_column_id=>wwv_flow_imp.id(54071159095447813)
-,p_is_visible=>true
-,p_is_frozen=>false
-,p_width=>100
 );
 wwv_flow_imp_page.create_page_item(
  p_id=>wwv_flow_imp.id(54069452814447796)
@@ -386,7 +342,7 @@ wwv_flow_imp_page.create_page_item(
 );
 wwv_flow_imp_page.create_page_item(
  p_id=>wwv_flow_imp.id(54069598859447797)
-,p_name=>'P4_SCHEMA'
+,p_name=>'P4_SCHEME'
 ,p_item_sequence=>50
 ,p_item_plug_id=>wwv_flow_imp.id(54068725227447789)
 ,p_display_as=>'NATIVE_HIDDEN'

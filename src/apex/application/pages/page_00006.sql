@@ -5,7 +5,7 @@ begin
 --   Manifest End
 wwv_flow_imp.component_begin (
  p_version_yyyy_mm_dd=>'2022.10.07'
-,p_release=>'22.2.5'
+,p_release=>'22.2.11'
 ,p_default_workspace_id=>33657925800256602
 ,p_default_application_id=>141
 ,p_default_id_offset=>33662320935301187
@@ -21,7 +21,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'21'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20230328203622'
+,p_last_upd_yyyymmddhh24miss=>'20231025134152'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(54073327692447835)
@@ -745,6 +745,48 @@ wwv_flow_imp_page.create_page_button(
 ,p_button_position=>'CREATE'
 ,p_button_redirect_url=>'f?p=&APP_ID.:7:&SESSION.::&DEBUG.:7::'
 ,p_icon_css_classes=>'fa-plus-square'
+);
+wwv_flow_imp_page.create_page_da_event(
+ p_id=>wwv_flow_imp.id(42249550385031705)
+,p_name=>'Refresh Report after Dialog closed (Report)'
+,p_event_sequence=>10
+,p_triggering_element_type=>'REGION'
+,p_triggering_region_id=>wwv_flow_imp.id(54071262705447814)
+,p_bind_type=>'bind'
+,p_execution_type=>'IMMEDIATE'
+,p_bind_event_type=>'apexafterclosedialog'
+);
+wwv_flow_imp_page.create_page_da_action(
+ p_id=>wwv_flow_imp.id(42249650107031706)
+,p_event_id=>wwv_flow_imp.id(42249550385031705)
+,p_event_result=>'TRUE'
+,p_action_sequence=>10
+,p_execute_on_page_init=>'N'
+,p_name=>'Refresh Report'
+,p_action=>'NATIVE_REFRESH'
+,p_affected_elements_type=>'REGION'
+,p_affected_region_id=>wwv_flow_imp.id(54071262705447814)
+);
+wwv_flow_imp_page.create_page_da_event(
+ p_id=>wwv_flow_imp.id(42249918798031709)
+,p_name=>'Refresh Report after Dialog closed (Breadcrumb)'
+,p_event_sequence=>20
+,p_triggering_element_type=>'REGION'
+,p_triggering_region_id=>wwv_flow_imp.id(54282053948258514)
+,p_bind_type=>'bind'
+,p_execution_type=>'IMMEDIATE'
+,p_bind_event_type=>'apexafterclosedialog'
+);
+wwv_flow_imp_page.create_page_da_action(
+ p_id=>wwv_flow_imp.id(42250031301031710)
+,p_event_id=>wwv_flow_imp.id(42249918798031709)
+,p_event_result=>'TRUE'
+,p_action_sequence=>10
+,p_execute_on_page_init=>'N'
+,p_name=>'Refresh Report'
+,p_action=>'NATIVE_REFRESH'
+,p_affected_elements_type=>'REGION'
+,p_affected_region_id=>wwv_flow_imp.id(54071262705447814)
 );
 wwv_flow_imp.component_end;
 end;
