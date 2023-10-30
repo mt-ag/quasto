@@ -99,6 +99,8 @@ PROMPT src/plsql/vw/qaru_predecessor_order_v.sql
 @src/plsql/vw/qaru_predecessor_order_v.sql
 PROMPT src/plsql/vw/qaru_scheme_names_for_testing_v.sql
 @src/plsql/vw/qaru_scheme_names_for_testing_v.sql
+PROMPT src/plsql/vw/qaru_apex_blacklisted_apps_v.sql
+@src/plsql/vw/qaru_apex_blacklisted_apps_v.sql
 
 
 PROMPT GRANT

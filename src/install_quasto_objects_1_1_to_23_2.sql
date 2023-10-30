@@ -9,6 +9,8 @@ set verify off
 PROMPT VIEWS
 PROMPT src/plsql/vw/qaru_scheme_names_for_testing_v.sql
 @src/plsql/vw/qaru_scheme_names_for_testing_v.sql
+PROMPT src/plsql/vw/qaru_apex_blacklisted_apps_v.sql
+@src/plsql/vw/qaru_apex_blacklisted_apps_v.sql
 
 PROMPT src/plsql/pkg/qa_main_pkg.sql
 @src/plsql/pkg/qa_main_pkg.sql
