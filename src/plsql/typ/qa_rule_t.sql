@@ -18,9 +18,9 @@ create or replace type qa_rule_t force as object
   object_updated_user varchar2(50), -- last update user on object
   object_updated_date date, -- last update date on object
 -- apex specific parameters for buildung edit links
-  apex_app_id    number, -- application where component is placed
-  apex_page_id   number, -- page where component is placed
-    
+  apex_app_id  number, -- application where component is placed
+  apex_page_id number, -- page where component is placed
+
 -- create object with minimal attributes to query
   constructor function qa_rule_t
   (
@@ -54,12 +54,12 @@ create or replace type qa_rule_t force as object
 -- Unit tests
   constructor function qa_rule_t
   (
-    pi_scheme_name         in varchar2
-   ,pi_object_name         in varchar2
-   ,pi_object_details      in varchar2
-   ,pi_error_message       in varchar2
+    pi_scheme_name    in varchar2
+   ,pi_object_name    in varchar2
+   ,pi_object_details in varchar2
+   ,pi_error_message  in varchar2
   ) return self as result,
-  
+
 -- APEX rules
   constructor function qa_rule_t
   (
@@ -72,13 +72,14 @@ create or replace type qa_rule_t force as object
    ,pi_scheme_name         in varchar2
    ,pi_object_id           in number
    ,pi_object_name         in varchar2
+   ,pi_object_details      in varchar2
    ,pi_object_type         in varchar2
    ,pi_object_value        in varchar2
    ,pi_object_updated_user in varchar2
    ,pi_object_updated_date in date
    ,pi_apex_app_id         in number
    ,pi_apex_page_id        in number
-   
+    
   ) return self as result,
 
   member function to_string return varchar2
@@ -103,7 +104,7 @@ create or replace type body qa_rule_t is
     self.qaru_error_message := pi_qaru_error_message;
     self.qaru_object_types  := pi_qaru_object_types;
     self.qaru_sql           := pi_qaru_sql;
-
+  
     return;
   end qa_rule_t;
 
@@ -139,23 +140,23 @@ create or replace type body qa_rule_t is
     self.object_value        := pi_object_value;
     self.object_updated_user := pi_object_updated_user;
     self.object_updated_date := pi_object_updated_date;
-
+  
     return;
   end qa_rule_t;
 
   constructor function qa_rule_t
   (
-    pi_scheme_name         in varchar2
-   ,pi_object_name         in varchar2
-   ,pi_object_details      in varchar2
-   ,pi_error_message       in varchar2
+    pi_scheme_name    in varchar2
+   ,pi_object_name    in varchar2
+   ,pi_object_details in varchar2
+   ,pi_error_message  in varchar2
   ) return self as result is
   begin
-    self.scheme_name         := pi_scheme_name;
-    self.object_name         := pi_object_name;
-    self.object_details      := pi_object_details;
-    self.qaru_error_message  := pi_error_message;
-
+    self.scheme_name        := pi_scheme_name;
+    self.object_name        := pi_object_name;
+    self.object_details     := pi_object_details;
+    self.qaru_error_message := pi_error_message;
+  
     return;
   end qa_rule_t;
 
@@ -170,13 +171,14 @@ create or replace type body qa_rule_t is
    ,pi_scheme_name         in varchar2
    ,pi_object_id           in number
    ,pi_object_name         in varchar2
+   ,pi_object_details      in varchar2
    ,pi_object_type         in varchar2
    ,pi_object_value        in varchar2
    ,pi_object_updated_user in varchar2
    ,pi_object_updated_date in date
    ,pi_apex_app_id         in number
    ,pi_apex_page_id        in number
-   
+    
   ) return self as result is
   begin
     self.qaru_id             := pi_qaru_id;
@@ -188,13 +190,14 @@ create or replace type body qa_rule_t is
     self.scheme_name         := pi_scheme_name;
     self.object_id           := pi_object_id;
     self.object_name         := pi_object_name;
+    self.object_details      := pi_object_details;
     self.object_type         := pi_object_type;
     self.object_value        := pi_object_value;
     self.object_updated_user := pi_object_updated_user;
     self.object_updated_date := pi_object_updated_date;
     self.apex_app_id         := pi_apex_app_id;
     self.apex_page_id        := pi_apex_page_id;
-     
+  
     return;
   end qa_rule_t;
 
