@@ -345,12 +345,13 @@ sqlplus admin/admins_password@database @uninstall.sql ut3
 
 ## 5. new Data type for holding additional information such as invalid schema objects
 
-## 6. Oracle Apex Application
-   One major component of the next update will be an apex application to add new rules or configure existing ones and run them.
-   We will also introduce the support for apex based rules to check the integrety of apex objects.
+## 6. Oracle APEX Application
+   One major component of the next update will be an APEX application to add new rules or configure existing ones. In this app, the rule attributes can be entered via selection lists and text fields. Next to the existing DDL-based rules, we will also introduce the support for APEX based rules to check the integrety of APEX objects. Exported rules can be imported as JSON files which allows rules to be exchanged across multiple QUASTO instances.
+   
+   Furthermore, a dashboard page will be available, which provides a graphical overview of the ratio between successful and failed tests. Filtering by schema and execution date to display details of invalid objects will be possible.
 
 ## 8. automated daily Unit Testing
-   We are planning to implement a new scheduler Job which runs all the activated Rules on a daily basis.
+   We are planning to implement a new scheduler Job which runs all generated Unit tests of Rules on a daily basis.
 
 ## 8. Installation Process will be adapted to be able to upgrade from any released version to the latest one
 
