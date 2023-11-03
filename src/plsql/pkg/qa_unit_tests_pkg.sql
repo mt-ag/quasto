@@ -79,7 +79,7 @@ create or replace package body qa_unit_tests_pkg is
         from dual
         where exists (select null
                       from qaru_scheme_names_for_testing_v
-                      where username = pi_scheme_names(rec_scheme_names)
+                      where username = upper(pi_scheme_names(rec_scheme_names))
                      );
         if l_scheme_exist = 0
         then
@@ -122,7 +122,7 @@ create or replace package body qa_unit_tests_pkg is
         for rec_packages in (select object_name
                              from user_objects
                              where object_type = 'PACKAGE'
-                             and object_name like upper(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix) || pi_scheme_names(rec_scheme_names) || '_%')
+                             and object_name like upper(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix) || upper(pi_scheme_names(rec_scheme_names)) || '_%')
         loop
           l_package_name := rec_packages.object_name;
           execute immediate 'DROP PACKAGE ' || l_package_name;
