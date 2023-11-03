@@ -15,9 +15,8 @@ declare
 
   l_utplsql_single_package number := 1;
   l_utplsql_single_package_per_rule number := 2;
-  l_utplsql_single_rule_per_object number := 3;
   l_utplsql_ut_test_packages_prefix varchar2(10) := 'QA_UT_';
-  l_utplsql_regexp_scheme_names varchar2(30) := '^[0-9A-Z]+(,[0-9A-Z]+)*$';
+  l_utplsql_scheduler_job_name varchar2(30) := 'JOB_RUN_UNIT_TESTS';
 begin
   l_action := 'create or replace package qa_constant_pkg
     authid definer
@@ -31,9 +30,8 @@ begin
 
     gc_utplsql_single_package          constant number := ' || l_utplsql_single_package || ';
     gc_utplsql_single_package_per_rule constant number := ' || l_utplsql_single_package_per_rule || ';
-    gc_utplsql_single_rule_per_object  constant number := ' || l_utplsql_single_rule_per_object || ';
     gc_utplsql_ut_test_packages_prefix constant varchar2(10) := ' || '''' || l_utplsql_ut_test_packages_prefix || '''' || ';
-    gc_utplsql_regexp_scheme_names     constant varchar2(30) := ' || '''' || l_utplsql_regexp_scheme_names || '''' || ';
+    gc_utplsql_scheduler_job_name      constant varchar2(30) := ' || '''' || l_utplsql_scheduler_job_name || '''' || ';
 
 end;';
 
