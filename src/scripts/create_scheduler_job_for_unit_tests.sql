@@ -1,6 +1,6 @@
 PROMPT Create Scheduler Job JOB_RUN_UNIT_TESTS
 /*
--- Temporaer ausgeklammert da skripte nicht lauffähig sind
+-- Temporaer ausgeklammert da skripte nicht lauffï¿½hig sind
 Unten Sheduler Job zum anlegen da fehlen aber dem Quasto Schema create Rechte fuer Scheduler
 declare
   l_sql varchar2(32767) := 
@@ -56,7 +56,7 @@ begin
   then
     dbms_scheduler.create_job(job_name            => 'JOB_RUN_UNIT_TESTS'
                              ,job_type            => 'STORED_PROCEDURE'
-                             ,job_action          => 'QUASTO.qa_unit_tests_pkg.p_run_unit_test_job'
+                             ,job_action          => 'DECLARE v_output VARCHAR2(500); BEGIN QUASTO.qa_unit_tests_pkg.p_run_unit_tests(v_output); END;'
                              ,number_of_arguments => null
                              ,start_date          => to_date('070720230100'
                                                             ,'DDMMYYYYHH24MI')
