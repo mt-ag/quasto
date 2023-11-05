@@ -4,10 +4,20 @@ create or replace package qa_unit_tests_pkg
   authid definer
 is
 
+/******************************************************************************
+   NAME:       qa_unit_tests_pkg
+   PURPOSE:    Methods for generating and modifying utPLSQL-compliant unit test procedures for QUASTO
+
+   REVISIONS:
+   Release    Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   23.2       05.11.2023  mwilhelm         Package has been added to QUASTO
+******************************************************************************/
+
 /**
 * create unit test packages
 * @param pi_option specifies the creation method
-* @param pi_scheme_names specifies the comma-separated scheme names to be tested
+* @param pi_scheme_names specifies scheme names to be tested
 * @param pi_delete_test_packages specifies if packages for the specified scheme names should be deleted
 */
   procedure p_create_unit_test_packages(
@@ -18,19 +28,37 @@ is
 
 /**
 * delete unit test packages
-* @param pi_scheme_names specifies the comma-separated scheme names for which packages should be deleted
+* @param pi_scheme_names specifies the scheme names for which packages should be deleted
 */
   procedure p_delete_unit_test_packages(
     pi_scheme_names  in VARCHAR2_TAB_T default null
   );
 
 /**
-* run unit tests and save xml result in the database
+* run unit tests from scheduler job and save xml result in the database
 * @param po_result returns the result message
 */
-  procedure p_run_unit_tests(
+  procedure p_run_unit_tests_job(
     po_result out varchar2
   );
+
+/**
+* enable or disable the scheduler job
+* @param pi_status defines the status of the scheduler job
+*/
+  procedure p_enable_scheduler_job(
+    pi_status in varchar2
+  );
+
+/**
+* run unit tests and return result as xml
+* @param pi_client_name defines the client name for which the unit tests should be executed
+* @param pi_scheme_name defines the scheme name for which the unit tests should be executed
+*/
+  function f_run_unit_tests(
+    pi_client_name in varchar2 default null
+   ,pi_scheme_name in varchar2 default null
+  ) return clob;
 
 /**
 * returns if scheduler job for execution of unit tests is enabled
@@ -38,17 +66,48 @@ is
   function f_is_scheduler_job_enabled
   return varchar2;
 
-/**
-* enable or disable the scheduler job
-* @param pi_status defines the enable status of the scheduler job
-*/
-  procedure p_enable_scheduler_job(
-    pi_status in varchar2
-  );
-
 end qa_unit_tests_pkg;
 /
 create or replace package body qa_unit_tests_pkg is
+
+  function f_get_suitepath(
+    pi_client_name   in varchar2 default null
+   ,pi_scheme_name   in varchar2 default null
+   ,pi_get_root_only in varchar2 default 'N'
+  ) return varchar2
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_suitepath';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_client_name_unified varchar2(1000);
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_client_name'
+                              ,p_val_01  => pi_client_name
+                              ,p_name_02 => 'pi_scheme_name'
+                              ,p_val_02  => pi_scheme_name
+                              ,p_name_03 => 'pi_get_root_only'
+                              ,p_val_03  => pi_get_root_only);
+    
+    if pi_client_name is not null and pi_scheme_name is not null and pi_get_root_only = 'N'
+    then
+      l_client_name_unified := regexp_replace(replace(pi_client_name
+                                                     ,' '
+                                                     ,'_')
+                                             ,'[^a-z0-9_]'
+                                             ,'_');
+      return lower(qa_constant_pkg.gc_quasto_name || '.' || l_client_name_unified || '.' || pi_scheme_name);
+    else
+      return lower(qa_constant_pkg.gc_quasto_name);
+    end if;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get the suitepath for unit tests!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_get_suitepath;
 
   procedure p_validate_input(
     pi_option               in number
@@ -104,54 +163,6 @@ create or replace package body qa_unit_tests_pkg is
       raise;
   end p_validate_input;
 
-  procedure p_delete_unit_test_packages(
-    pi_scheme_names  in VARCHAR2_TAB_T
-  ) is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.p_delete_unit_test_packages';
-    l_param_list qa_logger_pkg.tab_param;
-
-    l_package_name varchar2(255);
-  begin
-
-    if pi_scheme_names is not null
-    then
-      for rec_scheme_names in pi_scheme_names.FIRST .. pi_scheme_names.LAST
-      loop
-        for rec_packages in (select object_name
-                             from user_objects
-                             where object_type = 'PACKAGE'
-                             and object_name like upper(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix || pi_scheme_names(rec_scheme_names) || '_%'))
-        loop
-          l_package_name := rec_packages.object_name;
-          execute immediate 'DROP PACKAGE ' || l_package_name;
-          dbms_output.put_line('Drop of package ' || l_package_name || ' successful.');
-        end loop;
-     end loop;
-   else
-     for rec_packages in (select object_name
-                          from user_objects
-                          where object_type = 'PACKAGE'
-                          and object_name like upper(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix || '%'))
-     loop
-       l_package_name := rec_packages.object_name;
-       execute immediate 'DROP PACKAGE ' || l_package_name;
-       dbms_output.put_line('Drop of package ' || l_package_name || ' successful.');
-     end loop;
-   end if;
-
-  exception
-    when others then
-      dbms_output.put_line('--ERROR--');
-      dbms_output.put_line('Drop of package ' || l_package_name || ' raised exception.');
-      dbms_output.put_line(sqlerrm);
-      dbms_output.put_line(dbms_utility.format_error_backtrace);
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to delete the unit tests!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-      raise;
-  end p_delete_unit_test_packages;
-
   function f_get_all_scheme_names
   return VARCHAR2_TAB_T
   is
@@ -195,6 +206,7 @@ create or replace package body qa_unit_tests_pkg is
     l_param_list qa_logger_pkg.tab_param;
 
     l_clob clob;
+    l_package_purpose varchar(500) := 'This package contains procedures for utPLSQL to check the QUASTO rules of client ' || pi_qaru_client_name || ' on schema ' || upper(pi_scheme_name);
   begin
       qa_logger_pkg.append_param(p_params  => l_param_list
                                 ,p_name_01 => 'pi_package_name'
@@ -206,15 +218,19 @@ create or replace package body qa_unit_tests_pkg is
                                 ,p_name_04 => 'pi_qaru_client_name_unified'
                                 ,p_val_04  => pi_qaru_client_name_unified);
 
-      l_clob := 'CREATE OR REPLACE PACKAGE ' || pi_package_name || ' IS' || chr(10);
-      l_clob := l_clob || '/* THIS PACKAGE IS GENERATED AUTOMATICALLY. DO NOT MAKE ANY MANUAL CHANGES.' || chr(10);
+      l_clob := 'CREATE OR REPLACE PACKAGE ' || pi_package_name || ' IS' || chr(10) || chr(10);
+      l_clob := l_clob || '/******************************************************************************' || chr(10);
+      l_clob := l_clob || '   THIS PACKAGE IS GENERATED AUTOMATICALLY. DO NOT MAKE ANY MANUAL CHANGES.' || chr(10) || chr(10);
+      l_clob := l_clob || '   NAME:                  ' || pi_package_name || chr(10);
+      l_clob := l_clob || '   PURPOSE:               ' || l_package_purpose || chr(10) || chr(10);
+
       l_clob := l_clob || '   TIMESTAMP OF CREATION: ' || systimestamp || chr(10);
-      l_clob := l_clob || '   SCHEME NAME: ' || upper(pi_scheme_name) || chr(10);
-      l_clob := l_clob || '   CLIENT NAME: ' || pi_qaru_client_name || chr(10);
-      l_clob := l_clob || '*/' || chr(10) || chr(10);
+      l_clob := l_clob || '   SCHEME NAME:           ' || upper(pi_scheme_name) || chr(10);
+      l_clob := l_clob || '   CLIENT NAME:           ' || pi_qaru_client_name || chr(10);
+      l_clob := l_clob || '******************************************************************************/' || chr(10) || chr(10);
 
       l_clob := l_clob || '--%suite(Tests of ' || pi_qaru_client_name || ' on ' || upper(pi_scheme_name) || ')' || chr(10);
-      l_clob := l_clob || '--%suitepath(' || pi_qaru_client_name_unified || '.' || lower(pi_scheme_name) || ')' || chr(10) || chr(10);
+      l_clob := l_clob || '--%suitepath(' || f_get_suitepath(pi_client_name => pi_qaru_client_name_unified, pi_scheme_name => pi_scheme_name, pi_get_root_only => 'N') || ')' || chr(10) || chr(10);
 
       l_clob := l_clob || 'c_scheme_name constant varchar2_tab_t := new varchar2_tab_t(''' || upper(pi_scheme_name) || ''');' || chr(10);
       l_clob := l_clob || 'c_client_name constant qa_rules.qaru_client_name%type := ''' || pi_qaru_client_name || ''';' || chr(10) || chr(10);
@@ -661,10 +677,58 @@ create or replace package body qa_unit_tests_pkg is
       raise;
   end p_create_unit_test_packages;
 
-  procedure p_run_unit_tests(
+  procedure p_delete_unit_test_packages(
+    pi_scheme_names  in VARCHAR2_TAB_T
+  ) is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.p_delete_unit_test_packages';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_package_name varchar2(255);
+  begin
+
+    if pi_scheme_names is not null
+    then
+      for rec_scheme_names in pi_scheme_names.FIRST .. pi_scheme_names.LAST
+      loop
+        for rec_packages in (select object_name
+                             from user_objects
+                             where object_type = 'PACKAGE'
+                             and object_name like upper(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix || pi_scheme_names(rec_scheme_names) || '_%'))
+        loop
+          l_package_name := rec_packages.object_name;
+          execute immediate 'DROP PACKAGE ' || l_package_name;
+          dbms_output.put_line('Drop of package ' || l_package_name || ' successful.');
+        end loop;
+     end loop;
+   else
+     for rec_packages in (select object_name
+                          from user_objects
+                          where object_type = 'PACKAGE'
+                          and object_name like upper(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix || '%'))
+     loop
+       l_package_name := rec_packages.object_name;
+       execute immediate 'DROP PACKAGE ' || l_package_name;
+       dbms_output.put_line('Drop of package ' || l_package_name || ' successful.');
+     end loop;
+   end if;
+
+  exception
+    when others then
+      dbms_output.put_line('--ERROR--');
+      dbms_output.put_line('Drop of package ' || l_package_name || ' raised exception.');
+      dbms_output.put_line(sqlerrm);
+      dbms_output.put_line(dbms_utility.format_error_backtrace);
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to delete the unit tests!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end p_delete_unit_test_packages;
+
+  procedure p_run_unit_tests_job(
     po_result out varchar2
   ) is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.p_run_unit_tests';
+    c_unit constant varchar2(32767) := $$plsql_unit || '.p_run_unit_tests_job';
     l_param_list qa_logger_pkg.tab_param;
 
     l_xml_result clob;
@@ -673,9 +737,7 @@ create or replace package body qa_unit_tests_pkg is
     l_running_time_seconds number;
   begin
     l_timestamp_begin := systimestamp;
-    select DBMS_XMLGEN.CONVERT(XMLAGG(XMLELEMENT(E,column_value).EXTRACT('//text()')).GetClobVal(),1)
-    into l_xml_result
-    from table(ut.run(ut_junit_reporter()));
+    l_xml_result := f_run_unit_tests;
     l_timestamp_end := systimestamp;
 
     insert into QA_TEST_RESULTS(QATR_XML_RESULT)
@@ -689,44 +751,13 @@ create or replace package body qa_unit_tests_pkg is
                               ,p_val_01  => po_result);
   exception
     when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to run the unit tests!'
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to run the unit tests from scheduler job!'
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
       po_result := 'Execution of unit tests failed with error ' || sqlerrm || ' - ' || dbms_utility.format_error_backtrace;
       raise;
-  end p_run_unit_tests;
-
-  function f_is_scheduler_job_enabled
-  return varchar2
-  is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.f_is_scheduler_job_enabled';
-    l_param_list qa_logger_pkg.tab_param;
-
-    l_result number;
-  begin
-    select decode(count(1), 0, 0, 1)
-    into l_result
-    from dual
-    where exists (select null
-                  from user_scheduler_jobs
-                  where job_name = qa_constant_pkg.gc_utplsql_scheduler_job_name
-                  and enabled = 'TRUE');
-
-    if l_result = 1
-    then
-      return 'Y';
-    else
-      return 'N';
-    end if;
-  exception
-    when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get the status of the ut scheduler job!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-      raise;
-  end f_is_scheduler_job_enabled;
+  end p_run_unit_tests_job;
 
   procedure p_enable_scheduler_job(
     pi_status in varchar2
@@ -758,6 +789,76 @@ create or replace package body qa_unit_tests_pkg is
                             ,p_params => l_param_list);
       raise;
   end p_enable_scheduler_job;
+
+  function f_run_unit_tests(
+    pi_client_name in varchar2 default null
+   ,pi_scheme_name in varchar2 default null
+  ) return clob
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_run_unit_tests';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_suitepath varchar2(1000);
+    l_package_owner varchar2(1000) := SYS_CONTEXT('USERENV', 'CURRENT_USER');
+    l_xml_result clob;
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_client_name'
+                              ,p_val_01  => pi_client_name
+                              ,p_name_02 => 'pi_scheme_name'
+                              ,p_val_02  => pi_scheme_name);
+    
+    if pi_client_name is not null and pi_scheme_name is not null
+    then
+      l_suitepath := f_get_suitepath(pi_client_name => pi_client_name, pi_scheme_name => pi_scheme_name, pi_get_root_only => 'N');
+    else
+      l_suitepath := f_get_suitepath(pi_get_root_only => 'Y');
+    end if;
+
+    select DBMS_XMLGEN.CONVERT(XMLAGG(XMLELEMENT(E,column_value).EXTRACT('//text()')).GetClobVal(),1)
+    into l_xml_result
+    from table(ut.run(l_package_owner || ':' || l_suitepath, ut_junit_reporter()));
+
+    return l_xml_result;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to run the unit tests!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_run_unit_tests;
+
+  function f_is_scheduler_job_enabled
+  return varchar2
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_is_scheduler_job_enabled';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_result number;
+  begin
+    select decode(count(1), 0, 0, 1)
+    into l_result
+    from dual
+    where exists (select null
+                  from user_scheduler_jobs
+                  where job_name = qa_constant_pkg.gc_utplsql_scheduler_job_name
+                  and enabled = 'TRUE');
+
+    if l_result = 1
+    then
+      return 'Y';
+    else
+      return 'N';
+    end if;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get the status of the ut scheduler job!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_is_scheduler_job_enabled;
 
 end qa_unit_tests_pkg;
 /

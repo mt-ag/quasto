@@ -21,7 +21,8 @@ begin
   l_action := 'create or replace package qa_constant_pkg
     authid definer
   is
-    
+
+    gc_quasto_name               constant varchar(50 char)     := ''QUASTO'';
     gc_quasto_version            constant varchar(50 char)     := ' || '''' || l_apex_version || '''' || ';
     gc_utplsql_flag              constant number               := ' || l_utplsql_flag || ';
     gc_apex_flag                 constant number               := ' || l_apex_flag || ';
