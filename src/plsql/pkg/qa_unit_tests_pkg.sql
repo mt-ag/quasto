@@ -11,9 +11,9 @@ is
 * @param pi_delete_test_packages specifies if packages for the specified scheme names should be deleted
 */
   procedure p_create_unit_test_packages(
-    pi_option               in number,
-    pi_scheme_names         in VARCHAR2_TAB_T default null,
-    pi_delete_test_packages in varchar2 default 'N'
+    pi_option               in number
+   ,pi_scheme_names         in VARCHAR2_TAB_T default null
+   ,pi_delete_test_packages in varchar2 default 'N'
   );
 
 /**
@@ -51,9 +51,9 @@ end qa_unit_tests_pkg;
 create or replace package body qa_unit_tests_pkg is
 
   procedure p_validate_input(
-    pi_option               in number,
-    pi_scheme_names         in VARCHAR2_TAB_T,
-    pi_delete_test_packages in varchar2
+    pi_option               in number
+   ,pi_scheme_names         in VARCHAR2_TAB_T
+   ,pi_delete_test_packages in varchar2
   ) is
     c_unit constant varchar2(32767) := $$plsql_unit || '.p_validate_input';
     l_param_list qa_logger_pkg.tab_param;
@@ -66,9 +66,8 @@ create or replace package body qa_unit_tests_pkg is
                               ,p_name_02 => 'pi_delete_test_packages'
                               ,p_val_02  => pi_delete_test_packages);
 
-    if pi_option not in ( qa_constant_pkg.gc_utplsql_single_package
-                        , qa_constant_pkg.gc_utplsql_single_package_per_rule
-                        )
+    if pi_option not in (qa_constant_pkg.gc_utplsql_single_package
+                        ,qa_constant_pkg.gc_utplsql_single_package_per_rule)
     then
       raise_application_error(-20001, 'Invalid input parameter value for pi_option: ' || pi_option);
     elsif pi_scheme_names is not null
@@ -80,16 +79,14 @@ create or replace package body qa_unit_tests_pkg is
         from dual
         where exists (select null
                       from qaru_scheme_names_for_testing_v
-                      where username = upper(pi_scheme_names(rec_scheme_names))
-                     );
+                      where username = upper(pi_scheme_names(rec_scheme_names)));
         if l_scheme_exist = 0
         then
           raise_application_error(-20001, 'Invalid input parameter value for pi_scheme_names: ' || pi_scheme_names(rec_scheme_names) || ' - scheme name does not exist');
         end if;
       end loop;
-    elsif pi_delete_test_packages not in ( 'Y'
-                                         , 'N'
-                                         )
+    elsif pi_delete_test_packages not in ('Y'
+                                         ,'N')
     then
       raise_application_error(-20001, 'Invalid input parameter value for pi_delete_test_packages: ' || pi_delete_test_packages);
     end if;
@@ -164,9 +161,8 @@ create or replace package body qa_unit_tests_pkg is
     l_scheme_names varchar2_tab_t := new varchar2_tab_t();
   begin
 
-     for rec_users in ( select username
-                          from qaru_scheme_names_for_testing_v
-                      )
+     for rec_users in (select username
+                       from qaru_scheme_names_for_testing_v)
      loop
        l_scheme_names.extend;
        l_scheme_names(l_scheme_names.last) := rec_users.username;
@@ -188,10 +184,10 @@ create or replace package body qa_unit_tests_pkg is
   end f_get_all_scheme_names;
 
   function f_get_package_spec_header(
-    pi_package_name             in varchar2,
-    pi_scheme_name              in varchar2,
-    pi_qaru_client_name         in varchar2,
-    pi_qaru_client_name_unified in varchar2
+    pi_package_name             in varchar2
+   ,pi_scheme_name              in varchar2
+   ,pi_qaru_client_name         in varchar2
+   ,pi_qaru_client_name_unified in varchar2
   )
   return clob
   is
@@ -211,11 +207,17 @@ create or replace package body qa_unit_tests_pkg is
                                 ,p_val_04  => pi_qaru_client_name_unified);
 
       l_clob := 'CREATE OR REPLACE PACKAGE ' || pi_package_name || ' IS' || chr(10);
-      l_clob := l_clob || '--THIS PACKAGE IS GENERATED AUTOMATICALLY. DO NOT MAKE ANY MANUAL CHANGES.' || chr(10);
-      l_clob := l_clob || '--TIMESTAMP OF CREATION: ' || systimestamp || chr(10);
-      l_clob := l_clob || '--SCHEME NAME: ' || upper(pi_scheme_name) || chr(10);
-      l_clob := l_clob || '--%suite(' || pi_qaru_client_name || ')' || chr(10);
-      l_clob := l_clob || '--%suitepath(' || pi_qaru_client_name_unified || ')' || chr(10) || chr(10);
+      l_clob := l_clob || '/* THIS PACKAGE IS GENERATED AUTOMATICALLY. DO NOT MAKE ANY MANUAL CHANGES.' || chr(10);
+      l_clob := l_clob || '   TIMESTAMP OF CREATION: ' || systimestamp || chr(10);
+      l_clob := l_clob || '   SCHEME NAME: ' || upper(pi_scheme_name) || chr(10);
+      l_clob := l_clob || '   CLIENT NAME: ' || pi_qaru_client_name || chr(10);
+      l_clob := l_clob || '*/' || chr(10) || chr(10);
+
+      l_clob := l_clob || '--%suite(Tests of ' || pi_qaru_client_name || ' on ' || upper(pi_scheme_name) || ')' || chr(10);
+      l_clob := l_clob || '--%suitepath(' || pi_qaru_client_name_unified || '.' || lower(pi_scheme_name) || ')' || chr(10) || chr(10);
+
+      l_clob := l_clob || 'c_scheme_name constant varchar2_tab_t := new varchar2_tab_t(''' || upper(pi_scheme_name) || ''');' || chr(10);
+      l_clob := l_clob || 'c_client_name constant qa_rules.qaru_client_name%type := ''' || pi_qaru_client_name || ''';' || chr(10) || chr(10);
       
       return l_clob;
 
@@ -233,8 +235,8 @@ create or replace package body qa_unit_tests_pkg is
   end f_get_package_spec_header;
 
   function f_get_package_spec_content(
-    pi_previous_clob            in clob,
-    pi_qaru_rule_number_unified in varchar2
+    pi_previous_clob            in clob
+   ,pi_qaru_rule_number_unified in varchar2
   )
   return clob
   is
@@ -266,8 +268,8 @@ create or replace package body qa_unit_tests_pkg is
   end f_get_package_spec_content;
 
   function f_get_package_spec_footer(
-    pi_previous_clob in clob,
-    pi_package_name  in varchar2
+    pi_previous_clob in clob
+   ,pi_package_name  in varchar2
   )
   return clob
   is
@@ -329,13 +331,12 @@ create or replace package body qa_unit_tests_pkg is
   end f_get_package_body_header;
 
   function f_get_package_body_content(
-    pi_previous_clob            in clob,
-    pi_qaru_rule_number         in varchar2,
-    pi_qaru_rule_number_unified in varchar2,
-    pi_scheme_name              in varchar2,
-    pi_qaru_client_name         in varchar2,
-    pi_qaru_layer               in varchar2,
-    pi_qaru_test_name           in varchar2
+    pi_previous_clob            in clob
+   ,pi_qaru_rule_number         in varchar2
+   ,pi_qaru_rule_number_unified in varchar2
+   ,pi_scheme_name              in varchar2
+   ,pi_qaru_layer               in varchar2
+   ,pi_qaru_test_name           in varchar2
   )
   return clob
   is
@@ -351,34 +352,21 @@ create or replace package body qa_unit_tests_pkg is
                                 ,p_val_02  => pi_qaru_rule_number_unified
                                 ,p_name_03 => 'pi_scheme_name'
                                 ,p_val_03  => pi_scheme_name
-                                ,p_name_04 => 'pi_qaru_client_name'
-                                ,p_val_04  => pi_qaru_client_name
-                                ,p_name_05 => 'pi_qaru_layer'
-                                ,p_val_05  => pi_qaru_layer
-                                ,p_name_06 => 'pi_qaru_test_name'
-                                ,p_val_06  => pi_qaru_test_name);
+                                ,p_name_04 => 'pi_qaru_layer'
+                                ,p_val_04  => pi_qaru_layer
+                                ,p_name_05 => 'pi_qaru_test_name'
+                                ,p_val_05  => pi_qaru_test_name);
 
         l_clob := pi_previous_clob || 'PROCEDURE p_ut_rule_' || pi_qaru_rule_number_unified || chr(10);
         l_clob := l_clob || 'IS' || chr(10);
-        l_clob := l_clob || '  l_scheme_names varchar2_tab_t := new varchar2_tab_t();' || chr(10);
         l_clob := l_clob || '  l_scheme_objects qa_scheme_object_amounts_t := new qa_scheme_object_amounts_t();' || chr(10);
         l_clob := l_clob || '  l_result NUMBER;' || chr(10);
         l_clob := l_clob || '  l_invalid_objects qa_rules_t := new qa_rules_t();' || chr(10);
         l_clob := l_clob || 'BEGIN' || chr(10);
 
-        l_clob := l_clob || '  for rec_users in ( select username' || chr(10);
-        l_clob := l_clob || '                       from qaru_scheme_names_for_testing_v' || chr(10);
-        l_clob := l_clob || '                      where username = ''' || upper(pi_scheme_name) || '''' || chr(10);
-        l_clob := l_clob || '                   )' || chr(10);
-
-        l_clob := l_clob || '  loop' || chr(10);
-        l_clob := l_clob || '    l_scheme_names.extend;' || chr(10);
-        l_clob := l_clob || '    l_scheme_names(l_scheme_names.last) := rec_users.username;' || chr(10);
-        l_clob := l_clob || '  end loop;' || chr(10);
-
-        l_clob := l_clob || '  qa_main_pkg.p_test_rule(pi_qaru_client_name  => ''' || pi_qaru_client_name || ''',' || chr(10);
+        l_clob := l_clob || '  qa_main_pkg.p_test_rule(pi_qaru_client_name  => c_client_name,' || chr(10);
         l_clob := l_clob || '                          pi_qaru_rule_number  => ''' || pi_qaru_rule_number || ''',' || chr(10);
-        l_clob := l_clob || '                          pi_scheme_names      => l_scheme_names,' || chr(10);
+        l_clob := l_clob || '                          pi_scheme_names      => c_scheme_name,' || chr(10);
         l_clob := l_clob || '                          po_result            => l_result,' || chr(10);
         l_clob := l_clob || '                          po_scheme_objects    => l_scheme_objects,' || chr(10);
         l_clob := l_clob || '                          po_invalid_objects   => l_invalid_objects);' || chr(10);
@@ -434,8 +422,8 @@ create or replace package body qa_unit_tests_pkg is
   end f_get_package_body_content;
 
   function f_get_package_body_footer(
-    pi_previous_clob in clob,
-    pi_package_name  in varchar2
+    pi_previous_clob in clob
+   ,pi_package_name  in varchar2
   )
   return clob
   is
@@ -466,9 +454,9 @@ create or replace package body qa_unit_tests_pkg is
   end f_get_package_body_footer;
 
   procedure p_create_unit_test_packages(
-    pi_option               in number,
-    pi_scheme_names         in VARCHAR2_TAB_T default null,
-    pi_delete_test_packages in varchar2 default 'N'
+    pi_option               in number
+   ,pi_scheme_names         in VARCHAR2_TAB_T default null
+   ,pi_delete_test_packages in varchar2 default 'N'
   ) is
     c_unit constant varchar2(32767) := $$plsql_unit || '.p_create_unit_test_packages';
     l_param_list qa_logger_pkg.tab_param;
@@ -486,9 +474,9 @@ create or replace package body qa_unit_tests_pkg is
                               ,p_val_02  => pi_delete_test_packages);
     dbms_output.enable(buffer_size => 10000000);
 
-    p_validate_input(pi_option               => pi_option,
-                     pi_scheme_names         => pi_scheme_names,
-                     pi_delete_test_packages => pi_delete_test_packages);
+    p_validate_input(pi_option               => pi_option
+                    ,pi_scheme_names         => pi_scheme_names
+                    ,pi_delete_test_packages => pi_delete_test_packages);
 
     if pi_delete_test_packages = 'Y'
     then
@@ -520,9 +508,9 @@ create or replace package body qa_unit_tests_pkg is
 
          l_package_name := lower(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix) || lower(l_scheme_names(rec_schemes)) || '_' || rec_clients.qaru_client_name_unified || '_pkg';
 
-         l_clob := f_get_package_spec_header(pi_package_name => l_package_name
-                                            ,pi_scheme_name => l_scheme_names(rec_schemes)
-                                            ,pi_qaru_client_name => rec_clients.qaru_client_name
+         l_clob := f_get_package_spec_header(pi_package_name             => l_package_name
+                                            ,pi_scheme_name              => l_scheme_names(rec_schemes)
+                                            ,pi_qaru_client_name         => rec_clients.qaru_client_name
                                             ,pi_qaru_client_name_unified => rec_clients.qaru_client_name_unified);
 
          for rec_rules in (select qaru_rule_number
@@ -537,13 +525,13 @@ create or replace package body qa_unit_tests_pkg is
                            order by qaru_id asc)
          loop
       
-           l_clob := f_get_package_spec_content(pi_previous_clob => l_clob
+           l_clob := f_get_package_spec_content(pi_previous_clob            => l_clob
                                                ,pi_qaru_rule_number_unified => rec_rules.qaru_rule_number_unified);
 
          end loop;
 
          l_clob := f_get_package_spec_footer(pi_previous_clob => l_clob
-                                         ,pi_package_name => l_package_name);
+                                            ,pi_package_name  => l_package_name);
 
          execute immediate l_clob;
          dbms_output.put_line('Package specification for ' || l_package_name || ' created.');
@@ -566,18 +554,17 @@ create or replace package body qa_unit_tests_pkg is
                            order by qaru_id asc)
          loop
 
-           l_clob := f_get_package_body_content(pi_previous_clob  => l_clob
-                                               ,pi_qaru_rule_number => rec_rules.qaru_rule_number
+           l_clob := f_get_package_body_content(pi_previous_clob            => l_clob
+                                               ,pi_qaru_rule_number         => rec_rules.qaru_rule_number
                                                ,pi_qaru_rule_number_unified => rec_rules.qaru_rule_number_unified
-                                               ,pi_scheme_name => l_scheme_names(rec_schemes)
-                                               ,pi_qaru_client_name => rec_clients.qaru_client_name
-                                               ,pi_qaru_layer => rec_rules.qaru_layer
-                                               ,pi_qaru_test_name =>  rec_rules.qaru_test_name);
+                                               ,pi_scheme_name              => l_scheme_names(rec_schemes)
+                                               ,pi_qaru_layer               => rec_rules.qaru_layer
+                                               ,pi_qaru_test_name           => rec_rules.qaru_test_name);
 
          end loop;
 
          l_clob := f_get_package_body_footer(pi_previous_clob => l_clob
-                                            ,pi_package_name => l_package_name);
+                                            ,pi_package_name  => l_package_name);
 
        end loop;
 
@@ -626,32 +613,31 @@ create or replace package body qa_unit_tests_pkg is
 
           l_package_name := lower(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix) || lower(l_scheme_names(rec_schemes)) || '_' || rec_client_rules.qaru_client_name_unified || '_' || rec_client_rules.qaru_name_unified ||'_pkg';
 
-          l_clob := f_get_package_spec_header(pi_package_name => l_package_name
-                                             ,pi_scheme_name => l_scheme_names(rec_schemes)
-                                             ,pi_qaru_client_name => rec_client_rules.qaru_client_name
+          l_clob := f_get_package_spec_header(pi_package_name             => l_package_name
+                                             ,pi_scheme_name              => l_scheme_names(rec_schemes)
+                                             ,pi_qaru_client_name         => rec_client_rules.qaru_client_name
                                              ,pi_qaru_client_name_unified => rec_client_rules.qaru_client_name_unified);
 
-          l_clob := f_get_package_spec_content(pi_previous_clob => l_clob
+          l_clob := f_get_package_spec_content(pi_previous_clob            => l_clob
                                               ,pi_qaru_rule_number_unified => rec_client_rules.qaru_rule_number_unified);
 
           l_clob := f_get_package_spec_footer(pi_previous_clob => l_clob
-                                             ,pi_package_name => l_package_name);
+                                             ,pi_package_name  => l_package_name);
 
           execute immediate l_clob;
           dbms_output.put_line('Package specification for ' || l_package_name || ' created.');
       
           l_clob := f_get_package_body_header(pi_package_name => l_package_name);
 
-          l_clob := f_get_package_body_content(pi_previous_clob  => l_clob
-                                              ,pi_qaru_rule_number => rec_client_rules.qaru_rule_number
+          l_clob := f_get_package_body_content(pi_previous_clob            => l_clob
+                                              ,pi_qaru_rule_number         => rec_client_rules.qaru_rule_number
                                               ,pi_qaru_rule_number_unified => rec_client_rules.qaru_rule_number_unified
-                                              ,pi_scheme_name => l_scheme_names(rec_schemes)
-                                              ,pi_qaru_client_name => rec_client_rules.qaru_client_name
-                                              ,pi_qaru_layer => rec_client_rules.qaru_layer
-                                              ,pi_qaru_test_name =>  rec_client_rules.qaru_test_name);
+                                              ,pi_scheme_name              => l_scheme_names(rec_schemes)
+                                              ,pi_qaru_layer               => rec_client_rules.qaru_layer
+                                              ,pi_qaru_test_name           => rec_client_rules.qaru_test_name);
 
           l_clob := f_get_package_body_footer(pi_previous_clob => l_clob
-                                             ,pi_package_name => l_package_name);
+                                             ,pi_package_name  => l_package_name);
 
           execute immediate l_clob;
           dbms_output.put_line('Package body for ' || l_package_name || ' created.');
@@ -725,8 +711,7 @@ create or replace package body qa_unit_tests_pkg is
     where exists (select null
                   from user_scheduler_jobs
                   where job_name = qa_constant_pkg.gc_utplsql_scheduler_job_name
-                  and enabled = 'TRUE'
-                 );
+                  and enabled = 'TRUE');
 
     if l_result = 1
     then
@@ -753,9 +738,8 @@ create or replace package body qa_unit_tests_pkg is
                               ,p_name_01 => 'pi_status'
                               ,p_val_01  => pi_status);
 
-    if pi_status not in ( 'Y'
-                        , 'N'
-                        )
+    if pi_status not in ('Y'
+                        ,'N')
     then
       raise_application_error(-20001, 'Invalid input parameter value for pi_status: ' || pi_status);
     end if;
