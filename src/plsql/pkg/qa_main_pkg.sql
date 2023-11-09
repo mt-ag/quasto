@@ -760,20 +760,26 @@ create or replace package body qa_main_pkg as
                               ,p_name_01 => 'pi_user_name'
                               ,p_val_01  => pi_user_name);
   
-    select count(1)
-    into l_count
-    from qaru_scheme_names_for_testing_v v
-    where upper(v.username) = upper(pi_user_name);
-  
-    if l_count = 0
+    if pi_user_name is not null
     then
-      l_result := true;
-      raise e_user_blacklisted;
+      select count(1)
+      into l_count
+      from qaru_scheme_names_for_testing_v v
+      where upper(v.username) = upper(pi_user_name);
+    
+      if l_count = 0
+      then
+        l_result := true;
+        raise e_user_blacklisted;
+      else
+        l_result := false;
+      end if;
+    
+      return l_result;
+    
     else
-      l_result := false;
+      return false;
     end if;
-  
-    return l_result;
   exception
     when e_user_blacklisted then
       raise_application_error(-20007
