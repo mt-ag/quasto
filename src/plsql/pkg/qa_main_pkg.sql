@@ -715,24 +715,27 @@ create or replace package body qa_main_pkg as
         from qaru_apex_blacklisted_apps_v v
         where v.application_id = nvl(pi_qa_rules_t(i).apex_app_id
                                     ,-99999);
-        if l_app_ids is not null and
-           instr(',' || l_app_ids || ','
-                ,',' || pi_qa_rules_t(i).apex_app_id || ',') = 0
+        if (l_app_ids is not null and instr(',' || l_app_ids || ','
+                                           ,',' || pi_qa_rules_t(i).apex_app_id || ',') = 0) or
+          -- Apex Application welche geblacklisted wurden in der View qaru_apex_blacklisted_apps_v rausfiltern
+           l_count > 0
         then
           pi_qa_rules_t.delete(i);
-        elsif l_page_ids is not null and
-              instr(',' || l_page_ids || ','
-                   ,',' || nvl(pi_qa_rules_t(i).apex_page_id
-                              ,'-9999999') || ',') = 0
+        elsif l_page_ids is not null
         then
-          pi_qa_rules_t.delete(i);
-        elsif
-        -- Apex Application welche geblacklisted wurden in der View qaru_apex_blacklisted_apps_v rausfiltern
-         l_count > 0
-        then
-          pi_qa_rules_t.delete(i);
+          for s in (select *
+                    from apex_string.split(pi_qa_rules_t(i).apex_page_id
+                                          ,','))
+          loop
+            if (instr(',' || l_page_ids || ','
+                     ,',' || s.column_value || ',') > 0)
+            then
+              exit;
+            else
+              pi_qa_rules_t.delete(i);
+            end if;
+          end loop;
         end if;
-      
       end loop;
     end if;
   exception
