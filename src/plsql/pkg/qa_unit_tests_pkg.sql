@@ -1,5 +1,3 @@
-PROMPT create or replace package QA_UNIT_TESTS_PKG
-
 create or replace package qa_unit_tests_pkg 
   authid definer
 is
@@ -15,10 +13,10 @@ is
 ******************************************************************************/
 
 /**
-* create unit test packages
+* procedure to create unit test packages
 * @param pi_option specifies the creation method
 * @param pi_scheme_names specifies scheme names to be tested
-* @param pi_delete_test_packages specifies if packages for the specified scheme names should be deleted
+* @param pi_delete_test_packages specifies whether packages for the specified scheme names should be deleted or not
 */
   procedure p_create_unit_test_packages(
     pi_option               in number
@@ -27,7 +25,7 @@ is
   );
 
 /**
-* delete unit test packages
+* procedure to delete unit test packages
 * @param pi_scheme_names specifies the scheme names for which packages should be deleted
 */
   procedure p_delete_unit_test_packages(
@@ -35,7 +33,7 @@ is
   );
 
 /**
-* run unit tests from scheduler job and save xml result in the database
+* procedure to run unit tests from scheduler job
 * @param po_result returns the result message
 */
   procedure p_run_unit_tests_job(
@@ -43,7 +41,7 @@ is
   );
 
 /**
-* enable or disable the scheduler job
+* procedure to enable or disable the scheduler job
 * @param pi_status defines the status of the scheduler job
 */
   procedure p_enable_scheduler_job(
@@ -51,9 +49,10 @@ is
   );
 
 /**
-* run unit tests and return result as xml
-* @param pi_client_name defines the client name for which the unit tests should be executed
-* @param pi_scheme_name defines the scheme name for which the unit tests should be executed
+* function to run unit tests
+* @param  pi_client_name defines the client name for which the unit tests should be executed
+* @param  pi_scheme_name defines the scheme name for which the unit tests should be executed
+* @return clob returns the xml
 */
   function f_run_unit_tests(
     pi_client_name in varchar2 default null
@@ -61,7 +60,8 @@ is
   ) return clob;
 
 /**
-* returns if scheduler job for execution of unit tests is enabled
+* function to get status of scheduler job
+* @return varchar2 returns whether scheduler job for execution of unit tests is enabled or not
 */
   function f_is_scheduler_job_enabled
   return varchar2;

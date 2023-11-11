@@ -1,27 +1,46 @@
 create or replace package qa_main_pkg authid definer as
 
-  -- get sql and id from rule
-  -- %param pi_qaru_rule_number
-  -- %param pi_qaru_client_name
-  -- %param po_qaru_id
-  -- %param po_qaru_sql
+  /******************************************************************************
+     NAME:       qa_main_pkg
+     PURPOSE:    Methods for creating and testing the QUASTO rules
+  
+     REVISIONS:
+     Release    Date        Author           Description
+     ---------  ----------  ---------------  ------------------------------------
+     0.91       29.08.2022  olemm            Package has been added to QUASTO
+     1.1        21.04.2023  sprang/pdahlem   Added predecessor and exclude objects logic
+  ******************************************************************************/
+
+  /**
+  * function to get rule attributes by rule number and client name
+  * @param  pi_qaru_rule_number specifies the rule number
+  * @param  pi_qaru_client_name specifies the client name
+  * @throws NO_DATA_FOUND if rule number and client name do not exist
+  * @return qa_rule_t returns the rule entity
+  */
   function f_get_rule
   (
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
   ) return qa_rule_t;
 
-  -- get all rulenumbers from one client/project
-  -- %param pi_qaru_client_name
+  /**
+  * function to get all rule numbers from one client/project
+  * @param  pi_qaru_client_name specifies the client name
+  * @throws NO_DATA_FOUND if client name does not exist
+  * @return varchar2_tab_t returns the rule numbers
+  */
   function tf_get_rule_numbers(pi_qaru_client_name in qa_rules.qaru_client_name%type) return varchar2_tab_t;
 
-  -- procedure for testing a qa rule
-  -- %param pi_qaru_client_name
-  -- %param pi_qaru_rule_number
-  -- %param pi_scheme_names
-  -- %param po_result
-  -- %param po_scheme_objects
-  -- %param po_invalid_objects
+  /**
+  * procedure for testing a qa rule
+  * @param pi_qaru_client_name specifies the client name
+  * @param pi_qaru_rule_number specifies the rule number
+  * @param pi_scheme_names specifies the scheme names to be tested
+  * @param po_result returns the rule result
+  * @param po_scheme_objects returns the amount of invalid objects per scheme name
+  * @param po_invalid_objects returns all invalid objects with scheme name
+  */
   procedure p_test_rule
   (
     pi_qaru_client_name in qa_rules.qaru_client_name%type
@@ -32,8 +51,23 @@ create or replace package qa_main_pkg authid definer as
    ,po_invalid_objects  out qa_rules_t
   );
 
-  -- function for inserting a new rule
-  -- the function determines the next id and encapsulates the insert operation for new rules
+  /**
+  * function for inserting a new rule
+  * @param  pi_qaru_rule_number specifies the rule number
+  * @param  pi_qaru_client_name specifies the client name
+  * @param  pi_qaru_name specifies the rule name
+  * @param  pi_qaru_category specifies the rule category
+  * @param  pi_qaru_object_types specifies the object types for the rule to be tested
+  * @param  pi_qaru_error_message specifies the rule error message
+  * @param  pi_qaru_comment specifies a comment for the rule
+  * @param  pi_qaru_exclude_objects specifies object names to be ignored
+  * @param  pi_qaru_error_level specifies the error level for the rule
+  * @param  pi_qaru_is_active specifies whether the rule is activated
+  * @param  pi_qaru_sql specifies the SQL query in QUASTO format
+  * @param  pi_qaru_predecessor_ids specifies all rule ids to be executed preliminary
+  * @param  pi_qaru_layer specifies the layer of the rule
+  * @return number returns the rule number
+  */
   function f_insert_rule
   (
     pi_qaru_rule_number     in qa_rules.qaru_rule_number%type
@@ -51,24 +85,55 @@ create or replace package qa_main_pkg authid definer as
    ,pi_qaru_layer           in qa_rules.qaru_layer%type
   ) return qa_rules.qaru_id%type;
 
-
+  /**
+  * procedure for deleting entries in given ruleset for which exists an entry in quaru_excluded_ebjects
+  * @param pi_qa_rules specifies the rule entity
+  */
   procedure p_exclude_objects(pi_qa_rules in out nocopy qa_rules_t);
+
+  /**
+  * procedure for deleting entries in given ruleset for which exists an entry in qaru_apex_blacklisted_apps_v
+  * @param pi_qa_rules_t specifies the rule entity
+  */
   procedure p_exclude_not_whitelisted_apex_entries(pi_qa_rules_t in out qa_rules_t);
 
+  /**
+  * function for checking if a loop exists for the predecessor logic for the given rule identified by rule number and client name
+  * @param  pi_qaru_rule_number specifies the rule number
+  * @param  pi_client_name specifies the client name
+  * @throws LOOP_DETECT_E if loop was detected
+  * @return varchar2 returns the rule number
+  */
   function f_check_for_loop
   (
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type default null
    ,pi_client_name      in qa_rules.qaru_client_name%type default null
   ) return qa_rules.qaru_rule_number%type;
 
+  /**
+  * function for getting all predecessor ids for the given rule number
+  * @param  pi_rule_number specifies the rule number
+  * @return varchar2 returns the predecessor ids in a comma separated list
+  */
   function f_get_full_rule_pred(pi_rule_number in qa_rules.qaru_rule_number%type) return varchar2;
 
+  /**
+  * procedure for removing all objects from a given rule entity which do not belong to the given user
+  * @param pi_current_user specifies the user
+  * @param pi_qa_rules_t specifies the rule entity
+  */
   procedure p_exclude_not_owned_entries
   (
     pi_current_user in varchar2
    ,pi_qa_rules_t   in out qa_rules_t
   );
 
+  /**
+  * function to check if given user is black listed in qaru_scheme_names_for_testing_v
+  * @param  pi_user_name specifies the user
+  * @throws E_USER_BLACKLISTED if given user is blacklisted
+  * @return boolean returns whether user is blacklisted or not
+  */
   function f_is_owner_black_listed(pi_user_name varchar2) return boolean;
 
 end qa_main_pkg;

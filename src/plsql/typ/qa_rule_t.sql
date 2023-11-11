@@ -1,25 +1,41 @@
-create or replace type qa_rule_t force as object
-(
+create or replace type qa_rule_t force as 
+
+/******************************************************************************
+   NAME:       qa_rule_t
+   PURPOSE:    Attributes and constructors for initializing objects of type qa_rule_t
+
+   REVISIONS:
+   Release    Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   0.91       29.08.2022  olemm            Type has been added to QUASTO
+   23.2       05.11.2023  mwilhelm         Attributes object_name and object_details have been added
+******************************************************************************/
+
+  object
+  (
 -- Information based on the rule
-  qaru_id number, -- id of the rule
+    qaru_id number -- id of the rule
+
 -- optional attributes
-  qaru_category      varchar2(10), -- category of this rule row, based on the query
-  qaru_error_level   number, -- overwrite the error level based on the content of the object
-  qaru_error_message varchar2(4000), -- overwrite the standard error_message for this rule
-  qaru_object_types  varchar2(4000), -- object types which
-  qaru_sql           clob, -- sql query for this rule
+   ,qaru_category      varchar2(10)    -- category of this rule row, based on the query
+   ,qaru_error_level   number          -- overwrite the error level based on the content of the object
+   ,qaru_error_message varchar2(4000)  -- overwrite the standard error_message for this rule
+   ,qaru_object_types  varchar2(4000)  -- object types which
+   ,qaru_sql           clob            -- sql query for this rule
+
 -- Information based on the query, related to the object which is checked
-  scheme_name         varchar2(100), -- owner of the object
-  object_id           number, -- object id if possible
-  object_name         varchar2(1000), -- name of the object
-  object_details      varchar2(2000), -- details about the object and where to find it
-  object_type         varchar2(100), -- objecttype
-  object_value        varchar2(4000), -- value of the object itself
-  object_updated_user varchar2(50), -- last update user on object
-  object_updated_date date, -- last update date on object
--- apex specific parameters for buildung edit links
-  apex_app_id  number, -- application where component is placed
-  apex_page_id number, -- page where component is placed
+   ,scheme_name         varchar2(100)  -- owner of the object
+   ,object_id           number         -- object id if possible
+   ,object_name         varchar2(1000) -- name of the object
+   ,object_details      varchar2(2000) -- details about the object and where to find it
+   ,object_type         varchar2(100)  -- objecttype
+   ,object_value        varchar2(4000) -- value of the object itself
+   ,object_updated_user varchar2(50)   -- last update user on object
+   ,object_updated_date date           -- last update date on object
+
+-- APEX specific parameters for buildung edit links
+   ,apex_app_id  number                -- application where component is placed
+   ,apex_page_id number,               -- page where component is placed
 
 -- create object with minimal attributes to query
   constructor function qa_rule_t
@@ -83,7 +99,7 @@ create or replace type qa_rule_t force as object
   ) return self as result,
 
   member function to_string return varchar2
-)
+  )
 ;
 /
 create or replace type body qa_rule_t is

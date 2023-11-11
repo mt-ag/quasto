@@ -22,6 +22,16 @@ begin
     authid definer
   is
 
+  /******************************************************************************
+     NAME:       qa_constant_pkg
+     PURPOSE:    Global constants for QUASTO
+
+     REVISIONS:
+     Release    Date        Author           Description
+     ---------  ----------  ---------------  ------------------------------------
+     1.1        21.04.2023  pdahlem          Package has been added to QUASTO
+  ******************************************************************************/
+
     gc_quasto_name               constant varchar(50 char)     := ''QUASTO'';
     gc_quasto_version            constant varchar(50 char)     := ' || '''' || l_apex_version || '''' || ';
     gc_utplsql_flag              constant number               := ' || l_utplsql_flag || ';

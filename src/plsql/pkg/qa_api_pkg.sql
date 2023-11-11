@@ -1,32 +1,41 @@
-create or replace package qa_api_pkg authid current_user as
+create or replace package qa_api_pkg
+  authid current_user
+as
 
-  -- run a single rule and get for every mismatch one line back
-  -- %param pi_qaru_rule_number number to identify the rule combined with client name is unique
-  -- %param pi_qaru_client_name client or project name
-  -- %param pi_target_scheme should it run in one dedicated scheme
-  /** 
-* run a single rule and get for every mismatch one line back
-*  @param pi_qaru_rule_number is the number of the Rule from Table <a href =QA_RULES.html>QA_RULES </a>
-*  @param pi_qaru_client_name client or project name
-* @param pi_target_scheme should it run in one dedicated scheme
-*/
+/******************************************************************************
+   NAME:       qa_api_pkg
+   PURPOSE:    Methods for executing QUASTO rules
+
+   REVISIONS:
+   Release    Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   0.91       29.08.2022  olemm            Package has been added to QUASTO
+   1.1        21.04.2023  sprang           Added predecessor logic
+******************************************************************************/
+ 
+   /** 
+  * run a single rule and get for every mismatch one line back
+  * @param  pi_qaru_rule_number is the number of the Rule from Table <a href =QA_RULES.html>QA_RULES </a>
+  * @param  pi_qaru_client_name client or project name
+  * @param  pi_target_scheme should it run in one dedicated scheme
+  * @throws NO_DATA_FOUND if rule does not exist
+  * @return returns Qa_rules_t type
+  */ 
   function tf_run_rule
-
   (
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
    ,pi_target_scheme    in varchar2 default user
   ) return qa_rules_t;
 
-  -- run all rules from a client or project
-  -- %param pi_qaru_client_name 
-  -- %param pi_target_scheme 
-  
-    /** 
-* run all rules in the selected Scheme from Table <a href =QA_RULES.html>QA_RULES </a>
-*  @param pi_qaru_client_name client or project name
-* @param pi_target_scheme should it run in one dedicated scheme
-*/
+
+  /** 
+  * run all rules in the selected Scheme from Table <a href =QA_RULES.html>QA_RULES </a>
+  * @param  pi_qaru_client_name client or project name
+  * @param  pi_target_scheme should it run in one dedicated scheme
+  * @throws NO_DATA_FOUND if rule does not exist
+  * @return returns Qa_rules_t type
+  */
   function tf_run_rules
   (
     pi_qaru_client_name in qa_rules.qaru_client_name%type

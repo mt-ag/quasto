@@ -1,19 +1,28 @@
 create or replace package qa_export_import_rules_pkg is
 
+/******************************************************************************
+   NAME:       qa_export_import_rules_pkg
+   PURPOSE:    Methods for exporting and importing QUASTO rules
+
+   REVISIONS:
+   Release    Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   1.1        21.04.2023  pdahlem          Package has been added to QUASTO
+******************************************************************************/
+
   gc_scope constant varchar2(100) := $$plsql_unit || '.';
   g_version_number number := 1.1;
-/**
-@param g_spool_active if spool set to active, all outputs are deactivated
-** otherwise you would get extra lines in your JSON 
-*/
+
   -- if spool set to active, all outputs are deactivated
   -- otherwise you would get extra lines in your JSON
   g_spool_active boolean := false;
+
 /**
-*@param i_source takes the source to read the data
-*@param i_search search your Rule in i_source
-* @param i_replace replacing the searched value
-*
+* function for replacing strings in a clob
+* @param  i_source takes the source to read the data
+* @param  i_search search your Rule in i_source
+* @param  i_replace replacing the searched value
+* @return clob returns the data
 */
   function replace_with_clob
   (
@@ -21,18 +30,46 @@ create or replace package qa_export_import_rules_pkg is
    ,i_search  in varchar2
    ,i_replace in clob
   ) return clob;
+
+/**
+* function for converting rules table to clob
+* @param  pi_client_name specifies the client name
+* @param  pi_category specifies the rule category
+* @throws NO_DATA_FOUND if rule does not exist
+* @return clob returns the data
+*/
   function f_export_rules_table_to_clob
   (
     pi_client_name in qa_rules.qaru_client_name%type
    ,pi_category    in qa_rules.qaru_category%type default null
   ) return clob;
 
-  -- Wrapper Function to create an executable .sql Script to import Rules
-  function f_export_rules_to_script_clob(pi_clob in clob) return clob;
+/**
+* Wrapper function to create an executable .sql Script to import Rules
+* @param  pi_clob specifies the clob
+* @throws NO_DATA_FOUND if rule does not exist
+* @return clob returns the data
+*/
+  function f_export_rules_to_script_clob(
+    pi_clob in clob
+  ) return clob;
 
-  procedure p_clob_to_output(pi_clob in clob);
+/**
+* procedure to print clob to console output
+* @param  pi_clob specifies the clob
+* @throws NO_DATA_FOUND if no data found in given clob
+*/
+  procedure p_clob_to_output(
+   pi_clob in clob
+  );
 
-  -- Import to put Blob into qa_import_files table
+/**
+* procedure to import a given blob file into qa_import_files table
+* @param  pi_clob specifies the clob
+* @param  pi_filename specifies file name
+* @param  pi_mimetype specifies the MIME type
+* @throws NO_DATA_FOUND if no data found in given clob
+*/
   procedure f_import_clob_to_qa_import_files
   (
     pi_clob     in blob
@@ -40,10 +77,25 @@ create or replace package qa_export_import_rules_pkg is
    ,pi_mimetype in qa_import_files.qaif_mimetype%type
   );
 
-  procedure p_import_clob_to_rules_table(pi_qaif_id in qa_import_files.qaif_id%type);
+/**
+* procedure to import a given clob into qa_rules table
+* @param  pi_qaif_id specifies the primary key
+* @throws NO_DATA_FOUND if no data found for given qaif_id
+*/
+  procedure p_import_clob_to_rules_table(
+   pi_qaif_id in qa_import_files.qaif_id%type
+  );
 
-  /* will be removed in future */
-  function fc_export_qa_rules(pi_client_name in varchar2 default null) return clob;
+/* will be removed in future */
+/**
+* function to export a rule by a given client name
+* @param  pi_client_name specifies the client name
+* @throws NO_DATA_FOUND if rule does not exist
+* @return clob returns the data
+*/
+  function fc_export_qa_rules(
+   pi_client_name in varchar2 default null
+  ) return clob;
 
 end qa_export_import_rules_pkg;
 /

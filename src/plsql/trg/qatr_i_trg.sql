@@ -1,8 +1,18 @@
-PROMPT create or replace trigger QATR_I_TRG
 create or replace TRIGGER "QATR_I_TRG" 
   BEFORE INSERT ON QA_TEST_RESULTS
   REFERENCING NEW AS NEW
   FOR EACH ROW
+
+/******************************************************************************
+   NAME:       qatr_i_trg
+   PURPOSE:    Trigger for insert operations on table qa_test_results
+
+   REVISIONS:
+   Release    Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   23.2       05.11.2023  mwilhelm         Trigger has been added to QUASTO
+******************************************************************************/
+
 DECLARE
   l_user VARCHAR2(255);
 BEGIN
