@@ -14,7 +14,7 @@ create or replace type qa_rule_t force as
   object
   (
 -- Information based on the rule
-    qaru_id number -- id of the rule
+    qaru_id number                     -- id of the rule
 
 -- optional attributes
    ,qaru_category      varchar2(10)    -- category of this rule row, based on the query

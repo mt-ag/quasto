@@ -13,10 +13,10 @@ is
 ******************************************************************************/
 
 /**
-* procedure to create unit test packages
-* @param pi_option specifies the creation method
-* @param pi_scheme_names specifies scheme names to be tested
-* @param pi_delete_test_packages specifies whether packages for the specified scheme names should be deleted or not
+ * procedure to create unit test packages
+ * @param pi_option specifies the creation method
+ * @param pi_scheme_names specifies scheme names to be tested
+ * @param pi_delete_test_packages specifies whether packages for the specified scheme names should be deleted or not
 */
   procedure p_create_unit_test_packages(
     pi_option               in number
@@ -25,34 +25,34 @@ is
   );
 
 /**
-* procedure to delete unit test packages
-* @param pi_scheme_names specifies the scheme names for which packages should be deleted
+ * procedure to delete unit test packages
+ * @param pi_scheme_names specifies the scheme names for which packages should be deleted
 */
   procedure p_delete_unit_test_packages(
     pi_scheme_names  in VARCHAR2_TAB_T default null
   );
 
 /**
-* procedure to run unit tests from scheduler job
-* @param po_result returns the result message
+ * procedure to run unit tests from scheduler job
+ * @param po_result returns the result message
 */
   procedure p_run_unit_tests_job(
     po_result out varchar2
   );
 
 /**
-* procedure to enable or disable the scheduler job
-* @param pi_status defines the status of the scheduler job
+ * procedure to enable or disable the scheduler job
+ * @param pi_status defines the status of the scheduler job
 */
   procedure p_enable_scheduler_job(
     pi_status in varchar2
   );
 
 /**
-* function to run unit tests
-* @param  pi_client_name defines the client name for which the unit tests should be executed
-* @param  pi_scheme_name defines the scheme name for which the unit tests should be executed
-* @return clob returns the xml
+ * function to run unit tests
+ * @param  pi_client_name defines the client name for which the unit tests should be executed
+ * @param  pi_scheme_name defines the scheme name for which the unit tests should be executed
+ * @return clob returns the xml
 */
   function f_run_unit_tests(
     pi_client_name in varchar2 default null
@@ -60,8 +60,8 @@ is
   ) return clob;
 
 /**
-* function to get status of scheduler job
-* @return varchar2 returns whether scheduler job for execution of unit tests is enabled or not
+ * function to get status of scheduler job
+ * @return varchar2 returns whether scheduler job for execution of unit tests is enabled or not
 */
   function f_is_scheduler_job_enabled
   return varchar2;
@@ -229,11 +229,11 @@ create or replace package body qa_unit_tests_pkg is
       l_clob := l_clob || '   CLIENT NAME:           ' || pi_qaru_client_name || chr(10);
       l_clob := l_clob || '******************************************************************************/' || chr(10) || chr(10);
 
-      l_clob := l_clob || '--%suite(Tests of ' || pi_qaru_client_name || ' on ' || upper(pi_scheme_name) || ')' || chr(10);
-      l_clob := l_clob || '--%suitepath(' || f_get_suitepath(pi_client_name => pi_qaru_client_name_unified, pi_scheme_name => pi_scheme_name, pi_get_root_only => 'N') || ')' || chr(10) || chr(10);
+      l_clob := l_clob || '  --%suite(Tests of ' || pi_qaru_client_name || ' on ' || upper(pi_scheme_name) || ')' || chr(10);
+      l_clob := l_clob || '  --%suitepath(' || f_get_suitepath(pi_client_name => pi_qaru_client_name_unified, pi_scheme_name => pi_scheme_name, pi_get_root_only => 'N') || ')' || chr(10) || chr(10);
 
-      l_clob := l_clob || 'c_scheme_name constant varchar2_tab_t := new varchar2_tab_t(''' || upper(pi_scheme_name) || ''');' || chr(10);
-      l_clob := l_clob || 'c_client_name constant qa_rules.qaru_client_name%type := ''' || pi_qaru_client_name || ''';' || chr(10) || chr(10);
+      l_clob := l_clob || '  c_scheme_name constant varchar2_tab_t := new varchar2_tab_t(''' || upper(pi_scheme_name) || ''');' || chr(10);
+      l_clob := l_clob || '  c_client_name constant qa_rules.qaru_client_name%type := ''' || pi_qaru_client_name || ''';' || chr(10) || chr(10);
       
       return l_clob;
 
@@ -265,8 +265,8 @@ create or replace package body qa_unit_tests_pkg is
                                 ,p_name_01 => 'pi_qaru_rule_number_unified'
                                 ,p_val_01  => pi_qaru_rule_number_unified);
 
-      l_clob := pi_previous_clob || '--%test(quasto_test_rule_' || pi_qaru_rule_number_unified || ')' || chr(10);
-      l_clob := l_clob || 'PROCEDURE p_ut_rule_' || pi_qaru_rule_number_unified || ';' || chr(10);
+      l_clob := pi_previous_clob || '  --%test(quasto_test_rule_' || pi_qaru_rule_number_unified || ')' || chr(10);
+      l_clob := l_clob || '  PROCEDURE p_ut_rule_' || pi_qaru_rule_number_unified || ';' || chr(10);
       
       return l_clob;
 
@@ -373,54 +373,54 @@ create or replace package body qa_unit_tests_pkg is
                                 ,p_name_05 => 'pi_qaru_test_name'
                                 ,p_val_05  => pi_qaru_test_name);
 
-        l_clob := pi_previous_clob || 'PROCEDURE p_ut_rule_' || pi_qaru_rule_number_unified || chr(10);
-        l_clob := l_clob || 'IS' || chr(10);
-        l_clob := l_clob || '  l_scheme_objects qa_scheme_object_amounts_t := new qa_scheme_object_amounts_t();' || chr(10);
-        l_clob := l_clob || '  l_result NUMBER;' || chr(10);
-        l_clob := l_clob || '  l_invalid_objects qa_rules_t := new qa_rules_t();' || chr(10);
-        l_clob := l_clob || 'BEGIN' || chr(10);
+        l_clob := pi_previous_clob || '  PROCEDURE p_ut_rule_' || pi_qaru_rule_number_unified || chr(10);
+        l_clob := l_clob || '  IS' || chr(10);
+        l_clob := l_clob || '    l_scheme_objects qa_scheme_object_amounts_t := new qa_scheme_object_amounts_t();' || chr(10);
+        l_clob := l_clob || '    l_result NUMBER;' || chr(10);
+        l_clob := l_clob || '    l_invalid_objects qa_rules_t := new qa_rules_t();' || chr(10);
+        l_clob := l_clob || '  BEGIN' || chr(10);
 
-        l_clob := l_clob || '  qa_main_pkg.p_test_rule(pi_qaru_client_name  => c_client_name,' || chr(10);
-        l_clob := l_clob || '                          pi_qaru_rule_number  => ''' || pi_qaru_rule_number || ''',' || chr(10);
-        l_clob := l_clob || '                          pi_scheme_names      => c_scheme_name,' || chr(10);
-        l_clob := l_clob || '                          po_result            => l_result,' || chr(10);
-        l_clob := l_clob || '                          po_scheme_objects    => l_scheme_objects,' || chr(10);
-        l_clob := l_clob || '                          po_invalid_objects   => l_invalid_objects);' || chr(10);
+        l_clob := l_clob || '    qa_main_pkg.p_test_rule(pi_qaru_client_name  => c_client_name,' || chr(10);
+        l_clob := l_clob || '                            pi_qaru_rule_number  => ''' || pi_qaru_rule_number || ''',' || chr(10);
+        l_clob := l_clob || '                            pi_scheme_names      => c_scheme_name,' || chr(10);
+        l_clob := l_clob || '                            po_result            => l_result,' || chr(10);
+        l_clob := l_clob || '                            po_scheme_objects    => l_scheme_objects,' || chr(10);
+        l_clob := l_clob || '                            po_invalid_objects   => l_invalid_objects);' || chr(10);
 
-        l_clob := l_clob || '  ut.expect(l_result).to_(equal(1));' || chr(10);
+        l_clob := l_clob || '    ut.expect(l_result).to_(equal(1));' || chr(10);
 
-        l_clob := l_clob || '  dbms_output.put_line(''<Results rulenumber="' || pi_qaru_rule_number || '" layer="' || pi_qaru_layer || '" result="''||l_result||''">'');' || chr(10);
-        l_clob := l_clob || '  for rec_scheme_objects in ( select scheme_name' || chr(10);
-        l_clob := l_clob || '                                   , object_amount' || chr(10);
-        l_clob := l_clob || '                                from table(l_scheme_objects)' || chr(10);
-        l_clob := l_clob || '                            )' || chr(10);
+        l_clob := l_clob || '    dbms_output.put_line(''<Results rulenumber="' || pi_qaru_rule_number || '" layer="' || pi_qaru_layer || '" result="''||l_result||''">'');' || chr(10);
+        l_clob := l_clob || '    for rec_scheme_objects in ( select scheme_name' || chr(10);
+        l_clob := l_clob || '                                     , object_amount' || chr(10);
+        l_clob := l_clob || '                                  from table(l_scheme_objects)' || chr(10);
+        l_clob := l_clob || '                              )' || chr(10);
 
-        l_clob := l_clob || '  loop' || chr(10);
-        l_clob := l_clob || '    if rec_scheme_objects.object_amount = 0 then' || chr(10);
-        l_clob := l_clob || '      dbms_output.put_line(''<Scheme name="''||rec_scheme_objects.scheme_name||''" result="1"></Scheme>'');' || chr(10);
-        l_clob := l_clob || '    else' || chr(10);
-        l_clob := l_clob || '      dbms_output.put_line(''<Scheme name="''||rec_scheme_objects.scheme_name||''" result="0">'');' || chr(10);
-        l_clob := l_clob || '      for rec_scheme_invalid_objects in ( select object_name' || chr(10);
-        l_clob := l_clob || '                                               , object_details' || chr(10);
-        l_clob := l_clob || '                                               , qaru_error_message' || chr(10);
-        l_clob := l_clob || '                                            from table(l_invalid_objects)' || chr(10);
-        l_clob := l_clob || '                                           where scheme_name = rec_scheme_objects.scheme_name' || chr(10);
-        l_clob := l_clob || '                                        )' || chr(10);
-        l_clob := l_clob || '      loop' || chr(10);
-        l_clob := l_clob || '        dbms_output.put_line(''<Object name="''||rec_scheme_invalid_objects.object_name||''" details="''||rec_scheme_invalid_objects.object_details||''">''||rec_scheme_invalid_objects.qaru_error_message||''</Object>'');' || chr(10);
-        l_clob := l_clob || '      end loop;' || chr(10);
-        l_clob := l_clob || '      dbms_output.put_line(''</Scheme>'');' || chr(10);
-        l_clob := l_clob || '    end if;' || chr(10);
-        l_clob := l_clob || '  end loop;' || chr(10);
-        l_clob := l_clob || '  dbms_output.put_line(''</Results>'');' || chr(10);
+        l_clob := l_clob || '    loop' || chr(10);
+        l_clob := l_clob || '      if rec_scheme_objects.object_amount = 0 then' || chr(10);
+        l_clob := l_clob || '        dbms_output.put_line(''<Scheme name="''||rec_scheme_objects.scheme_name||''" result="1"></Scheme>'');' || chr(10);
+        l_clob := l_clob || '      else' || chr(10);
+        l_clob := l_clob || '        dbms_output.put_line(''<Scheme name="''||rec_scheme_objects.scheme_name||''" result="0">'');' || chr(10);
+        l_clob := l_clob || '        for rec_scheme_invalid_objects in ( select object_name' || chr(10);
+        l_clob := l_clob || '                                                 , object_details' || chr(10);
+        l_clob := l_clob || '                                                 , qaru_error_message' || chr(10);
+        l_clob := l_clob || '                                              from table(l_invalid_objects)' || chr(10);
+        l_clob := l_clob || '                                             where scheme_name = rec_scheme_objects.scheme_name' || chr(10);
+        l_clob := l_clob || '                                          )' || chr(10);
+        l_clob := l_clob || '        loop' || chr(10);
+        l_clob := l_clob || '          dbms_output.put_line(''<Object name="''||rec_scheme_invalid_objects.object_name||''" details="''||rec_scheme_invalid_objects.object_details||''">''||rec_scheme_invalid_objects.qaru_error_message||''</Object>'');' || chr(10);
+        l_clob := l_clob || '        end loop;' || chr(10);
+        l_clob := l_clob || '        dbms_output.put_line(''</Scheme>'');' || chr(10);
+        l_clob := l_clob || '      end if;' || chr(10);
+        l_clob := l_clob || '    end loop;' || chr(10);
+        l_clob := l_clob || '    dbms_output.put_line(''</Results>'');' || chr(10);
 
-        l_clob := l_clob || 'EXCEPTION' || chr(10);
-        l_clob := l_clob || '  WHEN OTHERS THEN' || chr(10);
-        l_clob := l_clob || '    dbms_output.put_line(''Execution of test "' || pi_qaru_test_name || '" raised exception.'');' || chr(10);
-        l_clob := l_clob || '    dbms_output.put_line(SQLERRM);' || chr(10);
-        l_clob := l_clob || '    dbms_output.put_line(DBMS_UTILITY.format_error_backtrace);' || chr(10);
-        l_clob := l_clob || '    RAISE;' || chr(10);
-        l_clob := l_clob || 'END p_ut_rule_' || pi_qaru_rule_number_unified || ';' || chr(10);
+        l_clob := l_clob || '  EXCEPTION' || chr(10);
+        l_clob := l_clob || '    WHEN OTHERS THEN' || chr(10);
+        l_clob := l_clob || '      dbms_output.put_line(''Execution of test "' || pi_qaru_test_name || '" raised exception.'');' || chr(10);
+        l_clob := l_clob || '      dbms_output.put_line(SQLERRM);' || chr(10);
+        l_clob := l_clob || '      dbms_output.put_line(DBMS_UTILITY.format_error_backtrace);' || chr(10);
+        l_clob := l_clob || '      RAISE;' || chr(10);
+        l_clob := l_clob || '  END p_ut_rule_' || pi_qaru_rule_number_unified || ';' || chr(10);
 
         return l_clob;
 

@@ -13,14 +13,14 @@ as
    1.1        21.04.2023  sprang           Added predecessor logic
 ******************************************************************************/
  
-   /** 
-  * run a single rule and get for every mismatch one line back
-  * @param  pi_qaru_rule_number is the number of the Rule from Table <a href =QA_RULES.html>QA_RULES </a>
-  * @param  pi_qaru_client_name client or project name
-  * @param  pi_target_scheme should it run in one dedicated scheme
-  * @throws NO_DATA_FOUND if rule does not exist
-  * @return returns Qa_rules_t type
-  */ 
+/** 
+ * function to run a single rule by given rule number and client name
+ * @param  pi_qaru_rule_number specifies the number of the rule from table QA_RULES
+ * @param  pi_qaru_client_name specifies the client or project name
+ * @param  pi_target_scheme specifies the scheme name to be tested
+ * @throws NO_DATA_FOUND if rule does not exist
+ * @return returns objects as type qa_rules_t
+*/ 
   function tf_run_rule
   (
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
@@ -29,13 +29,13 @@ as
   ) return qa_rules_t;
 
 
-  /** 
-  * run all rules in the selected Scheme from Table <a href =QA_RULES.html>QA_RULES </a>
-  * @param  pi_qaru_client_name client or project name
-  * @param  pi_target_scheme should it run in one dedicated scheme
-  * @throws NO_DATA_FOUND if rule does not exist
-  * @return returns Qa_rules_t type
-  */
+/** 
+ * function to run all rules by given client name in the selected scheme
+ * @param  pi_qaru_client_name specifies the client or project name
+ * @param  pi_target_scheme specifies the scheme name to be tested
+ * @throws NO_DATA_FOUND if rule does not exist
+ * @return returns objects as type qa_rules_t
+*/
   function tf_run_rules
   (
     pi_qaru_client_name in qa_rules.qaru_client_name%type

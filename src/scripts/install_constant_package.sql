@@ -30,6 +30,7 @@ begin
      Release    Date        Author           Description
      ---------  ----------  ---------------  ------------------------------------
      1.1        21.04.2023  pdahlem          Package has been added to QUASTO
+     23.2       05.11.2023  mwilhelm         Added new constants for utPLSQL objects
   ******************************************************************************/
 
     gc_quasto_name               constant varchar(50 char)     := ''QUASTO'';
