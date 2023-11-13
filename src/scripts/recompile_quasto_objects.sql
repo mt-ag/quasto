@@ -17,6 +17,8 @@ begin
   -- QASTO Objects
 
   -- Views:
+  l_object_name('QARU_SCHEME_NAMES_FOR_TESTING_V') := 'QARU_SCHEME_NAMES_FOR_TESTING_V';
+  l_object_type('QARU_SCHEME_NAMES_FOR_TESTING_V') := 'VIEW';
   l_object_name('QARU_PREDECESSOR_ORDER_V') := 'QARU_PREDECESSOR_ORDER_V';
   l_object_type('QARU_PREDECESSOR_ORDER_V') := 'VIEW';
   
