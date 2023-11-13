@@ -166,8 +166,20 @@ end;
 /
 
 PROMPT DROP SCHEDULER JOB JOB_RUN_UNIT_TESTS
+DECLARE
+  l_count number;
 BEGIN
-  dbms_scheduler.drop_job(job_name => 'JOB_RUN_UNIT_TESTS');
+  select count(1)
+  into l_count
+  from user_scheduler_jobs
+  where job_name = 'JOB_RUN_UNIT_TESTS';
+
+  if l_count > 0
+    then 
+      dbms_scheduler.drop_job(job_name => 'JOB_RUN_UNIT_TESTS');
+      dbms_output.put_line('Job JOB_RUN_UNIT_TESTS dropped');
+  end if;
+
 END;
 /
 -- Empty recyclebin because of lobs in user_objects after dropping objects with lobs
