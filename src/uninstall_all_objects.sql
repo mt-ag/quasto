@@ -164,6 +164,11 @@ exception
                                                                            ,200));
 end;
 /
+PROMPT DELETE SHEDULER JOB
+BEGIN
+  dbms_scheduler.drop_job(job_name => 'JOB_RUN_UNIT_TESTS');
+END;
+/
 
 -- Empty recyclebin because of lobs in user_objects after dropping objects with lobs
 purge recyclebin;
