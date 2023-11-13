@@ -11,6 +11,10 @@ variable script_ut_plsql VARCHAR2(50)
 COLUMN :script_quasto NEW_VALUE script_name_quasto NOPRINT
 variable script_quasto VARCHAR2(50)
 
+-- current Version installed
+COLUMN :version_old NEW_VALUE script_version_old NOPRINT
+variable version_old VARCHAR2(50)
+
 --Begin Instruction
 PROMPT '------------------------------------'
 PROMPT the install scripts expects 4 diffrent arguments!
@@ -40,25 +44,53 @@ SET SERVEROUTPUT ON
 
 variable flag char
 exec :flag := 'Y';
--- installed Version
-variable version_old varchar2 (50 char)
-exec :version_old := '1.0';
+
 -- upgrade version
 variable version varchar2 (50 char)
-exec :version := '1.1';
+exec :version := '23.2';
 
 -- Block to proceess first Argument
 declare
     l_script_name_utplsql         varchar2(100) := 'install_utplsql_objects.sql';
-    l_script_name_utplsql_upgrade varchar2(100) := 'install_utplsql_objects_' || replace(:version_old,'.','_') || '_to_' || replace(:version,'.','_') || '.sql';
+    l_script_name_utplsql_upgrade varchar2(100);
     l_script_name_quasto          varchar2(100) := 'install_quasto_objects.sql';
-    l_script_name_quasto_upgrade  varchar2(100) := 'install_quasto_objects_' || replace(:version_old,'.','_') || '_to_' || replace(:version,'.','_') || '.sql';
+    l_script_name_quasto_upgrade  varchar2(100);
     l_count                       number;
     l_count_utplsql               number;
+    l_version_old                 varchar2 (40 char);
     l_current_version             varchar2 (40 char) := :version;
     l_arg                         number := '~1';
-begin
 
+    function get_version_constant return varchar2 as
+      l_ret varchar2 (50 char);
+    begin
+      select trim(replace(REGEXP_SUBSTR(text, ':=(.*?);', 1, 1, NULL, 1),'''','')) AS version_old
+      into l_ret
+      from user_source
+      where type = 'PACKAGE'
+      and name = 'QA_CONSTANT_PKG'
+      and upper(text) like upper('%gc_quasto_version constant varchar(50 char) :=%');
+      
+      if l_ret is null
+        then
+          l_ret := '1.0';
+      end if;
+
+      return l_ret;
+    exception
+      when others then
+        return '1.0';
+    end;
+begin
+    
+    l_version_old := get_version_constant;
+    if l_version_old = :version
+      then 
+      l_version_old := '1.1';
+    end if;
+
+    l_script_name_utplsql_upgrade := 'install_utplsql_objects_' || replace(l_version_old,'.','_') || '_to_' || replace(:version,'.','_') || '.sql';
+    l_script_name_quasto_upgrade  := 'install_quasto_objects_' || replace(l_version_old,'.','_') || '_to_' || replace(:version,'.','_') || '.sql';
 
     -- Check if Pre Version exists
     select count(1)
@@ -117,7 +149,7 @@ set feedback on
 set head on
 
 -- Constant Package Generation with last argument as current Version
-@@src/scripts/install_constant_package '~1' '~2' '~3' '~4' '1.1'
+@@src/scripts/install_constant_package '~1' '~2' '~3' '~4' '23.2'
 
 @@src/~script_name_quasto
 @@src/~script_name_utplsql

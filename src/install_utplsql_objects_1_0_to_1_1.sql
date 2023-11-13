@@ -5,10 +5,6 @@ set concat on
 set concat .
 set verify off
 
-PROMPT PACKAGES
-PROMPT src/plsql/pkg/create_ut_test_packages_pkg.sql
-@src/plsql/pkg/create_ut_test_packages_pkg.sql
-
 PROMPT TABLES
 PROMPT src/ddl/utplsql_calendar_drop.sql
 @src/ddl/utplsql_calendar_drop.sql

@@ -39,6 +39,14 @@ PROMPT TYPE
 PROMPT src/plsql/typ/varchar2_tab_t.sql
 @src/plsql/typ/varchar2_tab_t.sql
 
+
+PROMPT TYPE
+PROMPT src/plsql/typ/qa_scheme_object_amount_t.sql
+@src/plsql/typ/qa_scheme_object_amount_t.sql
+
+PROMPT src/plsql/typ/qa_scheme_object_amounts_t.sql
+@src/plsql/typ/qa_scheme_object_amounts_t.sql
+
 PROMPT src/plsql/typ/qa_rule_t.sql
 @src/plsql/typ/qa_rule_t.sql
 
@@ -89,6 +97,11 @@ PROMPT src/plsql/trg/qaru_iu_trg.sql
 PROMPT VIEWS
 PROMPT src/plsql/vw/qaru_predecessor_order_v.sql
 @src/plsql/vw/qaru_predecessor_order_v.sql
+PROMPT src/plsql/vw/qaru_scheme_names_for_testing_v.sql
+@src/plsql/vw/qaru_scheme_names_for_testing_v.sql
+PROMPT src/plsql/vw/qaru_apex_blacklisted_apps_v.sql
+@src/plsql/vw/qaru_apex_blacklisted_apps_v.sql
+
 
 PROMPT GRANT
 grant execute on qa_api_pkg to public;

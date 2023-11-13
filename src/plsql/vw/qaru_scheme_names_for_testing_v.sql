@@ -1,4 +1,4 @@
-create or replace force view qa_schema_names_for_testing_v AS
+create or replace force view qaru_scheme_names_for_testing_v AS
 select username
 from all_users
 where username not in ( -- ORACLE

@@ -35,8 +35,8 @@ begin
   l_object_type('QA_APEX_PKG') := 'PACKAGE';
   l_object_name('QA_CONSTANT_PKG') := 'QA_CONSTANT_PKG';
   l_object_type('QA_CONSTANT_PKG') := 'PACKAGE';
-  l_object_name('CREATE_UT_TEST_PACKAGES_PKG') := 'CREATE_UT_TEST_PACKAGES_PKG';
-  l_object_type('CREATE_UT_TEST_PACKAGES_PKG') := 'PACKAGE';
+  l_object_name('QA_UNIT_TESTS_PKG') := 'QA_UNIT_TESTS_PKG';
+  l_object_type('QA_UNIT_TESTS_PKG') := 'PACKAGE';
   
 
 
@@ -51,16 +51,26 @@ begin
   l_object_type('RUNNING_RULE_T') := 'TYPE';
   l_object_name('RUNNING_RULES_T') := 'RUNNING_RULES_T';
   l_object_type('RUNNING_RULES_T') := 'TYPE';
+  l_object_name('QA_SCHEME_OBJECT_AMOUNTS_T') := 'QA_SCHEME_OBJECT_AMOUNTS_T';
+  l_object_type('QA_SCHEME_OBJECT_AMOUNTS_T') := 'TYPE';
+  l_object_name('QA_SCHEME_OBJECT_AMOUNT_T') := 'QA_SCHEME_OBJECT_AMOUNT_T';
+  l_object_type('QA_SCHEME_OBJECT_AMOUNT_T') := 'TYPE';
 
   -- sequences
   l_object_name('QARU_SEQ') := 'QARU_SEQ';
   l_object_type('QARU_SEQ') := 'SEQUENCE';
   l_object_name('QAIF_SEQ') := 'QAIF_SEQ';
   l_object_type('QAIF_SEQ') := 'SEQUENCE';
+  l_object_name('QATR_SEQ') := 'QATR_SEQ';
+  l_object_type('QATR_SEQ') := 'SEQUENCE';
 
   -- views
   l_object_name('QARU_PREDECESSOR_ORDER_V') := 'QARU_PREDECESSOR_ORDER_V';
   l_object_type('QARU_PREDECESSOR_ORDER_V') := 'VIEW';
+  l_object_name('QARU_SCHEME_NAMES_FOR_TESTING_V') := 'QARU_SCHEME_NAMES_FOR_TESTING_V';
+  l_object_type('QARU_SCHEME_NAMES_FOR_TESTING_V') := 'VIEW';
+  l_object_name('QARU_APEX_BLACKLISTED_APPS_V') := 'QARU_APEX_BLACKLISTED_APPS_V';
+  l_object_type('QARU_APEX_BLACKLISTED_APPS_V') := 'VIEW';
 
   l_object := l_object_name.first;
   dbms_output.put_line(l_object);
