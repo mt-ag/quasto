@@ -14,11 +14,21 @@ begin
    -- buffer size extend
   dbms_output.enable(buffer_size => 10000000);
   -- objects:
-  -- QASTO Objects
+  -- utPLSQL Objects
 
-  -- packages
+  -- Types:
+  l_object_name('QA_SCHEME_OBJECT_AMOUNT_T') := 'QA_SCHEME_OBJECT_AMOUNT_T';
+  l_object_type('QA_SCHEME_OBJECT_AMOUNT_T') := 'TYPE';
+  l_object_name('QA_SCHEME_OBJECT_AMOUNTS_T') := 'QA_SCHEME_OBJECT_AMOUNTS_T';
+  l_object_type('QA_SCHEME_OBJECT_AMOUNTS_T') := 'TYPE';
+
+  -- Packages:
   l_object_name('QA_UNIT_TESTS_PKG') := 'QA_UNIT_TESTS_PKG';
   l_object_type('QA_UNIT_TESTS_PKG') := 'PACKAGE';
+
+  -- Triggers:
+  l_object_name('QATR_I_TRG') := 'QATR_I_TRG';
+  l_object_type('QATR_I_TRG') := 'TRIGGER';
 
   l_object := l_object_name.first;
   while l_object is not null
