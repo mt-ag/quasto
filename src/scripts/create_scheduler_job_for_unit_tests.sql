@@ -10,7 +10,7 @@ begin
 
   if l_count = 0
   then
-    dbms_scheduler.create_job(job_name            => 'JOB_RUN_UNIT_TESTS'
+    dbms_scheduler.create_job(job_name            => 'PLSQL_BLOCK'
                              ,job_type            => 'STORED_PROCEDURE'
                              ,job_action          => 'DECLARE v_output VARCHAR2(500); BEGIN QUASTO.qa_unit_tests_pkg.p_run_unit_tests(v_output); END;'
                              ,number_of_arguments => 0
