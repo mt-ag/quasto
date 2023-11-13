@@ -31,15 +31,7 @@ begin
   l_object_type('QA_EXPORT_IMPORT_RULES_PKG') := 'PACKAGE';
   l_object_name('QA_LOGGER_PKG') := 'QA_LOGGER_PKG';
   l_object_type('QA_LOGGER_PKG') := 'PACKAGE';
-  
-  if QA_CONSTANT_PKG.gc_apex_flag = 1
-    then
-      l_object_name('QA_APEX_PKG') := 'QA_APEX_PKG';
-      l_object_type('QA_APEX_PKG') := 'PACKAGE';
-    else
-      null;
-  end if;
-
+ 
   --trigger
   l_object_name('QARU_IU_TRG') := 'QARU_IU_TRG';
   l_object_type('QARU_IU_TRG') := 'TRIGGER';
