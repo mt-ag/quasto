@@ -164,11 +164,6 @@ exception
                                                                            ,200));
 end;
 /
-PROMPT DELETE SHEDULER JOB
-BEGIN
-  dbms_scheduler.drop_job(job_name => 'JOB_RUN_UNIT_TESTS');
-END;
-/
 
 PROMPT DROP SCHEDULER JOB JOB_RUN_UNIT_TESTS
 DECLARE
