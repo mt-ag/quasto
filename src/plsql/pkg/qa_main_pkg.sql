@@ -763,7 +763,8 @@ create or replace package body qa_main_pkg as
     l_app_ids    varchar2(4000 char);
     l_page_ids   varchar2(4000 char);
   begin
-  
+    $IF qa_constant_pkg.gc_apex_flag = 1
+    $THEN  
     if pi_qa_rules_t.count > 0
     then
       select q.qaru_app_id
@@ -780,6 +781,7 @@ create or replace package body qa_main_pkg as
         from qaru_apex_blacklisted_apps_v v
         where v.application_id = nvl(pi_qa_rules_t(i).apex_app_id
                                     ,-99999);
+        
         if (l_app_ids is not null and instr(',' || l_app_ids || ','
                                            ,',' || pi_qa_rules_t(i).apex_app_id || ',') = 0) or
           -- Apex Application welche geblacklisted wurden in der View qaru_apex_blacklisted_apps_v rausfiltern
@@ -803,6 +805,9 @@ create or replace package body qa_main_pkg as
         end if;
       end loop;
     end if;
+    $ELSE
+      null;
+    $END
   exception
     when others then
       qa_logger_pkg.p_qa_log(p_text   => 'Cant remove Apex App or Pages from qa_rules Table Record that dont belong to the current owner!'
