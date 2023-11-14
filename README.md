@@ -1,12 +1,12 @@
-# Quasto - Quality Assurance Tool
-[1. What is Quasto?](https://github.com/mt-ag/quasto#1-what-is-quasto)<br>
-[2. Installing Quasto](https://github.com/mt-ag/quasto#2-installing-quasto)<br>
-[3. Using Quasto](https://github.com/mt-ag/quasto#3using-quasto)<br>
-[4. Installing utPLSQL](https://github.com/mt-ag/quasto#4-installing-guidelines-and-specifications-for-the-utplsql-framework)
-[5. Upcoming Features](https://github.com/mt-ag/quasto#5-upcoming-features)
+# QUASTO - Quality Assurance Tool
+[1. What is QUASTO?](https://github.com/mt-ag/quasto#1-what-is-quasto)<br>
+[2. Installing QUASTO](https://github.com/mt-ag/quasto#2-installing-quasto)<br>
+[3. Using QUASTO](https://github.com/mt-ag/quasto#3using-quasto)<br>
+[4. Installing utPLSQL](https://github.com/mt-ag/quasto#4-installing-utplsql)<br>
+[5. Upcoming Features](https://github.com/mt-ag/quasto#5-upcoming-features)<br>
 [6. Latest Releases](https://github.com/mt-ag/quasto#6-latest-releases)
 
-## 1. What is Quasto?
+## 1. What is QUASTO?
 A project for checking guidelines and code quality for inside the oracle database.
 The first version supports checks for your data model, PL/SQL code and data itself.
 Coming up releases will integrate utPLSQL and get an APEX Front-End.
@@ -14,7 +14,7 @@ CI/CD support for jenkins/azure devops or gitlab/github are planned on the roadm
 
 Project uses the MIT License.
 
-## 2. Installing Quasto
+## 2. Installing QUASTO
 ### Installing utPLSQL and QUASTO objects
 
 To install the QUASTO Quality Assurance Tool on your oracle database from scratch, run the install.sql file in the root directory of the repository.
@@ -30,12 +30,12 @@ To start the Installation process you need to move into the root directory of th
 In the next step the user connects to the database via sqlplus or sqlCL.
 To ensure all tables and packages are installed into the right schema make sure to check the current user and switch schema if required.
 
-In order to use quasto in other schemas a public synonym is required on the type "qa_rule_t".
-The user has to create this outside of the regular Quasto installation.
+In order to use QUASTO in other schemas a public synonym is required on the type "qa_rule_t".
+The user has to create this outside of the regular QUASTO installation.
 Note: To drop a public synonym the user needs the drop any synonym grant!
 
 ### Minimal user rights
-If you install quasto in a blank new scheme the user needs the following rights:
+If you install QUASTO in a blank new scheme the user needs the following rights:
 ```
 grant create procedure to quasto;
 grant create public synonym to quasto;
@@ -75,7 +75,7 @@ There are the three installer scripts:
 1. install_utplsql_objects.sql
 2. install_apex_objects.sql
 3. install_jenkins_objects.sql
-All of these scripts can be run without arguments and should be executed in the same schema as the original schema of Quasto.
+All of these scripts can be run without arguments and should be executed in the same schema as the original schema of QUASTO.
 
 Example:
 ```
@@ -86,9 +86,9 @@ Example:
 
 To uninstall the utPLSQL test and QUASTO objects, run the script uninstall.sql in the root directory of the repository.
 
-## 3.Using Quasto
+## 3.Using QUASTO
 ### Define a rule
-For using quasto you have to define rules based on SQL queries which have to be saved inside the QA_RULES table.
+For using QUASTO you have to define rules based on SQL queries which have to be saved inside the QA_RULES table.
 The query for every rule should name every object which does not match you quality standards.
 A first example could be, that every table needs to have a primary key.
 Here is an example for this rule:
@@ -138,7 +138,7 @@ from qa_api_pkg.tf_run_rule(pi_qaru_rule_number => '23.1'
                            ,pi_qaru_client_name => 'MT AG'
                            ,pi_target_scheme    => 'QUASTO')
 ```
-In this example the rule 23.1 from the client/project MT AG is used inside the schema Quasto. If you don't provide a schema, all Schemas are used which are able to reach. The sql output gives now every object in a row which is not matching your rule.
+In this example the rule 23.1 from the client/project MT AG is used inside the schema QUASTO. If you don't provide a schema, all schemas are used which are able to reach. The sql output gives now every object in a row which is not matching your rule.
 If you wanna run all rules from one client/project simply call
 ```
 select *
@@ -168,7 +168,7 @@ All rules that belongs to an APEX scheme have this rule as predecessor. So if th
 #### Exporting Rules:
 
 In order to export a JSON file of the currently exisiting rules of the QA_RULES table we need to connect to the database via SQL*Plus inside the Installation folder.
-For example open up cmd. And change with cd into the folder where your Quasto is located. It is required to be in the oracle-qa-tool\src\scripts Folder.
+For example open up cmd. And change with cd into the folder where your QUASTO is located. It is required to be in the oracle-qa-tool\src\scripts Folder.
 Afterwards you connect to the DB via SQL*Plus and run the following command:
 
 ```
