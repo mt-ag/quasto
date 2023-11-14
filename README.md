@@ -1,7 +1,7 @@
 # QUASTO - Quality Assurance Tool
 [1. What is QUASTO?](https://github.com/mt-ag/quasto#1-what-is-quasto)<br>
 [2. Installing QUASTO](https://github.com/mt-ag/quasto#2-installing-quasto)<br>
-[3. Using QUASTO](https://github.com/mt-ag/quasto#3using-quasto)<br>
+[3. Using QUASTO](https://github.com/mt-ag/quasto#3-using-quasto)<br>
 [4. Installing utPLSQL](https://github.com/mt-ag/quasto#4-installing-utplsql)<br>
 [5. Upcoming Features](https://github.com/mt-ag/quasto#5-upcoming-features)<br>
 [6. Latest Releases](https://github.com/mt-ag/quasto#6-latest-releases)
