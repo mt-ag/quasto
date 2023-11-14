@@ -15,14 +15,13 @@ CI/CD support for jenkins/azure devops or gitlab/github are planned on the roadm
 Project uses the MIT License.
 
 ## 2. Installing QUASTO
-### Installing utPLSQL and QUASTO objects
+### Installing Guidelines for the QUASTO Quality Assurance Tool
 
 To install the QUASTO Quality Assurance Tool on your oracle database from scratch, run the install.sql file in the root directory of the repository.
 
 This file will install all necessary objects for utPLSQL tests and QUASTO.
 
-## Installing Guidelines for the QUASTO Quality Assurance Tool 
-It is possible to run QUASTO standalone without a valid apex or utPLSQL Installation.
+It is possible to run QUASTO standalone without a valid APEX or utPLSQL Installation.
 In order to install the tool the user needs to move into the root directory of the downloaded folder. 
 You can either clone the repository on git itself or download a zip.file.
 
@@ -30,7 +29,7 @@ To start the Installation process you need to move into the root directory of th
 In the next step the user connects to the database via sqlplus or sqlCL.
 To ensure all tables and packages are installed into the right schema make sure to check the current user and switch schema if required.
 
-In order to use QUASTO in other schemas a public synonym is required on the type "qa_rule_t".
+In order to use QUASTO in other schemas a public synonym is required on the type "QA_RULE_T".
 The user has to create this outside of the regular QUASTO installation.
 Note: To drop a public synonym the user needs the drop any synonym grant!
 
@@ -86,7 +85,7 @@ Example:
 
 To uninstall the utPLSQL test and QUASTO objects, run the script uninstall.sql in the root directory of the repository.
 
-## 3.Using QUASTO
+## 3. Using QUASTO
 ### Define a rule
 For using QUASTO you have to define rules based on SQL queries which have to be saved inside the QA_RULES table.
 The query for every rule should name every object which does not match you quality standards.
@@ -350,7 +349,9 @@ sqlplus admin/admins_password@database @uninstall.sql ut3
    The create_ut_test_packages_pkg will be renamed to QA_UNIT_TESTS_PKG, and it will offer the option to create unit test packages per rule or as a single package containing all active rules per client/project name. Additionally, we want to enhanced the naming convention, including the schema name in the package names for more straightforward multiple schema management.
 
 #### 5. Changed/new Data types
-   The data type QA_RULE_T has been extended with a new attribute "object_details" to hold additional information about an object. This could include the line, position and function name where to find an invalid parameter name inside a package, for example.
+   The data type "QA_RULE_T" has been extended with a new attribute "object_details" to hold additional information about an object. This could include the line, position and function name where to find an invalid parameter name inside a package, for example. The data types "RUNNING_RULE_T" and "RUNNING_RULES_T" are used for internal processing during the execution of rule SQL statements.
+
+   In addition, the new types "QA_SCHEME_OBJECT_AMOUNT_T" and "QA_SCHEME_OBJECT_AMOUNTS_T" have been added which are used for calculating the number of invalid objects per scheme during the execution of Unit Tests.
 
 #### 6. Oracle APEX Application
    One major component of the next update will be an APEX application to add new rules or configure existing ones. In this app, the rule attributes can be entered via selection lists and text fields. Next to the existing DDL-based rules, we will also introduce the support for APEX based rules to check the integrety of APEX objects. Exported rules can be imported as JSON files which allows rules to be exchanged across multiple QUASTO instances.
