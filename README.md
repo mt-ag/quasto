@@ -334,46 +334,12 @@ sqlplus admin/admins_password@database @uninstall.sql ut3
 
 ## 5. Upcoming Features
 
-### Features of our new Version 23.2
-
-#### 1. Schema and Object Blacklisting:
-   We are implementing a schema and object based blacklisting. Those schmemes and objects are not checked when rules are executed. This can be beneficial for internal Oracle-owned resources.
-
-#### 2. Exclusion of objects which are not owned by a the testing schema
-   To avoid testing objects that are granted access by public synonyms or belong to other schemas, we are introducing a mechanism to exclude such objects from unit testing. This further refines your testing processes.
-
-#### 3. New table for Unit Test Results
-   In order to store unit test results, we are implementing a new table QA_TEST_RESULTS to hold this data to be further analzyed and processed. The results, which includes all invalid objects, is saved in a XML JUnit-compatible format.
-
-#### 4. Improved Unit Test Package Generation
-   The create_ut_test_packages_pkg will be renamed to QA_UNIT_TESTS_PKG, and it will offer the option to create unit test packages per rule or as a single package containing all active rules per client/project name. Additionally, we want to enhanced the naming convention, including the schema name in the package names for more straightforward multiple schema management.
-
-#### 5. Changed/new Data types
-   The data type "QA_RULE_T" has been extended with a new attribute "object_details" to hold additional information about an object. This could include the line, position and function name where to find an invalid parameter name inside a package, for example. The data types "RUNNING_RULE_T" and "RUNNING_RULES_T" are used for internal processing during the execution of rule SQL statements.
-
-   In addition, the new types "QA_SCHEME_OBJECT_AMOUNT_T" and "QA_SCHEME_OBJECT_AMOUNTS_T" have been added which are used for calculating the number of invalid objects per scheme during the execution of Unit Tests.
-
-#### 6. Oracle APEX Application
-   One major component of the next update will be an APEX application to add new rules or configure existing ones. In this app, the rule attributes can be entered via selection lists and text fields. Next to the existing DDL-based rules, we will also introduce the support for APEX based rules to check the integrety of APEX objects. Exported rules can be imported as JSON files which allows rules to be exchanged across multiple QUASTO instances.
-   
-   Furthermore, a dashboard page will be available, which provides a graphical overview of the ratio between successful and failed tests. Filtering by schema and execution date to display details of invalid objects will be possible.
-
-#### 7. Automated daily Unit Testing
-   We are planning to implement a new scheduler Job which runs all generated Unit tests of Rules on a daily basis. The results are saved in the table mentioned under point #3. This scheduler job can also me activated and deactivated via the APEX application.
-
-#### 8. Installation Process will be adapted to be able to upgrade from any released version to the latest one
-   The installation process will be adapted so that it will be possible to upgrade from any previous version to the latest release of QUASTO.
-
-#### 9. Version Naming has been changed to standard Oracle Format
-   The new Format for our upcoming and later releases will be changed to the standard that oracle uses for their relases as well.
-   The first part is always the year of release and the second part will be in our case the incremental number of an increnmental release cycle during the year.
-   In Our Case we already released a Version this year so we are jumping to the Version #23.2
-
-
-Beware that these features may be subject to change in the final release.
-The final release Notes will be released with the upcoming Version 23.2
+Get ready for an exciting update! We're thrilled to announce that Version 24.1 is on the horizon, bringing a wave of new and anticipated features. Stay tuned as we reveal the incredible enhancements coming your way very soon!
 
 ## 6. Latest Releases
+
+### Version 23.2
+[Release 23.3](https://github.com/mt-ag/quasto/releases/tag/v23.2)
 
 ### Version 1.1
 [Release 1.1](https://github.com/mt-ag/quasto/releases/tag/v1.1)
