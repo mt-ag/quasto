@@ -23,8 +23,8 @@ PROMPT src/plsql/typ/qa_scheme_object_amount_t.sql
 PROMPT src/plsql/typ/qa_scheme_object_amounts_t.sql
 @src/plsql/typ/qa_scheme_object_amounts_t.sql
 
-prompt recompile_quasto_objects.sql 
-@src/scripts/recompile_quasto_objects.sql
-
 PROMPT src/ddl/qa_rules_add_column_23_2.sql
 @src/ddl/qa_rules_add_column_23_2.sql
+
+prompt recompile_quasto_objects.sql 
+@src/scripts/recompile_quasto_objects.sql
