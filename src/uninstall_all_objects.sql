@@ -20,6 +20,8 @@ begin
   l_object_type('QA_RULES') := 'TABLE';
   l_object_name('QA_IMPORT_FILES') := 'QA_IMPORT_FILES';
   l_object_type('QA_IMPORT_FILES') := 'TABLE';
+  l_object_name('QA_TEST_RESULTS') := 'QA_TEST_RESULTS';
+  l_object_type('QA_TEST_RESULTS') := 'TABLE';
   
 
   -- packages

@@ -19,8 +19,31 @@ begin
   -- Views:
   l_object_name('QARU_SCHEME_NAMES_FOR_TESTING_V') := 'QARU_SCHEME_NAMES_FOR_TESTING_V';
   l_object_type('QARU_SCHEME_NAMES_FOR_TESTING_V') := 'VIEW';
+
+begin
+  if qa_constant_pkg.gc_apex_flag = 1
+    then
+      l_object_name('QARU_APEX_BLACKLISTED_APPS_V') := 'QARU_APEX_BLACKLISTED_APPS_V';
+      l_object_type('QARU_APEX_BLACKLISTED_APPS_V') := 'VIEW';
+  end if;
+end;
+/
+
   l_object_name('QARU_PREDECESSOR_ORDER_V') := 'QARU_PREDECESSOR_ORDER_V';
   l_object_type('QARU_PREDECESSOR_ORDER_V') := 'VIEW';
+
+  -- Types:
+  l_object_name('QA_RULE_T') := 'QA_RULE_T';
+  l_object_type('QA_RULE_T') := 'TYPE';
+  l_object_name('QA_RULES_T') := 'QA_RULES_T';
+  l_object_type('QA_RULES_T') := 'TYPE';
+  l_object_name('RUNNING_RULE_T') := 'RUNNING_RULE_T';
+  l_object_type('RUNNING_RULE_T') := 'TYPE';
+  l_object_name('RUNNING_RULES_T') := 'RUNNING_RULES_T';
+  l_object_type('RUNNING_RULES_T') := 'TYPE';
+
+  l_object_name('VARCHAR2_TAB_T') := 'VARCHAR2_TAB_T';
+  l_object_type('VARCHAR2_TAB_T') := 'TYPE';
   
   -- packages
   l_object_name('QA_CONSTANT_PKG') := 'QA_CONSTANT_PKG';

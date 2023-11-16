@@ -26,9 +26,6 @@ PROMPT CONSTRAINT
 PROMPT src/ddl/cons/qa_rules.sql
 @src/ddl/cons/qa_rules.sql
 
-PROMPT src/ddl/cons/qa_import_files.sql
-@src/ddl/cons/qa_import_files.sql
-
 PROMPT SEQUENCE
 PROMPT src/ddl/seq/qaru_seq.sql
 @src/ddl/seq/qaru_seq.sql
@@ -39,17 +36,8 @@ PROMPT TYPE
 PROMPT src/plsql/typ/varchar2_tab_t.sql
 @src/plsql/typ/varchar2_tab_t.sql
 
-
-PROMPT TYPE
-PROMPT src/plsql/typ/qa_scheme_object_amount_t.sql
-@src/plsql/typ/qa_scheme_object_amount_t.sql
-
-PROMPT src/plsql/typ/qa_scheme_object_amounts_t.sql
-@src/plsql/typ/qa_scheme_object_amounts_t.sql
-
 PROMPT src/plsql/typ/qa_rule_t.sql
 @src/plsql/typ/qa_rule_t.sql
-
 PROMPT src/plsql/typ/qa_rules_t.sql
 @src/plsql/typ/qa_rules_t.sql
 
@@ -59,7 +47,6 @@ PROMPT src/plsql/typ/running_rules_t.sql
 @src/plsql/typ/running_rules_t.sql
 
 PROMPT PACKAGE
-
 PROMPT src/plsql/pkg/qa_logger_pkg.sql
 @src/plsql/pkg/qa_logger_pkg.sql
 
