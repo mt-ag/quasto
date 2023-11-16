@@ -27,4 +27,4 @@ prompt recompile_quasto_objects.sql
 @src/scripts/recompile_quasto_objects.sql
 
 PROMPT src/ddl/qa_rules_add_column_23_2.sql
-@src/ddö/qa_rules_add_column_23_2.sql
+@src/ddl/qa_rules_add_column_23_2.sql
