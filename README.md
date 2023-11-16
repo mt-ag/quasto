@@ -81,6 +81,22 @@ Example:
 @install_utplsql_objects.sql 1 1 0 0
 ```
 
+### Upgrading from a prior Version to the latest
+In Order to Upgrade, the user has to follow the same steps like above.
+Just like installing the software for the first time we run:
+```
+@install [1/0] [1/0] [1/0] [1/0]
+```
+
+The script automatically detects if no Version is installed or one of the previous Versions (1.0,1.1) has been installed,
+and upgrades to the latest release.
+
+An alternative way to install the new release is to fully remove the old version and install the latest one.
+
+#Please be aware that this means that the qa_rules tables gets removed.#
+#This means that prior to the uninstall process you need to export or backup all your Rules and reimport them once the full installation process is finished.#
+
+
 ### Uninstalling utPLSQL and QUASTO objects
 
 To uninstall the utPLSQL test and QUASTO objects, run the script uninstall.sql in the root directory of the repository.
@@ -160,7 +176,7 @@ If one or more predecessors of one rule failed, the rule will not run. You have 
 
 With this option you have the ability to control, which rule will run under which circumstances. It can also protect you to get a big log of failures. For example, there could be a rule to check if APEX exists.
 
-All rules that belongs to an APEX scheme have this rule as predecessor. So if this first rule fails, no other APEX rule will run.
+All rules that belong to an APEX scheme have this rule as predecessor. So if this first rule fails, no other APEX rule will run.
 
 ### Export and Import Rules
 
