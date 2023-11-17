@@ -20,14 +20,11 @@ begin
   l_object_name('QARU_SCHEME_NAMES_FOR_TESTING_V') := 'QARU_SCHEME_NAMES_FOR_TESTING_V';
   l_object_type('QARU_SCHEME_NAMES_FOR_TESTING_V') := 'VIEW';
 
-begin
   if qa_constant_pkg.gc_apex_flag = 1
     then
       l_object_name('QARU_APEX_BLACKLISTED_APPS_V') := 'QARU_APEX_BLACKLISTED_APPS_V';
       l_object_type('QARU_APEX_BLACKLISTED_APPS_V') := 'VIEW';
   end if;
-end;
-/
 
   l_object_name('QARU_PREDECESSOR_ORDER_V') := 'QARU_PREDECESSOR_ORDER_V';
   l_object_type('QARU_PREDECESSOR_ORDER_V') := 'VIEW';
@@ -86,7 +83,7 @@ end;
     
     if l_count <> 0
       then
-        dbms_output.put_line('ERROR: The object ' || l_object_name(l_object) || l_object_type(l_object)  || 'is invalid');
+        dbms_output.put_line('ERROR: ' || l_object_type(l_object) || ' ' || l_object_name(l_object) || ' is invalid.');
     else
         dbms_output.put_line('INFO: ' || l_object_type(l_object) || ' ' || l_object_name(l_object) || ' recompiled.');
     end if;
@@ -96,7 +93,8 @@ end;
     exception
       when others
         then
-          dbms_output.put_line('ERROR: There are ' || l_count || 'Invalid Quasto objects ' || SQLERRM);
+          dbms_output.put_line('ERROR: There are ' || l_count || ' invalid QUASTO objects.');
+          dbms_output.put_line(SQLERRM);
           raise;
 end;
 /

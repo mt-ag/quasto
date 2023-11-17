@@ -55,7 +55,7 @@ begin
     
     if l_count <> 0
       then
-        dbms_output.put_line('ERROR: The object ' || l_object_name(l_object) || l_object_type(l_object)  || 'is invalid');
+        dbms_output.put_line('ERROR: The object ' || l_object_type(l_object) || ' ' || l_object_name(l_object) || ' is invalid.');
     else
         dbms_output.put_line('INFO: ' || l_object_type(l_object) || ' ' || l_object_name(l_object) || ' recompiled.');
     end if;
@@ -65,7 +65,8 @@ begin
     exception
       when others
         then
-          dbms_output.put_line('ERROR: There are ' || l_count || 'Invalid Utplsql objects ' || SQLERRM);
+          dbms_output.put_line('ERROR: There are ' || l_count || ' invalid utPLSQL objects.');
+          dbms_output.put_line(SQLERRM);
           raise;
 end;
 /

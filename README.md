@@ -8,9 +8,11 @@
 
 ## 1. What is QUASTO?
 A project for checking guidelines and code quality for inside the oracle database.
-The first version supports checks for your data model, PL/SQL code and data itself.
-Coming up releases will integrate utPLSQL and get an APEX Front-End.
-CI/CD support for jenkins/azure devops or gitlab/github are planned on the roadmap.
+The current version supports checks for your data model, PL/SQL code and data itself.
+It also provides utPLSQL tests to check your rules and an APEX Front-End.
+CI/CD support for jenkins/azure devops or gitlab/github are integrated.
+
+You need to have installed Oracle 19c or higher to be able to install and use QUASTO.
 
 Project uses the MIT License.
 

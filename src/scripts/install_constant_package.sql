@@ -57,9 +57,9 @@ end;';
 
     if l_count = 0
       then
-        dbms_output.put_line('ERROR: Cosntants_Package could not be created');
+        dbms_output.put_line('ERROR: qa_constant_pkg could not be created');
     else
-        dbms_output.put_line('INFO: Cosntants_Package was succesfully created');
+        dbms_output.put_line('INFO: qa_constant_pkg was succesfully created');
     end if;
   exception
     when others then

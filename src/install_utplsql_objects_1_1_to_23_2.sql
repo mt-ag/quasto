@@ -17,11 +17,6 @@ PROMPT src/ddl/cons/qa_test_results.sql
 PROMPT SEQUENCE
 PROMPT src/ddl/seq/qatr_seq.sql
 @src/ddl/seq/qatr_seq.sql
-PROMPT TYPE
-PROMPT src/plsql/typ/qa_scheme_object_amount_t.sql
-@src/plsql/typ/qa_scheme_object_amount_t.sql
-PROMPT src/plsql/typ/qa_scheme_object_amounts_t.sql
-@src/plsql/typ/qa_scheme_object_amounts_t.sql
 PROMPT PACKAGE
 @src/plsql/pkg/qa_unit_tests_pkg.sql
 PROMPT TRIGGER

@@ -46,15 +46,16 @@ PROMPT src/plsql/typ/running_rule_t.sql
 PROMPT src/plsql/typ/running_rules_t.sql
 @src/plsql/typ/running_rules_t.sql
 
-PROMPT PACKAGE
-PROMPT src/plsql/pkg/qa_logger_pkg.sql
-@src/plsql/pkg/qa_logger_pkg.sql
+PROMPT src/plsql/typ/qa_scheme_object_amount_t.sql
+@src/plsql/typ/qa_scheme_object_amount_t.sql
+PROMPT src/plsql/typ/qa_scheme_object_amounts_t.sql
+@src/plsql/typ/qa_scheme_object_amounts_t.sql
 
-PROMPT src/plsql/pkg/qa_main_pkg.sql
-@src/plsql/pkg/qa_main_pkg.sql
-
-PROMPT src/plsql/pkg/qa_api_pkg.sql
-@src/plsql/pkg/qa_api_pkg.sql
+PROMPT VIEWS
+PROMPT src/plsql/vw/qaru_predecessor_order_v.sql
+@src/plsql/vw/qaru_predecessor_order_v.sql
+PROMPT src/plsql/vw/qaru_scheme_names_for_testing_v.sql
+@src/plsql/vw/qaru_scheme_names_for_testing_v.sql
 
 PROMPT src/plsql/vw/qaru_apex_blacklisted_apps_v.sql
 declare
@@ -72,20 +73,22 @@ end;
 select :script_apex from dual;
 @@src/~script_name_apex
 
+PROMPT PACKAGE
+PROMPT src/plsql/pkg/qa_logger_pkg.sql
+@src/plsql/pkg/qa_logger_pkg.sql
+
+PROMPT src/plsql/pkg/qa_main_pkg.sql
+@src/plsql/pkg/qa_main_pkg.sql
+
+PROMPT src/plsql/pkg/qa_api_pkg.sql
+@src/plsql/pkg/qa_api_pkg.sql
+
 PROMPT src/plsql/pkg/qa_export_import_rules_pkg.sql
 @src/plsql/pkg/qa_export_import_rules_pkg.sql
-
-
 
 PROMPT TRIGGER
 PROMPT src/plsql/trg/qaru_iu_trg.sql
 @src/plsql/trg/qaru_iu_trg.sql
-
-PROMPT VIEWS
-PROMPT src/plsql/vw/qaru_predecessor_order_v.sql
-@src/plsql/vw/qaru_predecessor_order_v.sql
-PROMPT src/plsql/vw/qaru_scheme_names_for_testing_v.sql
-@src/plsql/vw/qaru_scheme_names_for_testing_v.sql
 
 PROMPT GRANT
 grant execute on qa_api_pkg to public;
