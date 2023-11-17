@@ -38,14 +38,7 @@ Note: To drop a public synonym the user needs the drop any synonym grant!
 ### Minimal user rights
 If you install QUASTO in a blank new scheme the user needs the following rights:
 ```
-grant create procedure to quasto;
-grant create public synonym to quasto;
-grant create sequence to quasto;
-grant create table to quasto;
-grant create trigger to quasto;
-grant create type to quasto;
-grant create view to quasto;
-grant create job to quasto;
+grant create procedure, public synonym, sequence, table, trigger, type, view, job to quasto;
 
 grant create session to quasto;
 ```
