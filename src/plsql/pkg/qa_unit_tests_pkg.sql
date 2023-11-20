@@ -389,7 +389,7 @@ create or replace package body qa_unit_tests_pkg is
 
         l_clob := l_clob || '    ut.expect(l_result).to_(equal(1));' || chr(10);
 
-        l_clob := l_clob || '    dbms_output.put_line(''<Results rulenumber="' || pi_qaru_rule_number || '" layer="' || pi_qaru_layer || '" result="''||l_result||''">'');' || chr(10);
+        l_clob := l_clob || '    dbms_output.put_line(''<Results rulenumber="' || DBMS_XMLGEN.CONVERT(pi_qaru_rule_number) || '" layer="' || DBMS_XMLGEN.CONVERT(pi_qaru_layer) || '" result="''||l_result||''">'');' || chr(10);
         l_clob := l_clob || '    for rec_scheme_objects in ( select scheme_name' || chr(10);
         l_clob := l_clob || '                                     , object_amount' || chr(10);
         l_clob := l_clob || '                                  from table(l_scheme_objects)' || chr(10);
@@ -397,9 +397,9 @@ create or replace package body qa_unit_tests_pkg is
 
         l_clob := l_clob || '    loop' || chr(10);
         l_clob := l_clob || '      if rec_scheme_objects.object_amount = 0 then' || chr(10);
-        l_clob := l_clob || '        dbms_output.put_line(''<Scheme name="''||rec_scheme_objects.scheme_name||''" result="1"></Scheme>'');' || chr(10);
+        l_clob := l_clob || '        dbms_output.put_line(''<Scheme name="''||DBMS_XMLGEN.CONVERT(rec_scheme_objects.scheme_name)||''" result="1"></Scheme>'');' || chr(10);
         l_clob := l_clob || '      else' || chr(10);
-        l_clob := l_clob || '        dbms_output.put_line(''<Scheme name="''||rec_scheme_objects.scheme_name||''" result="0">'');' || chr(10);
+        l_clob := l_clob || '        dbms_output.put_line(''<Scheme name="''||DBMS_XMLGEN.CONVERT(rec_scheme_objects.scheme_name)||''" result="0">'');' || chr(10);
         l_clob := l_clob || '        for rec_scheme_invalid_objects in ( select object_name' || chr(10);
         l_clob := l_clob || '                                                 , object_details' || chr(10);
         l_clob := l_clob || '                                                 , qaru_error_message' || chr(10);
@@ -407,7 +407,7 @@ create or replace package body qa_unit_tests_pkg is
         l_clob := l_clob || '                                             where scheme_name = rec_scheme_objects.scheme_name' || chr(10);
         l_clob := l_clob || '                                          )' || chr(10);
         l_clob := l_clob || '        loop' || chr(10);
-        l_clob := l_clob || '          dbms_output.put_line(''<Object name="''||rec_scheme_invalid_objects.object_name||''" details="''||rec_scheme_invalid_objects.object_details||''">''||rec_scheme_invalid_objects.qaru_error_message||''</Object>'');' || chr(10);
+        l_clob := l_clob || '          dbms_output.put_line(''<Object name="''||DBMS_XMLGEN.CONVERT(rec_scheme_invalid_objects.object_name)||''" details="''||DBMS_XMLGEN.CONVERT(rec_scheme_invalid_objects.object_details)||''">''||rec_scheme_invalid_objects.qaru_error_message||''</Object>'');' || chr(10);
         l_clob := l_clob || '        end loop;' || chr(10);
         l_clob := l_clob || '        dbms_output.put_line(''</Scheme>'');' || chr(10);
         l_clob := l_clob || '      end if;' || chr(10);
