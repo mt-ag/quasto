@@ -35,7 +35,7 @@ select * from
          , objects.objectdetails
          , objects.error_message
     from xml_result t
-         join XMLTABLE('/testsuites/testsuite/testsuite/testcase'
+         join XMLTABLE('/testsuites/testsuite/testsuite/testsuite/testsuite/testcase'
          PASSING XMLTYPE( t.xml_raw )
          COLUMNS
            quasto_test_name VARCHAR2(50) PATH '@name',

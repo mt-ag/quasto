@@ -23,7 +23,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'21'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20231025152413'
+,p_last_upd_yyyymmddhh24miss=>'20231120113758'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(54068725227447789)
@@ -58,7 +58,7 @@ wwv_flow_imp_page.create_page_plug(
 '         , objects.objectdetails',
 '         , objects.error_message',
 '    from xml_result t',
-'         join XMLTABLE(''/testsuites/testsuite/testsuite/testcase''',
+'         join XMLTABLE(''/testsuites/testsuite/testsuite/testsuite/testsuite/testcase''',
 '         PASSING XMLTYPE( t.xml_raw )',
 '         COLUMNS',
 '           quasto_test_name VARCHAR2(50) PATH ''@name'',',
@@ -258,7 +258,7 @@ wwv_flow_imp_page.create_interactive_grid(
 ,p_requires_filter=>false
 ,p_select_first_row=>true
 ,p_fixed_row_height=>true
-,p_pagination_type=>'SCROLL'
+,p_pagination_type=>'SET'
 ,p_show_total_row_count=>true
 ,p_show_toolbar=>true
 ,p_enable_save_public_report=>false
@@ -278,6 +278,7 @@ wwv_flow_imp_page.create_ig_report(
 ,p_static_id=>'204890'
 ,p_type=>'PRIMARY'
 ,p_default_view=>'GRID'
+,p_rows_per_page=>15
 ,p_show_row_number=>false
 ,p_settings_area_expanded=>true
 );

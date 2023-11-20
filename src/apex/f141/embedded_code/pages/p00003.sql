@@ -30,7 +30,7 @@ select system_error from
 (
     select testcases.system_error
     from xml_result t
-         join XMLTABLE('/testsuites/testsuite/testsuite/testcase'
+         join XMLTABLE('/testsuites/testsuite/testsuite/testsuite/testsuite/testcase'
          PASSING XMLTYPE( t.xml_raw )
          COLUMNS
            testcase_name VARCHAR2(4000) PATH '@name',

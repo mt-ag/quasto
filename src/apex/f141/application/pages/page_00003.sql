@@ -22,7 +22,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'17'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20230312132117'
+,p_last_upd_yyyymmddhh24miss=>'20231120113339'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(72887392674052001)
@@ -77,7 +77,7 @@ wwv_flow_imp_page.create_page_item(
 '(',
 '    select testcases.system_error',
 '    from xml_result t',
-'         join XMLTABLE(''/testsuites/testsuite/testsuite/testcase''',
+'         join XMLTABLE(''/testsuites/testsuite/testsuite/testsuite/testsuite/testcase''',
 '         PASSING XMLTYPE( t.xml_raw )',
 '         COLUMNS',
 '           testcase_name VARCHAR2(4000) PATH ''@name'',',
