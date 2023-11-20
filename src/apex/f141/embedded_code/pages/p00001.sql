@@ -64,7 +64,7 @@ select * from
          , qaru.qaru_comment
          , t.qatr_added_on
     from xml_result t
-         join XMLTABLE('/testsuites/testsuite/testsuite'
+         join XMLTABLE('/testsuites/testsuite/testsuite/testsuite/testsuite'
          PASSING XMLTYPE( t.xml_raw )
          COLUMNS
            quasto_test_suite VARCHAR2(50) PATH '@name',
@@ -125,7 +125,7 @@ select execution_date, testcase_status, status_amount, color_hex from
      ( select nvl(testcases.testcase_status, 'Success') as testcase_status
             , t.qatr_added_on as execution_date
      from xml_result t
-         join XMLTABLE('/testsuites/testsuite/testsuite/testcase'
+         join XMLTABLE('/testsuites/testsuite/testsuite/testsuite/testsuite/testcase'
          PASSING XMLTYPE( t.xml_raw )
          COLUMNS
            testcase_status VARCHAR2(4000) PATH '@status',
@@ -173,7 +173,7 @@ select execution_date, testcase_status, status_amount, color_hex from
      ( select nvl(testcases.testcase_status, 'Success') as testcase_status
             , t.qatr_added_on as execution_date
      from xml_result t
-         join XMLTABLE('/testsuites/testsuite/testsuite/testcase'
+         join XMLTABLE('/testsuites/testsuite/testsuite/testsuite/testsuite/testcase'
          PASSING XMLTYPE( t.xml_raw )
          COLUMNS
            testcase_status VARCHAR2(4000) PATH '@status',
@@ -221,7 +221,7 @@ select execution_date, testcase_status, status_amount, color_hex from
      ( select nvl(testcases.testcase_status, 'Success') as testcase_status
             , t.qatr_added_on as execution_date
      from xml_result t
-         join XMLTABLE('/testsuites/testsuite/testsuite/testcase'
+         join XMLTABLE('/testsuites/testsuite/testsuite/testsuite/testsuite/testcase'
          PASSING XMLTYPE( t.xml_raw )
          COLUMNS
            testcase_status VARCHAR2(4000) PATH '@status',
@@ -274,7 +274,7 @@ select testcase_status, status_amount, color_hex from
     from 
      ( select nvl(testcases.testcase_status, 'Success') as testcase_status
      from xml_result t
-         join XMLTABLE('/testsuites/testsuite/testsuite/testcase'
+         join XMLTABLE('/testsuites/testsuite/testsuite/testsuite/testsuite/testcase'
          PASSING XMLTYPE( t.xml_raw )
          COLUMNS
            testcase_status VARCHAR2(4000) PATH '@status',

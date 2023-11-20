@@ -21,7 +21,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'13'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20231025152612'
+,p_last_upd_yyyymmddhh24miss=>'20231120113205'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(53668689025955104)
@@ -99,7 +99,7 @@ wwv_flow_imp_page.create_page_plug(
 '         , qaru.qaru_comment',
 '         , t.qatr_added_on',
 '    from xml_result t',
-'         join XMLTABLE(''/testsuites/testsuite/testsuite''',
+'         join XMLTABLE(''/testsuites/testsuite/testsuite/testsuite/testsuite''',
 '         PASSING XMLTYPE( t.xml_raw )',
 '         COLUMNS',
 '           quasto_test_suite VARCHAR2(50) PATH ''@name'',',
@@ -761,7 +761,7 @@ wwv_flow_imp_page.create_jet_chart_series(
 '    from ',
 '     ( select nvl(testcases.testcase_status, ''Success'') as testcase_status',
 '     from xml_result t',
-'         join XMLTABLE(''/testsuites/testsuite/testsuite/testcase''',
+'         join XMLTABLE(''/testsuites/testsuite/testsuite/testsuite/testsuite/testcase''',
 '         PASSING XMLTYPE( t.xml_raw )',
 '         COLUMNS',
 '           testcase_status VARCHAR2(4000) PATH ''@status'',',
@@ -871,7 +871,7 @@ wwv_flow_imp_page.create_jet_chart_series(
 '     ( select nvl(testcases.testcase_status, ''Success'') as testcase_status',
 '            , t.qatr_added_on as execution_date',
 '     from xml_result t',
-'         join XMLTABLE(''/testsuites/testsuite/testsuite/testcase''',
+'         join XMLTABLE(''/testsuites/testsuite/testsuite/testsuite/testsuite/testcase''',
 '         PASSING XMLTYPE( t.xml_raw )',
 '         COLUMNS',
 '           testcase_status VARCHAR2(4000) PATH ''@status'',',
@@ -934,7 +934,7 @@ wwv_flow_imp_page.create_jet_chart_series(
 '     ( select nvl(testcases.testcase_status, ''Success'') as testcase_status',
 '            , t.qatr_added_on as execution_date',
 '     from xml_result t',
-'         join XMLTABLE(''/testsuites/testsuite/testsuite/testcase''',
+'         join XMLTABLE(''/testsuites/testsuite/testsuite/testsuite/testsuite/testcase''',
 '         PASSING XMLTYPE( t.xml_raw )',
 '         COLUMNS',
 '           testcase_status VARCHAR2(4000) PATH ''@status'',',
@@ -997,7 +997,7 @@ wwv_flow_imp_page.create_jet_chart_series(
 '     ( select nvl(testcases.testcase_status, ''Success'') as testcase_status',
 '            , t.qatr_added_on as execution_date',
 '     from xml_result t',
-'         join XMLTABLE(''/testsuites/testsuite/testsuite/testcase''',
+'         join XMLTABLE(''/testsuites/testsuite/testsuite/testsuite/testsuite/testcase''',
 '         PASSING XMLTYPE( t.xml_raw )',
 '         COLUMNS',
 '           testcase_status VARCHAR2(4000) PATH ''@status'',',
