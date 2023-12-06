@@ -19,9 +19,9 @@ wwv_flow_imp_page.create_page(
 ,p_autocomplete_on_off=>'OFF'
 ,p_page_template_options=>'#DEFAULT#'
 ,p_protection_level=>'C'
-,p_page_component_map=>'21'
-,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20231025134152'
+,p_page_component_map=>'18'
+,p_last_updated_by=>'SBOZOK'
+,p_last_upd_yyyymmddhh24miss=>'20231128100610'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(54073327692447835)
@@ -39,7 +39,6 @@ wwv_flow_imp_page.create_page_plug(
 ,p_plug_name=>'Rules Report'
 ,p_parent_plug_id=>wwv_flow_imp.id(54073327692447835)
 ,p_region_template_options=>'#DEFAULT#'
-,p_component_template_options=>'#DEFAULT#'
 ,p_plug_template=>wwv_flow_imp.id(50728801114675111)
 ,p_plug_display_sequence=>20
 ,p_query_type=>'SQL'
@@ -59,7 +58,7 @@ wwv_flow_imp_page.create_page_plug(
 'QARU_UPDATED_ON,',
 'QARU_UPDATED_BY',
 'from QA_RULES'))
-,p_plug_source_type=>'NATIVE_IG'
+,p_plug_source_type=>'NATIVE_IR'
 ,p_plug_query_options=>'DERIVED_REPORT_COLUMNS'
 ,p_prn_content_disposition=>'ATTACHMENT'
 ,p_prn_units=>'INCHES'
@@ -91,620 +90,163 @@ wwv_flow_imp_page.create_page_plug(
 ,p_prn_page_footer_alignment=>'CENTER'
 ,p_prn_border_color=>'#666666'
 );
-wwv_flow_imp_page.create_region_column(
- p_id=>wwv_flow_imp.id(54071490604447816)
-,p_name=>'QARU_ID'
-,p_source_type=>'DB_COLUMN'
-,p_source_expression=>'QARU_ID'
-,p_data_type=>'NUMBER'
-,p_session_state_data_type=>'VARCHAR2'
-,p_is_query_only=>false
-,p_item_type=>'NATIVE_HIDDEN'
-,p_display_sequence=>30
-,p_attribute_01=>'Y'
-,p_use_as_row_header=>false
-,p_enable_sort_group=>false
-,p_is_primary_key=>false
-,p_duplicate_value=>true
-,p_include_in_export=>false
-);
-wwv_flow_imp_page.create_region_column(
- p_id=>wwv_flow_imp.id(54071538591447817)
-,p_name=>'QARU_RULE_NUMBER'
-,p_source_type=>'DB_COLUMN'
-,p_source_expression=>'QARU_RULE_NUMBER'
-,p_data_type=>'VARCHAR2'
-,p_session_state_data_type=>'VARCHAR2'
-,p_is_query_only=>false
-,p_item_type=>'NATIVE_TEXT_FIELD'
-,p_heading=>'Rule Number'
-,p_heading_alignment=>'LEFT'
-,p_display_sequence=>40
-,p_value_alignment=>'LEFT'
-,p_attribute_05=>'BOTH'
-,p_is_required=>true
-,p_max_length=>80
-,p_enable_filter=>true
-,p_filter_operators=>'C:S:CASE_INSENSITIVE:REGEXP'
-,p_filter_is_required=>false
-,p_filter_text_case=>'MIXED'
-,p_filter_exact_match=>true
-,p_filter_lov_type=>'DISTINCT'
-,p_use_as_row_header=>false
-,p_enable_sort_group=>true
-,p_enable_control_break=>true
-,p_enable_hide=>true
-,p_is_primary_key=>false
-,p_duplicate_value=>true
-,p_include_in_export=>true
-);
-wwv_flow_imp_page.create_region_column(
- p_id=>wwv_flow_imp.id(54071715709447818)
-,p_name=>'QARU_CLIENT_NAME'
-,p_source_type=>'DB_COLUMN'
-,p_source_expression=>'QARU_CLIENT_NAME'
-,p_data_type=>'VARCHAR2'
-,p_session_state_data_type=>'VARCHAR2'
-,p_is_query_only=>false
-,p_item_type=>'NATIVE_TEXTAREA'
-,p_heading=>'Client Name'
-,p_heading_alignment=>'LEFT'
-,p_display_sequence=>50
-,p_value_alignment=>'LEFT'
-,p_attribute_01=>'Y'
-,p_attribute_02=>'N'
-,p_attribute_03=>'N'
-,p_attribute_04=>'BOTH'
-,p_is_required=>true
-,p_max_length=>400
-,p_enable_filter=>true
-,p_filter_operators=>'C:S:CASE_INSENSITIVE:REGEXP'
-,p_filter_is_required=>false
-,p_filter_text_case=>'MIXED'
-,p_filter_lov_type=>'NONE'
-,p_use_as_row_header=>false
-,p_enable_sort_group=>true
-,p_enable_control_break=>true
-,p_enable_hide=>true
-,p_is_primary_key=>false
-,p_duplicate_value=>true
-,p_include_in_export=>true
-);
-wwv_flow_imp_page.create_region_column(
- p_id=>wwv_flow_imp.id(54071765016447819)
-,p_name=>'QARU_NAME'
-,p_source_type=>'DB_COLUMN'
-,p_source_expression=>'QARU_NAME'
-,p_data_type=>'VARCHAR2'
-,p_session_state_data_type=>'VARCHAR2'
-,p_is_query_only=>false
-,p_item_type=>'NATIVE_TEXTAREA'
-,p_heading=>'Name'
-,p_heading_alignment=>'LEFT'
-,p_display_sequence=>60
-,p_value_alignment=>'LEFT'
-,p_attribute_01=>'Y'
-,p_attribute_02=>'N'
-,p_attribute_03=>'N'
-,p_attribute_04=>'BOTH'
-,p_is_required=>true
-,p_max_length=>400
-,p_enable_filter=>true
-,p_filter_operators=>'C:S:CASE_INSENSITIVE:REGEXP'
-,p_filter_is_required=>false
-,p_filter_text_case=>'MIXED'
-,p_filter_lov_type=>'NONE'
-,p_use_as_row_header=>false
-,p_enable_sort_group=>false
-,p_enable_hide=>true
-,p_is_primary_key=>false
-,p_duplicate_value=>true
-,p_include_in_export=>true
-);
-wwv_flow_imp_page.create_region_column(
- p_id=>wwv_flow_imp.id(54071890651447820)
-,p_name=>'QARU_CATEGORY'
-,p_source_type=>'DB_COLUMN'
-,p_source_expression=>'QARU_CATEGORY'
-,p_data_type=>'VARCHAR2'
-,p_session_state_data_type=>'VARCHAR2'
-,p_is_query_only=>false
-,p_item_type=>'NATIVE_TEXTAREA'
-,p_heading=>'Category'
-,p_heading_alignment=>'LEFT'
-,p_display_sequence=>70
-,p_value_alignment=>'LEFT'
-,p_attribute_01=>'Y'
-,p_attribute_02=>'N'
-,p_attribute_03=>'N'
-,p_attribute_04=>'BOTH'
-,p_is_required=>true
-,p_max_length=>400
-,p_enable_filter=>true
-,p_filter_operators=>'C:S:CASE_INSENSITIVE:REGEXP'
-,p_filter_is_required=>false
-,p_filter_text_case=>'MIXED'
-,p_filter_lov_type=>'NONE'
-,p_use_as_row_header=>false
-,p_enable_sort_group=>false
-,p_enable_hide=>true
-,p_is_primary_key=>false
-,p_duplicate_value=>true
-,p_include_in_export=>true
-);
-wwv_flow_imp_page.create_region_column(
- p_id=>wwv_flow_imp.id(54072082680447822)
-,p_name=>'QARU_ERROR_MESSAGE'
-,p_source_type=>'DB_COLUMN'
-,p_source_expression=>'QARU_ERROR_MESSAGE'
-,p_data_type=>'VARCHAR2'
-,p_session_state_data_type=>'VARCHAR2'
-,p_is_query_only=>false
-,p_item_type=>'NATIVE_TEXTAREA'
-,p_heading=>'Error Message'
-,p_heading_alignment=>'LEFT'
-,p_display_sequence=>80
-,p_value_alignment=>'LEFT'
-,p_attribute_01=>'Y'
-,p_attribute_02=>'N'
-,p_attribute_03=>'N'
-,p_attribute_04=>'BOTH'
-,p_is_required=>true
-,p_max_length=>4000
-,p_enable_filter=>true
-,p_filter_operators=>'C:S:CASE_INSENSITIVE:REGEXP'
-,p_filter_is_required=>false
-,p_filter_text_case=>'MIXED'
-,p_filter_lov_type=>'NONE'
-,p_use_as_row_header=>false
-,p_enable_sort_group=>false
-,p_enable_hide=>true
-,p_is_primary_key=>false
-,p_duplicate_value=>true
-,p_include_in_export=>true
-);
-wwv_flow_imp_page.create_region_column(
- p_id=>wwv_flow_imp.id(54072161938447823)
-,p_name=>'QARU_COMMENT'
-,p_source_type=>'DB_COLUMN'
-,p_source_expression=>'QARU_COMMENT'
-,p_data_type=>'VARCHAR2'
-,p_session_state_data_type=>'VARCHAR2'
-,p_is_query_only=>false
-,p_item_type=>'NATIVE_TEXTAREA'
-,p_heading=>'Comment'
-,p_heading_alignment=>'LEFT'
-,p_display_sequence=>90
-,p_value_alignment=>'LEFT'
-,p_attribute_01=>'Y'
-,p_attribute_02=>'N'
-,p_attribute_03=>'N'
-,p_attribute_04=>'BOTH'
-,p_is_required=>false
-,p_max_length=>4000
-,p_enable_filter=>true
-,p_filter_operators=>'C:S:CASE_INSENSITIVE:REGEXP'
-,p_filter_is_required=>false
-,p_filter_text_case=>'MIXED'
-,p_filter_lov_type=>'NONE'
-,p_use_as_row_header=>false
-,p_enable_sort_group=>false
-,p_enable_hide=>true
-,p_is_primary_key=>false
-,p_duplicate_value=>true
-,p_include_in_export=>true
-);
-wwv_flow_imp_page.create_region_column(
- p_id=>wwv_flow_imp.id(54072321560447825)
-,p_name=>'QARU_ERROR_LEVEL'
-,p_source_type=>'DB_COLUMN'
-,p_source_expression=>'QARU_ERROR_LEVEL'
-,p_data_type=>'NUMBER'
-,p_session_state_data_type=>'VARCHAR2'
-,p_is_query_only=>false
-,p_item_type=>'NATIVE_POPUP_LOV'
-,p_heading=>'Error Level'
-,p_heading_alignment=>'LEFT'
-,p_display_sequence=>100
-,p_value_alignment=>'LEFT'
-,p_attribute_01=>'POPUP'
-,p_attribute_02=>'FIRST_ROWSET'
-,p_attribute_03=>'N'
-,p_attribute_04=>'N'
-,p_attribute_05=>'N'
-,p_is_required=>true
-,p_lov_type=>'SHARED'
-,p_lov_id=>wwv_flow_imp.id(54240337370100757)
-,p_lov_display_extra=>false
-,p_lov_display_null=>false
-,p_enable_filter=>true
-,p_filter_operators=>'C:S:CASE_INSENSITIVE:REGEXP'
-,p_filter_is_required=>false
-,p_filter_text_case=>'MIXED'
-,p_filter_exact_match=>true
-,p_filter_lov_type=>'LOV'
-,p_use_as_row_header=>false
-,p_enable_sort_group=>true
-,p_enable_control_break=>true
-,p_enable_hide=>true
-,p_is_primary_key=>false
-,p_duplicate_value=>true
-,p_include_in_export=>true
-);
-wwv_flow_imp_page.create_region_column(
- p_id=>wwv_flow_imp.id(54072433772447826)
-,p_name=>'QARU_IS_ACTIVE'
-,p_source_type=>'DB_COLUMN'
-,p_source_expression=>'QARU_IS_ACTIVE'
-,p_data_type=>'NUMBER'
-,p_session_state_data_type=>'VARCHAR2'
-,p_is_query_only=>false
-,p_item_type=>'NATIVE_POPUP_LOV'
-,p_heading=>'Active'
-,p_heading_alignment=>'LEFT'
-,p_display_sequence=>110
-,p_value_alignment=>'LEFT'
-,p_attribute_01=>'POPUP'
-,p_attribute_02=>'FIRST_ROWSET'
-,p_attribute_03=>'N'
-,p_attribute_04=>'N'
-,p_attribute_05=>'N'
-,p_is_required=>true
-,p_lov_type=>'SHARED'
-,p_lov_id=>wwv_flow_imp.id(54239364838095093)
-,p_lov_display_extra=>false
-,p_lov_display_null=>false
-,p_enable_filter=>true
-,p_filter_operators=>'C:S:CASE_INSENSITIVE:REGEXP'
-,p_filter_is_required=>false
-,p_filter_text_case=>'MIXED'
-,p_filter_exact_match=>true
-,p_filter_lov_type=>'LOV'
-,p_use_as_row_header=>false
-,p_enable_sort_group=>true
-,p_enable_control_break=>true
-,p_enable_hide=>true
-,p_is_primary_key=>false
-,p_duplicate_value=>true
-,p_include_in_export=>true
-);
-wwv_flow_imp_page.create_region_column(
- p_id=>wwv_flow_imp.id(54072804689447829)
-,p_name=>'QARU_LAYER'
-,p_source_type=>'DB_COLUMN'
-,p_source_expression=>'QARU_LAYER'
-,p_data_type=>'VARCHAR2'
-,p_session_state_data_type=>'VARCHAR2'
-,p_is_query_only=>false
-,p_item_type=>'NATIVE_TEXTAREA'
-,p_heading=>'Layer'
-,p_heading_alignment=>'LEFT'
-,p_display_sequence=>120
-,p_value_alignment=>'LEFT'
-,p_attribute_01=>'Y'
-,p_attribute_02=>'N'
-,p_attribute_03=>'N'
-,p_attribute_04=>'BOTH'
-,p_is_required=>true
-,p_max_length=>400
-,p_enable_filter=>true
-,p_filter_operators=>'C:S:CASE_INSENSITIVE:REGEXP'
-,p_filter_is_required=>false
-,p_filter_text_case=>'MIXED'
-,p_filter_lov_type=>'NONE'
-,p_use_as_row_header=>false
-,p_enable_sort_group=>false
-,p_enable_hide=>true
-,p_is_primary_key=>false
-,p_duplicate_value=>true
-,p_include_in_export=>true
-);
-wwv_flow_imp_page.create_region_column(
- p_id=>wwv_flow_imp.id(54072834662447830)
-,p_name=>'QARU_CREATED_ON'
-,p_source_type=>'DB_COLUMN'
-,p_source_expression=>'QARU_CREATED_ON'
-,p_data_type=>'DATE'
-,p_session_state_data_type=>'VARCHAR2'
-,p_is_query_only=>false
-,p_item_type=>'NATIVE_DATE_PICKER_APEX'
-,p_heading=>'Created On'
-,p_heading_alignment=>'CENTER'
-,p_display_sequence=>130
-,p_value_alignment=>'CENTER'
-,p_attribute_01=>'N'
-,p_attribute_02=>'POPUP'
-,p_attribute_03=>'NONE'
-,p_attribute_06=>'NONE'
-,p_attribute_09=>'N'
-,p_attribute_11=>'Y'
-,p_is_required=>true
-,p_enable_filter=>true
-,p_filter_is_required=>false
-,p_filter_date_ranges=>'ALL'
-,p_filter_lov_type=>'DISTINCT'
-,p_use_as_row_header=>false
-,p_enable_sort_group=>true
-,p_enable_control_break=>true
-,p_enable_hide=>true
-,p_is_primary_key=>false
-,p_duplicate_value=>true
-,p_include_in_export=>true
-);
-wwv_flow_imp_page.create_region_column(
- p_id=>wwv_flow_imp.id(54072926017447831)
-,p_name=>'QARU_CREATED_BY'
-,p_source_type=>'DB_COLUMN'
-,p_source_expression=>'QARU_CREATED_BY'
-,p_data_type=>'VARCHAR2'
-,p_session_state_data_type=>'VARCHAR2'
-,p_is_query_only=>false
-,p_item_type=>'NATIVE_TEXTAREA'
-,p_heading=>'Created By'
-,p_heading_alignment=>'LEFT'
-,p_display_sequence=>140
-,p_value_alignment=>'LEFT'
-,p_attribute_01=>'Y'
-,p_attribute_02=>'N'
-,p_attribute_03=>'N'
-,p_attribute_04=>'BOTH'
-,p_is_required=>true
-,p_max_length=>1020
-,p_enable_filter=>true
-,p_filter_operators=>'C:S:CASE_INSENSITIVE:REGEXP'
-,p_filter_is_required=>false
-,p_filter_text_case=>'MIXED'
-,p_filter_lov_type=>'NONE'
-,p_use_as_row_header=>false
-,p_enable_sort_group=>false
-,p_enable_hide=>true
-,p_is_primary_key=>false
-,p_duplicate_value=>true
-,p_include_in_export=>true
-);
-wwv_flow_imp_page.create_region_column(
- p_id=>wwv_flow_imp.id(54073073696447832)
-,p_name=>'QARU_UPDATED_ON'
-,p_source_type=>'DB_COLUMN'
-,p_source_expression=>'QARU_UPDATED_ON'
-,p_data_type=>'DATE'
-,p_session_state_data_type=>'VARCHAR2'
-,p_is_query_only=>false
-,p_item_type=>'NATIVE_DATE_PICKER_APEX'
-,p_heading=>'Updated On'
-,p_heading_alignment=>'CENTER'
-,p_display_sequence=>150
-,p_value_alignment=>'CENTER'
-,p_attribute_01=>'N'
-,p_attribute_02=>'POPUP'
-,p_attribute_03=>'NONE'
-,p_attribute_06=>'NONE'
-,p_attribute_09=>'N'
-,p_attribute_11=>'Y'
-,p_is_required=>true
-,p_enable_filter=>true
-,p_filter_is_required=>false
-,p_filter_date_ranges=>'ALL'
-,p_filter_lov_type=>'DISTINCT'
-,p_use_as_row_header=>false
-,p_enable_sort_group=>true
-,p_enable_control_break=>true
-,p_enable_hide=>true
-,p_is_primary_key=>false
-,p_duplicate_value=>true
-,p_include_in_export=>true
-);
-wwv_flow_imp_page.create_region_column(
- p_id=>wwv_flow_imp.id(54073206868447833)
-,p_name=>'QARU_UPDATED_BY'
-,p_source_type=>'DB_COLUMN'
-,p_source_expression=>'QARU_UPDATED_BY'
-,p_data_type=>'VARCHAR2'
-,p_session_state_data_type=>'VARCHAR2'
-,p_is_query_only=>false
-,p_item_type=>'NATIVE_TEXTAREA'
-,p_heading=>'Updated By'
-,p_heading_alignment=>'LEFT'
-,p_display_sequence=>160
-,p_value_alignment=>'LEFT'
-,p_attribute_01=>'Y'
-,p_attribute_02=>'N'
-,p_attribute_03=>'N'
-,p_attribute_04=>'BOTH'
-,p_is_required=>true
-,p_max_length=>1020
-,p_enable_filter=>true
-,p_filter_operators=>'C:S:CASE_INSENSITIVE:REGEXP'
-,p_filter_is_required=>false
-,p_filter_text_case=>'MIXED'
-,p_filter_lov_type=>'NONE'
-,p_use_as_row_header=>false
-,p_enable_sort_group=>false
-,p_enable_hide=>true
-,p_is_primary_key=>false
-,p_duplicate_value=>true
-,p_include_in_export=>true
-);
-wwv_flow_imp_page.create_region_column(
- p_id=>wwv_flow_imp.id(54280611233258499)
-,p_name=>'EDIT_RULE'
-,p_source_type=>'NONE'
-,p_session_state_data_type=>'VARCHAR2'
-,p_item_type=>'NATIVE_LINK'
-,p_heading=>'Edit'
-,p_heading_alignment=>'CENTER'
-,p_display_sequence=>20
-,p_value_alignment=>'CENTER'
-,p_link_target=>'f?p=&APP_ID.:7:&SESSION.::&DEBUG.:7:P7_QARU_ID:&QARU_ID.'
-,p_link_text=>'<img src="#IMAGE_PREFIX#app_ui/img/icons/apex-edit-pencil.png" class="apex-edit-pencil" alt="">'
-,p_use_as_row_header=>false
-,p_enable_hide=>true
-,p_escape_on_http_output=>true
-);
-wwv_flow_imp_page.create_interactive_grid(
- p_id=>wwv_flow_imp.id(54071418807447815)
-,p_internal_uid=>20409097872146628
-,p_is_editable=>false
+wwv_flow_imp_page.create_worksheet(
+ p_id=>wwv_flow_imp.id(42907229798653329)
+,p_max_row_count=>'1000000'
+,p_pagination_type=>'ROWS_X_TO_Y'
+,p_pagination_display_pos=>'BOTTOM_RIGHT'
+,p_report_list_mode=>'TABS'
 ,p_lazy_loading=>false
-,p_requires_filter=>false
-,p_select_first_row=>true
-,p_fixed_row_height=>true
-,p_pagination_type=>'SCROLL'
-,p_show_total_row_count=>true
-,p_show_toolbar=>true
-,p_enable_save_public_report=>false
-,p_enable_subscriptions=>true
-,p_enable_flashback=>true
-,p_define_chart_view=>true
-,p_enable_download=>true
+,p_show_detail_link=>'C'
+,p_show_notify=>'Y'
 ,p_download_formats=>'CSV:HTML:XLSX:PDF'
-,p_enable_mail_download=>true
-,p_fixed_header=>'PAGE'
-,p_show_icon_view=>false
-,p_show_detail_view=>false
+,p_enable_mail_download=>'Y'
+,p_detail_link=>'f?p=&APP_ID.:7:&SESSION.::&DEBUG.::P7_QARU_ID:#QARU_ID#'
+,p_detail_link_text=>'<img src="#APEX_FILES#app_ui/img/icons/apex-edit-pencil.png" class="apex-edit-pencil" alt="">'
+,p_owner=>'SBOZOK'
+,p_internal_uid=>42907229798653329
 );
-wwv_flow_imp_page.create_ig_report(
- p_id=>wwv_flow_imp.id(54190397671063396)
-,p_interactive_grid_id=>wwv_flow_imp.id(54071418807447815)
-,p_static_id=>'205281'
-,p_type=>'PRIMARY'
-,p_default_view=>'GRID'
-,p_show_row_number=>false
-,p_settings_area_expanded=>false
+wwv_flow_imp_page.create_worksheet_column(
+ p_id=>wwv_flow_imp.id(42907305389653330)
+,p_db_column_name=>'QARU_ID'
+,p_display_order=>10
+,p_column_identifier=>'A'
+,p_column_label=>'Qaru Id'
+,p_column_type=>'NUMBER'
+,p_column_alignment=>'RIGHT'
+,p_use_as_row_header=>'N'
 );
-wwv_flow_imp_page.create_ig_report_view(
- p_id=>wwv_flow_imp.id(54190565301063396)
-,p_report_id=>wwv_flow_imp.id(54190397671063396)
-,p_view_type=>'GRID'
-,p_stretch_columns=>true
-,p_srv_exclude_null_values=>false
-,p_srv_only_display_columns=>true
-,p_edit_mode=>false
+wwv_flow_imp_page.create_worksheet_column(
+ p_id=>wwv_flow_imp.id(42907482835653331)
+,p_db_column_name=>'QARU_RULE_NUMBER'
+,p_display_order=>20
+,p_column_identifier=>'B'
+,p_column_label=>'Qaru Rule Number'
+,p_column_type=>'STRING'
+,p_use_as_row_header=>'N'
 );
-wwv_flow_imp_page.create_ig_report_column(
- p_id=>wwv_flow_imp.id(54191061971063398)
-,p_view_id=>wwv_flow_imp.id(54190565301063396)
-,p_display_seq=>1
-,p_column_id=>wwv_flow_imp.id(54071490604447816)
-,p_is_visible=>true
-,p_is_frozen=>false
+wwv_flow_imp_page.create_worksheet_column(
+ p_id=>wwv_flow_imp.id(42907589746653332)
+,p_db_column_name=>'QARU_CLIENT_NAME'
+,p_display_order=>30
+,p_column_identifier=>'C'
+,p_column_label=>'Qaru Client Name'
+,p_column_type=>'STRING'
+,p_use_as_row_header=>'N'
 );
-wwv_flow_imp_page.create_ig_report_column(
- p_id=>wwv_flow_imp.id(54192006289063401)
-,p_view_id=>wwv_flow_imp.id(54190565301063396)
-,p_display_seq=>4
-,p_column_id=>wwv_flow_imp.id(54071538591447817)
-,p_is_visible=>true
-,p_is_frozen=>false
+wwv_flow_imp_page.create_worksheet_column(
+ p_id=>wwv_flow_imp.id(42907646606653333)
+,p_db_column_name=>'QARU_NAME'
+,p_display_order=>40
+,p_column_identifier=>'D'
+,p_column_label=>'Qaru Name'
+,p_column_type=>'STRING'
+,p_use_as_row_header=>'N'
 );
-wwv_flow_imp_page.create_ig_report_column(
- p_id=>wwv_flow_imp.id(54192896687063404)
-,p_view_id=>wwv_flow_imp.id(54190565301063396)
-,p_display_seq=>3
-,p_column_id=>wwv_flow_imp.id(54071715709447818)
-,p_is_visible=>false
-,p_is_frozen=>false
-,p_break_order=>5
-,p_break_is_enabled=>true
-,p_break_sort_direction=>'ASC'
-,p_break_sort_nulls=>'LAST'
+wwv_flow_imp_page.create_worksheet_column(
+ p_id=>wwv_flow_imp.id(42907717940653334)
+,p_db_column_name=>'QARU_CATEGORY'
+,p_display_order=>50
+,p_column_identifier=>'E'
+,p_column_label=>'Qaru Category'
+,p_column_type=>'STRING'
+,p_use_as_row_header=>'N'
 );
-wwv_flow_imp_page.create_ig_report_column(
- p_id=>wwv_flow_imp.id(54193808968063407)
-,p_view_id=>wwv_flow_imp.id(54190565301063396)
-,p_display_seq=>5
-,p_column_id=>wwv_flow_imp.id(54071765016447819)
-,p_is_visible=>true
-,p_is_frozen=>false
+wwv_flow_imp_page.create_worksheet_column(
+ p_id=>wwv_flow_imp.id(42907867360653335)
+,p_db_column_name=>'QARU_ERROR_MESSAGE'
+,p_display_order=>60
+,p_column_identifier=>'F'
+,p_column_label=>'Qaru Error Message'
+,p_column_type=>'STRING'
+,p_use_as_row_header=>'N'
 );
-wwv_flow_imp_page.create_ig_report_column(
- p_id=>wwv_flow_imp.id(54194630190063410)
-,p_view_id=>wwv_flow_imp.id(54190565301063396)
-,p_display_seq=>7
-,p_column_id=>wwv_flow_imp.id(54071890651447820)
-,p_is_visible=>true
-,p_is_frozen=>false
+wwv_flow_imp_page.create_worksheet_column(
+ p_id=>wwv_flow_imp.id(42907956662653336)
+,p_db_column_name=>'QARU_COMMENT'
+,p_display_order=>70
+,p_column_identifier=>'G'
+,p_column_label=>'Qaru Comment'
+,p_column_type=>'STRING'
+,p_use_as_row_header=>'N'
 );
-wwv_flow_imp_page.create_ig_report_column(
- p_id=>wwv_flow_imp.id(54196427083063417)
-,p_view_id=>wwv_flow_imp.id(54190565301063396)
-,p_display_seq=>8
-,p_column_id=>wwv_flow_imp.id(54072082680447822)
-,p_is_visible=>true
-,p_is_frozen=>false
+wwv_flow_imp_page.create_worksheet_column(
+ p_id=>wwv_flow_imp.id(42908070995653337)
+,p_db_column_name=>'QARU_ERROR_LEVEL'
+,p_display_order=>80
+,p_column_identifier=>'H'
+,p_column_label=>'Qaru Error Level'
+,p_column_type=>'NUMBER'
+,p_column_alignment=>'RIGHT'
+,p_use_as_row_header=>'N'
 );
-wwv_flow_imp_page.create_ig_report_column(
- p_id=>wwv_flow_imp.id(54197364793063420)
-,p_view_id=>wwv_flow_imp.id(54190565301063396)
-,p_display_seq=>6
-,p_column_id=>wwv_flow_imp.id(54072161938447823)
-,p_is_visible=>true
-,p_is_frozen=>false
+wwv_flow_imp_page.create_worksheet_column(
+ p_id=>wwv_flow_imp.id(42908115635653338)
+,p_db_column_name=>'QARU_IS_ACTIVE'
+,p_display_order=>90
+,p_column_identifier=>'I'
+,p_column_label=>'Qaru Is Active'
+,p_column_type=>'NUMBER'
+,p_column_alignment=>'RIGHT'
+,p_use_as_row_header=>'N'
 );
-wwv_flow_imp_page.create_ig_report_column(
- p_id=>wwv_flow_imp.id(54199167178063426)
-,p_view_id=>wwv_flow_imp.id(54190565301063396)
-,p_display_seq=>9
-,p_column_id=>wwv_flow_imp.id(54072321560447825)
-,p_is_visible=>true
-,p_is_frozen=>false
+wwv_flow_imp_page.create_worksheet_column(
+ p_id=>wwv_flow_imp.id(42908299771653339)
+,p_db_column_name=>'QARU_LAYER'
+,p_display_order=>100
+,p_column_identifier=>'J'
+,p_column_label=>'Qaru Layer'
+,p_column_type=>'STRING'
+,p_use_as_row_header=>'N'
 );
-wwv_flow_imp_page.create_ig_report_column(
- p_id=>wwv_flow_imp.id(54200101238063428)
-,p_view_id=>wwv_flow_imp.id(54190565301063396)
-,p_display_seq=>10
-,p_column_id=>wwv_flow_imp.id(54072433772447826)
-,p_is_visible=>true
-,p_is_frozen=>false
+wwv_flow_imp_page.create_worksheet_column(
+ p_id=>wwv_flow_imp.id(42908374280653340)
+,p_db_column_name=>'QARU_CREATED_ON'
+,p_display_order=>110
+,p_column_identifier=>'K'
+,p_column_label=>'Qaru Created On'
+,p_column_type=>'DATE'
+,p_column_alignment=>'CENTER'
+,p_tz_dependent=>'N'
+,p_use_as_row_header=>'N'
 );
-wwv_flow_imp_page.create_ig_report_column(
- p_id=>wwv_flow_imp.id(54202761299063438)
-,p_view_id=>wwv_flow_imp.id(54190565301063396)
-,p_display_seq=>11
-,p_column_id=>wwv_flow_imp.id(54072804689447829)
-,p_is_visible=>true
-,p_is_frozen=>false
+wwv_flow_imp_page.create_worksheet_column(
+ p_id=>wwv_flow_imp.id(42908433613653341)
+,p_db_column_name=>'QARU_CREATED_BY'
+,p_display_order=>120
+,p_column_identifier=>'L'
+,p_column_label=>'Qaru Created By'
+,p_column_type=>'STRING'
+,p_use_as_row_header=>'N'
 );
-wwv_flow_imp_page.create_ig_report_column(
- p_id=>wwv_flow_imp.id(54203690667063441)
-,p_view_id=>wwv_flow_imp.id(54190565301063396)
-,p_display_seq=>12
-,p_column_id=>wwv_flow_imp.id(54072834662447830)
-,p_is_visible=>false
-,p_is_frozen=>false
+wwv_flow_imp_page.create_worksheet_column(
+ p_id=>wwv_flow_imp.id(42908582870653342)
+,p_db_column_name=>'QARU_UPDATED_ON'
+,p_display_order=>130
+,p_column_identifier=>'M'
+,p_column_label=>'Qaru Updated On'
+,p_column_type=>'DATE'
+,p_column_alignment=>'CENTER'
+,p_tz_dependent=>'N'
+,p_use_as_row_header=>'N'
 );
-wwv_flow_imp_page.create_ig_report_column(
- p_id=>wwv_flow_imp.id(54204581965063444)
-,p_view_id=>wwv_flow_imp.id(54190565301063396)
-,p_display_seq=>13
-,p_column_id=>wwv_flow_imp.id(54072926017447831)
-,p_is_visible=>false
-,p_is_frozen=>false
+wwv_flow_imp_page.create_worksheet_column(
+ p_id=>wwv_flow_imp.id(42908668899653343)
+,p_db_column_name=>'QARU_UPDATED_BY'
+,p_display_order=>140
+,p_column_identifier=>'N'
+,p_column_label=>'Qaru Updated By'
+,p_column_type=>'STRING'
+,p_use_as_row_header=>'N'
 );
-wwv_flow_imp_page.create_ig_report_column(
- p_id=>wwv_flow_imp.id(54205507473063447)
-,p_view_id=>wwv_flow_imp.id(54190565301063396)
-,p_display_seq=>14
-,p_column_id=>wwv_flow_imp.id(54073073696447832)
-,p_is_visible=>false
-,p_is_frozen=>false
-);
-wwv_flow_imp_page.create_ig_report_column(
- p_id=>wwv_flow_imp.id(54206344917063451)
-,p_view_id=>wwv_flow_imp.id(54190565301063396)
-,p_display_seq=>15
-,p_column_id=>wwv_flow_imp.id(54073206868447833)
-,p_is_visible=>false
-,p_is_frozen=>false
-);
-wwv_flow_imp_page.create_ig_report_column(
- p_id=>wwv_flow_imp.id(54289352188274415)
-,p_view_id=>wwv_flow_imp.id(54190565301063396)
-,p_display_seq=>2
-,p_column_id=>wwv_flow_imp.id(54280611233258499)
-,p_is_visible=>true
-,p_is_frozen=>false
-,p_width=>80
+wwv_flow_imp_page.create_worksheet_rpt(
+ p_id=>wwv_flow_imp.id(48686523933119244)
+,p_application_user=>'APXWS_DEFAULT'
+,p_report_seq=>10
+,p_report_alias=>'486866'
+,p_status=>'PUBLIC'
+,p_is_default=>'Y'
+,p_report_columns=>'QARU_ID:QARU_RULE_NUMBER:QARU_CLIENT_NAME:QARU_NAME:QARU_CATEGORY:QARU_ERROR_MESSAGE:QARU_COMMENT:QARU_ERROR_LEVEL:QARU_IS_ACTIVE:QARU_LAYER:QARU_CREATED_ON:QARU_CREATED_BY:QARU_UPDATED_ON:QARU_UPDATED_BY'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(54282053948258514)

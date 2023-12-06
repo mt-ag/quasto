@@ -99,6 +99,7 @@ prompt --install
 @@application/shared_components/logic/build_options.sql
 @@application/shared_components/globalization/messages.sql
 @@application/shared_components/globalization/dyntranslations.sql
+@@application/shared_components/security/authentications/opendoor.sql
 @@application/shared_components/security/authentications/oracle_apex_accounts.sql
 @@application/user_interfaces/combined_files.sql
 @@application/pages/page_00000.sql
@@ -111,6 +112,7 @@ prompt --install
 @@application/pages/page_00007.sql
 @@application/pages/page_00008.sql
 @@application/pages/page_00009.sql
+@@application/pages/page_00011.sql
 @@application/pages/page_09999.sql
 @@application/deployment/definition.sql
 @@application/deployment/checks.sql
