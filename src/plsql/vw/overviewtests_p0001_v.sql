@@ -50,7 +50,7 @@ select "QATR_ID","DETAILS","STATUS","UTPLSQL_INFO","TEST_NAME","SCHEME","PROJEKT
         end as ErrorLevel
          ,qaru.qaru_is_active as Active
           , t.qatr_added_on   as Execution_Date
-          , to_char(t.qatr_added_on, 'DD/MM/YYYY') as execution_date_char
+          , to_char(t.qatr_added_on, 'DD/MM/YYYY') ||' - '||row_number() over(partition by to_char(qatr_added_on, 'DD.MM.YYYY') order by qatr_added_on) as execution_date_char
 
     from xml_result t
          join XMLTABLE('/testsuites/testsuite/testsuite/testsuite/testsuite'
