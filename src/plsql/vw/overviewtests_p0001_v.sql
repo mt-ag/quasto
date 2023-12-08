@@ -1,5 +1,5 @@
 
-  CREATE OR REPLACE FORCE EDITIONABLE VIEW "QUASTO"."OVERVIEWTESTS_P0001_V" ("QATR_ID", "DETAILS", "STATUS", "UTPLSQL_INFO", "TEST_NAME", "SCHEME", "PROJEKT", "CATEGORY", "NAME", "LAYER", "ERRORLEVEL", "ACTIVE", "EXECUTION_DATE", "EXECUTION_DATE_CHAR" ) AS 
+  CREATE OR REPLACE FORCE EDITIONABLE VIEW "QUASTO"."OVERVIEWTESTS_P0001_V" ("QATR_ID", "DETAILS", "STATUS", "UTPLSQL_INFO", "TEST_NAME", "SCHEME", "PROJECT", "CATEGORY", "NAME", "LAYER", "ERRORLEVEL", "ACTIVE", "EXECUTION_DATE", "EXECUTION_DATE_CHAR" ) AS 
   with xml_result as
 (select qatr_id,
         qatr_added_on,
@@ -14,7 +14,7 @@
                       
                  as xml_raw
 from QA_TEST_RESULTS)
-select "QATR_ID","DETAILS","STATUS","UTPLSQL_INFO","TEST_NAME","SCHEME","PROJEKT","CATEGORY","NAME","LAYER","ERRORLEVEL","ACTIVE","EXECUTION_DATE", "EXECUTION_DATE_CHAR" from 
+select "QATR_ID","DETAILS","STATUS","UTPLSQL_INFO","TEST_NAME","SCHEME","PROJECT","CATEGORY","NAME","LAYER","ERRORLEVEL","ACTIVE","EXECUTION_DATE", "EXECUTION_DATE_CHAR" from 
 (
     select t.qatr_id, 
             case
@@ -36,7 +36,7 @@ select "QATR_ID","DETAILS","STATUS","UTPLSQL_INFO","TEST_NAME","SCHEME","PROJEKT
            end as utplsql_info
          ,testcases.quasto_test_name as test_name
          ,schemes.schemename as scheme
-         ,qaru.qaru_client_name as Projekt
+         ,qaru.qaru_client_name as Project
          ,qaru.qaru_category as Category
          ,qaru.qaru_name as Name
          ,qaru.qaru_layer as Layer
@@ -48,7 +48,7 @@ select "QATR_ID","DETAILS","STATUS","UTPLSQL_INFO","TEST_NAME","SCHEME","PROJEKT
          when 4 then 
          'INFO'
         end as ErrorLevel
-         ,qaru.qaru_is_active as Active
+         ,case qaru.qaru_is_active when 1 then 'Yes' when 0 then 'No' end as Active
           , t.qatr_added_on   as Execution_Date
           , to_char(t.qatr_added_on, 'DD/MM/YYYY') ||' - '||row_number() over(partition by to_char(qatr_added_on, 'DD.MM.YYYY') order by qatr_added_on) as execution_date_char
 
@@ -82,6 +82,6 @@ select "QATR_ID","DETAILS","STATUS","UTPLSQL_INFO","TEST_NAME","SCHEME","PROJEKT
          ) schemes on 1=1
          left join QA_RULES qaru
          on qaru.qaru_rule_number = testresult.quasto_rulenumber
-         order by QARU.QARU_CLIENT_NAME DESC, t.qatr_added_on DESC,schemes.schemename DESC, QARU.qaru_category, qaru.qaru_name
+         order by QARU.QARU_CLIENT_NAME asc, t.qatr_added_on asc,schemes.schemename asc, QARU.qaru_category asc, qaru.qaru_name asc
 );
 /
