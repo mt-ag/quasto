@@ -20,8 +20,8 @@ wwv_flow_imp_page.create_page(
 ,p_page_template_options=>'#DEFAULT#'
 ,p_protection_level=>'C'
 ,p_page_component_map=>'18'
-,p_last_updated_by=>'SBOZOK'
-,p_last_upd_yyyymmddhh24miss=>'20231128100610'
+,p_last_updated_by=>'MWILHELM'
+,p_last_upd_yyyymmddhh24miss=>'20231208122741'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(54073327692447835)
@@ -113,15 +113,14 @@ wwv_flow_imp_page.create_worksheet_column(
 ,p_column_identifier=>'A'
 ,p_column_label=>'Qaru Id'
 ,p_column_type=>'NUMBER'
-,p_column_alignment=>'RIGHT'
-,p_use_as_row_header=>'N'
+,p_display_text_as=>'HIDDEN_ESCAPE_SC'
 );
 wwv_flow_imp_page.create_worksheet_column(
  p_id=>wwv_flow_imp.id(42907482835653331)
 ,p_db_column_name=>'QARU_RULE_NUMBER'
 ,p_display_order=>20
 ,p_column_identifier=>'B'
-,p_column_label=>'Qaru Rule Number'
+,p_column_label=>'Rule Number'
 ,p_column_type=>'STRING'
 ,p_use_as_row_header=>'N'
 );
@@ -130,7 +129,7 @@ wwv_flow_imp_page.create_worksheet_column(
 ,p_db_column_name=>'QARU_CLIENT_NAME'
 ,p_display_order=>30
 ,p_column_identifier=>'C'
-,p_column_label=>'Qaru Client Name'
+,p_column_label=>'Client Name'
 ,p_column_type=>'STRING'
 ,p_use_as_row_header=>'N'
 );
@@ -139,7 +138,7 @@ wwv_flow_imp_page.create_worksheet_column(
 ,p_db_column_name=>'QARU_NAME'
 ,p_display_order=>40
 ,p_column_identifier=>'D'
-,p_column_label=>'Qaru Name'
+,p_column_label=>'Rule Name'
 ,p_column_type=>'STRING'
 ,p_use_as_row_header=>'N'
 );
@@ -148,7 +147,7 @@ wwv_flow_imp_page.create_worksheet_column(
 ,p_db_column_name=>'QARU_CATEGORY'
 ,p_display_order=>50
 ,p_column_identifier=>'E'
-,p_column_label=>'Qaru Category'
+,p_column_label=>'Category'
 ,p_column_type=>'STRING'
 ,p_use_as_row_header=>'N'
 );
@@ -157,7 +156,7 @@ wwv_flow_imp_page.create_worksheet_column(
 ,p_db_column_name=>'QARU_ERROR_MESSAGE'
 ,p_display_order=>60
 ,p_column_identifier=>'F'
-,p_column_label=>'Qaru Error Message'
+,p_column_label=>'Error Message'
 ,p_column_type=>'STRING'
 ,p_use_as_row_header=>'N'
 );
@@ -166,7 +165,7 @@ wwv_flow_imp_page.create_worksheet_column(
 ,p_db_column_name=>'QARU_COMMENT'
 ,p_display_order=>70
 ,p_column_identifier=>'G'
-,p_column_label=>'Qaru Comment'
+,p_column_label=>'Comment'
 ,p_column_type=>'STRING'
 ,p_use_as_row_header=>'N'
 );
@@ -175,9 +174,12 @@ wwv_flow_imp_page.create_worksheet_column(
 ,p_db_column_name=>'QARU_ERROR_LEVEL'
 ,p_display_order=>80
 ,p_column_identifier=>'H'
-,p_column_label=>'Qaru Error Level'
+,p_column_label=>'Error Level'
 ,p_column_type=>'NUMBER'
+,p_display_text_as=>'LOV_ESCAPE_SC'
 ,p_column_alignment=>'RIGHT'
+,p_rpt_named_lov=>wwv_flow_imp.id(54240337370100757)
+,p_rpt_show_filter_lov=>'1'
 ,p_use_as_row_header=>'N'
 );
 wwv_flow_imp_page.create_worksheet_column(
@@ -185,9 +187,12 @@ wwv_flow_imp_page.create_worksheet_column(
 ,p_db_column_name=>'QARU_IS_ACTIVE'
 ,p_display_order=>90
 ,p_column_identifier=>'I'
-,p_column_label=>'Qaru Is Active'
+,p_column_label=>'Active?'
 ,p_column_type=>'NUMBER'
+,p_display_text_as=>'LOV_ESCAPE_SC'
 ,p_column_alignment=>'RIGHT'
+,p_rpt_named_lov=>wwv_flow_imp.id(54239364838095093)
+,p_rpt_show_filter_lov=>'1'
 ,p_use_as_row_header=>'N'
 );
 wwv_flow_imp_page.create_worksheet_column(
@@ -195,8 +200,11 @@ wwv_flow_imp_page.create_worksheet_column(
 ,p_db_column_name=>'QARU_LAYER'
 ,p_display_order=>100
 ,p_column_identifier=>'J'
-,p_column_label=>'Qaru Layer'
+,p_column_label=>'Layer'
 ,p_column_type=>'STRING'
+,p_display_text_as=>'LOV_ESCAPE_SC'
+,p_rpt_named_lov=>wwv_flow_imp.id(42333993626488557)
+,p_rpt_show_filter_lov=>'1'
 ,p_use_as_row_header=>'N'
 );
 wwv_flow_imp_page.create_worksheet_column(
@@ -204,7 +212,7 @@ wwv_flow_imp_page.create_worksheet_column(
 ,p_db_column_name=>'QARU_CREATED_ON'
 ,p_display_order=>110
 ,p_column_identifier=>'K'
-,p_column_label=>'Qaru Created On'
+,p_column_label=>'Created On'
 ,p_column_type=>'DATE'
 ,p_column_alignment=>'CENTER'
 ,p_tz_dependent=>'N'
@@ -215,7 +223,7 @@ wwv_flow_imp_page.create_worksheet_column(
 ,p_db_column_name=>'QARU_CREATED_BY'
 ,p_display_order=>120
 ,p_column_identifier=>'L'
-,p_column_label=>'Qaru Created By'
+,p_column_label=>'Created By'
 ,p_column_type=>'STRING'
 ,p_use_as_row_header=>'N'
 );
@@ -224,7 +232,7 @@ wwv_flow_imp_page.create_worksheet_column(
 ,p_db_column_name=>'QARU_UPDATED_ON'
 ,p_display_order=>130
 ,p_column_identifier=>'M'
-,p_column_label=>'Qaru Updated On'
+,p_column_label=>'Updated On'
 ,p_column_type=>'DATE'
 ,p_column_alignment=>'CENTER'
 ,p_tz_dependent=>'N'
@@ -235,7 +243,7 @@ wwv_flow_imp_page.create_worksheet_column(
 ,p_db_column_name=>'QARU_UPDATED_BY'
 ,p_display_order=>140
 ,p_column_identifier=>'N'
-,p_column_label=>'Qaru Updated By'
+,p_column_label=>'Updated By'
 ,p_column_type=>'STRING'
 ,p_use_as_row_header=>'N'
 );
@@ -246,7 +254,9 @@ wwv_flow_imp_page.create_worksheet_rpt(
 ,p_report_alias=>'486866'
 ,p_status=>'PUBLIC'
 ,p_is_default=>'Y'
-,p_report_columns=>'QARU_ID:QARU_RULE_NUMBER:QARU_CLIENT_NAME:QARU_NAME:QARU_CATEGORY:QARU_ERROR_MESSAGE:QARU_COMMENT:QARU_ERROR_LEVEL:QARU_IS_ACTIVE:QARU_LAYER:QARU_CREATED_ON:QARU_CREATED_BY:QARU_UPDATED_ON:QARU_UPDATED_BY'
+,p_report_columns=>'QARU_ID:QARU_RULE_NUMBER:QARU_CLIENT_NAME:QARU_NAME:QARU_CATEGORY:QARU_ERROR_MESSAGE:QARU_COMMENT:QARU_ERROR_LEVEL:QARU_IS_ACTIVE:QARU_LAYER:'
+,p_break_on=>'QARU_CLIENT_NAME:0:0:0:0:0'
+,p_break_enabled_on=>'QARU_CLIENT_NAME:0:0:0:0:0'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(54282053948258514)

@@ -9,7 +9,7 @@
 -- --------------------------------------------------------------------------------
 
 -- ----------------------------------------
--- Page: 1 - Dashboard > Page Item: P1_DATE > List of Values > SQL Query
+-- Page: 10 - test page 1 > Page Item: P10_DATE > List of Values > SQL Query
 
 select to_char(qatr_added_on, 'DD-MON-YYYY')||' - '||row_number() over(partition by to_char(qatr_added_on, 'DD.MM.YYYY') order by qatr_added_on)  as d
       ,qatr_added_on as r
@@ -17,7 +17,7 @@ from qa_test_results
 order by qatr_added_on desc
 
 -- ----------------------------------------
--- Page: 1 - Dashboard > Region: Search Region > Filter: P1_EXECUTION_DATE > List of Values > SQL Query
+-- Page: 10 - test page 1 > Region: Search Region > Filter: P10_EXECUTION_DATE > List of Values > SQL Query
 
 select execution_date_char  d, execution_date_char r 
 from OVERVIEWTESTS_P0001_V 
@@ -25,13 +25,13 @@ order by execution_date desc
 
 
 -- ----------------------------------------
--- Page: 1 - Dashboard > Region: Search Region > Filter: P1_SCHEME > List of Values > SQL Query
+-- Page: 10 - test page 1 > Region: Search Region > Filter: P10_SCHEME > List of Values > SQL Query
 
 SELECT USERNAME as d, USERNAME AS R FROM QARU_SCHEME_NAMES_FOR_TESTING_V
 
 
 -- ----------------------------------------
--- Page: 1 - Dashboard > Region: Search Region > Facet: P1_EXECUTION_DATE > List of Values > SQL Query
+-- Page: 10 - test page 1 > Region: Search Region > Facet: P10_EXECUTION_DATE > List of Values > SQL Query
 
 select execution_date_char  d, execution_date_char r 
 from OVERVIEWTESTS_P0001_V 
@@ -39,13 +39,13 @@ order by execution_date desc
 
 
 -- ----------------------------------------
--- Page: 1 - Dashboard > Region: Search Region > Facet: P1_SCHEME > List of Values > SQL Query
+-- Page: 10 - test page 1 > Region: Search Region > Facet: P10_SCHEME > List of Values > SQL Query
 
 SELECT USERNAME as d, USERNAME AS R FROM QARU_SCHEME_NAMES_FOR_TESTING_V
 
 
 -- ----------------------------------------
--- Page: 1 - Dashboard > Region: Timeline Chart > Attributes:  > Series: Error > Source > SQL Query
+-- Page: 10 - test page 1 > Region: Timeline Chart > Attributes:  > Series: Error > Source > SQL Query
 
 with xml_result as
 (select qatr_id,
@@ -83,9 +83,9 @@ select execution_date, testcase_status, status_amount, color_hex from
          COLUMNS
            schemename VARCHAR2(50) PATH '@name'
          ) schemes on 1=1
-         where (to_date(t.qatr_added_on) = :P1_DATE or :P1_DATE is null)
-         and (:P1_SCHEME = schemes.schemename
-             or :P1_SCHEME is null)
+         where (to_date(t.qatr_added_on) = :P10_DATE or :P10_DATE is null)
+         and (:P10_SCHEME = schemes.schemename
+             or :P10_SCHEME is null)
      ) where testcase_status = 'Error'
      group by testcase_status, execution_date
      order by execution_date desc
@@ -93,7 +93,7 @@ select execution_date, testcase_status, status_amount, color_hex from
 )
 
 -- ----------------------------------------
--- Page: 1 - Dashboard > Region: Timeline Chart > Attributes:  > Series: Failure > Source > SQL Query
+-- Page: 10 - test page 1 > Region: Timeline Chart > Attributes:  > Series: Failure > Source > SQL Query
 
 with xml_result as
 (select qatr_id,
@@ -131,9 +131,9 @@ select execution_date, testcase_status, status_amount, color_hex from
          COLUMNS
            schemename VARCHAR2(50) PATH '@name'
          ) schemes on 1=1
-         where (to_date(t.qatr_added_on) = :P1_DATE or :P1_DATE is null)
-         and (:P1_SCHEME = schemes.schemename
-             or :P1_SCHEME is null)
+         where (to_date(t.qatr_added_on) = :P10_DATE or :P10_DATE is null)
+         and (:P10_SCHEME = schemes.schemename
+             or :P10_SCHEME is null)
      ) where testcase_status = 'Failure'
      group by testcase_status, execution_date
      order by execution_date desc
@@ -141,7 +141,7 @@ select execution_date, testcase_status, status_amount, color_hex from
 )
 
 -- ----------------------------------------
--- Page: 1 - Dashboard > Region: Timeline Chart > Attributes:  > Series: Success > Source > SQL Query
+-- Page: 10 - test page 1 > Region: Timeline Chart > Attributes:  > Series: Success > Source > SQL Query
 
 with xml_result as
 (select qatr_id,
@@ -179,9 +179,9 @@ select execution_date, testcase_status, status_amount, color_hex from
          COLUMNS
            schemename VARCHAR2(50) PATH '@name'
          ) schemes on 1=1
-         where (to_date(t.qatr_added_on) = :P1_DATE or :P1_DATE is null)
-         and (:P1_SCHEME = schemes.schemename
-             or :P1_SCHEME is null)
+         where (to_date(t.qatr_added_on) = :P10_DATE or :P10_DATE is null)
+         and (:P10_SCHEME = schemes.schemename
+             or :P10_SCHEME is null)
      ) where testcase_status = 'Success'
      group by testcase_status, execution_date
      order by execution_date desc
@@ -189,7 +189,7 @@ select execution_date, testcase_status, status_amount, color_hex from
 )
 
 -- ----------------------------------------
--- Page: 1 - Dashboard > Region: Quota Chart > Attributes:  > Series: Quota > Source > SQL Query
+-- Page: 10 - test page 1 > Region: Quota Chart > Attributes:  > Series: Quota > Source > SQL Query
 
     select status testcase_status
          , count(*) over (partition by status) as status_amount
@@ -205,7 +205,7 @@ select execution_date, testcase_status, status_amount, color_hex from
      
 
 -- ----------------------------------------
--- Page: 1 - Dashboard > Page Item: P1_SCHEME_OLD > List of Values > SQL Query
+-- Page: 10 - test page 1 > Page Item: P10_SCHEMEX > List of Values > SQL Query
 
 select username as d
       ,username as r
