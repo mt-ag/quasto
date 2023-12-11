@@ -20,7 +20,7 @@ wwv_flow_imp_page.create_page(
 ,p_autocomplete_on_off=>'OFF'
 ,p_page_template_options=>'#DEFAULT#:ui-dialog--stretch'
 ,p_protection_level=>'C'
-,p_page_component_map=>'16'
+,p_page_component_map=>'21'
 ,p_last_updated_by=>'MWILHELM'
 ,p_last_upd_yyyymmddhh24miss=>'20231208135659'
 );

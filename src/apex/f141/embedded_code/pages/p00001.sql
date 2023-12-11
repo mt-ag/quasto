@@ -19,9 +19,14 @@ order by qatr_added_on desc
 -- ----------------------------------------
 -- Page: 1 - Dashboard > Region: Search Region > Filter: P1_EXECUTION_DATE > List of Values > SQL Query
 
-select execution_date_char  d, execution_date_char r 
-from OVERVIEWTESTS_P0001_V 
-order by execution_date desc
+select to_char(qatr_added_on, 'DD/MM/YYYY') ||' - '||row_number() over(partition by to_char(qatr_added_on, 'DD.MM.YYYY') order by qatr_added_on) d ,
+       execution_date r
+  from (select distinct qatr_id, execution_date
+          from OVERVIEWTESTS_P0001_V 
+         order by execution_date desc
+       ) v
+join qa_test_results r on v.qatr_id = r.qatr_id
+order by qatr_added_on desc
 
 
 -- ----------------------------------------
@@ -33,9 +38,14 @@ SELECT USERNAME as d, USERNAME AS R FROM QARU_SCHEME_NAMES_FOR_TESTING_V
 -- ----------------------------------------
 -- Page: 1 - Dashboard > Region: Search Region > Facet: P1_EXECUTION_DATE > List of Values > SQL Query
 
-select execution_date_char  d, execution_date_char r 
-from OVERVIEWTESTS_P0001_V 
-order by execution_date desc
+select to_char(qatr_added_on, 'DD/MM/YYYY') ||' - '||row_number() over(partition by to_char(qatr_added_on, 'DD.MM.YYYY') order by qatr_added_on) d ,
+       execution_date r
+  from (select distinct qatr_id, execution_date
+          from OVERVIEWTESTS_P0001_V 
+         order by execution_date desc
+       ) v
+join qa_test_results r on v.qatr_id = r.qatr_id
+order by qatr_added_on desc
 
 
 -- ----------------------------------------
@@ -47,7 +57,17 @@ SELECT USERNAME as d, USERNAME AS R FROM QARU_SCHEME_NAMES_FOR_TESTING_V
 -- ----------------------------------------
 -- Page: 1 - Dashboard > Region: Timeline Chart > Attributes:  > Series: Error > Source > SQL Query
 
-with xml_result as
+select status testcase_status, 
+       count(1) as status_amount,
+       '#7a1616' as color_hex,
+       execution_date
+  from table(qa_helper_pkg.p0001_get_faceted_search_data(:APP_PAGE_ID, 'TEST_REPORT'))
+ where status = 'Error'
+ group by status, execution_date
+ order by execution_date desc
+
+
+/*with xml_result as
 (select qatr_id,
         qatr_added_on,
         replace(
@@ -90,12 +110,23 @@ select execution_date, testcase_status, status_amount, color_hex from
      group by testcase_status, execution_date
      order by execution_date desc
      fetch first 10 rows only
-)
+)*/
 
 -- ----------------------------------------
 -- Page: 1 - Dashboard > Region: Timeline Chart > Attributes:  > Series: Failure > Source > SQL Query
 
-with xml_result as
+select status testcase_status, 
+       count(1) as status_amount,
+       '#c42222' as color_hex,
+       execution_date
+  from table(qa_helper_pkg.p0001_get_faceted_search_data(:APP_PAGE_ID, 'TEST_REPORT'))
+ where status = 'Failure'
+ group by status, execution_date
+ order by execution_date desc
+
+
+
+/*with xml_result as
 (select qatr_id,
         qatr_added_on,
         replace(
@@ -138,11 +169,22 @@ select execution_date, testcase_status, status_amount, color_hex from
      group by testcase_status, execution_date
      order by execution_date desc
      fetch first 10 rows only
-)
+)*/
 
 -- ----------------------------------------
 -- Page: 1 - Dashboard > Region: Timeline Chart > Attributes:  > Series: Success > Source > SQL Query
 
+select status testcase_status, 
+       count(1) as status_amount,
+       '#1c6d11' as color_hex,
+       execution_date
+  from table(qa_helper_pkg.p0001_get_faceted_search_data(:APP_PAGE_ID, 'TEST_REPORT'))
+ where status = 'Success'
+ group by status, execution_date
+ order by execution_date desc
+
+
+/*
 with xml_result as
 (select qatr_id,
         qatr_added_on,
@@ -186,7 +228,7 @@ select execution_date, testcase_status, status_amount, color_hex from
      group by testcase_status, execution_date
      order by execution_date desc
      fetch first 10 rows only
-)
+)*/
 
 -- ----------------------------------------
 -- Page: 1 - Dashboard > Region: Quota Chart > Attributes:  > Series: Quota > Source > SQL Query
@@ -201,7 +243,7 @@ select execution_date, testcase_status, status_amount, color_hex from
             else
                 '#1c6d11'
           end as color_hex
-    from table(get_faceted_search_data(:APP_PAGE_ID, 'TEST_REPORT'))
+    from table(qa_helper_pkg.p0001_get_faceted_search_data(:APP_PAGE_ID, 'TEST_REPORT'))
      
 
 -- ----------------------------------------
