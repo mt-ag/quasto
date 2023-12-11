@@ -1,5 +1,5 @@
 
-  CREATE OR REPLACE FORCE EDITIONABLE VIEW "QUASTO"."OVERVIEWTESTS_P0001_V" ("QATR_ID", "DETAILS", "STATUS", "UTPLSQL_INFO", "TEST_NAME", "SCHEME", "PROJECT", "CATEGORY", "NAME", "LAYER", "ERRORLEVEL", "ACTIVE", "EXECUTION_DATE", "EXECUTION_DATE_CHAR" ) AS 
+  CREATE OR REPLACE FORCE EDITIONABLE VIEW "QUASTO"."OVERVIEWTESTS_P0001_V" ("QATR_ID", "DETAILS", "STATUS", "UTPLSQL_INFO", "TEST_NAME", "SCHEME", "RESTART_UNIT_TEST", "PROJECT", "CATEGORY", "NAME", "LAYER", "ERRORLEVEL", "ACTIVE", "EXECUTION_DATE") AS 
   with xml_result as
 (select qatr_id,
         qatr_added_on,
@@ -14,7 +14,7 @@
                       
                  as xml_raw
 from QA_TEST_RESULTS)
-select "QATR_ID","DETAILS","STATUS","UTPLSQL_INFO","TEST_NAME","SCHEME","PROJECT","CATEGORY","NAME","LAYER","ERRORLEVEL","ACTIVE","EXECUTION_DATE", "EXECUTION_DATE_CHAR" from 
+select "QATR_ID","DETAILS","STATUS","UTPLSQL_INFO","TEST_NAME","SCHEME","RESTART_UNIT_TEST","PROJECT","CATEGORY","NAME","LAYER","ERRORLEVEL","ACTIVE","EXECUTION_DATE" from 
 (
     select t.qatr_id, 
             case
@@ -36,6 +36,12 @@ select "QATR_ID","DETAILS","STATUS","UTPLSQL_INFO","TEST_NAME","SCHEME","PROJECT
            end as utplsql_info
          ,testcases.quasto_test_name as test_name
          ,schemes.schemename as scheme
+         ,'<a href="' || APEX_PAGE.GET_URL (p_page   => 11,          
+											p_items  => 'P11_CLIENT_NAME,P11_SCHEME_NAME,P11_RULE_NUMBER',
+											p_values =>  qaru.qaru_client_name ||','|| schemes.schemename ||','|| qaru.qaru_rule_number) || 
+		  '">' || 
+			  '<i class="fa fa-play-circle"></i>' ||
+		  '</a>' as restart_unit_test
          ,qaru.qaru_client_name as Project
          ,qaru.qaru_category as Category
          ,qaru.qaru_name as Name
@@ -50,7 +56,6 @@ select "QATR_ID","DETAILS","STATUS","UTPLSQL_INFO","TEST_NAME","SCHEME","PROJECT
         end as ErrorLevel
          ,case qaru.qaru_is_active when 1 then 'Yes' when 0 then 'No' end as Active
           , t.qatr_added_on   as Execution_Date
-          , to_char(t.qatr_added_on, 'DD/MM/YYYY') ||' - '||row_number() over(partition by to_char(qatr_added_on, 'DD.MM.YYYY') order by qatr_added_on) as execution_date_char
 
     from xml_result t
          join XMLTABLE('/testsuites/testsuite/testsuite/testsuite/testsuite'
@@ -84,4 +89,4 @@ select "QATR_ID","DETAILS","STATUS","UTPLSQL_INFO","TEST_NAME","SCHEME","PROJECT
          on qaru.qaru_rule_number = testresult.quasto_rulenumber
          order by QARU.QARU_CLIENT_NAME asc, t.qatr_added_on asc,schemes.schemename asc, QARU.qaru_category asc, qaru.qaru_name asc
 );
-/
+
