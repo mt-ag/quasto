@@ -47,8 +47,10 @@ wwv_flow_imp.create_flow(
 ,p_auto_time_zone=>'N'
 ,p_substitution_string_01=>'APP_NAME'
 ,p_substitution_value_01=>'QUASTO'
+,p_substitution_string_02=>'DATE_FORMAT'
+,p_substitution_value_02=>'DD/MM/YYYY'
 ,p_last_updated_by=>'SPRANG'
-,p_last_upd_yyyymmddhh24miss=>'20231206113519'
+,p_last_upd_yyyymmddhh24miss=>'20231208144012'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_files_version=>4
 ,p_print_server_type=>'NATIVE'

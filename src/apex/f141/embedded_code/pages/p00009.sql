@@ -9,6 +9,27 @@
 -- --------------------------------------------------------------------------------
 
 -- ----------------------------------------
+-- Page: 9 - Config Scheduler Job > Process: Load information > Source > PL/SQL Code
+
+begin
+select
+  to_char(START_DATE, 'DD-MON-YYYY HH24:MI')
+, to_char(LAST_START_DATE, 'DD-MON-YYYY HH24:MI')
+, LAST_RUN_DURATION
+, to_char(NEXT_RUN_DATE, 'DD-MON-YYYY HH24:MI')
+, REPEAT_INTERVAL
+, STATE
+into 
+  :P9_START_DATE
+, :P9_LAST_START_DATE
+, :P9_LAST_RUN_DURATION
+, :P9_NEXT_RUN_DATE
+, :P9_REPEAT_INTERVAL
+, :P9_JOB_STATE
+from JOBDETAILS_P0009_V;
+end;
+
+-- ----------------------------------------
 -- Page: 9 - Config Scheduler Job > Process: Save Scheduler Job Status > Source > PL/SQL Code
 
 qa_unit_tests_pkg.p_enable_scheduler_job(pi_status => :P9_ENABLE_SCHEDULER_JOB);
