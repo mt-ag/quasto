@@ -88,7 +88,7 @@ create or replace package body qa_unit_tests_pkg is
                               ,p_val_02  => pi_scheme_name
                               ,p_name_03 => 'pi_get_root_only'
                               ,p_val_03  => pi_get_root_only);
-
+    
     if pi_client_name is not null and pi_scheme_name is not null and pi_get_root_only = 'N'
     then
       l_client_name_unified := regexp_replace(replace(pi_client_name
@@ -178,7 +178,7 @@ create or replace package body qa_unit_tests_pkg is
        l_scheme_names.extend;
        l_scheme_names(l_scheme_names.last) := rec_users.username;
      end loop;
-
+     
      return l_scheme_names;
 
   exception
@@ -234,7 +234,7 @@ create or replace package body qa_unit_tests_pkg is
 
       l_clob := l_clob || '  c_scheme_name constant varchar2_tab_t := new varchar2_tab_t(''' || upper(pi_scheme_name) || ''');' || chr(10);
       l_clob := l_clob || '  c_client_name constant qa_rules.qaru_client_name%type := ''' || pi_qaru_client_name || ''';' || chr(10) || chr(10);
-
+      
       return l_clob;
 
   exception
@@ -253,7 +253,6 @@ create or replace package body qa_unit_tests_pkg is
   function f_get_package_spec_content(
     pi_previous_clob            in clob
    ,pi_qaru_rule_number_unified in varchar2
-   ,pi_qaru_name_unified        in varchar2 default null
   )
   return clob
   is
@@ -265,13 +264,10 @@ create or replace package body qa_unit_tests_pkg is
       qa_logger_pkg.append_param(p_params  => l_param_list
                                 ,p_name_01 => 'pi_qaru_rule_number_unified'
                                 ,p_val_01  => pi_qaru_rule_number_unified);
-      qa_logger_pkg.append_param(p_params  => l_param_list
-                                ,p_name_01 => 'pi_qaru_name_unified'
-                                ,p_val_01  => pi_qaru_name_unified);
 
-      l_clob := pi_previous_clob || '  --%test(quasto_test_rule_' || pi_qaru_rule_number_unified || '_' || pi_qaru_name_unified || ')' || chr(10);
+      l_clob := pi_previous_clob || '  --%test(quasto_test_rule_' || pi_qaru_rule_number_unified || ')' || chr(10);
       l_clob := l_clob || '  PROCEDURE p_ut_rule_' || pi_qaru_rule_number_unified || ';' || chr(10);
-
+      
       return l_clob;
 
   exception
@@ -303,7 +299,7 @@ create or replace package body qa_unit_tests_pkg is
                                 ,p_val_01  => pi_package_name);
 
       l_clob := pi_previous_clob || 'END ' || pi_package_name || ';';
-
+      
       return l_clob;
 
   exception
@@ -334,7 +330,7 @@ create or replace package body qa_unit_tests_pkg is
                                 ,p_val_01  => pi_package_name);
 
       l_clob := 'CREATE OR REPLACE PACKAGE BODY ' || pi_package_name || ' IS' || chr(10);
-
+      
       return l_clob;
 
   exception
@@ -457,7 +453,7 @@ create or replace package body qa_unit_tests_pkg is
                                 ,p_val_01  => pi_package_name);
 
       l_clob := pi_previous_clob || 'END ' || pi_package_name || ';';
-
+      
       return l_clob;
 
   exception
@@ -522,7 +518,7 @@ create or replace package body qa_unit_tests_pkg is
                                                  ,'[^a-z0-9_]'
                                                  ,'_') as qaru_client_name_unified
                            from qa_rules
-                           where qaru_is_active = 1
+                           where qaru_is_active = 1 
                            group by qaru_client_name)
        loop
 
@@ -539,20 +535,14 @@ create or replace package body qa_unit_tests_pkg is
                                                         ,'_')
                                                 ,'[^a-z0-9_]'
                                                 ,'_') as qaru_rule_number_unified
-                                 ,regexp_replace(replace(lower(qaru_name)
-                                                        ,' '
-                                                        ,'_')
-                                                ,'[^a-z0-9_]'
-                                                ,'_') as qaru_name_unified
                            from qa_rules
                            where qaru_client_name = rec_clients.qaru_client_name
-                           and qaru_is_active = 1
+                           and qaru_is_active = 1 
                            order by qaru_id asc)
          loop
-
+      
            l_clob := f_get_package_spec_content(pi_previous_clob            => l_clob
-                                               ,pi_qaru_rule_number_unified => rec_rules.qaru_rule_number_unified
-                                               ,pi_qaru_name_unified        => rec_rules.qaru_name_unified);
+                                               ,pi_qaru_rule_number_unified => rec_rules.qaru_rule_number_unified);
 
          end loop;
 
@@ -576,7 +566,7 @@ create or replace package body qa_unit_tests_pkg is
                                  ,qaru_layer
                            from qa_rules
                            where qaru_client_name = rec_clients.qaru_client_name
-                           and qaru_is_active = 1
+                           and qaru_is_active = 1 
                            order by qaru_id asc)
          loop
 
@@ -596,7 +586,7 @@ create or replace package body qa_unit_tests_pkg is
 
        execute immediate l_clob;
        dbms_output.put_line('Package body for ' || l_package_name || ' created.');
-
+    
       end loop;
 
     elsif pi_option = qa_constant_pkg.gc_utplsql_single_package_per_rule
@@ -628,7 +618,7 @@ create or replace package body qa_unit_tests_pkg is
                                                ,'' || chr(39) || chr(39) || '') as qaru_test_name
                                        ,qaru_layer
                                  from qa_rules
-                                 where qaru_is_active = 1
+                                 where qaru_is_active = 1 
                                  group by qaru_id
                                          ,qaru_client_name
                                          ,qaru_rule_number
@@ -652,7 +642,7 @@ create or replace package body qa_unit_tests_pkg is
 
           execute immediate l_clob;
           dbms_output.put_line('Package specification for ' || l_package_name || ' created.');
-
+      
           l_clob := f_get_package_body_header(pi_package_name => l_package_name);
 
           l_clob := f_get_package_body_content(pi_previous_clob            => l_clob
@@ -669,7 +659,7 @@ create or replace package body qa_unit_tests_pkg is
           dbms_output.put_line('Package body for ' || l_package_name || ' created.');
 
         end loop;
-
+    
       end loop;
 
     end if;
@@ -817,21 +807,17 @@ create or replace package body qa_unit_tests_pkg is
                               ,p_val_01  => pi_client_name
                               ,p_name_02 => 'pi_scheme_name'
                               ,p_val_02  => pi_scheme_name);
-
+    
     if pi_client_name is not null and pi_scheme_name is not null
     then
       l_suitepath := f_get_suitepath(pi_client_name => pi_client_name, pi_scheme_name => pi_scheme_name, pi_get_root_only => 'N');
     else
       l_suitepath := f_get_suitepath(pi_get_root_only => 'Y');
     end if;
-    
 
     select DBMS_XMLGEN.CONVERT(XMLAGG(XMLELEMENT(E,column_value).EXTRACT('//text()')).GetClobVal(),1)
     into l_xml_result
     from table(ut.run(l_package_owner || ':' || l_suitepath, ut_junit_reporter()));
-    
-    insert into QA_TEST_RESULTS(QATR_XML_RESULT)
-    values (l_xml_result);
 
     return l_xml_result;
   exception
