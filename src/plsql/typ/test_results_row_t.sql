@@ -1,16 +1,14 @@
 create or replace type test_results_row_t as object (
-  qatr_id              number,
-  execution_date       date,
-  scheme               varchar2(50),
-  category             varchar2(100 char),
-  details              varchar2(50 char),
-  status               varchar2(4000),
-  name                 varchar2(100 char),
-  layer                varchar2(100 char),
-  errorlevel           varchar2(10),
-  active               varchar2(10),
-  utplsql_info         varchar2(4000),
-  test_name            varchar2(4000),
-  project              varchar2(100 char)
+  qatr_id                   number,
+  qatr_date                 date,
+  qatr_scheme_name          varchar2(100),
+  qatr_category             varchar2(100),
+  qatr_result               varchar2(20),
+  qaru_name                 varchar2(100),
+  qaru_layer                varchar2(20),
+  qaru_error_level          varchar2(20),
+  qaru_is_active            varchar2(10),
+  qaru_client_name          varchar2(4000),
+  qatr_program_name         varchar2(500)
 );
 /

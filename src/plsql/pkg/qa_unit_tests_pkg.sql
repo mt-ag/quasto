@@ -8,6 +8,7 @@ create or replace package qa_unit_tests_pkg authid definer is
      Release    Date        Author           Description
      ---------  ----------  ---------------  ------------------------------------
      23.2       05.11.2023  mwilhelm         Package has been added to QUASTO
+     24.1       01.03.2024  mwilhelm         New Data model/tests can be triggered over APEX UI
   ******************************************************************************/
 
   /**
@@ -68,15 +69,17 @@ create or replace package qa_unit_tests_pkg authid definer is
   /**
    * function to save the failed result of a scheme - called from generated test packages
    * @param pi_scheme_name defines the scheme name for which faulty objects were found
+   * @param pi_program_name defines the qualified program name (package.procedure)
    * @param pi_qaru_id defines the rule id of the tested rule
    * @param pi_result defines the result as number
    * @return number returns the qatr_id
   */
   function f_save_scheme_error_result
   (
-    pi_scheme_name in varchar2
-   ,pi_qaru_id     in number
-   ,pi_result      in number
+    pi_scheme_name  in varchar2
+   ,pi_program_name in varchar2
+   ,pi_qaru_id      in number
+   ,pi_result       in number
   ) return number;
 
   /**
@@ -97,12 +100,16 @@ create or replace package qa_unit_tests_pkg authid definer is
    * @param pi_qaru_rule_number defines the rule number
    * @param pi_qaru_client_name defines the client name
    * @param pi_scheme_name defines the scheme name
+   * @param pi_program_name defines the qualified program name (package.procedure)
+   * @param pi_runtime_error defines the error backtrace information
   */
   procedure p_save_scheme_result_with_runtime_error
   (
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
    ,pi_scheme_name      in varchar2_tab_t
+   ,pi_program_name     in varchar2
+   ,pi_runtime_error    in varchar2
   );
 
   /**
@@ -607,6 +614,7 @@ create or replace package body qa_unit_tests_pkg is
         l_clob := pi_previous_clob || '  PROCEDURE p_ut_rule_' || pi_qaru_rule_number_unified || chr(10);
         l_clob := l_clob || '  IS' || chr(10);
         l_clob := l_clob || '    l_scheme_objects qa_scheme_object_amounts_t := new qa_scheme_object_amounts_t();' || chr(10);
+        l_clob := l_clob || '    l_program_name varchar2(4000) := utl_call_stack.concatenate_subprogram(utl_call_stack.subprogram(1));' || chr(10);
         l_clob := l_clob || '    l_result NUMBER;' || chr(10);
         l_clob := l_clob || '    l_invalid_objects qa_rules_t := new qa_rules_t();' || chr(10);
         l_clob := l_clob || '    l_qaru_id number;' || chr(10);
@@ -634,7 +642,7 @@ create or replace package body qa_unit_tests_pkg is
         l_clob := l_clob || '      else' || chr(10);
         l_clob := l_clob || '        dbms_output.put_line(''<Scheme name="''||DBMS_XMLGEN.CONVERT(rec_scheme_objects.scheme_name)||''" result="0">'');' || chr(10);
         l_clob := l_clob || '        l_qaru_id := qa_main_pkg.f_get_rule_pk(pi_qaru_rule_number => ''' || pi_qaru_rule_number || ''', pi_qaru_client_name => c_client_name);' || chr(10);
-        l_clob := l_clob || '        l_qatr_id := qa_unit_tests_pkg.f_save_scheme_error_result(pi_scheme_name => rec_scheme_objects.scheme_name, pi_qaru_id => l_qaru_id, pi_result => l_result);' || chr(10);
+        l_clob := l_clob || '        l_qatr_id := qa_unit_tests_pkg.f_save_scheme_error_result(pi_scheme_name => rec_scheme_objects.scheme_name, pi_program_name => l_program_name, pi_qaru_id => l_qaru_id, pi_result => l_result);' || chr(10);
         l_clob := l_clob || '        for rec_scheme_invalid_objects in ( select object_name' || chr(10);
         l_clob := l_clob || '                                                 , object_details' || chr(10);
         l_clob := l_clob || '                                                 , qaru_error_message' || chr(10);
@@ -655,7 +663,7 @@ create or replace package body qa_unit_tests_pkg is
         l_clob := l_clob || '      dbms_output.put_line(''Execution of test "' || pi_qaru_test_name || '" raised exception.'');' || chr(10);
         l_clob := l_clob || '      dbms_output.put_line(SQLERRM);' || chr(10);
         l_clob := l_clob || '      dbms_output.put_line(DBMS_UTILITY.format_error_backtrace);' || chr(10);
-        l_clob := l_clob || '      qa_unit_tests_pkg.p_save_scheme_result_with_runtime_error(pi_qaru_rule_number => ''' || pi_qaru_rule_number || ''', pi_qaru_client_name => c_client_name, pi_scheme_name => c_scheme_name);' || chr(10);
+        l_clob := l_clob || '      qa_unit_tests_pkg.p_save_scheme_result_with_runtime_error(pi_qaru_rule_number => ''' || pi_qaru_rule_number || ''', pi_qaru_client_name => c_client_name, pi_scheme_name => c_scheme_name, pi_program_name => l_program_name, pi_runtime_error => SQLERRM || '' - '' || DBMS_UTILITY.format_error_backtrace);' || chr(10);
         l_clob := l_clob || '      RAISE;' || chr(10);
         l_clob := l_clob || '  END p_ut_rule_' || pi_qaru_rule_number_unified || ';' || chr(10);
 
@@ -1082,9 +1090,10 @@ create or replace package body qa_unit_tests_pkg is
   end p_run_custom_unit_test;
 
   function f_save_scheme_error_result(
-    pi_scheme_name in varchar2
-   ,pi_qaru_id     in number
-   ,pi_result      in number
+    pi_scheme_name  in varchar2
+   ,pi_program_name in varchar2
+   ,pi_qaru_id      in number
+   ,pi_result       in number
   ) return number
   is
     c_unit constant varchar2(32767) := $$plsql_unit || '.f_save_scheme_error_result';
@@ -1095,13 +1104,15 @@ create or replace package body qa_unit_tests_pkg is
     qa_logger_pkg.append_param(p_params  => l_param_list
                               ,p_name_01 => 'pi_scheme_name'
                               ,p_val_01  => pi_scheme_name
-                              ,p_name_02 => 'pi_qaru_id'
-                              ,p_val_02  => pi_qaru_id
-                              ,p_name_03 => 'pi_result'
-                              ,p_val_03  => pi_result);
+                              ,p_name_02 => 'pi_program_name'
+                              ,p_val_02  => pi_program_name
+                              ,p_name_03 => 'pi_qaru_id'
+                              ,p_val_03  => pi_qaru_id
+                              ,p_name_04 => 'pi_result'
+                              ,p_val_04  => pi_result);
 
-    insert into QA_TEST_RUNS (qatr_schema_name, qatr_date, qatr_result, qatr_qaru_id)
-    values (pi_scheme_name, sysdate, pi_result, pi_qaru_id)
+    insert into QA_TEST_RUNS (qatr_scheme_name, qatr_date, qatr_result, qatr_qaru_id, qatr_program_name)
+    values (pi_scheme_name, sysdate, pi_result, pi_qaru_id, pi_program_name)
     returning qatr_id into l_qatr_id;
     
     return l_qatr_id;
@@ -1145,6 +1156,8 @@ create or replace package body qa_unit_tests_pkg is
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
    ,pi_scheme_name      in varchar2_tab_t
+   ,pi_program_name     in varchar2
+   ,pi_runtime_error    in varchar2
   )
   is
     pragma autonomous_transaction;
@@ -1159,20 +1172,28 @@ create or replace package body qa_unit_tests_pkg is
                               ,p_name_01 => 'pi_qaru_rule_number'
                               ,p_val_01  => pi_qaru_rule_number
                               ,p_name_02 => 'pi_qaru_client_name'
-                              ,p_val_02  => pi_qaru_client_name);
+                              ,p_val_02  => pi_qaru_client_name
+                              ,p_name_03 => 'pi_program_name'
+                              ,p_val_03  => pi_program_name
+                              ,p_name_04 => 'pi_runtime_error'
+                              ,p_val_04  => pi_runtime_error);
     
     for i in pi_scheme_name.first .. pi_scheme_name.last
     loop
       l_scheme_name := pi_scheme_name(i) || ',' || l_scheme_name;
     end loop;
+    l_scheme_name := substr(l_scheme_name
+                            ,0
+                            ,length(l_scheme_name) - 1);
 
     l_qaru_id := qa_main_pkg.f_get_rule_pk(pi_qaru_rule_number => pi_qaru_rule_number
                                          , pi_qaru_client_name => pi_qaru_client_name);
     l_qatr_id := f_save_scheme_error_result(pi_scheme_name => l_scheme_name
+                                           ,pi_program_name => pi_program_name
                                            ,pi_qaru_id => l_qaru_id
                                            ,pi_result => 0);
     update QA_TEST_RUNS
-    set runtime_error = dbms_utility.format_error_backtrace
+    set qatr_runtime_error = pi_runtime_error
     where qatr_id = l_qatr_id;
     commit;
   exception
