@@ -47,23 +47,21 @@ begin
   l_context := apex_region.open_query_context(p_page_id   => p_page_id,
                                               p_region_id => l_region_id);
 
-  get_column_indexes(wwv_flow_t_varchar2('QATR_ID','EXECUTION_DATE', 'SCHEME', 'CATEGORY', 'DETAILS', 'STATUS', 'NAME', 'LAYER', 'ERRORLEVEL', 'ACTIVE', 'UTPLSQL_INFO', 'TEST_NAME', 'PROJECT'));
+  get_column_indexes(wwv_flow_t_varchar2('QATR_ID','QATR_DATE', 'QATR_SCHEME_NAME', 'QARU_CATEGORY', 'QATR_RESULT', 'QARU_NAME', 'QARU_LAYER', 'QARU_ERROR_LEVEL', 'QARU_IS_ACTIVE', 'QARU_CLIENT_NAME', 'QATR_PROGRAM_NAME'));
 
   while apex_exec.next_row(p_context => l_context) loop
     pipe row(test_results_row_t(
                     apex_exec.get_number  (p_context => l_context, p_column_idx => l_col_index('QATR_ID')),
-                    apex_exec.get_date    (p_context => l_context, p_column_idx => l_col_index('EXECUTION_DATE')),
-                    apex_exec.get_varchar2(p_context => l_context, p_column_idx => l_col_index('SCHEME')),
-                    apex_exec.get_varchar2(p_context => l_context, p_column_idx => l_col_index('CATEGORY')),
-                    apex_exec.get_varchar2(p_context => l_context, p_column_idx => l_col_index('DETAILS')),
-                    apex_exec.get_varchar2(p_context => l_context, p_column_idx => l_col_index('STATUS')),
-                    apex_exec.get_varchar2(p_context => l_context, p_column_idx => l_col_index('NAME')),
-                    apex_exec.get_varchar2(p_context => l_context, p_column_idx => l_col_index('LAYER')),
-                    apex_exec.get_varchar2(p_context => l_context, p_column_idx => l_col_index('ERRORLEVEL')),
-                    apex_exec.get_varchar2(p_context => l_context, p_column_idx => l_col_index('ACTIVE')),
-                    apex_exec.get_varchar2(p_context => l_context, p_column_idx => l_col_index('UTPLSQL_INFO')),
-                    apex_exec.get_varchar2(p_context => l_context, p_column_idx => l_col_index('TEST_NAME')),
-                    apex_exec.get_varchar2(p_context => l_context, p_column_idx => l_col_index('PROJECT'))));
+                    apex_exec.get_date    (p_context => l_context, p_column_idx => l_col_index('QATR_DATE')),
+                    apex_exec.get_varchar2(p_context => l_context, p_column_idx => l_col_index('QATR_SCHEME_NAME')),
+                    apex_exec.get_varchar2(p_context => l_context, p_column_idx => l_col_index('QARU_CATEGORY')),
+                    apex_exec.get_varchar2(p_context => l_context, p_column_idx => l_col_index('QATR_RESULT')),
+                    apex_exec.get_varchar2(p_context => l_context, p_column_idx => l_col_index('QARU_NAME')),
+                    apex_exec.get_varchar2(p_context => l_context, p_column_idx => l_col_index('QARU_LAYER')),
+                    apex_exec.get_varchar2(p_context => l_context, p_column_idx => l_col_index('QARU_ERROR_LEVEL')),
+                    apex_exec.get_varchar2(p_context => l_context, p_column_idx => l_col_index('QARU_IS_ACTIVE')),
+                    apex_exec.get_varchar2(p_context => l_context, p_column_idx => l_col_index('QARU_CLIENT_NAME')),
+                    apex_exec.get_varchar2(p_context => l_context, p_column_idx => l_col_index('QATR_PROGRAM_NAME'))));
   end loop;
 
   apex_exec.close(l_context);
