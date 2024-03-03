@@ -9,7 +9,7 @@
 -- --------------------------------------------------------------------------------
 
 -- ----------------------------------------
--- Page: 5 - Upload Test Results > Process: Upload file > Source > PL/SQL Code
+-- Page: 5 - Test Result Files > Process: Upload file > Source > PL/SQL Code
 
 declare
     v_clob_content  clob;

@@ -4,8 +4,8 @@ begin
 --     PAGE: 00008
 --   Manifest End
 wwv_flow_imp.component_begin (
- p_version_yyyy_mm_dd=>'2022.10.07'
-,p_release=>'22.2.11'
+ p_version_yyyy_mm_dd=>'2023.10.31'
+,p_release=>'23.2.4'
 ,p_default_workspace_id=>33657925800256602
 ,p_default_application_id=>141
 ,p_default_id_offset=>33662320935301187
@@ -22,7 +22,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'16'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20231025133706'
+,p_last_upd_yyyymmddhh24miss=>'20240216113253'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(58888272315789075)
@@ -32,7 +32,6 @@ wwv_flow_imp_page.create_page_plug(
 ,p_plug_display_sequence=>10
 ,p_include_in_reg_disp_sel_yn=>'Y'
 ,p_plug_display_point=>'REGION_POSITION_03'
-,p_plug_query_options=>'DERIVED_REPORT_COLUMNS'
 ,p_attribute_01=>'N'
 ,p_attribute_02=>'HTML'
 );
@@ -43,7 +42,6 @@ wwv_flow_imp_page.create_page_plug(
 ,p_plug_template=>wwv_flow_imp.id(50790142840675136)
 ,p_plug_display_sequence=>10
 ,p_include_in_reg_disp_sel_yn=>'Y'
-,p_plug_query_options=>'DERIVED_REPORT_COLUMNS'
 ,p_attribute_01=>'N'
 ,p_attribute_02=>'HTML'
 );
@@ -117,19 +115,25 @@ wwv_flow_imp_page.create_page_process(
 ,p_process_name=>'Upload file'
 ,p_process_sql_clob=>wwv_flow_string.join(wwv_flow_t_varchar2(
 'declare',
-'    v_clob_content  clob;',
+'    v_blob_content  blob;',
+'    v_filename      varchar2(100);',
 'begin',
-'  select to_clob(blob_content)',
-'	into v_clob_content',
+'  select blob_content,',
+'         filename',
+'	into v_blob_content,',
+'         v_filename',
 '	from APEX_APPLICATION_TEMP_FILES',
 '   where name = :P8_JSON_FILE;',
 '   ',
-'   qa_export_import_rules_pkg.p_import_clob_to_rules_table(pi_clob => v_clob_content);',
+'   qa_export_import_rules_pkg.f_import_clob_to_qa_import_files(pi_clob => v_blob_content,',
+'                                                               pi_filename => v_filename,',
+'                                                               pi_mimetype => ''application/json'');',
 'end;'))
 ,p_process_clob_language=>'PLSQL'
 ,p_error_display_location=>'INLINE_IN_NOTIFICATION'
 ,p_process_when_button_id=>wwv_flow_imp.id(55484743688519636)
 ,p_process_success_message=>'File uploaded.'
+,p_internal_uid=>55485877005519637
 );
 wwv_flow_imp_page.create_page_process(
  p_id=>wwv_flow_imp.id(42250191047031711)
@@ -137,7 +141,9 @@ wwv_flow_imp_page.create_page_process(
 ,p_process_point=>'AFTER_SUBMIT'
 ,p_process_type=>'NATIVE_CLOSE_WINDOW'
 ,p_process_name=>'Close Dialog'
+,p_attribute_02=>'N'
 ,p_error_display_location=>'INLINE_IN_NOTIFICATION'
+,p_internal_uid=>42250191047031711
 );
 wwv_flow_imp.component_end;
 end;
