@@ -84,8 +84,7 @@ begin
   end loop;
 exception
   when others then
-    dbms_output.put_line('ERROR: There are ' || l_count || ' invalid utPLSQL objects.');
-    dbms_output.put_line(sqlerrm);
+    dbms_output.put_line('ERROR: There has been an unexpected Error!');
     raise;
 end;
 /
