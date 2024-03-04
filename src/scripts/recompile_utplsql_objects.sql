@@ -11,7 +11,7 @@ declare
   l_action_2    varchar2(32767);
   l_count       number;
 begin
-   -- buffer size extend
+  -- buffer size extend
   dbms_output.enable(buffer_size => 10000000);
   -- objects:
   -- utPLSQL Objects
@@ -35,38 +35,29 @@ begin
   loop
     l_action_2 := null;
     if l_object_type(l_object) = 'PACKAGE'
-      then
-        l_action   := 'alter package ' || l_object_name(l_object) || ' compile';
-        l_action_2 := 'alter package ' || l_object_name(l_object) || ' compile body';
+    then
+      l_action   := 'alter package ' || l_object_name(l_object) || ' compile';
+      l_action_2 := 'alter package ' || l_object_name(l_object) || ' compile body';
     else
-        l_action   := 'alter ' || l_object_type(l_object) || ' ' || l_object_name(l_object) || ' compile';
+      l_action := 'alter ' || l_object_type(l_object) || ' ' || l_object_name(l_object) || ' compile';
     end if;
-  
+    begin
       execute immediate (l_action);
       if l_action_2 is not null
-        then
-          execute immediate (l_action_2);
-      end if;
-    select count(*)
-    into l_count
-    from user_objects uo
-    where uo.status = 'INVALID'
-    and uo.object_name = l_object_name(l_object);
-    
-    if l_count <> 0
       then
+        execute immediate (l_action_2);
+      end if;
+      dbms_output.put_line('INFO: ' || l_object_type(l_object) || ' ' || l_object_name(l_object) || ' recompiled.');
+    exception
+      when others then
         dbms_output.put_line('ERROR: The object ' || l_object_type(l_object) || ' ' || l_object_name(l_object) || ' is invalid.');
-    else
-        dbms_output.put_line('INFO: ' || l_object_type(l_object) || ' ' || l_object_name(l_object) || ' recompiled.');
-    end if;
-
+    end;
     l_object := l_object_name.next(l_object);
   end loop;
-    exception
-      when others
-        then
-          dbms_output.put_line('ERROR: There are ' || l_count || ' invalid utPLSQL objects.');
-          dbms_output.put_line(SQLERRM);
-          raise;
+exception
+  when others then
+    dbms_output.put_line('ERROR: There are ' || l_count || ' invalid utPLSQL objects.');
+    dbms_output.put_line(sqlerrm);
+    raise;
 end;
 /
