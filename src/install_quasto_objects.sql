@@ -25,6 +25,8 @@ PROMPT src/ddl/ind/qa_import_files.sql
 PROMPT CONSTRAINT
 PROMPT src/ddl/cons/qa_rules.sql
 @src/ddl/cons/qa_rules.sql
+PROMPT src/ddl/cons/qa_import_files.sql
+@src/ddl/cons/qa_import_files.sql
 
 PROMPT SEQUENCE
 PROMPT src/ddl/seq/qaru_seq.sql
@@ -89,6 +91,8 @@ PROMPT src/plsql/pkg/qa_export_import_rules_pkg.sql
 PROMPT TRIGGER
 PROMPT src/plsql/trg/qaru_iu_trg.sql
 @src/plsql/trg/qaru_iu_trg.sql
+PROMPT src/plsql/trg/qaif_i_trg.sql
+@src/plsql/trg/qaif_i_trg.sql
 
 PROMPT GRANT
 grant execute on qa_api_pkg to public;
