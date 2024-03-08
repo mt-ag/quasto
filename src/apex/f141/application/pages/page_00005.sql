@@ -22,7 +22,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'18'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20240308144505'
+,p_last_upd_yyyymmddhh24miss=>'20240308154100'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(19585581091742406)
@@ -236,18 +236,7 @@ wwv_flow_imp_page.create_page_process(
 ,p_process_point=>'AFTER_SUBMIT'
 ,p_process_type=>'NATIVE_PLSQL'
 ,p_process_name=>'Upload file'
-,p_process_sql_clob=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'declare',
-'    v_clob_content  clob;',
-'begin',
-'  select to_clob(blob_content)',
-'	into v_clob_content',
-'	from APEX_APPLICATION_TEMP_FILES',
-'   where name = :P5_XML_FILE;',
-'   ',
-'   insert into qa_test_results (qatr_xml_result)',
-'   values (v_clob_content);',
-'end;'))
+,p_process_sql_clob=>'qa_unit_tests_pkg.p_upload_unit_test_xml(pi_file_name => :P5_XML_FILE);'
 ,p_process_clob_language=>'PLSQL'
 ,p_error_display_location=>'INLINE_IN_NOTIFICATION'
 ,p_process_when_button_id=>wwv_flow_imp.id(37067191899570632)

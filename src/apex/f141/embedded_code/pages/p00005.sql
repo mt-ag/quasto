@@ -11,15 +11,5 @@
 -- ----------------------------------------
 -- Page: 5 - Test Result Files > Process: Upload file > Source > PL/SQL Code
 
-declare
-    v_clob_content  clob;
-begin
-  select to_clob(blob_content)
-	into v_clob_content
-	from APEX_APPLICATION_TEMP_FILES
-   where name = :P5_XML_FILE;
-   
-   insert into qa_test_results (qatr_xml_result)
-   values (v_clob_content);
-end;
+qa_unit_tests_pkg.p_upload_unit_test_xml(pi_file_name => :P5_XML_FILE);
 

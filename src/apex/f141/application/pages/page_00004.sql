@@ -23,7 +23,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'18'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20240303150311'
+,p_last_upd_yyyymmddhh24miss=>'20240308173740'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(54068725227447789)
@@ -137,6 +137,7 @@ wwv_flow_imp_page.create_worksheet_rpt(
 ,p_report_alias=>'196254'
 ,p_status=>'PUBLIC'
 ,p_is_default=>'Y'
+,p_display_rows=>10
 ,p_report_columns=>'QATO_ID:QATR_SCHEME_NAME:QATO_OBJECT_NAME:QATO_OBJECT_DETAILS:QATO_QATR_ID'
 ,p_sort_column_1=>'QATO_OBJECT_NAME'
 ,p_sort_direction_1=>'ASC'

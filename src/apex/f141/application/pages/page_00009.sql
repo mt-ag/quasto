@@ -23,7 +23,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'18'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20240301143508'
+,p_last_upd_yyyymmddhh24miss=>'20240308171127'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(51469936526214117)
@@ -111,6 +111,7 @@ wwv_flow_imp_page.create_worksheet_column(
 ,p_column_label=>'Log Date'
 ,p_column_type=>'DATE'
 ,p_heading_alignment=>'LEFT'
+,p_format_mask=>'DD/MM/YYYY HH24:MI'
 ,p_tz_dependent=>'N'
 ,p_use_as_row_header=>'N'
 );

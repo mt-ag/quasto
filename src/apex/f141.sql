@@ -40,8 +40,8 @@ prompt APPLICATION 141 - QUASTO
 --       Items:                   50
 --       Processes:               15
 --       Regions:                 39
---       Buttons:                 19
---       Dynamic Actions:         13
+--       Buttons:                 21
+--       Dynamic Actions:         14
 --     Shared Components:
 --       Logic:
 --         Items:                  1
@@ -122,7 +122,7 @@ wwv_imp_workspace.create_flow(
 ,p_substitution_string_02=>'DATE_FORMAT'
 ,p_substitution_value_02=>'DD/MM/YYYY'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20240308144505'
+,p_last_upd_yyyymmddhh24miss=>'20240308173740'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_files_version=>4
 ,p_print_server_type=>'NATIVE'
@@ -15410,7 +15410,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'18'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20240303150311'
+,p_last_upd_yyyymmddhh24miss=>'20240308173740'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(54068725227447789)
@@ -15524,6 +15524,7 @@ wwv_flow_imp_page.create_worksheet_rpt(
 ,p_report_alias=>'196254'
 ,p_status=>'PUBLIC'
 ,p_is_default=>'Y'
+,p_display_rows=>10
 ,p_report_columns=>'QATO_ID:QATR_SCHEME_NAME:QATO_OBJECT_NAME:QATO_OBJECT_DETAILS:QATO_QATR_ID'
 ,p_sort_column_1=>'QATO_OBJECT_NAME'
 ,p_sort_direction_1=>'ASC'
@@ -15553,7 +15554,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'18'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20240308144505'
+,p_last_upd_yyyymmddhh24miss=>'20240308154100'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(19585581091742406)
@@ -15767,18 +15768,7 @@ wwv_flow_imp_page.create_page_process(
 ,p_process_point=>'AFTER_SUBMIT'
 ,p_process_type=>'NATIVE_PLSQL'
 ,p_process_name=>'Upload file'
-,p_process_sql_clob=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'declare',
-'    v_clob_content  clob;',
-'begin',
-'  select to_clob(blob_content)',
-'	into v_clob_content',
-'	from APEX_APPLICATION_TEMP_FILES',
-'   where name = :P5_XML_FILE;',
-'   ',
-'   insert into qa_test_results (qatr_xml_result)',
-'   values (v_clob_content);',
-'end;'))
+,p_process_sql_clob=>'qa_unit_tests_pkg.p_upload_unit_test_xml(pi_file_name => :P5_XML_FILE);'
 ,p_process_clob_language=>'PLSQL'
 ,p_error_display_location=>'INLINE_IN_NOTIFICATION'
 ,p_process_when_button_id=>wwv_flow_imp.id(37067191899570632)
@@ -16774,7 +16764,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'18'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20240301143508'
+,p_last_upd_yyyymmddhh24miss=>'20240308171127'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(51469936526214117)
@@ -16862,6 +16852,7 @@ wwv_flow_imp_page.create_worksheet_column(
 ,p_column_label=>'Log Date'
 ,p_column_type=>'DATE'
 ,p_heading_alignment=>'LEFT'
+,p_format_mask=>'DD/MM/YYYY HH24:MI'
 ,p_tz_dependent=>'N'
 ,p_use_as_row_header=>'N'
 );
@@ -18200,11 +18191,12 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'03'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20240216152416'
+,p_last_upd_yyyymmddhh24miss=>'20240308171203'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(104945985645082588)
 ,p_plug_name=>'Restart Unit Test'
+,p_region_name=>'job_overview'
 ,p_region_template_options=>'#DEFAULT#'
 ,p_plug_template=>wwv_flow_imp.id(50790142840675136)
 ,p_plug_display_sequence=>10
@@ -18226,6 +18218,7 @@ wwv_flow_imp_page.create_page_plug(
 wwv_flow_imp_page.create_report_region(
  p_id=>wwv_flow_imp.id(8767788728376801)
 ,p_name=>'History Report'
+,p_region_name=>'history_report'
 ,p_parent_plug_id=>wwv_flow_imp.id(8769661398376820)
 ,p_template=>wwv_flow_imp.id(50728801114675111)
 ,p_display_sequence=>20
@@ -18265,7 +18258,7 @@ wwv_flow_imp_page.create_report_columns(
 ,p_column_display_sequence=>20
 ,p_column_heading=>'Log Date'
 ,p_use_as_row_header=>'N'
-,p_column_format=>'DD-MON-YYYY HH24:MI'
+,p_column_format=>'DD/MM/YYYY HH24:MI'
 ,p_heading_alignment=>'LEFT'
 ,p_disable_sort_column=>'N'
 ,p_derived_column=>'N'
@@ -18336,13 +18329,63 @@ wwv_flow_imp_page.create_page_button(
 ,p_button_sequence=>60
 ,p_button_plug_id=>wwv_flow_imp.id(104945985645082588)
 ,p_button_name=>'RESTART_UNIT_TEST'
+,p_button_static_id=>'button'
 ,p_button_action=>'SUBMIT'
 ,p_button_template_options=>'#DEFAULT#:t-Button--large:t-Button--iconLeft:t-Button--stretch'
 ,p_button_template_id=>wwv_flow_imp.id(50844844448675167)
 ,p_button_is_hot=>'Y'
 ,p_button_image_alt=>'Restart Unit Test'
+,p_button_condition=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'QA_UNIT_TESTS_PKG.f_exist_custom_job(pi_client_name => :P11_CLIENT_NAME',
+'                                   , pi_scheme_name => :P11_SCHEME_NAME',
+'                                   , pi_qaru_rule_number => :P11_RULE_NUMBER) = ''N'''))
+,p_button_condition2=>'PLSQL'
+,p_button_condition_type=>'EXPRESSION'
 ,p_icon_css_classes=>'fa-play-circle'
 ,p_grid_new_row=>'Y'
+);
+wwv_flow_imp_page.create_page_button(
+ p_id=>wwv_flow_imp.id(21671676825944301)
+,p_button_sequence=>70
+,p_button_plug_id=>wwv_flow_imp.id(104945985645082588)
+,p_button_name=>'UNIT_TEST_IN_PROGRESS'
+,p_button_action=>'SUBMIT'
+,p_button_template_options=>'#DEFAULT#:t-Button--large:t-Button--warning:t-Button--iconLeft:t-Button--stretch'
+,p_button_template_id=>wwv_flow_imp.id(50844844448675167)
+,p_button_is_hot=>'Y'
+,p_button_image_alt=>'Unit Test in progress...'
+,p_button_execute_validations=>'N'
+,p_button_condition=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'QA_UNIT_TESTS_PKG.f_exist_custom_job(pi_client_name => :P11_CLIENT_NAME',
+'                                   , pi_scheme_name => :P11_SCHEME_NAME',
+'                                   , pi_qaru_rule_number => :P11_RULE_NUMBER) = ''Y'''))
+,p_button_condition2=>'PLSQL'
+,p_button_condition_type=>'EXPRESSION'
+,p_icon_css_classes=>'fa-spinner fa-anim-spin'
+,p_button_cattributes=>'disabled="disabled"'
+,p_grid_new_row=>'Y'
+,p_grid_column_span=>10
+);
+wwv_flow_imp_page.create_page_button(
+ p_id=>wwv_flow_imp.id(21671976762944304)
+,p_button_sequence=>80
+,p_button_plug_id=>wwv_flow_imp.id(104945985645082588)
+,p_button_name=>'REFRESH'
+,p_button_action=>'DEFINED_BY_DA'
+,p_button_template_options=>'#DEFAULT#:t-Button--large:t-Button--primary:t-Button--simple:t-Button--stretch'
+,p_button_template_id=>wwv_flow_imp.id(50844813129675167)
+,p_button_is_hot=>'Y'
+,p_button_image_alt=>'Refresh'
+,p_button_execute_validations=>'N'
+,p_warn_on_unsaved_changes=>null
+,p_button_condition=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'QA_UNIT_TESTS_PKG.f_exist_custom_job(pi_client_name => :P11_CLIENT_NAME',
+'                                   , pi_scheme_name => :P11_SCHEME_NAME',
+'                                   , pi_qaru_rule_number => :P11_RULE_NUMBER) = ''Y'''))
+,p_button_condition2=>'PLSQL'
+,p_button_condition_type=>'EXPRESSION'
+,p_grid_new_row=>'N'
+,p_grid_new_column=>'Y'
 );
 wwv_flow_imp_page.create_page_item(
  p_id=>wwv_flow_imp.id(8768814433376812)
@@ -18404,6 +18447,25 @@ wwv_flow_imp_page.create_page_item(
 ,p_attribute_04=>'Y'
 ,p_attribute_05=>'PLAIN'
 );
+wwv_flow_imp_page.create_page_da_event(
+ p_id=>wwv_flow_imp.id(21672053447944305)
+,p_name=>'Refresh Page'
+,p_event_sequence=>10
+,p_triggering_element_type=>'BUTTON'
+,p_triggering_button_id=>wwv_flow_imp.id(21671976762944304)
+,p_bind_type=>'bind'
+,p_execution_type=>'IMMEDIATE'
+,p_bind_event_type=>'click'
+);
+wwv_flow_imp_page.create_page_da_action(
+ p_id=>wwv_flow_imp.id(21672195827944306)
+,p_event_id=>wwv_flow_imp.id(21672053447944305)
+,p_event_result=>'TRUE'
+,p_action_sequence=>10
+,p_execute_on_page_init=>'N'
+,p_action=>'NATIVE_JAVASCRIPT_CODE'
+,p_attribute_01=>'location.reload();'
+);
 wwv_flow_imp_page.create_page_process(
  p_id=>wwv_flow_imp.id(51471617693214134)
 ,p_process_sequence=>10
@@ -18421,7 +18483,7 @@ wwv_flow_imp_page.create_page_process(
 ,p_process_clob_language=>'PLSQL'
 ,p_error_display_location=>'INLINE_IN_NOTIFICATION'
 ,p_process_when_button_id=>wwv_flow_imp.id(51471535036214133)
-,p_process_success_message=>'Job will start in 1 minute.'
+,p_process_success_message=>'Job started.'
 ,p_internal_uid=>51471617693214134
 );
 end;
