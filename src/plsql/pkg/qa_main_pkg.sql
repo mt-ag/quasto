@@ -24,6 +24,19 @@ create or replace package qa_main_pkg authid definer as
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
   ) return qa_rule_t;
 
+  /**
+  * function to get the rule pk by rule number and client name
+  * @param  pi_qaru_rule_number specifies the rule number
+  * @param  pi_qaru_client_name specifies the client name
+  * @throws NO_DATA_FOUND if rule number and client name do not exist
+  * @return qa_rule_t returns the rule entity
+  */
+  function f_get_rule_pk
+  (
+    pi_qaru_rule_number in qa_rules.qaru_rule_number%type
+   ,pi_qaru_client_name in qa_rules.qaru_client_name%type
+  ) return number;
+
 /**
  * function to get all rule numbers from one client/project
  * @param  pi_qaru_client_name specifies the client name
@@ -191,6 +204,37 @@ create or replace package body qa_main_pkg as
       raise;
   end f_get_rule;
 
+  function f_get_rule_pk
+  (
+    pi_qaru_rule_number in qa_rules.qaru_rule_number%type
+   ,pi_qaru_client_name in qa_rules.qaru_client_name%type
+  ) return number is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_rule_pk';
+    l_param_list qa_logger_pkg.tab_param;
+    
+    l_qaru_id number;
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qaru_rule_number'
+                              ,p_val_01  => pi_qaru_rule_number
+                              ,p_name_02 => 'pi_qaru_client_name'
+                              ,p_val_02  => pi_qaru_client_name);
+  
+    select qaru_id
+    into l_qaru_id
+    from QA_RULES
+    where qaru_client_name = pi_qaru_client_name
+    and qaru_rule_number = pi_qaru_rule_number;
+  
+    return l_qaru_id;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get the pk of a given rule number and client name!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_get_rule_pk;
 
   function tf_get_rule_numbers(pi_qaru_client_name in qa_rules.qaru_client_name%type) return varchar2_tab_t is
     c_unit constant varchar2(32767) := $$plsql_unit || '.tf_get_rule_numbers';

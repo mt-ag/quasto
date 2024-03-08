@@ -29,18 +29,6 @@ create or replace package qa_unit_tests_pkg authid definer is
   procedure p_delete_unit_test_packages(pi_scheme_names in varchar2_tab_t default null);
 
   /**
-   * procedure to run all unit tests, save the xml result in the database and return a status message - used by scheduler cronjob
-   * @param po_status_message returns the result message
-  */
-  procedure p_run_all_unit_tests(po_status_message out varchar2);
-
-  /**
-   * procedure to enable or disable the scheduler cronjob
-   * @param pi_status defines the status of the scheduler job
-  */
-  procedure p_enable_scheduler_cronjob(pi_status in varchar2);
-
-  /**
    * procedure to create a custom job to run a single unit test
    * @param pi_client_name defines the client name for which the unit test should be executed
    * @param pi_scheme_name defines the scheme name for which the unit test should be executed
@@ -52,6 +40,26 @@ create or replace package qa_unit_tests_pkg authid definer is
    ,pi_scheme_name      in varchar2
    ,pi_qaru_rule_number in varchar2
   );
+
+  /**
+   * procedure to run all unit tests, save the xml result in the database and return a status message - used by scheduler cronjob
+   * @param po_status_message returns the result message
+  */
+  procedure p_run_all_unit_tests(po_status_message out varchar2);
+
+  /**
+   * function to run all unit tests and return the xml result
+   * @param  pi_client_name defines the client name for which the unit tests should be executed
+   * @param  pi_scheme_name defines the scheme name for which the unit tests should be executed
+   * @param  pi_quasto_scheme defines the scheme name in which the quasto unit tests are saved
+   * @return clob returns the xml
+  */
+  function f_run_all_unit_tests
+  (
+    pi_client_name   in varchar2 default null
+   ,pi_scheme_name   in varchar2 default null
+   ,pi_quasto_scheme in varchar2 default SYS_CONTEXT('USERENV', 'CURRENT_USER')
+  ) return clob;
 
   /**
    * procedure to run a single unit test and save xml result in database
@@ -83,19 +91,6 @@ create or replace package qa_unit_tests_pkg authid definer is
   ) return number;
 
   /**
-   * procedure to save the details of faulty scheme objects - called from generated test packages
-   * @param pi_object_name defines the name of the object
-   * @param pi_object_details defines details about the object
-   * @param pi_qatr_id defines the test result id to which the objects belong to
-  */
-  procedure p_save_scheme_faulty_objects
-  (
-    pi_object_name    in varchar2
-   ,pi_object_details in varchar2
-   ,pi_qatr_id        in number
-  );
-
-  /**
    * procedure to save any occured runtime errors - called from generated test packages
    * @param pi_qaru_rule_number defines the rule number
    * @param pi_qaru_client_name defines the client name
@@ -113,31 +108,17 @@ create or replace package qa_unit_tests_pkg authid definer is
   );
 
   /**
-   * function to run all unit tests and return the xml result
-   * @param  pi_client_name defines the client name for which the unit tests should be executed
-   * @param  pi_scheme_name defines the scheme name for which the unit tests should be executed
-   * @param  pi_quasto_scheme defines the scheme name in which the quasto unit tests are saved
-   * @return clob returns the xml
+   * procedure to save the details of faulty scheme objects - called from generated test packages
+   * @param pi_object_name defines the name of the object
+   * @param pi_object_details defines details about the object
+   * @param pi_qatr_id defines the test result id to which the objects belong to
   */
-  function f_run_all_unit_tests
+  procedure p_save_scheme_faulty_objects
   (
-    pi_client_name   in varchar2 default null
-   ,pi_scheme_name   in varchar2 default null
-   ,pi_quasto_scheme in varchar2 default SYS_CONTEXT('USERENV', 'CURRENT_USER')
-  ) return clob;
-
-  /**
-   * procedure to download the xml result as file
-   * @param  pi_qatr_id defines the xml test result id
-   * @return clob returns the xml
-  */
-  procedure p_download_unit_test_xml(pi_qatr_id in number);
-
-  /**
-   * function to get status of scheduler cronjob
-   * @return varchar2 returns whether scheduler job for execution of unit tests is enabled or not
-  */
-  function f_is_scheduler_cronjob_enabled return varchar2;
+    pi_object_name    in varchar2
+   ,pi_object_details in varchar2
+   ,pi_qatr_id        in number
+  );
 
   /**
    * function to convert and unify a given string - for internal use only
@@ -166,118 +147,49 @@ create or replace package qa_unit_tests_pkg authid definer is
    ,pi_client_name      in varchar2 default null
    ,pi_qaru_rule_number in varchar2 default null
    ,pi_is_cronjob       in varchar2
-   ,pi_job_start_date   in date default null
   ) return varchar2 deterministic;
+
+  /**
+   * function to check if a custom unit test job exists
+   * @param  pi_scheme_name defines the scheme name
+   * @param  pi_client_name defines the client name
+   * @param  pi_qaru_rule_number defines the rule number
+   * @return varchar2 returns the result
+  */
+  function f_exist_custom_job
+  (
+    pi_scheme_name      in varchar2
+   ,pi_client_name      in varchar2
+   ,pi_qaru_rule_number in varchar2
+  ) return varchar2;
+
+  /**
+   * function to get status of scheduler cronjob
+   * @return varchar2 returns whether scheduler job for execution of unit tests is enabled or not
+  */
+  function f_is_scheduler_cronjob_enabled return varchar2;
+
+  /**
+   * procedure to enable or disable the scheduler cronjob
+   * @param pi_status defines the status of the scheduler job
+  */
+  procedure p_enable_scheduler_cronjob(pi_status in varchar2);
+
+  /**
+   * procedure to upload a xml result file
+   * @param pi_file_name defines the file name in APEX_APPLICATION_TEMP_FILES
+  */
+  procedure p_upload_unit_test_xml(pi_file_name in varchar2);
+
+  /**
+   * procedure to download a xml result as file
+   * @param pi_qatr_id defines the xml test result id
+  */
+  procedure p_download_unit_test_xml(pi_qatr_id in number);
 
 end qa_unit_tests_pkg;
 /
 create or replace package body qa_unit_tests_pkg is
-
-  function f_get_unified_string(
-    pi_string          in varchar2
-   ,pi_transform_case  in varchar2 default null
-  ) return varchar2 deterministic
-  is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_unified_string';
-    l_param_list qa_logger_pkg.tab_param;
-
-    v_string varchar2(500);
-  begin
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_string'
-                              ,p_val_01  => pi_string
-                              ,p_name_02 => 'pi_transform_case'
-                              ,p_val_02  => pi_transform_case);
-                              
-    if pi_string is null
-    or (pi_transform_case is not null and lower(pi_transform_case) not in ('l','u'))
-    then
-      raise_application_error(-20001, 'Invalid input parameter value for pi_string: ' || pi_string || ' or pi_transform_case: ' || pi_transform_case);
-    end if;
-    
-    v_string := regexp_replace(replace(pi_string
-                                      ,' '
-                                      ,'_')
-                              ,'[^a-zA-Z0-9_]'
-                              ,'_');
-
-    if lower(pi_transform_case) = 'l'
-    then
-      v_string := lower(v_string);
-    elsif lower(pi_transform_case) = 'u'
-    then
-      v_string := upper(v_string);
-    end if;
-    
-    return v_string;
-  exception
-    when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to generate an unified string!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-      raise;
-  end f_get_unified_string;
-
-  function f_get_job_name(
-    pi_scheme_name       in varchar2 default null
-   ,pi_client_name       in varchar2 default null
-   ,pi_qaru_rule_number  in varchar2 default null
-   ,pi_is_cronjob        in varchar2
-   ,pi_job_start_date    in date default null
-  ) return varchar2
-  is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_job_name';
-    l_param_list qa_logger_pkg.tab_param;
-
-    l_client_name varchar2(500);
-    l_scheme_name varchar2(500);
-    l_rule_number varchar2(5);
-    l_job_name varchar2(500);
-  begin
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_scheme_name'
-                              ,p_val_01  => pi_scheme_name
-                              ,p_name_02 => 'pi_client_name'
-                              ,p_val_02  => pi_client_name
-                              ,p_name_03 => 'pi_qaru_rule_number'
-                              ,p_val_03  => pi_qaru_rule_number
-                              ,p_name_04 => 'pi_is_cronjob'
-                              ,p_val_04  => pi_is_cronjob
-                              ,p_name_05 => 'pi_job_start_date'
-                              ,p_val_05  => pi_job_start_date);
-    
-    if ((pi_scheme_name is null or pi_client_name is null or pi_qaru_rule_number is null) and pi_is_cronjob != 'Y')
-    or pi_is_cronjob not in ('Y','N')
-    then
-      raise_application_error(-20001, 'Invalid input parameter value or value missing for pi_scheme_name: ' || pi_scheme_name || ', pi_client_name: ' || pi_client_name || ', pi_qaru_rule_number: ' || pi_qaru_rule_number || ', pi_is_cronjob: ' || pi_is_cronjob);
-    end if;
-    
-    if pi_is_cronjob = 'Y'
-    then
-      l_job_name := qa_constant_pkg.gc_utplsql_scheduler_cronjob_name;
-    else
-      l_client_name := f_get_unified_string(pi_string => pi_client_name, pi_transform_case => 'u');
-      l_scheme_name := f_get_unified_string(pi_string => pi_scheme_name, pi_transform_case => 'u');
-      l_rule_number := f_get_unified_string(pi_string => pi_qaru_rule_number);
-
-      l_job_name := qa_constant_pkg.gc_utplsql_custom_scheduler_job_name || '_' || l_scheme_name || '_' || l_client_name || '_' || l_rule_number;
-    
-      if pi_job_start_date is not null
-      then
-        l_job_name := l_job_name || '_' || to_char(pi_job_start_date,'YYYYMMDDHH24MISS');
-      end if;
-    end if;
-   
-   return l_job_name;
-  exception
-    when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get a custom job name!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-      raise;
-  end f_get_job_name;
 
   function f_get_suitepath(
     pi_client_name   in varchar2 default null
@@ -951,6 +863,49 @@ create or replace package body qa_unit_tests_pkg is
       raise;
   end p_delete_unit_test_packages;
 
+  procedure p_create_custom_unit_test_job(
+    pi_client_name      in varchar2
+   ,pi_scheme_name      in varchar2
+   ,pi_qaru_rule_number in varchar2
+  ) is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.p_create_custom_unit_test_job';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_job_start_date date;
+    l_job_name varchar2(500);
+    l_utplsql_call varchar2(1000);
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_client_name'
+                              ,p_val_01  => pi_client_name
+                              ,p_name_02 => 'pi_scheme_name'
+                              ,p_val_02  => pi_scheme_name
+                              ,p_name_03 => 'pi_qaru_rule_number'
+                              ,p_val_03  => pi_qaru_rule_number);
+    
+    l_job_start_date := systimestamp + interval '5' second;
+    l_job_name := f_get_job_name(pi_scheme_name => pi_scheme_name, pi_client_name => pi_client_name, pi_qaru_rule_number => pi_qaru_rule_number, pi_is_cronjob => 'N');
+    l_job_name := l_job_name || '_' || to_char(l_job_start_date,'YYYYMMDDHH24MISS');
+    
+    dbms_scheduler.create_job(
+      job_name   => l_job_name
+    , job_type   => 'PLSQL_BLOCK'
+    , job_action => 'BEGIN qa_unit_tests_pkg.p_run_custom_unit_test(pi_client_name => '''|| pi_client_name || ''', pi_scheme_name => '''|| pi_scheme_name || ''', pi_qaru_rule_number => '''|| pi_qaru_rule_number || '''); END;'
+    , start_date => l_job_start_date
+    , enabled    => true
+    , auto_drop  => true
+    , comments   => 'Custom Job to run an Unit Test triggered by APEX app (rule number: '||pi_qaru_rule_number||' - client name: '||pi_client_name||' - scheme name: '||pi_scheme_name||')'
+   );
+
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to create a custom scheduler job to run an unit test procedure!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end p_create_custom_unit_test_job;
+
   procedure p_run_all_unit_tests(
     po_status_message out varchar2
   ) is
@@ -984,232 +939,6 @@ create or replace package body qa_unit_tests_pkg is
       po_status_message := 'Execution of unit tests failed with error ' || sqlerrm || ' - ' || dbms_utility.format_error_backtrace;
       raise;
   end p_run_all_unit_tests;
-
-  procedure p_enable_scheduler_cronjob(
-    pi_status in varchar2
-  ) is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.p_enable_scheduler_cronjob';
-    l_param_list qa_logger_pkg.tab_param;
-  begin
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_status'
-                              ,p_val_01  => pi_status);
-
-    if pi_status not in ('Y'
-                        ,'N')
-    then
-      raise_application_error(-20001, 'Invalid input parameter value for pi_status: ' || pi_status);
-    end if;
-
-    if pi_status = 'Y'
-    then
-      dbms_scheduler.enable(qa_constant_pkg.gc_utplsql_scheduler_cronjob_name);
-    else
-      dbms_scheduler.disable(qa_constant_pkg.gc_utplsql_scheduler_cronjob_name);
-    end if;
-  exception
-    when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to enable the ut scheduler cronjob!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-      raise;
-  end p_enable_scheduler_cronjob;
-
-  procedure p_create_custom_unit_test_job(
-    pi_client_name      in varchar2
-   ,pi_scheme_name      in varchar2
-   ,pi_qaru_rule_number in varchar2
-  ) is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.p_create_custom_unit_test_job';
-    l_param_list qa_logger_pkg.tab_param;
-
-    l_job_start_date date;
-    l_job_name varchar2(500);
-    l_utplsql_call varchar2(1000);
-  begin
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_client_name'
-                              ,p_val_01  => pi_client_name
-                              ,p_name_02 => 'pi_scheme_name'
-                              ,p_val_02  => pi_scheme_name
-                              ,p_name_03 => 'pi_qaru_rule_number'
-                              ,p_val_03  => pi_qaru_rule_number);
-    
-    l_job_start_date := systimestamp + interval '1' minute;
-    l_job_name := f_get_job_name(pi_scheme_name => pi_scheme_name, pi_client_name => pi_client_name, pi_qaru_rule_number => pi_qaru_rule_number, pi_is_cronjob => 'N', pi_job_start_date => l_job_start_date);
-    
-    dbms_scheduler.create_job(
-      job_name   => l_job_name
-    , job_type   => 'PLSQL_BLOCK'
-    , job_action => 'BEGIN qa_unit_tests_pkg.p_run_custom_unit_test(pi_client_name => '''|| pi_client_name || ''', pi_scheme_name => '''|| pi_scheme_name || ''', pi_qaru_rule_number => '''|| pi_qaru_rule_number || '''); END;'
-    , start_date => l_job_start_date
-    , enabled    => true
-    , auto_drop  => true
-    , comments   => 'Custom Job to run an Unit Test triggered by APEX app (rule number: '||pi_qaru_rule_number||' - client name: '||pi_client_name||' - scheme name: '||pi_scheme_name||')'
-   );
-
-  exception
-    when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to create a custom scheduler job to run an unit test procedure!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-      raise;
-  end p_create_custom_unit_test_job;
-
-  procedure p_run_custom_unit_test(
-    pi_client_name      in varchar2
-   ,pi_scheme_name      in varchar2
-   ,pi_qaru_rule_number in varchar2
-  ) is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.p_run_custom_unit_test';
-    l_param_list qa_logger_pkg.tab_param;
-
-    l_utplsql_call varchar2(1000);
-    l_xml_result clob;
-  begin
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_client_name'
-                              ,p_val_01  => pi_client_name
-                              ,p_name_02 => 'pi_scheme_name'
-                              ,p_val_02  => pi_scheme_name
-                              ,p_name_03 => 'pi_qaru_rule_number'
-                              ,p_val_03  => pi_qaru_rule_number);
-
-    l_utplsql_call := f_get_unit_test_call(pi_client_name => pi_client_name, pi_scheme_name => pi_scheme_name, pi_qaru_rule_number => pi_qaru_rule_number);
-    
-    select DBMS_XMLGEN.CONVERT(XMLAGG(XMLELEMENT(E,column_value).EXTRACT('//text()')).GetClobVal(),1)
-    into l_xml_result
-    from table(ut.run(l_utplsql_call, ut_junit_reporter()));
-    
-    insert into QA_TEST_RESULTS(QATR_XML_RESULT)
-    values (l_xml_result);
-
-  exception
-    when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while running a single unit test!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-      raise;
-  end p_run_custom_unit_test;
-
-  function f_save_scheme_error_result(
-    pi_scheme_name  in varchar2
-   ,pi_program_name in varchar2
-   ,pi_qaru_id      in number
-   ,pi_result       in number
-  ) return number
-  is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.f_save_scheme_error_result';
-    l_param_list qa_logger_pkg.tab_param;
-    
-    l_qatr_id number;
-  begin
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_scheme_name'
-                              ,p_val_01  => pi_scheme_name
-                              ,p_name_02 => 'pi_program_name'
-                              ,p_val_02  => pi_program_name
-                              ,p_name_03 => 'pi_qaru_id'
-                              ,p_val_03  => pi_qaru_id
-                              ,p_name_04 => 'pi_result'
-                              ,p_val_04  => pi_result);
-
-    insert into QA_TEST_RUNS (qatr_scheme_name, qatr_date, qatr_result, qatr_qaru_id, qatr_program_name)
-    values (pi_scheme_name, sysdate, pi_result, pi_qaru_id, pi_program_name)
-    returning qatr_id into l_qatr_id;
-    
-    return l_qatr_id;
-  exception
-    when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while saving the failed result of a scheme!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-      raise;
-  end f_save_scheme_error_result;
-
-  procedure p_save_scheme_faulty_objects(
-    pi_object_name    in varchar2
-   ,pi_object_details in varchar2
-   ,pi_qatr_id        in number
-  ) is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.p_save_scheme_faulty_objects';
-    l_param_list qa_logger_pkg.tab_param;
-  begin
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_object_name'
-                              ,p_val_01  => pi_object_name
-                              ,p_name_02 => 'pi_object_details'
-                              ,p_val_02  => pi_object_details
-                              ,p_name_03 => 'pi_qatr_id'
-                              ,p_val_03  => pi_qatr_id);
-
-    insert into QA_TEST_RUN_INVALID_OBJECTS (qato_object_name, qato_object_details, qato_qatr_id)
-    values (pi_object_name, pi_object_details, pi_qatr_id);
-  exception
-    when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while saving the details of faulty scheme object!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-      raise;
-  end p_save_scheme_faulty_objects;
-
-  procedure p_save_scheme_result_with_runtime_error(
-    pi_qaru_rule_number in qa_rules.qaru_rule_number%type
-   ,pi_qaru_client_name in qa_rules.qaru_client_name%type
-   ,pi_scheme_name      in varchar2_tab_t
-   ,pi_program_name     in varchar2
-   ,pi_runtime_error    in varchar2
-  )
-  is
-    pragma autonomous_transaction;
-    c_unit constant varchar2(32767) := $$plsql_unit || '.p_save_scheme_result_with_runtime_error';
-    l_param_list qa_logger_pkg.tab_param;
-
-    l_scheme_name varchar2(100);
-    l_qaru_id number;
-    l_qatr_id number;
-  begin
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_qaru_rule_number'
-                              ,p_val_01  => pi_qaru_rule_number
-                              ,p_name_02 => 'pi_qaru_client_name'
-                              ,p_val_02  => pi_qaru_client_name
-                              ,p_name_03 => 'pi_program_name'
-                              ,p_val_03  => pi_program_name
-                              ,p_name_04 => 'pi_runtime_error'
-                              ,p_val_04  => pi_runtime_error);
-    
-    for i in pi_scheme_name.first .. pi_scheme_name.last
-    loop
-      l_scheme_name := pi_scheme_name(i) || ',' || l_scheme_name;
-    end loop;
-    l_scheme_name := substr(l_scheme_name
-                            ,0
-                            ,length(l_scheme_name) - 1);
-
-    l_qaru_id := qa_main_pkg.f_get_rule_pk(pi_qaru_rule_number => pi_qaru_rule_number
-                                         , pi_qaru_client_name => pi_qaru_client_name);
-    l_qatr_id := f_save_scheme_error_result(pi_scheme_name => l_scheme_name
-                                           ,pi_program_name => pi_program_name
-                                           ,pi_qaru_id => l_qaru_id
-                                           ,pi_result => 0);
-    update QA_TEST_RUNS
-    set qatr_runtime_error = pi_runtime_error
-    where qatr_id = l_qatr_id;
-    commit;
-  exception
-    when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while saving the scheme result with runtime error for a test result!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-      raise;
-  end p_save_scheme_result_with_runtime_error;
 
   function f_run_all_unit_tests(
     pi_client_name   in varchar2 default null
@@ -1256,6 +985,405 @@ create or replace package body qa_unit_tests_pkg is
                             ,p_params => l_param_list);
       raise;
   end f_run_all_unit_tests;
+
+  procedure p_run_custom_unit_test(
+    pi_client_name      in varchar2
+   ,pi_scheme_name      in varchar2
+   ,pi_qaru_rule_number in varchar2
+  ) is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.p_run_custom_unit_test';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_utplsql_call varchar2(1000);
+    l_xml_result clob;
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_client_name'
+                              ,p_val_01  => pi_client_name
+                              ,p_name_02 => 'pi_scheme_name'
+                              ,p_val_02  => pi_scheme_name
+                              ,p_name_03 => 'pi_qaru_rule_number'
+                              ,p_val_03  => pi_qaru_rule_number);
+
+    l_utplsql_call := f_get_unit_test_call(pi_client_name => pi_client_name, pi_scheme_name => pi_scheme_name, pi_qaru_rule_number => pi_qaru_rule_number);
+    
+    select DBMS_XMLGEN.CONVERT(XMLAGG(XMLELEMENT(E,column_value).EXTRACT('//text()')).GetClobVal(),1)
+    into l_xml_result
+    from table(ut.run(l_utplsql_call, ut_junit_reporter()));
+    
+    insert into QA_TEST_RESULTS(QATR_XML_RESULT)
+    values (l_xml_result);
+
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while running a single unit test!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end p_run_custom_unit_test;
+
+  function f_save_scheme_error_result(
+    pi_scheme_name  in varchar2
+   ,pi_program_name in varchar2
+   ,pi_qaru_id      in number
+   ,pi_result       in number
+  ) return number
+  is
+  pragma autonomous_transaction;
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_save_scheme_error_result';
+    l_param_list qa_logger_pkg.tab_param;
+    
+    l_qatr_id number;
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_scheme_name'
+                              ,p_val_01  => pi_scheme_name
+                              ,p_name_02 => 'pi_program_name'
+                              ,p_val_02  => pi_program_name
+                              ,p_name_03 => 'pi_qaru_id'
+                              ,p_val_03  => pi_qaru_id
+                              ,p_name_04 => 'pi_result'
+                              ,p_val_04  => pi_result);
+
+    insert into QA_TEST_RUNS (qatr_scheme_name, qatr_date, qatr_result, qatr_qaru_id, qatr_program_name)
+    values (pi_scheme_name, sysdate, pi_result, pi_qaru_id, pi_program_name)
+    returning qatr_id into l_qatr_id;
+    commit;
+    
+    return l_qatr_id;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while saving the failed result of a scheme!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_save_scheme_error_result;
+
+  procedure p_save_scheme_result_with_runtime_error(
+    pi_qaru_rule_number in qa_rules.qaru_rule_number%type
+   ,pi_qaru_client_name in qa_rules.qaru_client_name%type
+   ,pi_scheme_name      in varchar2_tab_t
+   ,pi_program_name     in varchar2
+   ,pi_runtime_error    in varchar2
+  )
+  is
+  pragma autonomous_transaction;
+    c_unit constant varchar2(32767) := $$plsql_unit || '.p_save_scheme_result_with_runtime_error';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_scheme_name varchar2(100);
+    l_qaru_id number;
+    l_qatr_id number;
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qaru_rule_number'
+                              ,p_val_01  => pi_qaru_rule_number
+                              ,p_name_02 => 'pi_qaru_client_name'
+                              ,p_val_02  => pi_qaru_client_name
+                              ,p_name_03 => 'pi_program_name'
+                              ,p_val_03  => pi_program_name
+                              ,p_name_04 => 'pi_runtime_error'
+                              ,p_val_04  => pi_runtime_error);
+    
+    for i in pi_scheme_name.first .. pi_scheme_name.last
+    loop
+      l_scheme_name := pi_scheme_name(i) || ',' || l_scheme_name;
+    end loop;
+    l_scheme_name := substr(l_scheme_name
+                            ,0
+                            ,length(l_scheme_name) - 1);
+
+    l_qaru_id := qa_main_pkg.f_get_rule_pk(pi_qaru_rule_number => pi_qaru_rule_number
+                                         , pi_qaru_client_name => pi_qaru_client_name);
+    l_qatr_id := f_save_scheme_error_result(pi_scheme_name => l_scheme_name
+                                           ,pi_program_name => pi_program_name
+                                           ,pi_qaru_id => l_qaru_id
+                                           ,pi_result => 0);
+    update QA_TEST_RUNS
+    set qatr_runtime_error = pi_runtime_error
+    where qatr_id = l_qatr_id;
+    commit;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while saving the scheme result with runtime error for a test result!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end p_save_scheme_result_with_runtime_error;
+
+  procedure p_save_scheme_faulty_objects(
+    pi_object_name    in varchar2
+   ,pi_object_details in varchar2
+   ,pi_qatr_id        in number
+  ) is
+  pragma autonomous_transaction;
+    c_unit constant varchar2(32767) := $$plsql_unit || '.p_save_scheme_faulty_objects';
+    l_param_list qa_logger_pkg.tab_param;
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_object_name'
+                              ,p_val_01  => pi_object_name
+                              ,p_name_02 => 'pi_object_details'
+                              ,p_val_02  => pi_object_details
+                              ,p_name_03 => 'pi_qatr_id'
+                              ,p_val_03  => pi_qatr_id);
+
+    insert into QA_TEST_RUN_INVALID_OBJECTS (qato_object_name, qato_object_details, qato_qatr_id)
+    values (pi_object_name, pi_object_details, pi_qatr_id);
+    commit;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while saving the details of faulty scheme object!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end p_save_scheme_faulty_objects;
+
+  function f_get_unified_string(
+    pi_string          in varchar2
+   ,pi_transform_case  in varchar2 default null
+  ) return varchar2 deterministic
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_unified_string';
+    l_param_list qa_logger_pkg.tab_param;
+
+    v_string varchar2(500);
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_string'
+                              ,p_val_01  => pi_string
+                              ,p_name_02 => 'pi_transform_case'
+                              ,p_val_02  => pi_transform_case);
+                              
+    if pi_string is null
+    or (pi_transform_case is not null and lower(pi_transform_case) not in ('l','u'))
+    then
+      raise_application_error(-20001, 'Invalid input parameter value for pi_string: ' || pi_string || ' or pi_transform_case: ' || pi_transform_case);
+    end if;
+    
+    v_string := regexp_replace(replace(pi_string
+                                      ,' '
+                                      ,'_')
+                              ,'[^a-zA-Z0-9_]'
+                              ,'_');
+
+    if lower(pi_transform_case) = 'l'
+    then
+      v_string := lower(v_string);
+    elsif lower(pi_transform_case) = 'u'
+    then
+      v_string := upper(v_string);
+    end if;
+    
+    return v_string;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to generate an unified string!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_get_unified_string;
+
+  function f_get_job_name(
+    pi_scheme_name       in varchar2 default null
+   ,pi_client_name       in varchar2 default null
+   ,pi_qaru_rule_number  in varchar2 default null
+   ,pi_is_cronjob        in varchar2
+  ) return varchar2
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_job_name';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_client_name varchar2(500);
+    l_scheme_name varchar2(500);
+    l_rule_number varchar2(5);
+    l_job_name varchar2(500);
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_scheme_name'
+                              ,p_val_01  => pi_scheme_name
+                              ,p_name_02 => 'pi_client_name'
+                              ,p_val_02  => pi_client_name
+                              ,p_name_03 => 'pi_qaru_rule_number'
+                              ,p_val_03  => pi_qaru_rule_number
+                              ,p_name_04 => 'pi_is_cronjob'
+                              ,p_val_04  => pi_is_cronjob);
+    
+    if ((pi_scheme_name is null or pi_client_name is null or pi_qaru_rule_number is null) and pi_is_cronjob != 'Y')
+    or pi_is_cronjob not in ('Y','N')
+    then
+      raise_application_error(-20001, 'Invalid input parameter value or value missing for pi_scheme_name: ' || pi_scheme_name || ', pi_client_name: ' || pi_client_name || ', pi_qaru_rule_number: ' || pi_qaru_rule_number || ', pi_is_cronjob: ' || pi_is_cronjob);
+    end if;
+    
+    if pi_is_cronjob = 'Y'
+    then
+      l_job_name := qa_constant_pkg.gc_utplsql_scheduler_cronjob_name;
+    else
+      l_client_name := f_get_unified_string(pi_string => pi_client_name, pi_transform_case => 'u');
+      l_scheme_name := f_get_unified_string(pi_string => pi_scheme_name, pi_transform_case => 'u');
+      l_rule_number := f_get_unified_string(pi_string => pi_qaru_rule_number);
+
+      l_job_name := qa_constant_pkg.gc_utplsql_custom_scheduler_job_name || '_' || l_scheme_name || '_' || l_client_name || '_' || l_rule_number;
+    end if;
+   
+   return l_job_name;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get a custom job name!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_get_job_name;
+
+  function f_exist_custom_job(
+    pi_scheme_name       in varchar2
+   ,pi_client_name       in varchar2
+   ,pi_qaru_rule_number  in varchar2
+  ) return varchar2
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_exist_custom_job';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_job_name varchar2(500);
+    l_exist number;
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_scheme_name'
+                              ,p_val_01  => pi_scheme_name
+                              ,p_name_02 => 'pi_client_name'
+                              ,p_val_02  => pi_client_name
+                              ,p_name_03 => 'pi_qaru_rule_number'
+                              ,p_val_03  => pi_qaru_rule_number);
+
+    l_job_name := f_get_job_name(pi_scheme_name => pi_scheme_name, pi_client_name => pi_client_name, pi_qaru_rule_number => pi_qaru_rule_number, pi_is_cronjob => 'N');
+    
+    select decode(count(1), 0, 0, 1)
+    into l_exist
+    from dual
+    where exists (select null
+                  from USER_SCHEDULER_JOBS
+                  where job_name like l_job_name || '_%');
+
+   if l_exist = 0
+   then
+      return 'N';
+   else
+      return 'Y';
+   end if;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to check if custom unit test jobs exist!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_exist_custom_job;
+
+  function f_is_scheduler_cronjob_enabled
+  return varchar2
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_is_scheduler_cronjob_enabled';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_result number;
+  begin
+    select decode(count(1), 0, 0, 1)
+    into l_result
+    from dual
+    where exists (select null
+                  from user_scheduler_jobs
+                  where job_name = qa_constant_pkg.gc_utplsql_scheduler_cronjob_name
+                  and enabled = 'TRUE');
+
+    if l_result = 1
+    then
+      return 'Y';
+    else
+      return 'N';
+    end if;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get the status of the ut scheduler cronjob!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_is_scheduler_cronjob_enabled;
+
+  procedure p_enable_scheduler_cronjob(
+    pi_status in varchar2
+  ) is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.p_enable_scheduler_cronjob';
+    l_param_list qa_logger_pkg.tab_param;
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_status'
+                              ,p_val_01  => pi_status);
+
+    if pi_status not in ('Y'
+                        ,'N')
+    then
+      raise_application_error(-20001, 'Invalid input parameter value for pi_status: ' || pi_status);
+    end if;
+
+    if pi_status = 'Y'
+    then
+      dbms_scheduler.enable(qa_constant_pkg.gc_utplsql_scheduler_cronjob_name);
+    else
+      dbms_scheduler.disable(qa_constant_pkg.gc_utplsql_scheduler_cronjob_name);
+    end if;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to enable the ut scheduler cronjob!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end p_enable_scheduler_cronjob;
+
+  procedure p_upload_unit_test_xml(
+    pi_file_name in varchar2
+  )
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.p_upload_unit_test_xml';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_clob_content clob;
+    l_mime_type varchar2(100);
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_file_name'
+                              ,p_val_01  => pi_file_name);
+
+    select to_clob(blob_content)
+          ,mime_type
+	into l_clob_content
+        ,l_mime_type
+	from APEX_APPLICATION_TEMP_FILES
+    where name = pi_file_name;
+    
+    if l_mime_type != 'application/xml'
+    then
+      raise_application_error(-20001, 'Invalid MIME type of xml file: ' || pi_file_name || ' - MIME type: ' || l_mime_type);
+    end if;
+   
+    insert into qa_test_results(qatr_xml_result)
+    values (l_clob_content);
+
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to upload the xml file!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end p_upload_unit_test_xml;
 
   procedure p_download_unit_test_xml(
     pi_qatr_id   in number
@@ -1305,37 +1433,6 @@ create or replace package body qa_unit_tests_pkg is
                             ,p_params => l_param_list);
       raise;
   end p_download_unit_test_xml;
-
-  function f_is_scheduler_cronjob_enabled
-  return varchar2
-  is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.f_is_scheduler_cronjob_enabled';
-    l_param_list qa_logger_pkg.tab_param;
-
-    l_result number;
-  begin
-    select decode(count(1), 0, 0, 1)
-    into l_result
-    from dual
-    where exists (select null
-                  from user_scheduler_jobs
-                  where job_name = qa_constant_pkg.gc_utplsql_scheduler_cronjob_name
-                  and enabled = 'TRUE');
-
-    if l_result = 1
-    then
-      return 'Y';
-    else
-      return 'N';
-    end if;
-  exception
-    when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get the status of the ut scheduler cronjob!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-      raise;
-  end f_is_scheduler_cronjob_enabled;
 
 end qa_unit_tests_pkg;
 /
