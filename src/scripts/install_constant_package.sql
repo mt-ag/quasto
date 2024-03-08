@@ -16,7 +16,8 @@ declare
   l_utplsql_single_package number := 1;
   l_utplsql_single_package_per_rule number := 2;
   l_utplsql_ut_test_packages_prefix varchar2(10) := 'QA_UT_';
-  l_utplsql_scheduler_job_name varchar2(30) := 'JOB_RUN_UNIT_TESTS';
+  l_utplsql_scheduler_cronjob_name varchar2(30) := 'CRONJOB_RUN_UNIT_TESTS';
+  l_utplsql_custom_scheduler_job_name varchar2(30) := 'JOB_RUN_UNIT_TEST';
 begin
   l_action := 'create or replace package qa_constant_pkg
     authid definer
@@ -40,10 +41,11 @@ begin
     gc_logger_flag               constant number               := ' || l_logger_flag || ';
     gc_black_list_exception_text constant varchar2 (5000 char) := ' || '''' || 'A User has tried to be tested that is blacklisted in the View qa_scheme_names_for_testing_v!' || '''' || '|| chr(13) ||' || '''' || 'To edit blacklisted users please edit the View mentioned above!' || '''' || ' || chr(13) ||' || '''' || 'User:' || '''' || ';
 
-    gc_utplsql_single_package          constant number := ' || l_utplsql_single_package || ';
-    gc_utplsql_single_package_per_rule constant number := ' || l_utplsql_single_package_per_rule || ';
-    gc_utplsql_ut_test_packages_prefix constant varchar2(10) := ' || '''' || l_utplsql_ut_test_packages_prefix || '''' || ';
-    gc_utplsql_scheduler_job_name      constant varchar2(30) := ' || '''' || l_utplsql_scheduler_job_name || '''' || ';
+    gc_utplsql_single_package             constant number := ' || l_utplsql_single_package || ';
+    gc_utplsql_single_package_per_rule    constant number := ' || l_utplsql_single_package_per_rule || ';
+    gc_utplsql_ut_test_packages_prefix    constant varchar2(10) := ' || '''' || l_utplsql_ut_test_packages_prefix || '''' || ';
+    gc_utplsql_scheduler_cronjob_name     constant varchar2(30) := ' || '''' || l_utplsql_scheduler_cronjob_name || '''' || ';
+    gc_utplsql_custom_scheduler_job_name  constant varchar2(30) := ' || '''' || l_utplsql_custom_scheduler_job_name || '''' || ';
 
 end;';
 

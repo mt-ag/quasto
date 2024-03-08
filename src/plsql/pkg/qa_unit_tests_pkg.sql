@@ -29,10 +29,10 @@ create or replace package qa_unit_tests_pkg authid definer is
   procedure p_delete_unit_test_packages(pi_scheme_names in varchar2_tab_t default null);
 
   /**
-   * procedure to run unit tests from scheduler cronjob
-   * @param po_result returns the result message
+   * procedure to run all unit tests, save the xml result in the database and return a status message - used by scheduler cronjob
+   * @param po_status_message returns the result message
   */
-  procedure p_run_unit_tests_from_cronjob(po_result out varchar2);
+  procedure p_run_all_unit_tests(po_status_message out varchar2);
 
   /**
    * procedure to enable or disable the scheduler cronjob
@@ -54,7 +54,7 @@ create or replace package qa_unit_tests_pkg authid definer is
   );
 
   /**
-   * procedure to run an unit test from custom scheduler job
+   * procedure to run a single unit test and save xml result in database
    * @param pi_client_name defines the client name for which the unit test should be executed
    * @param pi_scheme_name defines the scheme name for which the unit test should be executed
    * @param pi_qaru_rule_number defines the rule number to be executed
@@ -113,15 +113,17 @@ create or replace package qa_unit_tests_pkg authid definer is
   );
 
   /**
-   * function to run all unit tests from scheduler cronjob
+   * function to run all unit tests and return the xml result
    * @param  pi_client_name defines the client name for which the unit tests should be executed
    * @param  pi_scheme_name defines the scheme name for which the unit tests should be executed
+   * @param  pi_quasto_scheme defines the scheme name in which the quasto unit tests are saved
    * @return clob returns the xml
   */
-  function f_run_unit_tests_from_scheduler_cronjob
+  function f_run_all_unit_tests
   (
-    pi_client_name in varchar2 default null
-   ,pi_scheme_name in varchar2 default null
+    pi_client_name   in varchar2 default null
+   ,pi_scheme_name   in varchar2 default null
+   ,pi_quasto_scheme in varchar2 default SYS_CONTEXT('USERENV', 'CURRENT_USER')
   ) return clob;
 
   /**
@@ -490,7 +492,7 @@ create or replace package body qa_unit_tests_pkg is
   function f_get_package_spec_content(
     pi_previous_clob            in clob
    ,pi_qaru_rule_number_unified in varchar2
-   ,pi_qaru_name_unified        in varchar2 default null
+   ,pi_qaru_name_unified        in varchar2
   )
   return clob
   is
@@ -765,11 +767,7 @@ create or replace package body qa_unit_tests_pkg is
 
          for rec_rules in (select qaru_rule_number
                                  ,f_get_unified_string(pi_string => qaru_rule_number, pi_transform_case => 'l') as qaru_rule_number_unified
-                                 ,regexp_replace(replace(lower(qaru_name)
-                                                        ,' '
-                                                        ,'_')
-                                                ,'[^a-z0-9_]'
-                                                ,'_') as qaru_name_unified
+                                 ,f_get_unified_string(pi_string => qaru_name, pi_transform_case => 'l') as qaru_name_unified
                            from qa_rules
                            where qaru_client_name = rec_clients.qaru_client_name
                            and qaru_is_active = 1 
@@ -831,8 +829,8 @@ create or replace package body qa_unit_tests_pkg is
                                        ,qaru_rule_number
                                        ,qaru_name
                                        ,f_get_unified_string(pi_string => qaru_client_name, pi_transform_case => 'l') as qaru_client_name_unified
-                                       ,f_get_unified_string(pi_string => qaru_name, pi_transform_case => 'l') as qaru_name_unified
                                        ,f_get_unified_string(pi_string => qaru_rule_number, pi_transform_case => 'l') as qaru_rule_number_unified
+                                       ,f_get_unified_string(pi_string => qaru_name, pi_transform_case => 'l') as qaru_name_unified
                                        ,replace(qaru_name
                                                ,'' || chr(39) || ''
                                                ,'' || chr(39) || chr(39) || '') as qaru_test_name
@@ -855,7 +853,8 @@ create or replace package body qa_unit_tests_pkg is
                                              ,pi_qaru_client_name_unified => rec_client_rules.qaru_client_name_unified);
 
           l_clob := f_get_package_spec_content(pi_previous_clob            => l_clob
-                                              ,pi_qaru_rule_number_unified => rec_client_rules.qaru_rule_number_unified);
+                                              ,pi_qaru_rule_number_unified => rec_client_rules.qaru_rule_number_unified
+                                              ,pi_qaru_name_unified        => rec_client_rules.qaru_name_unified);
 
           l_clob := f_get_package_spec_footer(pi_previous_clob => l_clob
                                              ,pi_package_name  => l_package_name);
@@ -945,10 +944,10 @@ create or replace package body qa_unit_tests_pkg is
       raise;
   end p_delete_unit_test_packages;
 
-  procedure p_run_unit_tests_from_cronjob(
-    po_result out varchar2
+  procedure p_run_all_unit_tests(
+    po_status_message out varchar2
   ) is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.p_run_unit_tests_from_cronjob';
+    c_unit constant varchar2(32767) := $$plsql_unit || '.p_run_all_unit_tests';
     l_param_list qa_logger_pkg.tab_param;
 
     l_xml_result clob;
@@ -957,27 +956,27 @@ create or replace package body qa_unit_tests_pkg is
     l_running_time_seconds number;
   begin
     l_timestamp_begin := systimestamp;
-    l_xml_result := f_run_unit_tests_from_scheduler_cronjob;
+    l_xml_result := f_run_all_unit_tests;
     l_timestamp_end := systimestamp;
 
     insert into QA_TEST_RESULTS(QATR_XML_RESULT)
     values (l_xml_result);
 
     l_running_time_seconds := extract(second from(l_timestamp_end-l_timestamp_begin));
-    po_result := 'Execution of unit tests finished successful after ' || l_running_time_seconds || ' seconds';
+    po_status_message := 'Execution of unit tests finished successful after ' || l_running_time_seconds || ' seconds';
 
     qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'po_result'
-                              ,p_val_01  => po_result);
+                              ,p_name_01 => 'po_status_message'
+                              ,p_val_01  => po_status_message);
   exception
     when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to run the unit tests from scheduler cronjob!'
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to run all unit tests!'
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
-      po_result := 'Execution of unit tests failed with error ' || sqlerrm || ' - ' || dbms_utility.format_error_backtrace;
+      po_status_message := 'Execution of unit tests failed with error ' || sqlerrm || ' - ' || dbms_utility.format_error_backtrace;
       raise;
-  end p_run_unit_tests_from_cronjob;
+  end p_run_all_unit_tests;
 
   procedure p_enable_scheduler_cronjob(
     pi_status in varchar2
@@ -1082,7 +1081,7 @@ create or replace package body qa_unit_tests_pkg is
 
   exception
     when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while running an unit test from custom scheduler job!'
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while running a single unit test!'
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
@@ -1205,23 +1204,30 @@ create or replace package body qa_unit_tests_pkg is
       raise;
   end p_save_scheme_result_with_runtime_error;
 
-  function f_run_unit_tests_from_scheduler_cronjob(
-    pi_client_name in varchar2 default null
-   ,pi_scheme_name in varchar2 default null
+  function f_run_all_unit_tests(
+    pi_client_name   in varchar2 default null
+   ,pi_scheme_name   in varchar2 default null
+   ,pi_quasto_scheme in varchar2 default SYS_CONTEXT('USERENV', 'CURRENT_USER')
   ) return clob
   is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.f_run_unit_tests_from_scheduler_cronjob';
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_run_all_unit_tests';
     l_param_list qa_logger_pkg.tab_param;
 
     l_suitepath varchar2(1000);
-    l_package_owner varchar2(1000) := SYS_CONTEXT('USERENV', 'CURRENT_USER');
     l_xml_result clob;
   begin
     qa_logger_pkg.append_param(p_params  => l_param_list
                               ,p_name_01 => 'pi_client_name'
                               ,p_val_01  => pi_client_name
                               ,p_name_02 => 'pi_scheme_name'
-                              ,p_val_02  => pi_scheme_name);
+                              ,p_val_02  => pi_scheme_name
+                              ,p_name_03 => 'pi_quasto_scheme'
+                              ,p_val_03  => pi_quasto_scheme);
+    
+    if pi_quasto_scheme is null
+    then
+      raise_application_error(-20001, 'Missing input parameter value for pi_quasto_scheme: ' || pi_quasto_scheme);
+    end if;
     
     if pi_client_name is not null and pi_scheme_name is not null
     then
@@ -1232,17 +1238,17 @@ create or replace package body qa_unit_tests_pkg is
 
     select DBMS_XMLGEN.CONVERT(XMLAGG(XMLELEMENT(E,column_value).EXTRACT('//text()')).GetClobVal(),1)
     into l_xml_result
-    from table(ut.run(l_package_owner || ':' || l_suitepath, ut_junit_reporter()));
+    from table(ut.run(pi_quasto_scheme || ':' || l_suitepath, ut_junit_reporter()));
 
     return l_xml_result;
   exception
     when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to run the unit tests from scheduler cronjob!'
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to run all unit tests!'
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
       raise;
-  end f_run_unit_tests_from_scheduler_cronjob;
+  end f_run_all_unit_tests;
 
   function f_is_scheduler_cronjob_enabled
   return varchar2
