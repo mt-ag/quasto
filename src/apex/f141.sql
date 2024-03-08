@@ -44,6 +44,8 @@ prompt APPLICATION 141 - QUASTO
 --       Dynamic Actions:         13
 --     Shared Components:
 --       Logic:
+--         Items:                  1
+--         Processes:              1
 --         Build Options:          1
 --       Navigation:
 --         Lists:                  2
@@ -120,7 +122,7 @@ wwv_imp_workspace.create_flow(
 ,p_substitution_string_02=>'DATE_FORMAT'
 ,p_substitution_value_02=>'DD/MM/YYYY'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20240303151544'
+,p_last_upd_yyyymmddhh24miss=>'20240308144505'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_files_version=>4
 ,p_print_server_type=>'NATIVE'
@@ -622,6 +624,35 @@ end;
 prompt --application/shared_components/navigation/navigation_bar
 begin
 null;
+end;
+/
+prompt --application/shared_components/logic/application_processes/getutxmlattachment
+begin
+wwv_flow_imp_shared.create_flow_process(
+ p_id=>wwv_flow_imp.id(21646742059529764)
+,p_process_sequence=>1
+,p_process_point=>'ON_DEMAND'
+,p_process_type=>'NATIVE_PLSQL'
+,p_process_name=>'getUTXMLAttachment'
+,p_process_sql_clob=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'BEGIN',
+'  QA_UNIT_TESTS_PKG.p_download_unit_test_xml(:AI_XML_TEST_RESULT_ID);',
+'END;'))
+,p_process_clob_language=>'PLSQL'
+,p_security_scheme=>'MUST_NOT_BE_PUBLIC_USER'
+,p_version_scn=>1901323520
+);
+end;
+/
+prompt --application/shared_components/logic/application_items/ai_xml_test_result_id
+begin
+wwv_flow_imp_shared.create_flow_item(
+ p_id=>wwv_flow_imp.id(21640155044548937)
+,p_name=>'AI_XML_TEST_RESULT_ID'
+,p_protection_level=>'P'
+,p_escape_on_http_output=>'N'
+,p_version_scn=>1901320916
+);
 end;
 /
 prompt --application/shared_components/logic/application_settings
@@ -15522,7 +15553,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'18'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20240301143001'
+,p_last_upd_yyyymmddhh24miss=>'20240308144505'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(19585581091742406)
@@ -15597,9 +15628,22 @@ wwv_flow_imp_page.create_worksheet_column(
 ,p_display_order=>10
 ,p_is_primary_key=>'Y'
 ,p_column_identifier=>'A'
-,p_column_label=>'Qatr Id'
+,p_column_label=>'Download'
+,p_column_link=>'f?p=&APP_ID.:&APP_PAGE_ID.:&SESSION.:APPLICATION_PROCESS=getUTXMLAttachment:&DEBUG.::AI_XML_TEST_RESULT_ID:#QATR_ID#'
+,p_column_linktext=>' <span class="fa fa-download" aria-hidden="true"></span>'
+,p_allow_sorting=>'N'
+,p_allow_filtering=>'N'
+,p_allow_highlighting=>'N'
+,p_allow_ctrl_breaks=>'N'
+,p_allow_aggregations=>'N'
+,p_allow_computations=>'N'
+,p_allow_charting=>'N'
+,p_allow_group_by=>'N'
+,p_allow_pivot=>'N'
+,p_allow_hide=>'N'
 ,p_column_type=>'NUMBER'
-,p_display_text_as=>'HIDDEN_ESCAPE_SC'
+,p_column_alignment=>'CENTER'
+,p_use_as_row_header=>'N'
 );
 wwv_flow_imp_page.create_worksheet_column(
  p_id=>wwv_flow_imp.id(19586029409742411)
