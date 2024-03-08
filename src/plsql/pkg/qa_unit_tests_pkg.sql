@@ -127,6 +127,13 @@ create or replace package qa_unit_tests_pkg authid definer is
   ) return clob;
 
   /**
+   * procedure to download the xml result as file
+   * @param  pi_qatr_id defines the xml test result id
+   * @return clob returns the xml
+  */
+  procedure p_download_unit_test_xml(pi_qatr_id in number);
+
+  /**
    * function to get status of scheduler cronjob
    * @return varchar2 returns whether scheduler job for execution of unit tests is enabled or not
   */
@@ -1249,6 +1256,55 @@ create or replace package body qa_unit_tests_pkg is
                             ,p_params => l_param_list);
       raise;
   end f_run_all_unit_tests;
+
+  procedure p_download_unit_test_xml(
+    pi_qatr_id   in number
+  )
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.p_download_unit_test_xml';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_offset number := 1;
+    l_chunk number := 3000;
+    l_clob_xml clob;
+    l_added_on date;
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qatr_id'
+                              ,p_val_01  => pi_qatr_id);
+
+    select qatr_xml_result
+          ,qatr_added_on
+    into l_clob_xml
+        ,l_added_on
+    from qa_test_results
+    where qatr_id = pi_qatr_id;
+    
+    HTP.init;
+    OWA_UTIL.mime_header('application/xml', false, 'UTF-8');
+    HTP.p('Content-Length: ' || DBMS_LOB.getlength(l_clob_xml));
+    HTP.p('Content-Type: application/octet-stream');
+    HTP.p('Cache-Control: no-cache');
+    HTP.p('Content-Disposition: attachment; filename="unit_test_results_' || to_char(l_added_on, 'YYYYMMDDHH24MI') || '.xml"');
+    OWA_UTIL.http_header_close;
+
+    loop
+      exit when l_offset > length(l_clob_xml);
+      HTP.prn(substr(l_clob_xml, l_offset, l_chunk));
+      l_offset := l_offset + l_chunk;
+     end loop;
+
+    apex_application.stop_apex_engine;
+  exception
+    when apex_application.e_stop_apex_engine then
+      null;
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get the xml file of an unit test execution!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end p_download_unit_test_xml;
 
   function f_is_scheduler_cronjob_enabled
   return varchar2
