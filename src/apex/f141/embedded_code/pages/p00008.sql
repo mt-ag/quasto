@@ -9,21 +9,7 @@
 -- --------------------------------------------------------------------------------
 
 -- ----------------------------------------
--- Page: 8 - Upload Rules > Process: Upload file > Source > PL/SQL Code
+-- Page: 8 - Rule Files > Process: Import file > Source > PL/SQL Code
 
-declare
-    v_blob_content  blob;
-    v_filename      varchar2(100);
-begin
-  select blob_content,
-         filename
-	into v_blob_content,
-         v_filename
-	from APEX_APPLICATION_TEMP_FILES
-   where name = :P8_JSON_FILE;
-   
-   qa_export_import_rules_pkg.f_import_clob_to_qa_import_files(pi_clob => v_blob_content,
-                                                               pi_filename => v_filename,
-                                                               pi_mimetype => 'application/json');
-end;
+qa_export_import_rules_pkg.p_upload_rules_json(pi_file_name => :P8_JSON_FILE);
 

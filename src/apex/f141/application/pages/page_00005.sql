@@ -22,7 +22,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'18'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20240308154100'
+,p_last_upd_yyyymmddhh24miss=>'20240309183017'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(19585581091742406)
@@ -168,6 +168,17 @@ wwv_flow_imp_page.create_page_plug(
 ,p_attribute_01=>'N'
 ,p_attribute_02=>'HTML'
 );
+wwv_flow_imp_page.create_page_plug(
+ p_id=>wwv_flow_imp.id(21827569251985601)
+,p_plug_name=>'Info'
+,p_parent_plug_id=>wwv_flow_imp.id(75052216545326159)
+,p_region_template_options=>'#DEFAULT#:t-Alert--horizontal:t-Alert--defaultIcons:t-Alert--info:t-Alert--removeHeading js-removeLandmark'
+,p_plug_template=>wwv_flow_imp.id(50721469375675106)
+,p_plug_display_sequence=>10
+,p_plug_source=>'Uploaded Unit Test result files will only be saved in the database but are not considered on the Unit Test results Dashboard page of the APEX app.'
+,p_attribute_01=>'N'
+,p_attribute_02=>'HTML'
+);
 wwv_flow_imp_page.create_page_button(
  p_id=>wwv_flow_imp.id(37066871401570629)
 ,p_button_sequence=>10
@@ -198,7 +209,7 @@ wwv_flow_imp_page.create_page_item(
  p_id=>wwv_flow_imp.id(37066648007570627)
 ,p_name=>'P5_XML_FILE'
 ,p_is_required=>true
-,p_item_sequence=>10
+,p_item_sequence=>20
 ,p_item_plug_id=>wwv_flow_imp.id(75052216545326159)
 ,p_prompt=>'XML file'
 ,p_display_as=>'NATIVE_FILE'

@@ -9,6 +9,13 @@
 -- --------------------------------------------------------------------------------
 
 -- ----------------------------------------
+-- Application Process: getRuleJSONAttachment > Source > PL/SQL Code
+
+BEGIN
+  QA_EXPORT_IMPORT_RULES_PKG.p_download_rules_json(:AI_CLIENT_NAME);
+END;
+
+-- ----------------------------------------
 -- Application Process: getUTXMLAttachment > Source > PL/SQL Code
 
 BEGIN

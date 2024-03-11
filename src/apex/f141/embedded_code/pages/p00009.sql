@@ -9,6 +9,16 @@
 -- --------------------------------------------------------------------------------
 
 -- ----------------------------------------
+-- Page: 9 - Config Scheduler Job > Process: Trigger Scheduler Cronjob > Source > PL/SQL Code
+
+qa_unit_tests_pkg.p_trigger_scheduler_cronjob;
+
+-- ----------------------------------------
+-- Page: 9 - Config Scheduler Job > Process: Save Scheduler Job Status > Source > PL/SQL Code
+
+qa_unit_tests_pkg.p_enable_scheduler_job(pi_status => :P9_ENABLE_SCHEDULER_JOB);
+
+-- ----------------------------------------
 -- Page: 9 - Config Scheduler Job > Process: Load information > Source > PL/SQL Code
 
 begin
@@ -28,9 +38,4 @@ into
 , :P9_JOB_STATE
 from JOBDETAILS_P0009_V;
 end;
-
--- ----------------------------------------
--- Page: 9 - Config Scheduler Job > Process: Save Scheduler Job Status > Source > PL/SQL Code
-
-qa_unit_tests_pkg.p_enable_scheduler_job(pi_status => :P9_ENABLE_SCHEDULER_JOB);
 

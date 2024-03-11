@@ -13,6 +13,8 @@ prompt --install
 @@application/shared_components/security/authorizations/administration_rights.sql
 @@application/shared_components/navigation/navigation_bar.sql
 @@application/shared_components/logic/application_processes/getutxmlattachment.sql
+@@application/shared_components/logic/application_processes/getrulejsonattachment.sql
+@@application/shared_components/logic/application_items/ai_client_name.sql
 @@application/shared_components/logic/application_items/ai_xml_test_result_id.sql
 @@application/shared_components/logic/application_settings.sql
 @@application/shared_components/navigation/tabs/standard.sql
@@ -20,7 +22,6 @@ prompt --install
 @@application/shared_components/user_interface/lovs/category_lov.sql
 @@application/shared_components/user_interface/lovs/error_level_lov.sql
 @@application/shared_components/user_interface/lovs/layer_lov.sql
-@@application/shared_components/user_interface/lovs/test_result.sql
 @@application/shared_components/user_interface/lovs/yes_no_lov.sql
 @@application/pages/page_groups.sql
 @@application/shared_components/navigation/breadcrumbs/breadcrumb.sql
@@ -108,6 +109,7 @@ prompt --install
 @@application/user_interfaces/combined_files.sql
 @@application/pages/page_00000.sql
 @@application/pages/page_00001.sql
+@@application/pages/page_00002.sql
 @@application/pages/page_00003.sql
 @@application/pages/page_00004.sql
 @@application/pages/page_00005.sql

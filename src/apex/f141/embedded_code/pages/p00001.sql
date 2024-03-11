@@ -9,25 +9,41 @@
 -- --------------------------------------------------------------------------------
 
 -- ----------------------------------------
--- Page: 1 - Dashboard > Region: Timeline Chart > Attributes:  > Series: Error > Source > SQL Query
+-- Page: 1 - Dashboard > Region: Timeline Chart > Attributes:  > Series: Failure > Source > SQL Query
 
-select qatr_result testcase_status, 
-       count(1) as status_amount,
-       '#7a1616' as color_hex,
-       qatr_date
-  from table(qa_helper_pkg.p0001_get_faceted_search_data(:APP_PAGE_ID, 'TEST_REPORT'))
- where qatr_result = 'Error'
- group by qatr_result, qatr_date
- order by qatr_date desc;
+select qatr_result as testcase_status,
+       '#c42222' as color_hex,
+       to_char(qatr_date, 'DD/MM/YYYY') as qatr_date,
+       status_amount
+from (
+    select qatr_result,
+           qatr_date,
+           status_amount
+    from (
+        select qatr_result, 
+               qatr_date, 
+               count(1) over (partition by qatr_result, qatr_date) as status_amount
+        from (
+            select qatr_result,
+                   trunc(qatr_date) as qatr_date
+              from table(qa_helper_pkg.p0001_get_faceted_search_data(:APP_PAGE_ID, 'TEST_REPORT'))
+              order by qatr_date desc
+              fetch first 10 rows only
+             )
+        where qatr_result = 'Failure'
+    )
+    group by qatr_result, qatr_date, status_amount
+);
 
 -- ----------------------------------------
 -- Page: 1 - Dashboard > Region: Filter > Filter: P1_EXECUTION_DATE > List of Values > SQL Query
 
-select to_char(ov1.qatr_date, 'DD/MM/YYYY HH24:MI') || ' (' || (select count(1) from OVERVIEWTESTS_P0001_V ov2 where ov2.qatr_date = ov1.qatr_date) || ')' as d,
-       ov1.qatr_date r
-  from OVERVIEWTESTS_P0001_V ov1
-  group by qatr_date
-  order by qatr_date desc;
+select to_char(v.qatr_date, 'DD/MM/YYYY') as d,
+       v.qatr_date as r
+  from (select trunc(qatr_date) as qatr_date
+        from OVERVIEWTESTS_P0001_V
+        group by trunc(qatr_date)) v
+order by v.qatr_date desc;
 
 -- ----------------------------------------
 -- Page: 1 - Dashboard > Region: Filter > Filter: P1_SCHEME > List of Values > SQL Query
@@ -37,11 +53,12 @@ SELECT USERNAME as d, USERNAME AS R FROM QARU_SCHEME_NAMES_FOR_TESTING_V;
 -- ----------------------------------------
 -- Page: 1 - Dashboard > Region: Filter > Facet: P1_EXECUTION_DATE > List of Values > SQL Query
 
-select to_char(ov1.qatr_date, 'DD/MM/YYYY HH24:MI') || ' (' || (select count(1) from OVERVIEWTESTS_P0001_V ov2 where ov2.qatr_date = ov1.qatr_date) || ')' as d,
-       ov1.qatr_date r
-  from OVERVIEWTESTS_P0001_V ov1
-  group by qatr_date
-  order by qatr_date desc;
+select to_char(v.qatr_date, 'DD/MM/YYYY') as d,
+       v.qatr_date as r
+  from (select trunc(qatr_date) as qatr_date
+        from OVERVIEWTESTS_P0001_V
+        group by trunc(qatr_date)) v
+order by v.qatr_date desc;
 
 -- ----------------------------------------
 -- Page: 1 - Dashboard > Region: Filter > Facet: P1_SCHEME > List of Values > SQL Query
@@ -49,10 +66,37 @@ select to_char(ov1.qatr_date, 'DD/MM/YYYY HH24:MI') || ' (' || (select count(1) 
 SELECT USERNAME as d, USERNAME AS R FROM QARU_SCHEME_NAMES_FOR_TESTING_V;
 
 -- ----------------------------------------
+-- Page: 1 - Dashboard > Region: Timeline Chart > Attributes:  > Series: Error > Source > SQL Query
+
+select qatr_result as testcase_status,
+       '#7a1616' as color_hex,
+       to_char(qatr_date, 'DD/MM/YYYY') as qatr_date,
+       status_amount
+from (
+    select qatr_result,
+           qatr_date,
+           status_amount
+    from (
+        select qatr_result, 
+               qatr_date, 
+               count(1) over (partition by qatr_result, qatr_date) as status_amount
+        from (
+            select qatr_result,
+                   trunc(qatr_date) as qatr_date
+              from table(qa_helper_pkg.p0001_get_faceted_search_data(:APP_PAGE_ID, 'TEST_REPORT'))
+              order by qatr_date desc
+              fetch first 10 rows only
+             )
+        where qatr_result = 'Error'
+    )
+    group by qatr_result, qatr_date, status_amount
+);
+
+-- ----------------------------------------
 -- Page: 1 - Dashboard > Region: Quota Chart > Attributes:  > Series: Quota > Source > SQL Query
 
 select qatr_result testcase_status
-         , count(*) over (partition by qatr_result) as status_amount
+         , count(1) over (partition by qatr_result) as status_amount
          , case qatr_result
             when 'Failure' then
                '#c42222'
@@ -66,24 +110,27 @@ select qatr_result testcase_status
 -- ----------------------------------------
 -- Page: 1 - Dashboard > Region: Timeline Chart > Attributes:  > Series: Success > Source > SQL Query
 
-select qatr_result testcase_status, 
-       count(1) as status_amount,
+select qatr_result as testcase_status,
        '#1c6d11' as color_hex,
-       qatr_date
-  from table(qa_helper_pkg.p0001_get_faceted_search_data(:APP_PAGE_ID, 'TEST_REPORT'))
- where qatr_result = 'Success'
- group by qatr_result, qatr_date
- order by qatr_date desc;
-
--- ----------------------------------------
--- Page: 1 - Dashboard > Region: Timeline Chart > Attributes:  > Series: Failure > Source > SQL Query
-
-select qatr_result testcase_status, 
-       count(1) as status_amount,
-       '#c42222' as color_hex,
-       qatr_date
-  from table(qa_helper_pkg.p0001_get_faceted_search_data(:APP_PAGE_ID, 'TEST_REPORT'))
- where qatr_result = 'Failure'
- group by qatr_result, qatr_date
- order by qatr_date desc;
+       to_char(qatr_date, 'DD/MM/YYYY') as qatr_date,
+       status_amount
+from (
+    select qatr_result,
+           qatr_date,
+           status_amount
+    from (
+        select qatr_result, 
+               qatr_date, 
+               count(1) over (partition by qatr_result, qatr_date) as status_amount
+        from (
+            select qatr_result,
+                   trunc(qatr_date) as qatr_date
+              from table(qa_helper_pkg.p0001_get_faceted_search_data(:APP_PAGE_ID, 'TEST_REPORT'))
+              order by qatr_date desc
+              fetch first 10 rows only
+             )
+        where qatr_result = 'Success'
+    )
+    group by qatr_result, qatr_date, status_amount
+);
 

@@ -23,7 +23,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'03'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20240308171203'
+,p_last_upd_yyyymmddhh24miss=>'20240309012517'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(104945985645082588)
@@ -193,7 +193,7 @@ wwv_flow_imp_page.create_page_button(
 '                                   , pi_qaru_rule_number => :P11_RULE_NUMBER) = ''Y'''))
 ,p_button_condition2=>'PLSQL'
 ,p_button_condition_type=>'EXPRESSION'
-,p_icon_css_classes=>'fa-spinner fa-anim-spin'
+,p_icon_css_classes=>'fa-refresh fa-anim-spin'
 ,p_button_cattributes=>'disabled="disabled"'
 ,p_grid_new_row=>'Y'
 ,p_grid_column_span=>10

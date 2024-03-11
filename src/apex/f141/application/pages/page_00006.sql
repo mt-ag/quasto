@@ -21,7 +21,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'18'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20231208122741'
+,p_last_upd_yyyymmddhh24miss=>'20240309182613'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(54073327692447835)
@@ -268,20 +268,6 @@ wwv_flow_imp_page.create_page_plug(
 ,p_attribute_02=>'HTML'
 );
 wwv_flow_imp_page.create_page_button(
- p_id=>wwv_flow_imp.id(54468222926367591)
-,p_button_sequence=>10
-,p_button_plug_id=>wwv_flow_imp.id(54282053948258514)
-,p_button_name=>'UPLOAD_RULE'
-,p_button_action=>'REDIRECT_PAGE'
-,p_button_template_options=>'#DEFAULT#:t-Button--iconLeft:t-Button--gapTop'
-,p_button_template_id=>wwv_flow_imp.id(50844844448675167)
-,p_button_is_hot=>'Y'
-,p_button_image_alt=>'Upload Rule'
-,p_button_position=>'CREATE'
-,p_button_redirect_url=>'f?p=&APP_ID.:8:&SESSION.::&DEBUG.:::'
-,p_icon_css_classes=>'fa-upload'
-);
-wwv_flow_imp_page.create_page_button(
  p_id=>wwv_flow_imp.id(54073316110447834)
 ,p_button_sequence=>20
 ,p_button_plug_id=>wwv_flow_imp.id(54282053948258514)
@@ -294,6 +280,20 @@ wwv_flow_imp_page.create_page_button(
 ,p_button_position=>'CREATE'
 ,p_button_redirect_url=>'f?p=&APP_ID.:7:&SESSION.::&DEBUG.:7::'
 ,p_icon_css_classes=>'fa-plus-square'
+);
+wwv_flow_imp_page.create_page_button(
+ p_id=>wwv_flow_imp.id(54468222926367591)
+,p_button_sequence=>30
+,p_button_plug_id=>wwv_flow_imp.id(54282053948258514)
+,p_button_name=>'RULE_FILES'
+,p_button_action=>'REDIRECT_PAGE'
+,p_button_template_options=>'#DEFAULT#:t-Button--iconLeft:t-Button--gapTop'
+,p_button_template_id=>wwv_flow_imp.id(50844844448675167)
+,p_button_is_hot=>'Y'
+,p_button_image_alt=>'Rule Files'
+,p_button_position=>'CREATE'
+,p_button_redirect_url=>'f?p=&APP_ID.:8:&SESSION.::&DEBUG.:::'
+,p_icon_css_classes=>'fa-file-o'
 );
 wwv_flow_imp_page.create_page_da_event(
  p_id=>wwv_flow_imp.id(42249550385031705)
