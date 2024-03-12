@@ -86,6 +86,22 @@ create or replace package qa_export_import_rules_pkg is
    pi_qaif_id in qa_import_files.qaif_id%type
   );
 
+/**
+ * procedure to upload a json rule file
+ * @param pi_file_name defines the file name in APEX_APPLICATION_TEMP_FILES
+*/
+  procedure p_upload_rules_json(
+   pi_file_name in varchar2
+  );
+
+/**
+ * procedure to download a json rule file
+ * @param pi_client_name defines the client name for which rules should be exported
+*/
+  procedure p_download_rules_json(
+   pi_client_name in varchar2
+  );
+
 /* will be removed in future */
 /**
  * function to export a rule by a given client name
@@ -592,6 +608,99 @@ create or replace package body qa_export_import_rules_pkg is
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
   end p_import_clob_to_rules_table;
+
+  procedure p_upload_rules_json(
+    pi_file_name in varchar2
+  )
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.p_upload_rules_json';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_blob_content blob;
+    l_mime_type varchar2(100);
+    l_file_name varchar2(100);
+    l_mime_type_json varchar2(50) := 'application/json';
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_file_name'
+                              ,p_val_01  => pi_file_name);
+
+    select blob_content
+          ,mime_type
+          ,filename
+	into l_blob_content
+        ,l_mime_type
+        ,l_file_name
+	from APEX_APPLICATION_TEMP_FILES
+    where name = pi_file_name;
+    
+    if l_mime_type != l_mime_type_json
+    then
+      raise_application_error(-20001, 'Invalid MIME type of json file: ' || pi_file_name || ' - MIME type: ' || l_mime_type);
+    end if;
+   
+    f_import_clob_to_qa_import_files(pi_clob => l_blob_content,
+                                     pi_filename => l_file_name,
+                                     pi_mimetype => l_mime_type);
+
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to import the json file!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end p_upload_rules_json;
+
+  procedure p_download_rules_json(
+   pi_client_name in varchar2
+  )
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.p_download_rules_json';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_offset number := 1;
+    l_chunk number := 3000;
+    l_clob_json clob;
+    l_client_name_unified varchar2(500);
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_client_name'
+                              ,p_val_01  => pi_client_name);
+
+    l_clob_json := f_export_rules_table_to_clob(pi_client_name => pi_client_name);
+    
+    l_client_name_unified := regexp_replace(replace(lower(pi_client_name)
+                                                   ,' '
+                                                   ,'_')
+                                           ,'[^a-z0-9_]'
+                                           ,'_');
+    
+    HTP.init;
+    OWA_UTIL.mime_header('application/json', false, 'UTF-8');
+    HTP.p('Content-Length: ' || DBMS_LOB.getlength(l_clob_json));
+    HTP.p('Content-Type: application/octet-stream');
+    HTP.p('Cache-Control: no-cache');
+    HTP.p('Content-Disposition: attachment; filename="export_rules_' || l_client_name_unified || '_' || to_char(systimestamp, 'YYYYMMDDHH24MI') || '.json"');
+    OWA_UTIL.http_header_close;
+
+    loop
+      exit when l_offset > length(l_clob_json);
+      HTP.prn(substr(l_clob_json, l_offset, l_chunk));
+      l_offset := l_offset + l_chunk;
+     end loop;
+
+    apex_application.stop_apex_engine;
+  exception
+    when apex_application.e_stop_apex_engine then
+      null;
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to export the json file!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end p_download_rules_json;
 
   function fc_export_qa_rules(pi_client_name in varchar2 default null) return clob is
     c_unit constant varchar2(32767) := $$plsql_unit || '.fc_export_qa_rules';

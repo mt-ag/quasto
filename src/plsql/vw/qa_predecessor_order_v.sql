@@ -1,4 +1,4 @@
-create or replace force view QARU_PREDECESSOR_ORDER_V AS
+create or replace force view QA_PREDECESSOR_ORDER_V AS
 select qaru_rule_number
       ,predec
       ,step

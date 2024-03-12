@@ -18,6 +18,9 @@ declare
   l_utplsql_ut_test_packages_prefix varchar2(10) := 'QA_UT_';
   l_utplsql_scheduler_cronjob_name varchar2(30) := 'CRONJOB_RUN_UNIT_TESTS';
   l_utplsql_custom_scheduler_job_name varchar2(30) := 'JOB_RUN_UNIT_TEST';
+  l_utplsql_scheme_result_failure number := 0;
+  l_utplsql_scheme_result_success number := 1;
+  l_utplsql_scheme_result_error number := 2;
 begin
   l_action := 'create or replace package qa_constant_pkg
     authid definer
@@ -46,6 +49,10 @@ begin
     gc_utplsql_ut_test_packages_prefix    constant varchar2(10) := ' || '''' || l_utplsql_ut_test_packages_prefix || '''' || ';
     gc_utplsql_scheduler_cronjob_name     constant varchar2(30) := ' || '''' || l_utplsql_scheduler_cronjob_name || '''' || ';
     gc_utplsql_custom_scheduler_job_name  constant varchar2(30) := ' || '''' || l_utplsql_custom_scheduler_job_name || '''' || ';
+
+    gc_utplsql_scheme_result_failure      constant number := ' || '''' || l_utplsql_scheme_result_failure || '''' || ';
+    gc_utplsql_scheme_result_success      constant number := ' || '''' || l_utplsql_scheme_result_success || '''' || ';
+    gc_utplsql_scheme_result_error        constant number := ' || '''' || l_utplsql_scheme_result_error || '''' || ';
 
 end;';
 
