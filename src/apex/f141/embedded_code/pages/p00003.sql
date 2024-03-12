@@ -12,6 +12,6 @@
 -- Page: 3 - Runtime Error > Page Item: P3_RUNTIME_ERROR > Source > SQL Query
 
 select qatr_runtime_error
-from TESTRUNTIMEERROR_P0003_V
+from QA_TEST_RUNTIME_ERROR_P0003_V
 where qatr_id = :P3_QATR_ID;
 

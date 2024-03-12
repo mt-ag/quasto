@@ -6,6 +6,8 @@ prompt --install
 @@application/shared_components/navigation/lists/navigation_menu.sql
 @@application/shared_components/navigation/lists/navigation_bar.sql
 @@application/shared_components/navigation/listentry.sql
+@@application/shared_components/files/icons_app_icon_144_rounded_png.sql
+@@application/shared_components/files/icons_app_icon_256_rounded_png.sql
 @@application/shared_components/files/icons_app_icon_32_png.sql
 @@application/shared_components/files/icons_app_icon_192_png.sql
 @@application/shared_components/files/icons_app_icon_512_png.sql
@@ -117,7 +119,6 @@ prompt --install
 @@application/pages/page_00007.sql
 @@application/pages/page_00008.sql
 @@application/pages/page_00009.sql
-@@application/pages/page_00010.sql
 @@application/pages/page_00011.sql
 @@application/pages/page_09999.sql
 @@application/deployment/definition.sql

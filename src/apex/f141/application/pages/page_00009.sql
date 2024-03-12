@@ -23,7 +23,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'03'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20240309012452'
+,p_last_upd_yyyymmddhh24miss=>'20240312123047'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(51469936526214117)
@@ -46,7 +46,7 @@ wwv_flow_imp_page.create_report_region(
 ,p_display_point=>'SUB_REGIONS'
 ,p_source_type=>'NATIVE_SQL_REPORT'
 ,p_query_type=>'TABLE'
-,p_query_table=>'JOBRUNDETAILS_V'
+,p_query_table=>'QA_JOB_RUN_DETAILS_V'
 ,p_query_where=>'JOB_NAME = :P9_CRONJOB_NAME'
 ,p_include_rowid_column=>false
 ,p_ajax_enabled=>'Y'
@@ -78,7 +78,7 @@ wwv_flow_imp_page.create_report_columns(
 ,p_column_display_sequence=>20
 ,p_column_heading=>'Log Date'
 ,p_use_as_row_header=>'N'
-,p_column_format=>'DD/MM/YYYY HH24:MI'
+,p_column_format=>'MM/DD/YYYY HH24:MI'
 ,p_heading_alignment=>'LEFT'
 ,p_disable_sort_column=>'N'
 ,p_derived_column=>'N'
@@ -447,7 +447,7 @@ wwv_flow_imp_page.create_page_process(
 ', :P9_NEXT_RUN_DATE',
 ', :P9_REPEAT_INTERVAL',
 ', :P9_JOB_STATE',
-'from JOBDETAILS_P0009_V;',
+'from QA_JOB_DETAILS_P0009_V;',
 'end;'))
 ,p_process_clob_language=>'PLSQL'
 ,p_internal_uid=>51470870455214126

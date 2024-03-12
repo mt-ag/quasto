@@ -13,7 +13,8 @@
 
 select qatr_result as testcase_status,
        '#c42222' as color_hex,
-       to_char(qatr_date, 'DD/MM/YYYY') as qatr_date,
+       to_char(qatr_date, 'MM/DD/YYYY') as testcase_date,
+       to_char(qatr_date, 'fmMM/DD/YYYY') as filter_date,
        status_amount
 from (
     select qatr_result,
@@ -38,39 +39,40 @@ from (
 -- ----------------------------------------
 -- Page: 1 - Dashboard > Region: Filter > Filter: P1_EXECUTION_DATE > List of Values > SQL Query
 
-select to_char(v.qatr_date, 'DD/MM/YYYY') as d,
-       v.qatr_date as r
+select to_char(v.qatr_date, 'MM/DD/YYYY') as d,
+       to_char(v.qatr_date, 'fmMM/DD/YYYY') as r
   from (select trunc(qatr_date) as qatr_date
-        from OVERVIEWTESTS_P0001_V
+        from QA_OVERVIEW_TESTS_P0001_V
         group by trunc(qatr_date)) v
 order by v.qatr_date desc;
 
 -- ----------------------------------------
 -- Page: 1 - Dashboard > Region: Filter > Filter: P1_SCHEME > List of Values > SQL Query
 
-SELECT USERNAME as d, USERNAME AS R FROM QARU_SCHEME_NAMES_FOR_TESTING_V;
+SELECT USERNAME as d, USERNAME AS R FROM QA_SCHEME_NAMES_FOR_TESTING_V;
 
 -- ----------------------------------------
 -- Page: 1 - Dashboard > Region: Filter > Facet: P1_EXECUTION_DATE > List of Values > SQL Query
 
-select to_char(v.qatr_date, 'DD/MM/YYYY') as d,
-       v.qatr_date as r
+select to_char(v.qatr_date, 'MM/DD/YYYY') as d,
+       to_char(v.qatr_date, 'fmMM/DD/YYYY') as r
   from (select trunc(qatr_date) as qatr_date
-        from OVERVIEWTESTS_P0001_V
+        from QA_OVERVIEW_TESTS_P0001_V
         group by trunc(qatr_date)) v
 order by v.qatr_date desc;
 
 -- ----------------------------------------
 -- Page: 1 - Dashboard > Region: Filter > Facet: P1_SCHEME > List of Values > SQL Query
 
-SELECT USERNAME as d, USERNAME AS R FROM QARU_SCHEME_NAMES_FOR_TESTING_V;
+SELECT USERNAME as d, USERNAME AS R FROM QA_SCHEME_NAMES_FOR_TESTING_V;
 
 -- ----------------------------------------
 -- Page: 1 - Dashboard > Region: Timeline Chart > Attributes:  > Series: Error > Source > SQL Query
 
 select qatr_result as testcase_status,
        '#7a1616' as color_hex,
-       to_char(qatr_date, 'DD/MM/YYYY') as qatr_date,
+       to_char(qatr_date, 'MM/DD/YYYY') as testcase_date,
+       to_char(qatr_date, 'fmMM/DD/YYYY') as filter_date,
        status_amount
 from (
     select qatr_result,
@@ -112,7 +114,8 @@ select qatr_result testcase_status
 
 select qatr_result as testcase_status,
        '#1c6d11' as color_hex,
-       to_char(qatr_date, 'DD/MM/YYYY') as qatr_date,
+       to_char(qatr_date, 'MM/DD/YYYY') as testcase_date,
+       to_char(qatr_date, 'fmMM/DD/YYYY') as filter_date,
        status_amount
 from (
     select qatr_result,

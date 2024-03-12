@@ -22,7 +22,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'18'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20240309183017'
+,p_last_upd_yyyymmddhh24miss=>'20240312123029'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(19585581091742406)
@@ -44,7 +44,7 @@ wwv_flow_imp_page.create_page_plug(
 ,p_plug_display_sequence=>10
 ,p_plug_display_point=>'SUB_REGIONS'
 ,p_query_type=>'TABLE'
-,p_query_table=>'TESTRESULTFILES_P0005_V'
+,p_query_table=>'QA_TEST_RESULT_FILES_P0005_V'
 ,p_include_rowid_column=>false
 ,p_plug_source_type=>'NATIVE_IR'
 ,p_prn_content_disposition=>'ATTACHMENT'
@@ -122,7 +122,7 @@ wwv_flow_imp_page.create_worksheet_column(
 ,p_column_label=>'Added On'
 ,p_column_type=>'DATE'
 ,p_heading_alignment=>'LEFT'
-,p_format_mask=>'DD/MM/YYYY HH24:MI'
+,p_format_mask=>'MM/DD/YYYY HH24:MI'
 ,p_tz_dependent=>'N'
 ,p_use_as_row_header=>'N'
 );

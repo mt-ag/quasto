@@ -29,7 +29,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'13'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20240311104633'
+,p_last_upd_yyyymmddhh24miss=>'20240312122554'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(50026038309358532)
@@ -69,7 +69,7 @@ wwv_flow_imp_page.create_report_region(
 ,p_display_point=>'SUB_REGIONS'
 ,p_source_type=>'NATIVE_SQL_REPORT'
 ,p_query_type=>'TABLE'
-,p_query_table=>'OVERVIEWTESTS_P0001_V'
+,p_query_table=>'QA_OVERVIEW_TESTS_P0001_V'
 ,p_include_rowid_column=>false
 ,p_ajax_enabled=>'Y'
 ,p_ajax_items_to_submit=>'P1_CATEGORIES,P1_PROJECT,P1_SCHEME,P1_TEST_RESULT,P1_ERRORLEVEL,P1_EXECUTION_DATE'
@@ -114,7 +114,7 @@ wwv_flow_imp_page.create_report_columns(
 ,p_column_display_sequence=>20
 ,p_column_heading=>'Date'
 ,p_use_as_row_header=>'N'
-,p_column_format=>'DD/MM/YYYY HH24:MI'
+,p_column_format=>'MM/DD/YYYY HH24:MI'
 ,p_heading_alignment=>'LEFT'
 ,p_disable_sort_column=>'N'
 ,p_derived_column=>'N'
@@ -337,7 +337,7 @@ wwv_flow_imp_page.create_jet_chart_series(
 ,p_items_label_rendered=>true
 ,p_items_label_position=>'auto'
 ,p_items_label_display_as=>'LBL_PCT'
-,p_link_target=>'f?p=&APP_ID.:1:&SESSION.::&DEBUG.::P1_TEST_RESULT:&TESTCASE_STATUS.'
+,p_link_target=>'f?p=&APP_ID.:&APP_PAGE_ID.:&SESSION.::&DEBUG.::P1_TEST_RESULT:&TESTCASE_STATUS.'
 ,p_link_target_type=>'REDIRECT_PAGE'
 );
 wwv_flow_imp_page.create_page_plug(
@@ -385,7 +385,8 @@ wwv_flow_imp_page.create_jet_chart_series(
 ,p_data_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
 'select qatr_result as testcase_status,',
 '       ''#1c6d11'' as color_hex,',
-'       to_char(qatr_date, ''DD/MM/YYYY'') as qatr_date,',
+'       to_char(qatr_date, ''MM/DD/YYYY'') as testcase_date,',
+'       to_char(qatr_date, ''fmMM/DD/YYYY'') as filter_date,',
 '       status_amount',
 'from (',
 '    select qatr_result,',
@@ -409,7 +410,7 @@ wwv_flow_imp_page.create_jet_chart_series(
 ,p_ajax_items_to_submit=>'P1_CATEGORIES,P1_PROJECT,P1_SCHEME,P1_TEST_RESULT,P1_ERRORLEVEL,P1_EXECUTION_DATE'
 ,p_series_name_column_name=>'TESTCASE_STATUS'
 ,p_items_value_column_name=>'STATUS_AMOUNT'
-,p_items_label_column_name=>'QATR_DATE'
+,p_items_label_column_name=>'TESTCASE_DATE'
 ,p_color=>'&COLOR_HEX.'
 ,p_line_style=>'solid'
 ,p_line_type=>'auto'
@@ -417,6 +418,8 @@ wwv_flow_imp_page.create_jet_chart_series(
 ,p_marker_shape=>'auto'
 ,p_assigned_to_y2=>'off'
 ,p_items_label_rendered=>false
+,p_link_target=>'f?p=&APP_ID.:&APP_PAGE_ID.:&SESSION.::&DEBUG.::P1_EXECUTION_DATE,P1_TEST_RESULT:&FILTER_DATE.,&TESTCASE_STATUS.'
+,p_link_target_type=>'REDIRECT_PAGE'
 );
 wwv_flow_imp_page.create_jet_chart_series(
  p_id=>wwv_flow_imp.id(53669166727955109)
@@ -427,7 +430,8 @@ wwv_flow_imp_page.create_jet_chart_series(
 ,p_data_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
 'select qatr_result as testcase_status,',
 '       ''#c42222'' as color_hex,',
-'       to_char(qatr_date, ''DD/MM/YYYY'') as qatr_date,',
+'       to_char(qatr_date, ''MM/DD/YYYY'') as testcase_date,',
+'       to_char(qatr_date, ''fmMM/DD/YYYY'') as filter_date,',
 '       status_amount',
 'from (',
 '    select qatr_result,',
@@ -451,7 +455,7 @@ wwv_flow_imp_page.create_jet_chart_series(
 ,p_ajax_items_to_submit=>'P1_CATEGORIES,P1_PROJECT,P1_SCHEME,P1_TEST_RESULT,P1_ERRORLEVEL,P1_EXECUTION_DATE'
 ,p_series_name_column_name=>'TESTCASE_STATUS'
 ,p_items_value_column_name=>'STATUS_AMOUNT'
-,p_items_label_column_name=>'QATR_DATE'
+,p_items_label_column_name=>'TESTCASE_DATE'
 ,p_color=>'&COLOR_HEX.'
 ,p_line_style=>'solid'
 ,p_line_type=>'auto'
@@ -459,6 +463,8 @@ wwv_flow_imp_page.create_jet_chart_series(
 ,p_marker_shape=>'auto'
 ,p_assigned_to_y2=>'off'
 ,p_items_label_rendered=>false
+,p_link_target=>'f?p=&APP_ID.:&APP_PAGE_ID.:&SESSION.::&DEBUG.::P1_EXECUTION_DATE,P1_TEST_RESULT:&FILTER_DATE.,&TESTCASE_STATUS.'
+,p_link_target_type=>'REDIRECT_PAGE'
 );
 wwv_flow_imp_page.create_jet_chart_series(
  p_id=>wwv_flow_imp.id(22079556541883204)
@@ -469,7 +475,8 @@ wwv_flow_imp_page.create_jet_chart_series(
 ,p_data_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
 'select qatr_result as testcase_status,',
 '       ''#7a1616'' as color_hex,',
-'       to_char(qatr_date, ''DD/MM/YYYY'') as qatr_date,',
+'       to_char(qatr_date, ''MM/DD/YYYY'') as testcase_date,',
+'       to_char(qatr_date, ''fmMM/DD/YYYY'') as filter_date,',
 '       status_amount',
 'from (',
 '    select qatr_result,',
@@ -493,7 +500,7 @@ wwv_flow_imp_page.create_jet_chart_series(
 ,p_ajax_items_to_submit=>'P1_CATEGORIES,P1_PROJECT,P1_SCHEME,P1_TEST_RESULT,P1_ERRORLEVEL,P1_EXECUTION_DATE'
 ,p_series_name_column_name=>'TESTCASE_STATUS'
 ,p_items_value_column_name=>'STATUS_AMOUNT'
-,p_items_label_column_name=>'QATR_DATE'
+,p_items_label_column_name=>'TESTCASE_DATE'
 ,p_color=>'&COLOR_HEX.'
 ,p_line_style=>'solid'
 ,p_line_type=>'auto'
@@ -501,6 +508,8 @@ wwv_flow_imp_page.create_jet_chart_series(
 ,p_marker_shape=>'auto'
 ,p_assigned_to_y2=>'off'
 ,p_items_label_rendered=>false
+,p_link_target=>'f?p=&APP_ID.:&APP_PAGE_ID.:&SESSION.::&DEBUG.::P1_EXECUTION_DATE,P1_TEST_RESULT:&FILTER_DATE.,&TESTCASE_STATUS.'
+,p_link_target_type=>'REDIRECT_PAGE'
 );
 wwv_flow_imp_page.create_jet_chart_axis(
  p_id=>wwv_flow_imp.id(53668369396955101)
@@ -661,7 +670,7 @@ wwv_flow_imp_page.create_page_item(
 ,p_source_type=>'FACET_COLUMN'
 ,p_display_as=>'NATIVE_CHECKBOX'
 ,p_lov=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'SELECT USERNAME as d, USERNAME AS R FROM QARU_SCHEME_NAMES_FOR_TESTING_V',
+'SELECT USERNAME as d, USERNAME AS R FROM QA_SCHEME_NAMES_FOR_TESTING_V',
 ''))
 ,p_item_template_options=>'#DEFAULT#'
 ,p_fc_show_label=>true
@@ -742,14 +751,13 @@ wwv_flow_imp_page.create_page_item(
 ,p_source_type=>'FACET_COLUMN'
 ,p_display_as=>'NATIVE_CHECKBOX'
 ,p_lov=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'select to_char(v.qatr_date, ''DD/MM/YYYY'') as d,',
-'       v.qatr_date as r',
+'select to_char(v.qatr_date, ''MM/DD/YYYY'') as d,',
+'       to_char(v.qatr_date, ''fmMM/DD/YYYY'') as r',
 '  from (select trunc(qatr_date) as qatr_date',
-'        from OVERVIEWTESTS_P0001_V',
+'        from QA_OVERVIEW_TESTS_P0001_V',
 '        group by trunc(qatr_date)) v',
 'order by v.qatr_date desc'))
 ,p_item_template_options=>'#DEFAULT#'
-,p_fc_show_label=>true
 ,p_fc_collapsible=>true
 ,p_fc_initial_collapsed=>false
 ,p_fc_compute_counts=>false
@@ -765,7 +773,7 @@ wwv_flow_imp_page.create_page_item(
 );
 wwv_flow_imp_page.create_page_da_event(
  p_id=>wwv_flow_imp.id(42250668839031716)
-,p_name=>'Refresh Reports after Dialog closed (Breadcrumb)'
+,p_name=>'Refresh Report after Dialog closed (Breadcrumb)'
 ,p_event_sequence=>20
 ,p_triggering_element_type=>'REGION'
 ,p_triggering_region_id=>wwv_flow_imp.id(54282244796258516)

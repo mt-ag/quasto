@@ -23,7 +23,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'18'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20240308173740'
+,p_last_upd_yyyymmddhh24miss=>'20240312123018'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(54068725227447789)
@@ -33,7 +33,7 @@ wwv_flow_imp_page.create_page_plug(
 ,p_plug_display_sequence=>10
 ,p_include_in_reg_disp_sel_yn=>'Y'
 ,p_query_type=>'TABLE'
-,p_query_table=>'TESTRUNDETAILS_P0004_V'
+,p_query_table=>'QA_TEST_RUN_DETAILS_P0004_V'
 ,p_query_where=>'qato_qatr_id = :P4_QATR_ID'
 ,p_include_rowid_column=>false
 ,p_plug_source_type=>'NATIVE_IR'

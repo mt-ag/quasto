@@ -13,7 +13,7 @@
 
 select username as d
      , username as r
-from QARU_SCHEME_NAMES_FOR_TESTING_V
+from QA_SCHEME_NAMES_FOR_TESTING_V
 order by 1;
 
 -- ----------------------------------------

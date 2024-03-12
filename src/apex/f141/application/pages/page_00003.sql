@@ -22,7 +22,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'17'
 ,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20240303150103'
+,p_last_upd_yyyymmddhh24miss=>'20240312122738'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(72887392674052001)
@@ -51,7 +51,7 @@ wwv_flow_imp_page.create_page_item(
 ,p_prompt=>'Error Backtrace'
 ,p_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
 'select qatr_runtime_error',
-'from TESTRUNTIMEERROR_P0003_V',
+'from QA_TEST_RUNTIME_ERROR_P0003_V',
 'where qatr_id = :P3_QATR_ID'))
 ,p_source_type=>'QUERY'
 ,p_display_as=>'NATIVE_DISPLAY_ONLY'

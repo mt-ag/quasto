@@ -11,11 +11,7 @@
 -- ----------------------------------------
 -- Page: 11 - Restart Unit Test > Process: Create Job > Source > PL/SQL Code
 
-begin
-qa_unit_tests_pkg.p_create_custom_unit_test_job(
-    pi_client_name => :P11_CLIENT_NAME
-  , pi_scheme_name => :P11_SCHEME_NAME
-  , pi_qaru_rule_number => :P11_RULE_NUMBER
-);
-end;
+qa_unit_tests_pkg.p_create_custom_unit_test_job(pi_qaru_rule_number => :P11_RULE_NUMBER
+                                               ,pi_qaru_client_name => :P11_CLIENT_NAME
+                                               ,pi_scheme_name => :P11_SCHEME_NAME);
 
