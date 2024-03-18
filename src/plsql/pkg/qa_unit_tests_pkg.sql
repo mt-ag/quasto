@@ -42,10 +42,9 @@ create or replace package qa_unit_tests_pkg authid definer is
   );
 
   /**
-   * procedure to run all unit tests, save the xml result in the database and return a status message - used by scheduler cronjob
-   * @param po_status_message returns the result message
+   * procedure to run all unit tests and save the xml result in the database - used by scheduler cronjob
   */
-  procedure p_run_all_unit_tests(po_status_message out varchar2);
+  procedure p_run_all_unit_tests;
 
   /**
    * function to run all unit tests, save the xml result in the database and return the xml result
@@ -537,7 +536,6 @@ create or replace package body qa_unit_tests_pkg is
    ,pi_qaru_rule_number_unified in varchar2
    ,pi_scheme_name              in varchar2
    ,pi_qaru_layer               in qa_rules.qaru_layer%type
-   ,pi_qaru_test_name           in varchar2
   )
   return clob
   is
@@ -554,9 +552,7 @@ create or replace package body qa_unit_tests_pkg is
                                 ,p_name_03 => 'pi_scheme_name'
                                 ,p_val_03  => pi_scheme_name
                                 ,p_name_04 => 'pi_qaru_layer'
-                                ,p_val_04  => pi_qaru_layer
-                                ,p_name_05 => 'pi_qaru_test_name'
-                                ,p_val_05  => pi_qaru_test_name);
+                                ,p_val_04  => pi_qaru_layer);
 
         l_clob := pi_previous_clob || '  PROCEDURE p_ut_rule_' || pi_qaru_rule_number_unified || chr(10);
         l_clob := l_clob || '  IS' || chr(10);
@@ -713,9 +709,6 @@ create or replace package body qa_unit_tests_pkg is
          l_clob := f_get_package_body_header(pi_package_name => l_package_name);
 
          for rec_rules in (select qaru_rule_number
-                                 ,replace(qaru_name
-                                         ,'' || chr(39) || ''
-                                         ,'' || chr(39) || chr(39) || '') as qaru_test_name
                                  ,f_get_unified_string(pi_string => qaru_rule_number, pi_transform_case => 'l') as qaru_rule_number_unified
                                  ,qaru_layer
                            from qa_rules
@@ -728,8 +721,7 @@ create or replace package body qa_unit_tests_pkg is
                                                ,pi_qaru_rule_number         => rec_rules.qaru_rule_number
                                                ,pi_qaru_rule_number_unified => rec_rules.qaru_rule_number_unified
                                                ,pi_scheme_name              => l_scheme_names(rec_schemes)
-                                               ,pi_qaru_layer               => rec_rules.qaru_layer
-                                               ,pi_qaru_test_name           => rec_rules.qaru_test_name);
+                                               ,pi_qaru_layer               => rec_rules.qaru_layer);
 
          end loop;
 
@@ -755,9 +747,6 @@ create or replace package body qa_unit_tests_pkg is
                                        ,f_get_unified_string(pi_string => qaru_client_name, pi_transform_case => 'l') as qaru_client_name_unified
                                        ,f_get_unified_string(pi_string => qaru_rule_number, pi_transform_case => 'l') as qaru_rule_number_unified
                                        ,f_get_unified_string(pi_string => qaru_name, pi_transform_case => 'l') as qaru_name_unified
-                                       ,replace(qaru_name
-                                               ,'' || chr(39) || ''
-                                               ,'' || chr(39) || chr(39) || '') as qaru_test_name
                                        ,qaru_layer
                                  from qa_rules
                                  where qaru_is_active = 1 
@@ -792,8 +781,7 @@ create or replace package body qa_unit_tests_pkg is
                                               ,pi_qaru_rule_number         => rec_client_rules.qaru_rule_number
                                               ,pi_qaru_rule_number_unified => rec_client_rules.qaru_rule_number_unified
                                               ,pi_scheme_name              => l_scheme_names(rec_schemes)
-                                              ,pi_qaru_layer               => rec_client_rules.qaru_layer
-                                              ,pi_qaru_test_name           => rec_client_rules.qaru_test_name);
+                                              ,pi_qaru_layer               => rec_client_rules.qaru_layer);
 
           l_clob := f_get_package_body_footer(pi_previous_clob => l_clob
                                              ,pi_package_name  => l_package_name);
@@ -817,6 +805,7 @@ create or replace package body qa_unit_tests_pkg is
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
+      dbms_output.disable();
       raise;
   end p_create_unit_test_packages;
 
@@ -914,34 +903,20 @@ create or replace package body qa_unit_tests_pkg is
       raise;
   end p_create_custom_unit_test_job;
 
-  procedure p_run_all_unit_tests(
-    po_status_message out varchar2
-  ) is
+  procedure p_run_all_unit_tests
+  is
     c_unit constant varchar2(32767) := $$plsql_unit || '.p_run_all_unit_tests';
     l_param_list qa_logger_pkg.tab_param;
 
     l_xml_result clob;
-    l_timestamp_begin timestamp(6);
-    l_timestamp_end timestamp(6);
-    l_running_time_seconds number;
   begin
-    l_timestamp_begin := systimestamp;
     l_xml_result := f_run_all_unit_tests;
-    l_timestamp_end := systimestamp;
-
-    l_running_time_seconds := extract(second from(l_timestamp_end-l_timestamp_begin));
-    po_status_message := 'Execution of unit tests finished successful after ' || l_running_time_seconds || ' seconds';
-
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'po_status_message'
-                              ,p_val_01  => po_status_message);
   exception
     when others then
       qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to run all unit tests!'
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
-      po_status_message := 'Execution of unit tests failed with error ' || sqlerrm || ' - ' || dbms_utility.format_error_backtrace;
       raise;
   end p_run_all_unit_tests;
 
@@ -968,9 +943,9 @@ create or replace package body qa_unit_tests_pkg is
                               ,p_name_04 => 'pi_character_set'
                               ,p_val_04  => pi_character_set);
     
-    if pi_quasto_scheme is null
+    if pi_quasto_scheme is null or pi_character_set is null
     then
-      raise_application_error(-20001, 'Missing input parameter value for pi_quasto_scheme: ' || pi_quasto_scheme);
+      raise_application_error(-20001, 'Missing input parameter value for pi_quasto_scheme: ' || pi_quasto_scheme || ' or pi_character_set: ' || pi_character_set);
     end if;
     
     if pi_qaru_client_name is not null and pi_scheme_name is not null
@@ -980,9 +955,11 @@ create or replace package body qa_unit_tests_pkg is
       l_suitepath := f_get_suitepath(pi_get_root_only => 'Y');
     end if;
 
+    dbms_output.enable(buffer_size => 1000000);
     select DBMS_XMLGEN.CONVERT(XMLAGG(XMLELEMENT(E,column_value).EXTRACT('//text()')).GetClobVal(),1)
     into l_xml_result
     from table(ut.run(a_path => pi_quasto_scheme || ':' || l_suitepath, a_reporter => ut_junit_reporter(), a_client_character_set => pi_character_set));
+    dbms_output.disable();
 
     insert into QA_TEST_RESULTS(QATR_XML_RESULT)
     values (l_xml_result);
@@ -994,6 +971,7 @@ create or replace package body qa_unit_tests_pkg is
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
+      dbms_output.disable();
       raise;
   end f_run_all_unit_tests;
 
@@ -1019,11 +997,18 @@ create or replace package body qa_unit_tests_pkg is
                               ,p_name_04 => 'pi_character_set'
                               ,p_val_04  => pi_character_set);
 
+    if pi_qaru_rule_number is null or pi_qaru_client_name is null or pi_scheme_name is null or pi_character_set is null
+    then
+      raise_application_error(-20001, 'Missing input parameter value for pi_qaru_rule_number: ' || pi_qaru_rule_number || ' or pi_qaru_client_name: ' || pi_qaru_client_name || ' or pi_scheme_name: ' || pi_scheme_name || ' or pi_character_set: ' || pi_character_set);
+    end if;
+
     l_utplsql_call := f_get_unit_test_call(pi_qaru_rule_number => pi_qaru_rule_number, pi_qaru_client_name => pi_qaru_client_name, pi_scheme_name => pi_scheme_name);
-    
+
+    dbms_output.enable(buffer_size => 1000000);
     select DBMS_XMLGEN.CONVERT(XMLAGG(XMLELEMENT(E,column_value).EXTRACT('//text()')).GetClobVal(),1)
     into l_xml_result
     from table(ut.run(a_path => l_utplsql_call, a_reporter => ut_junit_reporter(), a_client_character_set => pi_character_set));
+    dbms_output.disable();
     
     insert into QA_TEST_RESULTS(QATR_XML_RESULT)
     values (l_xml_result);
@@ -1034,6 +1019,7 @@ create or replace package body qa_unit_tests_pkg is
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
+      dbms_output.disable();
       raise;
   end p_run_custom_unit_test;
 
@@ -1157,11 +1143,8 @@ create or replace package body qa_unit_tests_pkg is
   begin    
     for i in pi_scheme_name.first .. pi_scheme_name.last
     loop
-      l_scheme_name := pi_scheme_name(i) || ',' || l_scheme_name;
+      l_scheme_name := concat(pi_scheme_name(i), ',' || l_scheme_name);
     end loop;
-    l_scheme_name := substr(l_scheme_name
-                            ,0
-                            ,length(l_scheme_name) - 1);
 
     l_qaru_id := qa_main_pkg.f_get_rule_pk(pi_qaru_rule_number => pi_qaru_rule_number
                                          , pi_qaru_client_name => pi_qaru_client_name);
@@ -1197,7 +1180,7 @@ create or replace package body qa_unit_tests_pkg is
     if pi_string is null
     or (pi_transform_case is not null and lower(pi_transform_case) not in ('l','u'))
     then
-      raise_application_error(-20001, 'Invalid input parameter value for pi_string: ' || pi_string || ' or pi_transform_case: ' || pi_transform_case);
+      raise_application_error(-20001, 'Missing or invalid input parameter value for pi_string: ' || pi_string || ' or pi_transform_case: ' || pi_transform_case);
     end if;
     
     v_string := regexp_replace(replace(pi_string
@@ -1252,7 +1235,7 @@ create or replace package body qa_unit_tests_pkg is
     if ((pi_qaru_rule_number is null or pi_qaru_client_name is null or pi_scheme_name is null) and pi_is_cronjob != 'Y')
     or pi_is_cronjob not in ('Y','N')
     then
-      raise_application_error(-20001, 'Invalid input parameter value or value missing for pi_qaru_rule_number: ' || pi_qaru_rule_number || ', pi_qaru_client_name: ' || pi_qaru_client_name || ', pi_scheme_name: ' || pi_scheme_name || ', pi_is_cronjob: ' || pi_is_cronjob);
+      raise_application_error(-20001, 'Missing or invalid input parameter value for pi_qaru_rule_number: ' || pi_qaru_rule_number || ', pi_qaru_client_name: ' || pi_qaru_client_name || ', pi_scheme_name: ' || pi_scheme_name || ', pi_is_cronjob: ' || pi_is_cronjob);
     end if;
     
     if pi_is_cronjob = 'Y'

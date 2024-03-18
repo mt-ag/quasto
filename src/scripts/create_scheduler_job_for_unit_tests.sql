@@ -12,7 +12,7 @@ begin
   then
     dbms_scheduler.create_job(job_name            => 'CRONJOB_RUN_UNIT_TESTS'
                              ,job_type            => 'PLSQL_BLOCK'
-                             ,job_action          => 'DECLARE v_output VARCHAR2(500); BEGIN qa_unit_tests_pkg.p_run_all_unit_tests(v_output); dbms_output.put_line(v_output); END;'
+                             ,job_action          => 'BEGIN qa_unit_tests_pkg.p_run_all_unit_tests; END;'
                              ,number_of_arguments => 0
                              ,start_date          => to_date('070720230100'
                                                             ,'DDMMYYYYHH24MI')
@@ -21,7 +21,7 @@ begin
                              ,job_class           => 'DEFAULT_JOB_CLASS'
                              ,enabled             => false
                              ,auto_drop           => false
-                             ,comments            => 'Job runs unit test packages and saves xml result into table QA_TEST_RESULTS');
+                             ,comments            => 'Job runs all QUASTO unit test packages and saves invalid objects with xml result file in database');
   
     select count(1)
     into l_count
