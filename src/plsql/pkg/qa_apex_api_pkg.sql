@@ -1,9 +1,9 @@
-create or replace package qa_apex_pkg
+create or replace package qa_apex_api_pkg
   authid definer
 as
 
 /******************************************************************************
-   NAME:       qa_apex_pkg
+   NAME:       qa_apex_api_pkg
    PURPOSE:    Methods for executing QUASTO rules for APEX
 
    REVISIONS:
@@ -14,9 +14,9 @@ as
 
   procedure placeholder;
 
-end qa_apex_pkg;
+end qa_apex_api_pkg;
 /
-create or replace package body qa_apex_pkg as
+create or replace package body qa_apex_api_pkg as
 
   procedure placeholder
     as
@@ -24,5 +24,5 @@ create or replace package body qa_apex_pkg as
         null;
   end placeholder;
 
-end qa_apex_pkg;
+end qa_apex_api_pkg;
 /
