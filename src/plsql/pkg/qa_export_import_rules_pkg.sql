@@ -18,20 +18,6 @@ create or replace package qa_export_import_rules_pkg is
   g_spool_active boolean := false;
 
 /**
- * function for replacing strings in a clob
- * @param  i_source specifies the source to read the data
- * @param  i_search specifies a string to search for
- * @param  i_replace specifies a value to replace the search string with
- * @return clob returns the data
-*/
-  function replace_with_clob
-  (
-    i_source  in clob
-   ,i_search  in varchar2
-   ,i_replace in clob
-  ) return clob;
-
-/**
  * function for converting rules table to clob
  * @param  pi_client_name specifies the client name
  * @param  pi_category specifies the rule category
@@ -55,27 +41,19 @@ create or replace package qa_export_import_rules_pkg is
   ) return clob;
 
 /**
- * procedure to print clob to console output
- * @param  pi_clob specifies the clob
- * @throws NO_DATA_FOUND if no data found in given clob
-*/
-  procedure p_clob_to_output(
-   pi_clob in clob
-  );
-
-/**
- * procedure to import a given blob file into qa_import_files table
+ * function to import a given blob file into qa_import_files table and return id
  * @param  pi_clob specifies the clob
  * @param  pi_filename specifies file name
  * @param  pi_mimetype specifies the MIME type
  * @throws NO_DATA_FOUND if no data found in given clob
+ * @return number returns the id
 */
-  procedure f_import_clob_to_qa_import_files
+  function f_import_clob_to_qa_import_files
   (
-    pi_clob     in blob
+    pi_clob     in clob
    ,pi_filename in qa_import_files.qaif_filename%type
    ,pi_mimetype in qa_import_files.qaif_mimetype%type
-  );
+  ) return number;
 
 /**
  * procedure to import a given clob into qa_rules table
@@ -84,22 +62,6 @@ create or replace package qa_export_import_rules_pkg is
 */
   procedure p_import_clob_to_rules_table(
    pi_qaif_id in qa_import_files.qaif_id%type
-  );
-
-/**
- * procedure to upload a json rule file
- * @param pi_file_name defines the file name in APEX_APPLICATION_TEMP_FILES
-*/
-  procedure p_upload_rules_json(
-   pi_file_name in varchar2
-  );
-
-/**
- * procedure to download a json rule file
- * @param pi_client_name defines the client name for which rules should be exported
-*/
-  procedure p_download_rules_json(
-   pi_client_name in varchar2
   );
 
 /* will be removed in future */
@@ -116,34 +78,6 @@ create or replace package qa_export_import_rules_pkg is
 end qa_export_import_rules_pkg;
 /
 create or replace package body qa_export_import_rules_pkg is
-
-  procedure p_print(pi_text in varchar2) is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.p_print';
-    l_param_list qa_logger_pkg.tab_param;
-
-  begin
-
-    qa_logger_pkg.append_param(p_params => l_param_list
-                              ,p_name_01 => 'pi_text'
-                              ,p_val_01 => pi_text);
-
-    if not g_spool_active
-    then
-      dbms_output.put_line(pi_text);
-    end if;
-  exception 
-    when no_data_found then 
-      qa_logger_pkg.p_qa_log(p_text   => 'No Data found from print'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-
-    when others then 
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to printing the Rules!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-  end p_print;
 
   function f_export_rules_table_to_clob
   (
@@ -184,10 +118,16 @@ create or replace package body qa_export_import_rules_pkg is
 
     if l_count_rules = 0
     then
-      p_print('No rules found.');
+      if not g_spool_active
+      then
+        qa_utils_pkg.p_print_to_dbms_output('No rules found.');
+      end if;
       return null;
     else
-      p_print('Exporting ' || l_count_rules || ' rules with CLIENT_NAME=' || pi_client_name || ' and CATEGORY=' || pi_category);
+      if not g_spool_active
+      then
+        qa_utils_pkg.p_print_to_dbms_output('Exporting ' || l_count_rules || ' rules with CLIENT_NAME=' || pi_client_name || ' and CATEGORY=' || pi_category);
+      end if;
 
       -- for each client_name
       for client in (select qaru_client_name
@@ -298,59 +238,6 @@ create or replace package body qa_export_import_rules_pkg is
       raise;
   end f_export_rules_table_to_clob;
 
-  -- Helper Function to replace json-control chars in our clob
-  function replace_with_clob
-  (
-    i_source  in clob
-   ,i_search  in varchar2
-   ,i_replace in clob
-  ) return clob is      
-    c_unit constant varchar2(32767) := $$plsql_unit || '.f_replace_with_clob';
-    l_param_list qa_logger_pkg.tab_param;
-
-    l_pos pls_integer;
-    l_source_varchar varchar(32767); 
-    l_replace_varchar varchar(32767);
-
-  begin
-
-    l_source_varchar := dbms_lob.substr(i_source,4000,1);
-    l_replace_varchar := dbms_lob.substr(i_replace,4000,1);
-
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'i_source'
-                              ,p_val_01  => l_source_varchar
-                              ,p_name_02 => 'i_search'
-                              ,p_val_02  =>i_search
-                              ,p_name_03 => 'i_replace'
-                              ,p_val_03  => l_replace_varchar);
-
-
-    l_pos := instr(i_source
-                  ,i_search);
-    if l_pos > 0
-    then
-      return substr(i_source
-                   ,1
-                   ,l_pos - 1) || i_replace || substr(i_source
-                                                     ,l_pos + length(i_search));
-    end if;
-    return i_source;
-  exception
-    when no_data_found then
-      qa_logger_pkg.p_qa_log(p_text   => 'NoData found while replacing json-control chars in clob'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-      raise;
-    when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while replacing json_control chars in clob'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-  end replace_with_clob;
-
-
   -- Experimental Function to Export A Json as an executable script
   function f_export_rules_to_script_clob(pi_clob in clob) return clob is
 
@@ -391,9 +278,9 @@ create or replace package body qa_export_import_rules_pkg is
                        ,'"sql" : "') > 0 --and 1=0
       then
         null;
-        l_sql := replace_with_clob(i_source  => f.line
-                                  ,i_search  => '\n'
-                                  ,i_replace => 'chr(10)');
+        l_sql := qa_utils_pkg.f_replace_string(pi_source_string  => f.line
+                                              ,pi_search_string  => '\n'
+                                              ,pi_replace_string => 'chr(10)');
         /*select qaru_sql
           into l_sql
           from json_table(f.line
@@ -427,49 +314,13 @@ create or replace package body qa_export_import_rules_pkg is
                             ,p_params => l_param_list);
   end f_export_rules_to_script_clob;
 
-
-  procedure p_clob_to_output(pi_clob in clob) is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.p_clob_to_output';
-    l_param_list qa_logger_pkg.tab_param;
-
-    l_offset int := 1;
-    l_step   number := 32767;
-    l_clob_varchar varchar(32767); 
-  begin
-
-    l_clob_varchar := dbms_lob.substr(pi_clob,4000,1);
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_clob'
-                              ,p_val_01  => l_clob_varchar);
-
-    dbms_output.enable(buffer_size => 10000000);
-    loop
-      exit when l_offset > dbms_lob.getlength(pi_clob);
-      dbms_output.put_line(dbms_lob.substr(pi_clob
-                                          ,l_step
-                                          ,l_offset));
-      l_offset := l_offset + l_step;
-    end loop;
-  exception
-    when no_data_found then
-      qa_logger_pkg.p_qa_log(p_text   => 'No Data found for Output Clob'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-      raise;
-    when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while Output Clob'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-  end p_clob_to_output;
-
-  procedure f_import_clob_to_qa_import_files
+  function f_import_clob_to_qa_import_files
   (
-    pi_clob     in blob
+    pi_clob     in clob
    ,pi_filename in qa_import_files.qaif_filename%type
    ,pi_mimetype in qa_import_files.qaif_mimetype%type
-  ) is
+  ) return number
+  is
     c_unit constant varchar2(32767) := $$plsql_unit || '.f_Import_clob_to_qa_import_files';
     l_param_list qa_logger_pkg.tab_param;
 
@@ -495,7 +346,8 @@ create or replace package body qa_export_import_rules_pkg is
       ,pi_mimetype
       ,to_clob(pi_clob))
     returning qaif_id into l_ret;
-    --  return l_ret;
+    
+    return l_ret;
   exception
     when no_data_found then
       qa_logger_pkg.p_qa_log(p_text   => 'No Data found while Importing clob to qa_import_files'
@@ -509,7 +361,6 @@ create or replace package body qa_export_import_rules_pkg is
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
   end f_import_clob_to_qa_import_files;
-
 
 
   procedure p_import_clob_to_rules_table(pi_qaif_id in qa_import_files.qaif_id%type) is
@@ -608,99 +459,6 @@ create or replace package body qa_export_import_rules_pkg is
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
   end p_import_clob_to_rules_table;
-
-  procedure p_upload_rules_json(
-    pi_file_name in varchar2
-  )
-  is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.p_upload_rules_json';
-    l_param_list qa_logger_pkg.tab_param;
-
-    l_blob_content blob;
-    l_mime_type varchar2(100);
-    l_file_name varchar2(100);
-    l_mime_type_json varchar2(50) := 'application/json';
-  begin
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_file_name'
-                              ,p_val_01  => pi_file_name);
-
-    select blob_content
-          ,mime_type
-          ,filename
-	into l_blob_content
-        ,l_mime_type
-        ,l_file_name
-	from APEX_APPLICATION_TEMP_FILES
-    where name = pi_file_name;
-    
-    if l_mime_type != l_mime_type_json
-    then
-      raise_application_error(-20001, 'Invalid MIME type of json file: ' || pi_file_name || ' - MIME type: ' || l_mime_type);
-    end if;
-   
-    f_import_clob_to_qa_import_files(pi_clob => l_blob_content,
-                                     pi_filename => l_file_name,
-                                     pi_mimetype => l_mime_type);
-
-  exception
-    when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to import the json file!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-      raise;
-  end p_upload_rules_json;
-
-  procedure p_download_rules_json(
-   pi_client_name in varchar2
-  )
-  is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.p_download_rules_json';
-    l_param_list qa_logger_pkg.tab_param;
-
-    l_offset number := 1;
-    l_chunk number := 3000;
-    l_clob_json clob;
-    l_client_name_unified varchar2(500);
-  begin
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_client_name'
-                              ,p_val_01  => pi_client_name);
-
-    l_clob_json := f_export_rules_table_to_clob(pi_client_name => pi_client_name);
-    
-    l_client_name_unified := regexp_replace(replace(lower(pi_client_name)
-                                                   ,' '
-                                                   ,'_')
-                                           ,'[^a-z0-9_]'
-                                           ,'_');
-    
-    HTP.init;
-    OWA_UTIL.mime_header('application/json', false, 'UTF-8');
-    HTP.p('Content-Length: ' || DBMS_LOB.getlength(l_clob_json));
-    HTP.p('Content-Type: application/octet-stream');
-    HTP.p('Cache-Control: no-cache');
-    HTP.p('Content-Disposition: attachment; filename="export_rules_' || l_client_name_unified || '_' || to_char(systimestamp, 'YYYYMMDDHH24MI') || '.json"');
-    OWA_UTIL.http_header_close;
-
-    loop
-      exit when l_offset > length(l_clob_json);
-      HTP.prn(substr(l_clob_json, l_offset, l_chunk));
-      l_offset := l_offset + l_chunk;
-     end loop;
-
-    apex_application.stop_apex_engine;
-  exception
-    when apex_application.e_stop_apex_engine then
-      null;
-    when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to export the json file!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-      raise;
-  end p_download_rules_json;
 
   function fc_export_qa_rules(pi_client_name in varchar2 default null) return clob is
     c_unit constant varchar2(32767) := $$plsql_unit || '.fc_export_qa_rules';

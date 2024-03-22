@@ -115,21 +115,6 @@ create or replace package qa_unit_tests_pkg authid definer is
   );
 
   /**
-   * function to convert and unify a given string - for internal use only
-   * @param  pi_string defines the string to be converted
-   * @param  pi_transform_case defines the transformation as l - lowercase - or u - uppercase
-   * @return varchar2 returns the unified string
-  */
-  function f_get_unified_string
-  (
-    pi_string         in varchar2
-   ,pi_transform_case in varchar2 default null
-  ) return varchar2 deterministic;
-
-
-  /* Procedures and functions used by APEX app */
-
-  /**
    * function to get the name format of a scheduler job
    * @param  pi_qaru_rule_number defines the rule number
    * @param  pi_qaru_client_name defines the client name
@@ -184,16 +169,18 @@ create or replace package qa_unit_tests_pkg authid definer is
   procedure p_trigger_scheduler_cronjob;
 
   /**
-   * procedure to upload a xml result file
-   * @param pi_file_name defines the file name in APEX_APPLICATION_TEMP_FILES
+   * function to import an unit test file clob
+   * @param pi_xml_clob defines the clob
+   * @return number returns the id
   */
-  procedure p_upload_unit_test_xml(pi_file_name in varchar2);
+  function f_import_test_result(pi_xml_clob in clob) return number;
 
   /**
-   * procedure to download a xml result as file
-   * @param pi_qatr_id defines the xml test result id
+   * function to export an unit test clob
+   * @param pi_qatr_id defines the id of the unit test result
+   * @return clob returns the clob
   */
-  procedure p_download_unit_test_xml(pi_qatr_id in number);
+  function f_export_test_result(pi_qatr_id in qa_test_results.qatr_id%type) return clob;
 
   /**
    * procedure to create unit tests for given schemes
@@ -237,7 +224,7 @@ create or replace package body qa_unit_tests_pkg is
     
     if pi_qaru_client_name is not null and pi_scheme_name is not null and pi_get_root_only = 'N'
     then
-      l_client_name_unified := f_get_unified_string(pi_string => pi_qaru_client_name);
+      l_client_name_unified := qa_utils_pkg.f_get_unified_string(pi_string => pi_qaru_client_name);
       return lower(qa_constant_pkg.gc_quasto_name || '.' || l_client_name_unified || '.' || pi_scheme_name);
     else
       return lower(qa_constant_pkg.gc_quasto_name);
@@ -273,14 +260,14 @@ create or replace package body qa_unit_tests_pkg is
                               ,p_name_03 => 'pi_scheme_name'
                               ,p_val_03  => pi_scheme_name);
     
-    select f_get_unified_string(pi_string => qaru_name)
+    select qa_utils_pkg.f_get_unified_string(pi_string => qaru_name)
     into l_qaru_name_unified
     from qa_rules
     where qaru_client_name = pi_qaru_client_name
     and qaru_rule_number = pi_qaru_rule_number;
 
-    l_client_name_unified := f_get_unified_string(pi_string => pi_qaru_client_name, pi_transform_case => 'u');
-    l_rule_number_unified := f_get_unified_string(pi_string => pi_qaru_rule_number);
+    l_client_name_unified := qa_utils_pkg.f_get_unified_string(pi_string => pi_qaru_client_name, pi_transform_case => 'u');
+    l_rule_number_unified := qa_utils_pkg.f_get_unified_string(pi_string => pi_qaru_rule_number);
     
     select object_name
     into l_package_name
@@ -672,7 +659,7 @@ create or replace package body qa_unit_tests_pkg is
       loop
 
         for rec_clients in (select qaru_client_name
-                                  ,f_get_unified_string(pi_string => qaru_client_name, pi_transform_case => 'l') as qaru_client_name_unified
+                                  ,qa_utils_pkg.f_get_unified_string(pi_string => qaru_client_name, pi_transform_case => 'l') as qaru_client_name_unified
                            from qa_rules
                            where qaru_is_active = 1 
                            group by qaru_client_name)
@@ -686,8 +673,8 @@ create or replace package body qa_unit_tests_pkg is
                                             ,pi_qaru_client_name_unified => rec_clients.qaru_client_name_unified);
 
          for rec_rules in (select qaru_rule_number
-                                 ,f_get_unified_string(pi_string => qaru_rule_number, pi_transform_case => 'l') as qaru_rule_number_unified
-                                 ,f_get_unified_string(pi_string => qaru_name, pi_transform_case => 'l') as qaru_name_unified
+                                 ,qa_utils_pkg.f_get_unified_string(pi_string => qaru_rule_number, pi_transform_case => 'l') as qaru_rule_number_unified
+                                 ,qa_utils_pkg.f_get_unified_string(pi_string => qaru_name, pi_transform_case => 'l') as qaru_name_unified
                            from qa_rules
                            where qaru_client_name = rec_clients.qaru_client_name
                            and qaru_is_active = 1 
@@ -709,7 +696,7 @@ create or replace package body qa_unit_tests_pkg is
          l_clob := f_get_package_body_header(pi_package_name => l_package_name);
 
          for rec_rules in (select qaru_rule_number
-                                 ,f_get_unified_string(pi_string => qaru_rule_number, pi_transform_case => 'l') as qaru_rule_number_unified
+                                 ,qa_utils_pkg.f_get_unified_string(pi_string => qaru_rule_number, pi_transform_case => 'l') as qaru_rule_number_unified
                                  ,qaru_layer
                            from qa_rules
                            where qaru_client_name = rec_clients.qaru_client_name
@@ -744,9 +731,9 @@ create or replace package body qa_unit_tests_pkg is
         for rec_client_rules in (select qaru_client_name
                                        ,qaru_rule_number
                                        ,qaru_name
-                                       ,f_get_unified_string(pi_string => qaru_client_name, pi_transform_case => 'l') as qaru_client_name_unified
-                                       ,f_get_unified_string(pi_string => qaru_rule_number, pi_transform_case => 'l') as qaru_rule_number_unified
-                                       ,f_get_unified_string(pi_string => qaru_name, pi_transform_case => 'l') as qaru_name_unified
+                                       ,qa_utils_pkg.f_get_unified_string(pi_string => qaru_client_name, pi_transform_case => 'l') as qaru_client_name_unified
+                                       ,qa_utils_pkg.f_get_unified_string(pi_string => qaru_rule_number, pi_transform_case => 'l') as qaru_rule_number_unified
+                                       ,qa_utils_pkg.f_get_unified_string(pi_string => qaru_name, pi_transform_case => 'l') as qaru_name_unified
                                        ,qaru_layer
                                  from qa_rules
                                  where qaru_is_active = 1 
@@ -1141,13 +1128,10 @@ create or replace package body qa_unit_tests_pkg is
     l_qaru_id number;
     l_qatr_id number;
   begin    
-    for i in pi_scheme_name.first .. pi_scheme_name.last
-    loop
-      l_scheme_name := concat(pi_scheme_name(i), ',' || l_scheme_name);
-    end loop;
-
+    l_scheme_name := qa_utils_pkg.f_get_table_as_string(pi_table     => pi_scheme_name
+                                                       ,pi_separator => ',');
     l_qaru_id := qa_main_pkg.f_get_rule_pk(pi_qaru_rule_number => pi_qaru_rule_number
-                                         , pi_qaru_client_name => pi_qaru_client_name);
+                                          ,pi_qaru_client_name => pi_qaru_client_name);
     l_qatr_id := f_save_scheme_result(pi_scheme_name  => l_scheme_name
                                      ,pi_program_name => pi_program_name
                                      ,pi_qaru_id      => l_qaru_id
@@ -1160,52 +1144,6 @@ create or replace package body qa_unit_tests_pkg is
     when others then
       raise;
   end p_handle_test_exception;
-
-  function f_get_unified_string(
-    pi_string          in varchar2
-   ,pi_transform_case  in varchar2 default null
-  ) return varchar2 deterministic
-  is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_unified_string';
-    l_param_list qa_logger_pkg.tab_param;
-
-    v_string varchar2(500);
-  begin
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_string'
-                              ,p_val_01  => pi_string
-                              ,p_name_02 => 'pi_transform_case'
-                              ,p_val_02  => pi_transform_case);
-                              
-    if pi_string is null
-    or (pi_transform_case is not null and lower(pi_transform_case) not in ('l','u'))
-    then
-      raise_application_error(-20001, 'Missing or invalid input parameter value for pi_string: ' || pi_string || ' or pi_transform_case: ' || pi_transform_case);
-    end if;
-    
-    v_string := regexp_replace(replace(pi_string
-                                      ,' '
-                                      ,'_')
-                              ,'[^a-zA-Z0-9_]'
-                              ,'_');
-
-    if lower(pi_transform_case) = 'l'
-    then
-      v_string := lower(v_string);
-    elsif lower(pi_transform_case) = 'u'
-    then
-      v_string := upper(v_string);
-    end if;
-    
-    return v_string;
-  exception
-    when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to generate an unified string!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-      raise;
-  end f_get_unified_string;
 
   function f_get_job_name(
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type default null
@@ -1242,9 +1180,9 @@ create or replace package body qa_unit_tests_pkg is
     then
       l_job_name := qa_constant_pkg.gc_utplsql_scheduler_cronjob_name;
     else
-      l_client_name := f_get_unified_string(pi_string => pi_qaru_client_name, pi_transform_case => 'u');
-      l_scheme_name := f_get_unified_string(pi_string => pi_scheme_name, pi_transform_case => 'u');
-      l_rule_number := f_get_unified_string(pi_string => pi_qaru_rule_number);
+      l_client_name := qa_utils_pkg.f_get_unified_string(pi_string => pi_qaru_client_name, pi_transform_case => 'u');
+      l_scheme_name := qa_utils_pkg.f_get_unified_string(pi_string => pi_scheme_name, pi_transform_case => 'u');
+      l_rule_number := qa_utils_pkg.f_get_unified_string(pi_string => pi_qaru_rule_number);
 
       l_job_name := qa_constant_pkg.gc_utplsql_custom_scheduler_job_name || '_' || l_scheme_name || '_' || l_client_name || '_' || l_rule_number;
     end if;
@@ -1425,92 +1363,53 @@ create or replace package body qa_unit_tests_pkg is
       raise;
   end p_trigger_scheduler_cronjob;
 
-  procedure p_upload_unit_test_xml(
-    pi_file_name in varchar2
-  )
+  function f_import_test_result
+  (
+    pi_xml_clob in clob
+  ) return number
   is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.p_upload_unit_test_xml';
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_import_test_result';
     l_param_list qa_logger_pkg.tab_param;
 
-    l_clob_content clob;
-    l_mime_type varchar2(100);
+    l_return number;
   begin
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_file_name'
-                              ,p_val_01  => pi_file_name);
-
-    select to_clob(blob_content)
-          ,mime_type
-    into l_clob_content
-        ,l_mime_type
-	from APEX_APPLICATION_TEMP_FILES
-    where name = pi_file_name;
     
-    if l_mime_type != 'application/xml'
-    then
-      raise_application_error(-20001, 'Invalid MIME type of xml file: ' || pi_file_name || ' - MIME type: ' || l_mime_type);
-    end if;
-   
     insert into qa_test_results(qatr_xml_result)
-    values (l_clob_content);
-
+    values (pi_xml_clob);
+    
   exception
     when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to upload the xml file!'
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to import a xml test result!'
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
       raise;
-  end p_upload_unit_test_xml;
+  end f_import_test_result;
 
-  procedure p_download_unit_test_xml(
-    pi_qatr_id   in number
-  )
+  function f_export_test_result
+  (
+    pi_qatr_id in qa_test_results.qatr_id%type
+  ) return clob
   is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.p_download_unit_test_xml';
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_export_test_result';
     l_param_list qa_logger_pkg.tab_param;
 
-    l_offset number := 1;
-    l_chunk number := 3000;
-    l_clob_xml clob;
-    l_added_on date;
+    l_return clob;
   begin
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_qatr_id'
-                              ,p_val_01  => pi_qatr_id);
-
+    
     select qatr_xml_result
-          ,qatr_added_on
-    into l_clob_xml
-        ,l_added_on
+    into l_return
     from qa_test_results
     where qatr_id = pi_qatr_id;
     
-    HTP.init;
-    OWA_UTIL.mime_header('application/xml', false, 'UTF-8');
-    HTP.p('Content-Length: ' || DBMS_LOB.getlength(l_clob_xml));
-    HTP.p('Content-Type: application/octet-stream');
-    HTP.p('Cache-Control: no-cache');
-    HTP.p('Content-Disposition: attachment; filename="export_unit_test_results_' || to_char(l_added_on, 'YYYYMMDDHH24MI') || '.xml"');
-    OWA_UTIL.http_header_close;
-
-    loop
-      exit when l_offset > length(l_clob_xml);
-      HTP.prn(substr(l_clob_xml, l_offset, l_chunk));
-      l_offset := l_offset + l_chunk;
-     end loop;
-
-    apex_application.stop_apex_engine;
   exception
-    when apex_application.e_stop_apex_engine then
-      null;
     when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get the xml file of an unit test execution!'
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to export a xml test result!'
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
       raise;
-  end p_download_unit_test_xml;
+  end f_export_test_result;
 
   procedure p_create_unit_tests_for_schemes(
     pi_option       in number
@@ -1532,14 +1431,8 @@ create or replace package body qa_unit_tests_pkg is
     then
       p_create_unit_test_packages(pi_option => pi_option);
     else
-      for i in (select column_value
-                from table(apex_string.split(pi_scheme_names,':'))
-               )
-      loop
-       l_scheme_names.extend;
-       l_scheme_names(l_scheme_names.last) := i.column_value;
-      end loop;
-    
+      l_scheme_names := qa_utils_pkg.f_get_string_as_table(pi_string    => pi_scheme_names
+                                                          ,pi_separator => ':');
       p_create_unit_test_packages(pi_option       => pi_option
                                  ,pi_scheme_names => l_scheme_names);
     end if;
@@ -1570,14 +1463,8 @@ create or replace package body qa_unit_tests_pkg is
     then
       p_delete_unit_test_packages;
     else
-      for i in (select column_value
-                from table(apex_string.split(pi_scheme_names,':'))
-               )
-      loop
-       l_scheme_names.extend;
-       l_scheme_names(l_scheme_names.last) := i.column_value;
-      end loop;
-     
+      l_scheme_names := qa_utils_pkg.f_get_string_as_table(pi_string    => pi_scheme_names
+                                                          ,pi_separator => ':');
       p_delete_unit_test_packages(pi_scheme_names => l_scheme_names);
     end if;
 
