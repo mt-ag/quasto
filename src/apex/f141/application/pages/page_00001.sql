@@ -29,7 +29,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'13'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240318105634'
+,p_last_upd_yyyymmddhh24miss=>'20240322175651'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(50026038309358532)
@@ -327,7 +327,7 @@ wwv_flow_imp_page.create_jet_chart_series(
 '            else',
 '                ''#1c6d11''',
 '          end as color_hex',
-'    from table(qa_helper_pkg.p0001_get_faceted_search_data(:APP_PAGE_ID, ''TEST_REPORT''))',
+'    from table(qa_apex_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT''))',
 '     '))
 ,p_ajax_items_to_submit=>'P1_CATEGORIES,P1_PROJECT,P1_SCHEME,P1_TEST_RESULT,P1_ERRORLEVEL,P1_EXECUTION_DATE'
 ,p_items_value_column_name=>'STATUS_AMOUNT'
@@ -399,7 +399,7 @@ wwv_flow_imp_page.create_jet_chart_series(
 '        from (',
 '            select qatr_result,',
 '                   trunc(qatr_date) as qatr_date',
-'              from table(qa_helper_pkg.p0001_get_faceted_search_data(:APP_PAGE_ID, ''TEST_REPORT''))',
+'              from table(qa_apex_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT''))',
 '              order by qatr_date desc',
 '              fetch first 10 rows only',
 '             )',
@@ -444,7 +444,7 @@ wwv_flow_imp_page.create_jet_chart_series(
 '        from (',
 '            select qatr_result,',
 '                   trunc(qatr_date) as qatr_date',
-'              from table(qa_helper_pkg.p0001_get_faceted_search_data(:APP_PAGE_ID, ''TEST_REPORT''))',
+'              from table(qa_apex_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT''))',
 '              order by qatr_date desc',
 '              fetch first 10 rows only',
 '             )',
@@ -489,7 +489,7 @@ wwv_flow_imp_page.create_jet_chart_series(
 '        from (',
 '            select qatr_result,',
 '                   trunc(qatr_date) as qatr_date',
-'              from table(qa_helper_pkg.p0001_get_faceted_search_data(:APP_PAGE_ID, ''TEST_REPORT''))',
+'              from table(qa_apex_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT''))',
 '              order by qatr_date desc',
 '              fetch first 10 rows only',
 '             )',
