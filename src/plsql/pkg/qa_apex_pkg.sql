@@ -14,6 +14,7 @@ create or replace package qa_apex_pkg is
    * function to get the data of the classic report on the dashboard page
    * @param pi_page_id defines the page id
    * @param pi_region_static_id defines the region id of the report
+   * @return test_results_table_t returns the data
   */
   function get_faceted_search_dashboard_data
   (
