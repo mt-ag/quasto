@@ -10,10 +10,15 @@ create or replace package qa_apex_pkg is
    24.1       22.03.2024  mwilhelm         Package has been added to QUASTO
 ******************************************************************************/
 
+  /**
+   * function to get the data of the classic report on the dashboard page
+   * @param pi_page_id defines the page id
+   * @param pi_region_static_id defines the region id of the report
+  */
   function get_faceted_search_dashboard_data
   (
-    p_page_id          in number
-   ,p_region_static_id in varchar2
+    pi_page_id          in number
+   ,pi_region_static_id in varchar2
   ) return test_results_table_t pipelined;
 
   /**
@@ -46,8 +51,8 @@ create or replace package body qa_apex_pkg as
 
   function get_faceted_search_dashboard_data
   (
-    p_page_id          in number
-   ,p_region_static_id in varchar2
+    pi_page_id          in number
+   ,pi_region_static_id in varchar2
   ) return test_results_table_t pipelined
   is
     l_region_id number;
@@ -69,10 +74,10 @@ create or replace package body qa_apex_pkg as
       into l_region_id
       from apex_application_page_regions
      where application_id = V('APP_ID')
-       and page_id = p_page_id
-       and static_id = p_region_static_id;
+       and page_id = pi_page_id
+       and static_id = pi_region_static_id;
 
-    l_context := apex_region.open_query_context(p_page_id   => p_page_id
+    l_context := apex_region.open_query_context(p_page_id   => pi_page_id
                                                ,p_region_id => l_region_id);
 
     get_column_indexes(pi_columns => varchar2_tab_t('QATR_ID','QATR_DATE', 'QATR_SCHEME_NAME', 'QARU_CATEGORY', 'QATR_RESULT', 'QARU_NAME', 'QARU_LAYER', 'QARU_ERROR_LEVEL', 'QARU_IS_ACTIVE', 'QARU_CLIENT_NAME', 'QATR_PROGRAM_NAME'));
