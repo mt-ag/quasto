@@ -27,7 +27,7 @@ from (
         from (
             select qatr_result,
                    trunc(qatr_date) as qatr_date
-              from table(qa_helper_pkg.p0001_get_faceted_search_data(:APP_PAGE_ID, 'TEST_REPORT'))
+              from table(qa_apex_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, 'TEST_REPORT'))
               order by qatr_date desc
               fetch first 10 rows only
              )
@@ -85,7 +85,7 @@ from (
         from (
             select qatr_result,
                    trunc(qatr_date) as qatr_date
-              from table(qa_helper_pkg.p0001_get_faceted_search_data(:APP_PAGE_ID, 'TEST_REPORT'))
+              from table(qa_apex_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, 'TEST_REPORT'))
               order by qatr_date desc
               fetch first 10 rows only
              )
@@ -107,7 +107,7 @@ select qatr_result testcase_status
             else
                 '#1c6d11'
           end as color_hex
-    from table(qa_helper_pkg.p0001_get_faceted_search_data(:APP_PAGE_ID, 'TEST_REPORT'));
+    from table(qa_apex_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, 'TEST_REPORT'));
 
 -- ----------------------------------------
 -- Page: 1 - Dashboard > Region: Timeline Chart > Attributes:  > Series: Success > Source > SQL Query
@@ -128,7 +128,7 @@ from (
         from (
             select qatr_result,
                    trunc(qatr_date) as qatr_date
-              from table(qa_helper_pkg.p0001_get_faceted_search_data(:APP_PAGE_ID, 'TEST_REPORT'))
+              from table(qa_apex_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, 'TEST_REPORT'))
               order by qatr_date desc
               fetch first 10 rows only
              )
