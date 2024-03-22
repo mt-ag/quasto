@@ -19,11 +19,11 @@ wwv_flow_imp_shared.create_flow_process(
 ,p_process_name=>'getRuleJSONAttachment'
 ,p_process_sql_clob=>wwv_flow_string.join(wwv_flow_t_varchar2(
 'BEGIN',
-'  QA_EXPORT_IMPORT_RULES_PKG.p_download_rules_json(:AI_CLIENT_NAME);',
+'  QA_APEX_PKG.p_download_rules_json(:AI_CLIENT_NAME);',
 'END;'))
 ,p_process_clob_language=>'PLSQL'
 ,p_security_scheme=>'MUST_NOT_BE_PUBLIC_USER'
-,p_version_scn=>1901984883
+,p_version_scn=>1908812209
 );
 wwv_flow_imp.component_end;
 end;

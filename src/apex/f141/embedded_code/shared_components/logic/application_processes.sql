@@ -12,13 +12,13 @@
 -- Application Process: getRuleJSONAttachment > Source > PL/SQL Code
 
 BEGIN
-  QA_EXPORT_IMPORT_RULES_PKG.p_download_rules_json(:AI_CLIENT_NAME);
+  QA_APEX_PKG.p_download_rules_json(:AI_CLIENT_NAME);
 END;
 
 -- ----------------------------------------
 -- Application Process: getUTXMLAttachment > Source > PL/SQL Code
 
 BEGIN
-  QA_UNIT_TESTS_PKG.p_download_unit_test_xml(:AI_XML_TEST_RESULT_ID);
+  QA_APEX_PKG.p_download_unit_test_xml(:AI_XML_TEST_RESULT_ID);
 END;
 

@@ -11,5 +11,5 @@
 -- ----------------------------------------
 -- Page: 5 - Test Result Files > Process: Upload file > Source > PL/SQL Code
 
-qa_unit_tests_pkg.p_upload_unit_test_xml(pi_file_name => :P5_XML_FILE);
+qa_apex_pkg.p_upload_unit_test_xml(pi_file_name => :P5_XML_FILE);
 

@@ -11,5 +11,5 @@
 -- ----------------------------------------
 -- Page: 8 - Rule Files > Process: Import file > Source > PL/SQL Code
 
-qa_export_import_rules_pkg.p_upload_rules_json(pi_file_name => :P8_JSON_FILE);
+qa_apex_pkg.p_upload_rules_json(pi_file_name => :P8_JSON_FILE);
 

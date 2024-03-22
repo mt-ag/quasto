@@ -19,11 +19,11 @@ wwv_flow_imp_shared.create_flow_process(
 ,p_process_name=>'getUTXMLAttachment'
 ,p_process_sql_clob=>wwv_flow_string.join(wwv_flow_t_varchar2(
 'BEGIN',
-'  QA_UNIT_TESTS_PKG.p_download_unit_test_xml(:AI_XML_TEST_RESULT_ID);',
+'  QA_APEX_PKG.p_download_unit_test_xml(:AI_XML_TEST_RESULT_ID);',
 'END;'))
 ,p_process_clob_language=>'PLSQL'
 ,p_security_scheme=>'MUST_NOT_BE_PUBLIC_USER'
-,p_version_scn=>1901323520
+,p_version_scn=>1908812287
 );
 wwv_flow_imp.component_end;
 end;
