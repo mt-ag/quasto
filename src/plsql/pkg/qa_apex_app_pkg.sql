@@ -1,7 +1,7 @@
-create or replace package qa_apex_pkg is
+create or replace package qa_apex_app_pkg is
 
 /******************************************************************************
-   NAME:       qa_apex_pkg
+   NAME:       qa_apex_app_pkg
    PURPOSE:    Methods for helpers and functionalities used on APEX pages
 
    REVISIONS:
@@ -46,9 +46,9 @@ create or replace package qa_apex_pkg is
   */
   procedure p_download_unit_test_xml(pi_qatr_id in number);
 
-end qa_apex_pkg;
+end qa_apex_app_pkg;
 /
-create or replace package body qa_apex_pkg as
+create or replace package body qa_apex_app_pkg as
 
   function get_faceted_search_dashboard_data
   (
@@ -288,5 +288,5 @@ create or replace package body qa_apex_pkg as
       raise;
   end p_download_unit_test_xml;
 
-end qa_apex_pkg;
+end qa_apex_app_pkg;
 /

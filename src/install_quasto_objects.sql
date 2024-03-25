@@ -11,14 +11,12 @@ variable script_apex VARCHAR2(50)
 PROMPT TABLE
 PROMPT src/ddl/tab/qa_rules.sql 
 @src/ddl/tab/qa_rules.sql
-
 PROMPT src/ddl/qa_import_files.sql
 @src/ddl/tab/qa_import_files.sql
 
 PROMPT INDEX
 PROMPT src/ddl/ind/qa_rules.sql
 @src/ddl/ind/qa_rules.sql
-
 PROMPT src/ddl/ind/qa_import_files.sql
 @src/ddl/ind/qa_import_files.sql
 
@@ -37,27 +35,42 @@ PROMPT src/ddl/seq/qaif_seq.sql
 PROMPT TYPE
 PROMPT src/plsql/typ/varchar2_tab_t.sql
 @src/plsql/typ/varchar2_tab_t.sql
-
 PROMPT src/plsql/typ/qa_rule_t.sql
 @src/plsql/typ/qa_rule_t.sql
 PROMPT src/plsql/typ/qa_rules_t.sql
 @src/plsql/typ/qa_rules_t.sql
-
 PROMPT src/plsql/typ/running_rule_t.sql
 @src/plsql/typ/running_rule_t.sql
 PROMPT src/plsql/typ/running_rules_t.sql
 @src/plsql/typ/running_rules_t.sql
-
 PROMPT src/plsql/typ/qa_scheme_object_amount_t.sql
 @src/plsql/typ/qa_scheme_object_amount_t.sql
 PROMPT src/plsql/typ/qa_scheme_object_amounts_t.sql
 @src/plsql/typ/qa_scheme_object_amounts_t.sql
+PROMPT src/plsql/typ/test_results_row_t.sql
+@src/plsql/typ/test_results_row_t.sql
+PROMPT src/plsql/typ/test_results_table_t.sql
+@src/plsql/typ/test_results_table_t.sql
 
 PROMPT VIEWS
 PROMPT src/plsql/vw/qa_predecessor_order_v.sql
 @src/plsql/vw/qa_predecessor_order_v.sql
 PROMPT src/plsql/vw/qa_scheme_names_for_testing_v.sql
 @src/plsql/vw/qa_scheme_names_for_testing_v.sql
+PROMPT src/plsql/vw/qa_application_owner_v.sql
+@src/plsql/vw/qa_application_owner_v.sql
+PROMPT src/plsql/vw/qa_overview_tests_p0001_v.sql
+@src/plsql/vw/qa_overview_tests_p0001_v.sql
+PROMPT src/plsql/vw/qa_job_run_details_v.sql
+@src/plsql/vw/qa_job_run_details_v.sql
+PROMPT src/plsql/vw/qa_test_runtime_error_p0003_v.sql
+@src/plsql/vw/qa_test_runtime_error_p0003_v.sql
+PROMPT src/plsql/vw/qa_test_run_details_p0004_v.sql
+@src/plsql/vw/qa_test_run_details_p0004_v.sql
+PROMPT src/plsql/vw/qa_test_result_files_p0005_v.sql
+@src/plsql/vw/qa_test_result_files_p0005_v.sql
+PROMPT src/plsql/vw/qa_job_details_P0009_v.sql
+@src/plsql/vw/qa_job_details_P0009_v.sql
 
 PROMPT src/plsql/vw/qa_apex_blacklisted_apps_v.sql
 declare
@@ -78,15 +91,18 @@ select :script_apex from dual;
 PROMPT PACKAGE
 PROMPT src/plsql/pkg/qa_logger_pkg.sql
 @src/plsql/pkg/qa_logger_pkg.sql
-
 PROMPT src/plsql/pkg/qa_main_pkg.sql
 @src/plsql/pkg/qa_main_pkg.sql
-
 PROMPT src/plsql/pkg/qa_api_pkg.sql
 @src/plsql/pkg/qa_api_pkg.sql
-
 PROMPT src/plsql/pkg/qa_export_import_rules_pkg.sql
 @src/plsql/pkg/qa_export_import_rules_pkg.sql
+PROMPT src/plsql/pkg/qa_utils_pkg.sql
+@src/plsql/pkg/qa_utils_pkg.sql
+PROMPT src/plsql/pkg/qa_apex_app_pkg.sql
+@src/plsql/pkg/qa_apex_app_pkg.sql
+PROMPT src/plsql/pkg/qa_apex_api_pkg.sql
+@src/plsql/pkg/qa_apex_api_pkg.sql
 
 PROMPT TRIGGER
 PROMPT src/plsql/trg/qaru_iu_trg.sql
