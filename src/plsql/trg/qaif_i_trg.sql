@@ -11,5 +11,3 @@ begin
   end if;
 end qaif_i_trg;
 /
-
-alter trigger qato_i_trg enable;
