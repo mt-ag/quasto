@@ -29,6 +29,10 @@ begin
   -- Triggers:
   l_object_name('QATR_I_TRG') := 'QATR_I_TRG';
   l_object_type('QATR_I_TRG') := 'TRIGGER';
+  l_object_name('QATO_I_TRG') := 'QATO_I_TRG';
+  l_object_type('QATO_I_TRG') := 'TRIGGER';
+  l_object_name('QATRU_I_TRG') := 'QATRU_I_TRG';
+  l_object_type('QATRU_I_TRG') := 'TRIGGER';
 
   l_object := l_object_name.first;
   while l_object is not null

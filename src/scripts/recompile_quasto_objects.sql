@@ -28,6 +28,20 @@ begin
 
   l_object_name('QARU_PREDECESSOR_ORDER_V') := 'QARU_PREDECESSOR_ORDER_V';
   l_object_type('QARU_PREDECESSOR_ORDER_V') := 'VIEW';
+  l_object_name('QA_APPLICATION_OWNER_V') := 'QA_APPLICATION_OWNER_V';
+  l_object_type('QA_APPLICATION_OWNER_V') := 'VIEW';
+  l_object_name('QA_JOB_RUN_DETAILS_V') := 'QA_JOB_RUN_DETAILS_V';
+  l_object_type('QA_JOB_RUN_DETAILS_V') := 'VIEW';
+  l_object_name('QA_OVERVIEW_TESTS_P0001_V') := 'QA_OVERVIEW_TESTS_P0001_V';
+  l_object_type('QA_OVERVIEW_TESTS_P0001_V') := 'VIEW';
+  l_object_name('QA_TEST_RUNTIME_ERROR_P0003_V') := 'QA_TEST_RUNTIME_ERROR_P0003_V';
+  l_object_type('QA_TEST_RUNTIME_ERROR_P0003_V') := 'VIEW';
+  l_object_name('QA_TEST_RUN_DETAILS_P0004_V') := 'QA_TEST_RUN_DETAILS_P0004_V';
+  l_object_type('QA_TEST_RUN_DETAILS_P0004_V') := 'VIEW';
+  l_object_name('QA_TEST_RESULT_FILES_P0005_V') := 'QA_TEST_RESULT_FILES_P0005_V';
+  l_object_type('QA_TEST_RESULT_FILES_P0005_V') := 'VIEW';
+  l_object_name('QA_JOB_DETAILS_P0009_V') := 'QA_JOB_DETAILS_P0009_V';
+  l_object_type('QA_JOB_DETAILS_P0009_V') := 'VIEW';
 
   -- Types:
   l_object_name('QA_RULE_T') := 'QA_RULE_T';
@@ -41,6 +55,10 @@ begin
 
   l_object_name('VARCHAR2_TAB_T') := 'VARCHAR2_TAB_T';
   l_object_type('VARCHAR2_TAB_T') := 'TYPE';
+  l_object_name('TEST_RESULTS_TABLE_T') := 'TEST_RESULTS_TABLE_T';
+  l_object_type('TEST_RESULTS_TABLE_T') := 'TYPE';
+  l_object_name('TEST_RESULTS_ROW_T') := 'TEST_RESULTS_ROW_T';
+  l_object_type('TEST_RESULTS_ROW_T') := 'TYPE';
   
   -- packages
   l_object_name('QA_CONSTANT_PKG') := 'QA_CONSTANT_PKG';
@@ -53,10 +71,18 @@ begin
   l_object_type('QA_EXPORT_IMPORT_RULES_PKG') := 'PACKAGE';
   l_object_name('QA_LOGGER_PKG') := 'QA_LOGGER_PKG';
   l_object_type('QA_LOGGER_PKG') := 'PACKAGE';
+  l_object_name('QA_UTILS_PKG') := 'QA_UTILS_PKG';
+  l_object_type('QA_UTILS_PKG') := 'PACKAGE';
+  l_object_name('QA_APEX_APP_PKG') := 'QA_APEX_APP_PKG';
+  l_object_type('QA_APEX_APP_PKG') := 'PACKAGE';
+  l_object_name('QA_APEX_API_PKG') := 'QA_APEX_API_PKG';
+  l_object_type('QA_APEX_API_PKG') := 'PACKAGE';
  
   --trigger
   l_object_name('QARU_IU_TRG') := 'QARU_IU_TRG';
   l_object_type('QARU_IU_TRG') := 'TRIGGER';
+  l_object_name('QAIF_I_TRG') := 'QAIF_I_TRG';
+  l_object_type('QAIF_I_TRG') := 'TRIGGER';
 
   l_object := l_object_name.first;
   while l_object is not null
