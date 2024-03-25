@@ -92,7 +92,7 @@ create or replace package body qa_api_pkg as
         $THEN
           if l_qa_rule.qaru_category = 'APEX'
           then
-            qa_main_pkg.p_exclude_not_whitelisted_apex_entries(pi_qa_rules_t => l_qa_rules);
+            qa_apex_api_pkg.p_exclude_not_whitelisted_apex_entries(pi_qa_rules_t => l_qa_rules);
           end if;
         $ELSE
           null;
