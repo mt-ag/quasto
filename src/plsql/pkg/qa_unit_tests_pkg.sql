@@ -1068,7 +1068,7 @@ create or replace package body qa_unit_tests_pkg is
     l_qatr_id number;
   begin
 
-    ut.expect(pi_result).to_(equal(1));
+    ut.expect(pi_result).to_equal(1);
     l_qaru_id := qa_main_pkg.f_get_rule_pk(pi_qaru_rule_number => pi_qaru_rule_number
                                           ,pi_qaru_client_name => pi_qaru_client_name);
 
