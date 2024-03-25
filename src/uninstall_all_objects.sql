@@ -163,6 +163,11 @@ begin
   while l_object is not null
   loop
     l_action := 'drop ' || l_object_type(l_object) || ' ' || l_object_name(l_object);
+    if l_object_type(l_object) = 'TYPE'
+      then
+        -- Sortierung aller Objekt Namen kann zu dependency Errors fuehren
+        l_action := l_action || ' force';
+    end if;
 
     select count(1)
     into l_count
