@@ -88,10 +88,16 @@ create or replace package body qa_api_pkg as
         qa_main_pkg.p_exclude_not_owned_entries(pi_current_user => pi_target_scheme
                                                ,pi_qa_rules_t   => l_qa_rules);
       end if;
-      if l_qa_rule.qaru_category = 'APEX'
-      then
-        qa_main_pkg.p_exclude_not_whitelisted_apex_entries(pi_qa_rules_t => l_qa_rules);
-      end if;
+      $IF qa_constant_pkg.gc_apex_flag = 1
+        $THEN
+          if l_qa_rule.qaru_category = 'APEX'
+          then
+            qa_main_pkg.p_exclude_not_whitelisted_apex_entries(pi_qa_rules_t => l_qa_rules);
+          end if;
+        $ELSE
+          null;
+      $END
+      
       qa_main_pkg.p_exclude_objects(pi_qa_rules => l_qa_rules);
       return l_qa_rules;
     else
