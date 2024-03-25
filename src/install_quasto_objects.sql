@@ -54,18 +54,18 @@ PROMPT src/plsql/typ/qa_scheme_object_amounts_t.sql
 @src/plsql/typ/qa_scheme_object_amounts_t.sql
 
 PROMPT VIEWS
-PROMPT src/plsql/vw/qaru_predecessor_order_v.sql
-@src/plsql/vw/qaru_predecessor_order_v.sql
-PROMPT src/plsql/vw/qaru_scheme_names_for_testing_v.sql
-@src/plsql/vw/qaru_scheme_names_for_testing_v.sql
+PROMPT src/plsql/vw/qa_predecessor_order_v.sql
+@src/plsql/vw/qa_predecessor_order_v.sql
+PROMPT src/plsql/vw/qa_scheme_names_for_testing_v.sql
+@src/plsql/vw/qa_scheme_names_for_testing_v.sql
 
-PROMPT src/plsql/vw/qaru_apex_blacklisted_apps_v.sql
+PROMPT src/plsql/vw/qa_apex_blacklisted_apps_v.sql
 declare
     l_script_name varchar2(100);
 begin
   if qa_constant_pkg.gc_apex_flag = 1
     then
-      l_script_name := 'plsql/vw/qaru_apex_blacklisted_apps_v.sql';
+      l_script_name := 'plsql/vw/qa_apex_blacklisted_apps_v.sql';
     else
       l_script_name := 'null.sql';
   end if;
