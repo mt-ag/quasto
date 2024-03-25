@@ -85,10 +85,10 @@ begin
   l_object_type('QATRU_SEQ') := 'SEQUENCE';
 
   -- views
-  l_object_name('QARU_PREDECESSOR_ORDER_V') := 'QARU_PREDECESSOR_ORDER_V';
-  l_object_type('QARU_PREDECESSOR_ORDER_V') := 'VIEW';
-  l_object_name('QARU_SCHEME_NAMES_FOR_TESTING_V') := 'QARU_SCHEME_NAMES_FOR_TESTING_V';
-  l_object_type('QARU_SCHEME_NAMES_FOR_TESTING_V') := 'VIEW';
+  l_object_name('QA_PREDECESSOR_ORDER_V') := 'QA_PREDECESSOR_ORDER_V';
+  l_object_type('QA_PREDECESSOR_ORDER_V') := 'VIEW';
+  l_object_name('QA_SCHEME_NAMES_FOR_TESTING_V') := 'QA_SCHEME_NAMES_FOR_TESTING_V';
+  l_object_type('QA_SCHEME_NAMES_FOR_TESTING_V') := 'VIEW';
   l_object_name('QA_APEX_BLACKLISTED_APPS_V') := 'QA_APEX_BLACKLISTED_APPS_V';
   l_object_type('QA_APEX_BLACKLISTED_APPS_V') := 'VIEW';
   l_object_name('QA_APPLICATION_OWNER_V') := 'QA_APPLICATION_OWNER_V';
