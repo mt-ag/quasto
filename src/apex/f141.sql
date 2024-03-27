@@ -42,7 +42,7 @@ prompt APPLICATION 141 - QUASTO
 --       Processes:               17
 --       Regions:                 38
 --       Buttons:                 25
---       Dynamic Actions:         13
+--       Dynamic Actions:         12
 --     Shared Components:
 --       Logic:
 --         Items:                  2
@@ -102,7 +102,7 @@ wwv_imp_workspace.create_flow(
 ,p_timestamp_tz_format=>'DS'
 ,p_direction_right_to_left=>'N'
 ,p_flow_image_prefix => nvl(wwv_flow_application_install.get_image_prefix,'')
-,p_authentication_id=>wwv_flow_imp.id(50668898619675067)
+,p_authentication_id=>wwv_flow_imp.id(48686292485118198)
 ,p_application_tab_set=>1
 ,p_logo_type=>'T'
 ,p_logo_text=>'QUASTO'
@@ -123,7 +123,7 @@ wwv_imp_workspace.create_flow(
 ,p_substitution_string_02=>'DATE_FORMAT'
 ,p_substitution_value_02=>'DD/MM/YYYY'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240322175810'
+,p_last_upd_yyyymmddhh24miss=>'20240326225420'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_files_version=>9
 ,p_print_server_type=>'NATIVE'
@@ -690,11 +690,11 @@ wwv_flow_imp_shared.create_flow_process(
 ,p_process_name=>'getUTXMLAttachment'
 ,p_process_sql_clob=>wwv_flow_string.join(wwv_flow_t_varchar2(
 'BEGIN',
-'  QA_APEX_PKG.p_download_unit_test_xml(:AI_XML_TEST_RESULT_ID);',
+'  QA_APEX_APP_PKG.p_download_unit_test_xml(:AI_XML_TEST_RESULT_ID);',
 'END;'))
 ,p_process_clob_language=>'PLSQL'
 ,p_security_scheme=>'MUST_NOT_BE_PUBLIC_USER'
-,p_version_scn=>1908812287
+,p_version_scn=>1909755995
 );
 end;
 /
@@ -708,11 +708,11 @@ wwv_flow_imp_shared.create_flow_process(
 ,p_process_name=>'getRuleJSONAttachment'
 ,p_process_sql_clob=>wwv_flow_string.join(wwv_flow_t_varchar2(
 'BEGIN',
-'  QA_APEX_PKG.p_download_rules_json(:AI_CLIENT_NAME);',
+'  QA_APEX_APP_PKG.p_download_rules_json(:AI_CLIENT_NAME);',
 'END;'))
 ,p_process_clob_language=>'PLSQL'
 ,p_security_scheme=>'MUST_NOT_BE_PUBLIC_USER'
-,p_version_scn=>1908812209
+,p_version_scn=>1909756093
 );
 end;
 /
@@ -14624,7 +14624,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'13'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240322175651'
+,p_last_upd_yyyymmddhh24miss=>'20240326225256'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(50026038309358532)
@@ -14922,7 +14922,7 @@ wwv_flow_imp_page.create_jet_chart_series(
 '            else',
 '                ''#1c6d11''',
 '          end as color_hex',
-'    from table(qa_apex_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT''))',
+'    from table(qa_apex_app_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT''))',
 '     '))
 ,p_ajax_items_to_submit=>'P1_CATEGORIES,P1_PROJECT,P1_SCHEME,P1_TEST_RESULT,P1_ERRORLEVEL,P1_EXECUTION_DATE'
 ,p_items_value_column_name=>'STATUS_AMOUNT'
@@ -14984,24 +14984,22 @@ wwv_flow_imp_page.create_jet_chart_series(
 '       to_char(qatr_date, ''fmMM/DD/YYYY'') as filter_date,',
 '       status_amount',
 'from (',
-'    select qatr_result,',
-'           qatr_date,',
-'           status_amount',
-'    from (',
-'        select qatr_result, ',
-'               qatr_date, ',
-'               count(1) over (partition by qatr_result, qatr_date) as status_amount',
+'        select q2.qatr_result, ',
+'               trunc(q2.qatr_date) as qatr_date,',
+'               count(1) as status_amount',
 '        from (',
-'            select qatr_result,',
-'                   trunc(qatr_date) as qatr_date',
-'              from table(qa_apex_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT''))',
-'              order by qatr_date desc',
+'            select trunc(qatr_date) as qatr_date',
+'              from table(qa_apex_app_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT''))',
+'              group by trunc(qatr_date)',
+'              order by trunc(qatr_date) desc',
 '              fetch first 10 rows only',
-'             )',
-'        where qatr_result = ''Success''',
-'    )',
-'    group by qatr_result, qatr_date, status_amount',
-')'))
+'             ) q1',
+'        join table(qa_apex_app_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT'')) q2',
+'        on trunc(q2.qatr_date) = q1.qatr_date',
+'        where q2.qatr_result = ''Success''',
+'        group by q2.qatr_result, trunc(q2.qatr_date)',
+')',
+'order by qatr_date asc'))
 ,p_ajax_items_to_submit=>'P1_CATEGORIES,P1_PROJECT,P1_SCHEME,P1_TEST_RESULT,P1_ERRORLEVEL,P1_EXECUTION_DATE'
 ,p_series_name_column_name=>'TESTCASE_STATUS'
 ,p_items_value_column_name=>'STATUS_AMOUNT'
@@ -15029,24 +15027,22 @@ wwv_flow_imp_page.create_jet_chart_series(
 '       to_char(qatr_date, ''fmMM/DD/YYYY'') as filter_date,',
 '       status_amount',
 'from (',
-'    select qatr_result,',
-'           qatr_date,',
-'           status_amount',
-'    from (',
-'        select qatr_result, ',
-'               qatr_date, ',
-'               count(1) over (partition by qatr_result, qatr_date) as status_amount',
+'        select q2.qatr_result, ',
+'               trunc(q2.qatr_date) as qatr_date,',
+'               count(1) as status_amount',
 '        from (',
-'            select qatr_result,',
-'                   trunc(qatr_date) as qatr_date',
-'              from table(qa_apex_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT''))',
-'              order by qatr_date desc',
+'            select trunc(qatr_date) as qatr_date',
+'              from table(qa_apex_app_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT''))',
+'              group by trunc(qatr_date)',
+'              order by trunc(qatr_date) desc',
 '              fetch first 10 rows only',
-'             )',
-'        where qatr_result = ''Failure''',
-'    )',
-'    group by qatr_result, qatr_date, status_amount',
-')'))
+'             ) q1',
+'        join table(qa_apex_app_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT'')) q2',
+'        on trunc(q2.qatr_date) = q1.qatr_date',
+'        where q2.qatr_result = ''Failure''',
+'        group by q2.qatr_result, trunc(q2.qatr_date)',
+')',
+'order by qatr_date asc'))
 ,p_ajax_items_to_submit=>'P1_CATEGORIES,P1_PROJECT,P1_SCHEME,P1_TEST_RESULT,P1_ERRORLEVEL,P1_EXECUTION_DATE'
 ,p_series_name_column_name=>'TESTCASE_STATUS'
 ,p_items_value_column_name=>'STATUS_AMOUNT'
@@ -15074,24 +15070,22 @@ wwv_flow_imp_page.create_jet_chart_series(
 '       to_char(qatr_date, ''fmMM/DD/YYYY'') as filter_date,',
 '       status_amount',
 'from (',
-'    select qatr_result,',
-'           qatr_date,',
-'           status_amount',
-'    from (',
-'        select qatr_result, ',
-'               qatr_date, ',
-'               count(1) over (partition by qatr_result, qatr_date) as status_amount',
+'        select q2.qatr_result, ',
+'               trunc(q2.qatr_date) as qatr_date,',
+'               count(1) as status_amount',
 '        from (',
-'            select qatr_result,',
-'                   trunc(qatr_date) as qatr_date',
-'              from table(qa_apex_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT''))',
-'              order by qatr_date desc',
+'            select trunc(qatr_date) as qatr_date',
+'              from table(qa_apex_app_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT''))',
+'              group by trunc(qatr_date)',
+'              order by trunc(qatr_date) desc',
 '              fetch first 10 rows only',
-'             )',
-'        where qatr_result = ''Error''',
-'    )',
-'    group by qatr_result, qatr_date, status_amount',
-')'))
+'             ) q1',
+'        join table(qa_apex_app_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT'')) q2',
+'        on trunc(q2.qatr_date) = q1.qatr_date',
+'        where q2.qatr_result = ''Error''',
+'        group by q2.qatr_result, trunc(q2.qatr_date)',
+')',
+'order by qatr_date asc'))
 ,p_ajax_items_to_submit=>'P1_CATEGORIES,P1_PROJECT,P1_SCHEME,P1_TEST_RESULT,P1_ERRORLEVEL,P1_EXECUTION_DATE'
 ,p_series_name_column_name=>'TESTCASE_STATUS'
 ,p_items_value_column_name=>'STATUS_AMOUNT'
@@ -15410,30 +15404,6 @@ wwv_flow_imp_page.create_page_da_action(
 ,p_affected_region_id=>wwv_flow_imp.id(15081484244011701)
 );
 wwv_flow_imp_page.create_page_da_event(
- p_id=>wwv_flow_imp.id(50234139716848219)
-,p_name=>'Repot neuanordnen'
-,p_event_sequence=>30
-,p_triggering_element_type=>'REGION'
-,p_triggering_region_id=>wwv_flow_imp.id(53667537845955093)
-,p_bind_type=>'bind'
-,p_execution_type=>'IMMEDIATE'
-,p_bind_event_type=>'click'
-,p_required_patch=>wwv_flow_imp.id(50668567409675065)
-);
-wwv_flow_imp_page.create_page_da_action(
- p_id=>wwv_flow_imp.id(50234206967848220)
-,p_event_id=>wwv_flow_imp.id(50234139716848219)
-,p_event_result=>'TRUE'
-,p_action_sequence=>10
-,p_execute_on_page_init=>'N'
-,p_action=>'NATIVE_SET_VALUE'
-,p_affected_elements_type=>'ITEM'
-,p_affected_elements=>'P1_REPORT_STATUS_FILTER'
-,p_attribute_01=>'STATIC_ASSIGNMENT'
-,p_attribute_09=>'N'
-,p_wait_for_result=>'Y'
-);
-wwv_flow_imp_page.create_page_da_event(
  p_id=>wwv_flow_imp.id(50904210902097603)
 ,p_name=>'Filter Regions'
 ,p_event_sequence=>50
@@ -15445,10 +15415,21 @@ wwv_flow_imp_page.create_page_da_event(
 ,p_bind_event_type_custom=>'facetschange'
 );
 wwv_flow_imp_page.create_page_da_action(
- p_id=>wwv_flow_imp.id(50904357709097604)
+ p_id=>wwv_flow_imp.id(15085258264011739)
 ,p_event_id=>wwv_flow_imp.id(50904210902097603)
 ,p_event_result=>'TRUE'
 ,p_action_sequence=>10
+,p_execute_on_page_init=>'N'
+,p_name=>'Refresh Report'
+,p_action=>'NATIVE_REFRESH'
+,p_affected_elements_type=>'REGION'
+,p_affected_region_id=>wwv_flow_imp.id(15081484244011701)
+);
+wwv_flow_imp_page.create_page_da_action(
+ p_id=>wwv_flow_imp.id(50904357709097604)
+,p_event_id=>wwv_flow_imp.id(50904210902097603)
+,p_event_result=>'TRUE'
+,p_action_sequence=>20
 ,p_execute_on_page_init=>'N'
 ,p_name=>'Refresh Quota Chart'
 ,p_action=>'NATIVE_REFRESH'
@@ -15459,23 +15440,12 @@ wwv_flow_imp_page.create_page_da_action(
  p_id=>wwv_flow_imp.id(51633519640081204)
 ,p_event_id=>wwv_flow_imp.id(50904210902097603)
 ,p_event_result=>'TRUE'
-,p_action_sequence=>20
+,p_action_sequence=>30
 ,p_execute_on_page_init=>'N'
 ,p_name=>'Refresh Timeline Chart'
 ,p_action=>'NATIVE_REFRESH'
 ,p_affected_elements_type=>'REGION'
 ,p_affected_region_id=>wwv_flow_imp.id(53668118104955098)
-);
-wwv_flow_imp_page.create_page_da_action(
- p_id=>wwv_flow_imp.id(15085258264011739)
-,p_event_id=>wwv_flow_imp.id(50904210902097603)
-,p_event_result=>'TRUE'
-,p_action_sequence=>30
-,p_execute_on_page_init=>'N'
-,p_name=>'Refresh Report'
-,p_action=>'NATIVE_REFRESH'
-,p_affected_elements_type=>'REGION'
-,p_affected_region_id=>wwv_flow_imp.id(15081484244011701)
 );
 end;
 /
@@ -15692,8 +15662,8 @@ wwv_flow_imp_page.create_page(
 ,p_page_template_options=>'#DEFAULT#'
 ,p_protection_level=>'C'
 ,p_page_component_map=>'17'
-,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20240312122738'
+,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
+,p_last_upd_yyyymmddhh24miss=>'20240326225420'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(72887392674052001)
@@ -15728,7 +15698,7 @@ wwv_flow_imp_page.create_page_item(
 ,p_display_as=>'NATIVE_DISPLAY_ONLY'
 ,p_field_template=>wwv_flow_imp.id(50842276801675164)
 ,p_item_template_options=>'#DEFAULT#'
-,p_attribute_01=>'Y'
+,p_attribute_01=>'N'
 ,p_attribute_02=>'VALUE'
 ,p_attribute_04=>'Y'
 ,p_attribute_05=>'PLAIN'
@@ -15893,7 +15863,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'18'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240322155745'
+,p_last_upd_yyyymmddhh24miss=>'20240325155807'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(19585581091742406)
@@ -16118,7 +16088,7 @@ wwv_flow_imp_page.create_page_process(
 ,p_process_point=>'AFTER_SUBMIT'
 ,p_process_type=>'NATIVE_PLSQL'
 ,p_process_name=>'Upload file'
-,p_process_sql_clob=>'qa_apex_pkg.p_upload_unit_test_xml(pi_file_name => :P5_XML_FILE);'
+,p_process_sql_clob=>'qa_apex_app_pkg.p_upload_unit_test_xml(pi_file_name => :P5_XML_FILE);'
 ,p_process_clob_language=>'PLSQL'
 ,p_error_display_location=>'INLINE_IN_NOTIFICATION'
 ,p_process_when_button_id=>wwv_flow_imp.id(37067191899570632)
@@ -16975,7 +16945,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'18'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240322155629'
+,p_last_upd_yyyymmddhh24miss=>'20240325155812'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(21827658750985602)
@@ -17174,7 +17144,7 @@ wwv_flow_imp_page.create_page_process(
 ,p_process_point=>'AFTER_SUBMIT'
 ,p_process_type=>'NATIVE_PLSQL'
 ,p_process_name=>'Import file'
-,p_process_sql_clob=>'qa_apex_pkg.p_upload_rules_json(pi_file_name => :P8_JSON_FILE);'
+,p_process_sql_clob=>'qa_apex_app_pkg.p_upload_rules_json(pi_file_name => :P8_JSON_FILE);'
 ,p_process_clob_language=>'PLSQL'
 ,p_error_display_location=>'INLINE_IN_NOTIFICATION'
 ,p_process_when_button_id=>wwv_flow_imp.id(55484743688519636)

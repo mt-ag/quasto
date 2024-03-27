@@ -17,24 +17,22 @@ select qatr_result as testcase_status,
        to_char(qatr_date, 'fmMM/DD/YYYY') as filter_date,
        status_amount
 from (
-    select qatr_result,
-           qatr_date,
-           status_amount
-    from (
-        select qatr_result, 
-               qatr_date, 
-               count(1) over (partition by qatr_result, qatr_date) as status_amount
+        select q2.qatr_result, 
+               trunc(q2.qatr_date) as qatr_date,
+               count(1) as status_amount
         from (
-            select qatr_result,
-                   trunc(qatr_date) as qatr_date
-              from table(qa_apex_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, 'TEST_REPORT'))
-              order by qatr_date desc
+            select trunc(qatr_date) as qatr_date
+              from table(qa_apex_app_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, 'TEST_REPORT'))
+              group by trunc(qatr_date)
+              order by trunc(qatr_date) desc
               fetch first 10 rows only
-             )
-        where qatr_result = 'Failure'
-    )
-    group by qatr_result, qatr_date, status_amount
-);
+             ) q1
+        join table(qa_apex_app_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, 'TEST_REPORT')) q2
+        on trunc(q2.qatr_date) = q1.qatr_date
+        where q2.qatr_result = 'Failure'
+        group by q2.qatr_result, trunc(q2.qatr_date)
+)
+order by qatr_date asc;
 
 -- ----------------------------------------
 -- Page: 1 - Dashboard > Region: Filter > Filter: P1_EXECUTION_DATE > List of Values > SQL Query
@@ -75,24 +73,22 @@ select qatr_result as testcase_status,
        to_char(qatr_date, 'fmMM/DD/YYYY') as filter_date,
        status_amount
 from (
-    select qatr_result,
-           qatr_date,
-           status_amount
-    from (
-        select qatr_result, 
-               qatr_date, 
-               count(1) over (partition by qatr_result, qatr_date) as status_amount
+        select q2.qatr_result, 
+               trunc(q2.qatr_date) as qatr_date,
+               count(1) as status_amount
         from (
-            select qatr_result,
-                   trunc(qatr_date) as qatr_date
-              from table(qa_apex_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, 'TEST_REPORT'))
-              order by qatr_date desc
+            select trunc(qatr_date) as qatr_date
+              from table(qa_apex_app_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, 'TEST_REPORT'))
+              group by trunc(qatr_date)
+              order by trunc(qatr_date) desc
               fetch first 10 rows only
-             )
-        where qatr_result = 'Error'
-    )
-    group by qatr_result, qatr_date, status_amount
-);
+             ) q1
+        join table(qa_apex_app_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, 'TEST_REPORT')) q2
+        on trunc(q2.qatr_date) = q1.qatr_date
+        where q2.qatr_result = 'Error'
+        group by q2.qatr_result, trunc(q2.qatr_date)
+)
+order by qatr_date asc;
 
 -- ----------------------------------------
 -- Page: 1 - Dashboard > Region: Quota Chart > Attributes:  > Series: Quota > Source > SQL Query
@@ -107,7 +103,7 @@ select qatr_result testcase_status
             else
                 '#1c6d11'
           end as color_hex
-    from table(qa_apex_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, 'TEST_REPORT'));
+    from table(qa_apex_app_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, 'TEST_REPORT'));
 
 -- ----------------------------------------
 -- Page: 1 - Dashboard > Region: Timeline Chart > Attributes:  > Series: Success > Source > SQL Query
@@ -118,22 +114,20 @@ select qatr_result as testcase_status,
        to_char(qatr_date, 'fmMM/DD/YYYY') as filter_date,
        status_amount
 from (
-    select qatr_result,
-           qatr_date,
-           status_amount
-    from (
-        select qatr_result, 
-               qatr_date, 
-               count(1) over (partition by qatr_result, qatr_date) as status_amount
+        select q2.qatr_result, 
+               trunc(q2.qatr_date) as qatr_date,
+               count(1) as status_amount
         from (
-            select qatr_result,
-                   trunc(qatr_date) as qatr_date
-              from table(qa_apex_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, 'TEST_REPORT'))
-              order by qatr_date desc
+            select trunc(qatr_date) as qatr_date
+              from table(qa_apex_app_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, 'TEST_REPORT'))
+              group by trunc(qatr_date)
+              order by trunc(qatr_date) desc
               fetch first 10 rows only
-             )
-        where qatr_result = 'Success'
-    )
-    group by qatr_result, qatr_date, status_amount
-);
+             ) q1
+        join table(qa_apex_app_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, 'TEST_REPORT')) q2
+        on trunc(q2.qatr_date) = q1.qatr_date
+        where q2.qatr_result = 'Success'
+        group by q2.qatr_result, trunc(q2.qatr_date)
+)
+order by qatr_date asc;
 
