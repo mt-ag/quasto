@@ -23,7 +23,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'03'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240327152506'
+,p_last_upd_yyyymmddhh24miss=>'20240327174536'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(104945985645082588)
@@ -58,7 +58,7 @@ wwv_flow_imp_page.create_report_region(
 ,p_component_template_options=>'#DEFAULT#:t-Report--stretch:t-Report--altRowsDefault:t-Report--rowHighlight'
 ,p_source_type=>'NATIVE_SQL_REPORT'
 ,p_query_type=>'TABLE'
-,p_query_table=>'QA_JOB_RUN_DETAILS_V'
+,p_query_table=>'QA_JOB_RUN_DETAILS_P0011_V'
 ,p_query_where=>'JOB_NAME like :P11_CUSTOM_JOB_NAME || ''%'''
 ,p_include_rowid_column=>false
 ,p_ajax_enabled=>'Y'
