@@ -21,8 +21,8 @@ wwv_flow_imp_page.create_page(
 ,p_page_template_options=>'#DEFAULT#:ui-dialog--stretch'
 ,p_protection_level=>'C'
 ,p_page_component_map=>'02'
-,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20231208121710'
+,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
+,p_last_upd_yyyymmddhh24miss=>'20240327153059'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(54280765006258501)
@@ -41,22 +41,9 @@ wwv_flow_imp_page.create_page_plug(
 ,p_region_template_options=>'#DEFAULT#'
 ,p_plug_template=>wwv_flow_imp.id(50790142840675136)
 ,p_plug_display_sequence=>20
-,p_query_type=>'SQL'
-,p_plug_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'select QARU_ID,',
-'QARU_RULE_NUMBER,',
-'QARU_CLIENT_NAME,',
-'QARU_NAME,',
-'QARU_CATEGORY,',
-'QARU_OBJECT_TYPES,',
-'QARU_ERROR_MESSAGE,',
-'QARU_COMMENT,',
-'QARU_EXCLUDE_OBJECTS,',
-'QARU_ERROR_LEVEL,',
-'QARU_IS_ACTIVE,',
-'QARU_SQL,',
-'QARU_LAYER',
-'from QA_RULES'))
+,p_query_type=>'TABLE'
+,p_query_table=>'QA_RULES_P0007_V'
+,p_include_rowid_column=>false
 ,p_is_editable=>false
 ,p_plug_source_type=>'NATIVE_FORM'
 );
@@ -246,8 +233,7 @@ wwv_flow_imp_page.create_page_item(
 ,p_source=>'QARU_CATEGORY'
 ,p_source_type=>'REGION_SOURCE_COLUMN'
 ,p_display_as=>'NATIVE_POPUP_LOV'
-,p_named_lov=>'CATEGORY_LOV'
-,p_lov=>'.'||wwv_flow_imp.id(55492320191214030)||'.'
+,p_named_lov=>'RULE_CATEGORIES_LOV'
 ,p_cSize=>30
 ,p_cMaxlength=>400
 ,p_begin_on_new_line=>'N'
@@ -316,8 +302,7 @@ wwv_flow_imp_page.create_page_item(
 ,p_source=>'QARU_ERROR_LEVEL'
 ,p_source_type=>'REGION_SOURCE_COLUMN'
 ,p_display_as=>'NATIVE_POPUP_LOV'
-,p_named_lov=>'ERROR_LEVEL_LOV'
-,p_lov=>'.'||wwv_flow_imp.id(54240337370100757)||'.'
+,p_named_lov=>'RULE_ERROR_LEVELS_LOV'
 ,p_cSize=>30
 ,p_begin_on_new_line=>'N'
 ,p_field_template=>wwv_flow_imp.id(50842276801675164)
@@ -367,8 +352,7 @@ wwv_flow_imp_page.create_page_item(
 ,p_source=>'QARU_LAYER'
 ,p_source_type=>'REGION_SOURCE_COLUMN'
 ,p_display_as=>'NATIVE_POPUP_LOV'
-,p_named_lov=>'LAYER_LOV'
-,p_lov=>'.'||wwv_flow_imp.id(42333993626488557)||'.'
+,p_named_lov=>'RULE_LAYERS_LOV'
 ,p_cSize=>30
 ,p_cMaxlength=>400
 ,p_field_template=>wwv_flow_imp.id(50842276801675164)

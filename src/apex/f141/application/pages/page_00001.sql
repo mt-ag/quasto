@@ -29,7 +29,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'13'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240326225256'
+,p_last_upd_yyyymmddhh24miss=>'20240327153109'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(50026038309358532)
@@ -182,7 +182,7 @@ wwv_flow_imp_page.create_report_columns(
 ,p_heading_alignment=>'LEFT'
 ,p_disable_sort_column=>'N'
 ,p_display_as=>'TEXT_FROM_LOV_ESC'
-,p_named_lov=>wwv_flow_imp.id(55492320191214030)
+,p_named_lov=>wwv_flow_imp.id(28141307571811854)
 ,p_derived_column=>'N'
 ,p_include_in_export=>'Y'
 );
@@ -208,7 +208,7 @@ wwv_flow_imp_page.create_report_columns(
 ,p_heading_alignment=>'LEFT'
 ,p_disable_sort_column=>'N'
 ,p_display_as=>'TEXT_FROM_LOV_ESC'
-,p_named_lov=>wwv_flow_imp.id(42333993626488557)
+,p_named_lov=>wwv_flow_imp.id(28141931342798943)
 ,p_derived_column=>'N'
 ,p_include_in_export=>'Y'
 );
@@ -222,7 +222,7 @@ wwv_flow_imp_page.create_report_columns(
 ,p_heading_alignment=>'LEFT'
 ,p_disable_sort_column=>'N'
 ,p_display_as=>'TEXT_FROM_LOV_ESC'
-,p_named_lov=>wwv_flow_imp.id(54240337370100757)
+,p_named_lov=>wwv_flow_imp.id(28141712169803882)
 ,p_derived_column=>'N'
 ,p_include_in_export=>'Y'
 );
@@ -315,21 +315,10 @@ wwv_flow_imp_page.create_jet_chart_series(
 ,p_chart_id=>wwv_flow_imp.id(53667689137955094)
 ,p_seq=>10
 ,p_name=>'Quota'
-,p_data_source_type=>'SQL'
-,p_data_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'    select qatr_result testcase_status',
-'         , count(1) over (partition by qatr_result) as status_amount',
-'         , case qatr_result',
-'            when ''Failure'' then',
-'               ''#c42222''',
-'            when ''Error'' then',
-'                ''#7a1616''',
-'            else',
-'                ''#1c6d11''',
-'          end as color_hex',
-'    from table(qa_apex_app_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT''))',
-'     '))
+,p_data_source_type=>'TABLE'
 ,p_ajax_items_to_submit=>'P1_CATEGORIES,P1_PROJECT,P1_SCHEME,P1_TEST_RESULT,P1_ERRORLEVEL,P1_EXECUTION_DATE'
+,p_query_table=>'QA_OVERVIEW_QUOTA_P0001_V'
+,p_include_rowid_column=>false
 ,p_items_value_column_name=>'STATUS_AMOUNT'
 ,p_items_label_column_name=>'TESTCASE_STATUS'
 ,p_items_short_desc_column_name=>'TESTCASE_STATUS'
@@ -381,31 +370,10 @@ wwv_flow_imp_page.create_jet_chart_series(
 ,p_chart_id=>wwv_flow_imp.id(53668181381955099)
 ,p_seq=>10
 ,p_name=>'Success'
-,p_data_source_type=>'SQL'
-,p_data_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'select qatr_result as testcase_status,',
-'       ''#1c6d11'' as color_hex,',
-'       to_char(qatr_date, ''MM/DD/YYYY'') as testcase_date,',
-'       to_char(qatr_date, ''fmMM/DD/YYYY'') as filter_date,',
-'       status_amount',
-'from (',
-'        select q2.qatr_result, ',
-'               trunc(q2.qatr_date) as qatr_date,',
-'               count(1) as status_amount',
-'        from (',
-'            select trunc(qatr_date) as qatr_date',
-'              from table(qa_apex_app_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT''))',
-'              group by trunc(qatr_date)',
-'              order by trunc(qatr_date) desc',
-'              fetch first 10 rows only',
-'             ) q1',
-'        join table(qa_apex_app_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT'')) q2',
-'        on trunc(q2.qatr_date) = q1.qatr_date',
-'        where q2.qatr_result = ''Success''',
-'        group by q2.qatr_result, trunc(q2.qatr_date)',
-')',
-'order by qatr_date asc'))
+,p_data_source_type=>'TABLE'
 ,p_ajax_items_to_submit=>'P1_CATEGORIES,P1_PROJECT,P1_SCHEME,P1_TEST_RESULT,P1_ERRORLEVEL,P1_EXECUTION_DATE'
+,p_query_table=>'QA_OVERVIEW_TIMELINE_SUCCESS_P0001_V'
+,p_include_rowid_column=>false
 ,p_series_name_column_name=>'TESTCASE_STATUS'
 ,p_items_value_column_name=>'STATUS_AMOUNT'
 ,p_items_label_column_name=>'TESTCASE_DATE'
@@ -420,35 +388,14 @@ wwv_flow_imp_page.create_jet_chart_series(
 ,p_link_target_type=>'REDIRECT_PAGE'
 );
 wwv_flow_imp_page.create_jet_chart_series(
- p_id=>wwv_flow_imp.id(53669166727955109)
+ p_id=>wwv_flow_imp.id(28125480259016701)
 ,p_chart_id=>wwv_flow_imp.id(53668181381955099)
-,p_seq=>20
+,p_seq=>30
 ,p_name=>'Failure'
-,p_data_source_type=>'SQL'
-,p_data_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'select qatr_result as testcase_status,',
-'       ''#c42222'' as color_hex,',
-'       to_char(qatr_date, ''MM/DD/YYYY'') as testcase_date,',
-'       to_char(qatr_date, ''fmMM/DD/YYYY'') as filter_date,',
-'       status_amount',
-'from (',
-'        select q2.qatr_result, ',
-'               trunc(q2.qatr_date) as qatr_date,',
-'               count(1) as status_amount',
-'        from (',
-'            select trunc(qatr_date) as qatr_date',
-'              from table(qa_apex_app_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT''))',
-'              group by trunc(qatr_date)',
-'              order by trunc(qatr_date) desc',
-'              fetch first 10 rows only',
-'             ) q1',
-'        join table(qa_apex_app_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT'')) q2',
-'        on trunc(q2.qatr_date) = q1.qatr_date',
-'        where q2.qatr_result = ''Failure''',
-'        group by q2.qatr_result, trunc(q2.qatr_date)',
-')',
-'order by qatr_date asc'))
+,p_data_source_type=>'TABLE'
 ,p_ajax_items_to_submit=>'P1_CATEGORIES,P1_PROJECT,P1_SCHEME,P1_TEST_RESULT,P1_ERRORLEVEL,P1_EXECUTION_DATE'
+,p_query_table=>'QA_OVERVIEW_TIMELINE_FAILURE_P0001_V'
+,p_include_rowid_column=>false
 ,p_series_name_column_name=>'TESTCASE_STATUS'
 ,p_items_value_column_name=>'STATUS_AMOUNT'
 ,p_items_label_column_name=>'TESTCASE_DATE'
@@ -465,33 +412,12 @@ wwv_flow_imp_page.create_jet_chart_series(
 wwv_flow_imp_page.create_jet_chart_series(
  p_id=>wwv_flow_imp.id(22079556541883204)
 ,p_chart_id=>wwv_flow_imp.id(53668181381955099)
-,p_seq=>30
+,p_seq=>40
 ,p_name=>'Error'
-,p_data_source_type=>'SQL'
-,p_data_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'select qatr_result as testcase_status,',
-'       ''#7a1616'' as color_hex,',
-'       to_char(qatr_date, ''MM/DD/YYYY'') as testcase_date,',
-'       to_char(qatr_date, ''fmMM/DD/YYYY'') as filter_date,',
-'       status_amount',
-'from (',
-'        select q2.qatr_result, ',
-'               trunc(q2.qatr_date) as qatr_date,',
-'               count(1) as status_amount',
-'        from (',
-'            select trunc(qatr_date) as qatr_date',
-'              from table(qa_apex_app_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT''))',
-'              group by trunc(qatr_date)',
-'              order by trunc(qatr_date) desc',
-'              fetch first 10 rows only',
-'             ) q1',
-'        join table(qa_apex_app_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT'')) q2',
-'        on trunc(q2.qatr_date) = q1.qatr_date',
-'        where q2.qatr_result = ''Error''',
-'        group by q2.qatr_result, trunc(q2.qatr_date)',
-')',
-'order by qatr_date asc'))
+,p_data_source_type=>'TABLE'
 ,p_ajax_items_to_submit=>'P1_CATEGORIES,P1_PROJECT,P1_SCHEME,P1_TEST_RESULT,P1_ERRORLEVEL,P1_EXECUTION_DATE'
+,p_query_table=>'QA_OVERVIEW_TIMELINE_ERROR_P0001_V'
+,p_include_rowid_column=>false
 ,p_series_name_column_name=>'TESTCASE_STATUS'
 ,p_items_value_column_name=>'STATUS_AMOUNT'
 ,p_items_label_column_name=>'TESTCASE_DATE'
@@ -663,9 +589,7 @@ wwv_flow_imp_page.create_page_item(
 ,p_source=>'QATR_SCHEME_NAME'
 ,p_source_type=>'FACET_COLUMN'
 ,p_display_as=>'NATIVE_CHECKBOX'
-,p_lov=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'SELECT USERNAME as d, USERNAME AS R FROM QA_SCHEME_NAMES_FOR_TESTING_V',
-''))
+,p_named_lov=>'TEST_SCHEME_NAMES_LOV'
 ,p_item_template_options=>'#DEFAULT#'
 ,p_fc_show_label=>true
 ,p_fc_collapsible=>false
@@ -717,8 +641,7 @@ wwv_flow_imp_page.create_page_item(
 ,p_source=>'QARU_ERROR_LEVEL'
 ,p_source_type=>'FACET_COLUMN'
 ,p_display_as=>'NATIVE_CHECKBOX'
-,p_named_lov=>'ERROR_LEVEL_LOV'
-,p_lov=>'.'||wwv_flow_imp.id(54240337370100757)||'.'
+,p_named_lov=>'RULE_ERROR_LEVELS_LOV'
 ,p_item_template_options=>'#DEFAULT#'
 ,p_fc_show_label=>true
 ,p_fc_collapsible=>false
@@ -744,14 +667,9 @@ wwv_flow_imp_page.create_page_item(
 ,p_source=>'QATR_DATE'
 ,p_source_type=>'FACET_COLUMN'
 ,p_display_as=>'NATIVE_CHECKBOX'
-,p_lov=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'select to_char(v.qatr_date, ''MM/DD/YYYY'') as d,',
-'       to_char(v.qatr_date, ''fmMM/DD/YYYY'') as r',
-'  from (select trunc(qatr_date) as qatr_date',
-'        from QA_OVERVIEW_TESTS_P0001_V',
-'        group by trunc(qatr_date)) v',
-'order by v.qatr_date desc'))
+,p_named_lov=>'TEST_EXECUTION_DATES_LOV'
 ,p_item_template_options=>'#DEFAULT#'
+,p_fc_show_label=>true
 ,p_fc_collapsible=>true
 ,p_fc_initial_collapsed=>false
 ,p_fc_compute_counts=>false

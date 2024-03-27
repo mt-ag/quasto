@@ -21,9 +21,11 @@ prompt --install
 @@application/shared_components/logic/application_settings.sql
 @@application/shared_components/navigation/tabs/standard.sql
 @@application/shared_components/navigation/tabs/parent.sql
-@@application/shared_components/user_interface/lovs/category_lov.sql
-@@application/shared_components/user_interface/lovs/error_level_lov.sql
-@@application/shared_components/user_interface/lovs/layer_lov.sql
+@@application/shared_components/user_interface/lovs/rule_categories_lov.sql
+@@application/shared_components/user_interface/lovs/rule_error_levels_lov.sql
+@@application/shared_components/user_interface/lovs/rule_layers_lov.sql
+@@application/shared_components/user_interface/lovs/test_execution_dates_lov.sql
+@@application/shared_components/user_interface/lovs/test_scheme_names_lov.sql
 @@application/shared_components/user_interface/lovs/yes_no_lov.sql
 @@application/pages/page_groups.sql
 @@application/shared_components/navigation/breadcrumbs/breadcrumb.sql

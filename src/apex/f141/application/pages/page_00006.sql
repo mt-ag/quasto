@@ -20,8 +20,8 @@ wwv_flow_imp_page.create_page(
 ,p_page_template_options=>'#DEFAULT#'
 ,p_protection_level=>'C'
 ,p_page_component_map=>'18'
-,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20240309182613'
+,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
+,p_last_upd_yyyymmddhh24miss=>'20240327133626'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(54073327692447835)
@@ -40,23 +40,9 @@ wwv_flow_imp_page.create_page_plug(
 ,p_region_template_options=>'#DEFAULT#'
 ,p_plug_template=>wwv_flow_imp.id(50728801114675111)
 ,p_plug_display_sequence=>20
-,p_query_type=>'SQL'
-,p_plug_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'select QARU_ID,',
-'QARU_RULE_NUMBER,',
-'QARU_CLIENT_NAME,',
-'QARU_NAME,',
-'QARU_CATEGORY,',
-'QARU_ERROR_MESSAGE,',
-'QARU_COMMENT,',
-'QARU_ERROR_LEVEL,',
-'QARU_IS_ACTIVE,',
-'QARU_LAYER,',
-'QARU_CREATED_ON,',
-'QARU_CREATED_BY,',
-'QARU_UPDATED_ON,',
-'QARU_UPDATED_BY',
-'from QA_RULES'))
+,p_query_type=>'TABLE'
+,p_query_table=>'QA_RULES_P0006_V'
+,p_include_rowid_column=>false
 ,p_plug_source_type=>'NATIVE_IR'
 ,p_prn_content_disposition=>'ATTACHMENT'
 ,p_prn_units=>'INCHES'
@@ -100,7 +86,7 @@ wwv_flow_imp_page.create_worksheet(
 ,p_download_formats=>'CSV:HTML:XLSX:PDF'
 ,p_enable_mail_download=>'Y'
 ,p_detail_link=>'f?p=&APP_ID.:7:&SESSION.::&DEBUG.::P7_QARU_ID:#QARU_ID#'
-,p_detail_link_text=>'<img src="#APEX_FILES#app_ui/img/icons/apex-edit-pencil.png" class="apex-edit-pencil" alt="">'
+,p_detail_link_text=>'<span role="img" aria-label="Edit" class="fa fa-edit" title="Edit"></span>'
 ,p_owner=>'SBOZOK'
 ,p_internal_uid=>42907229798653329
 );
@@ -176,7 +162,7 @@ wwv_flow_imp_page.create_worksheet_column(
 ,p_column_type=>'NUMBER'
 ,p_display_text_as=>'LOV_ESCAPE_SC'
 ,p_column_alignment=>'RIGHT'
-,p_rpt_named_lov=>wwv_flow_imp.id(54240337370100757)
+,p_rpt_named_lov=>wwv_flow_imp.id(28141712169803882)
 ,p_rpt_show_filter_lov=>'1'
 ,p_use_as_row_header=>'N'
 );
@@ -201,7 +187,7 @@ wwv_flow_imp_page.create_worksheet_column(
 ,p_column_label=>'Layer'
 ,p_column_type=>'STRING'
 ,p_display_text_as=>'LOV_ESCAPE_SC'
-,p_rpt_named_lov=>wwv_flow_imp.id(42333993626488557)
+,p_rpt_named_lov=>wwv_flow_imp.id(28141931342798943)
 ,p_rpt_show_filter_lov=>'1'
 ,p_use_as_row_header=>'N'
 );

@@ -22,8 +22,8 @@ wwv_flow_imp_page.create_page(
 ,p_dialog_width=>'1500px'
 ,p_protection_level=>'C'
 ,p_page_component_map=>'16'
-,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20240312123209'
+,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
+,p_last_upd_yyyymmddhh24miss=>'20240327153109'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(21698602325160714)
@@ -118,11 +118,7 @@ wwv_flow_imp_page.create_page_item(
 ,p_item_plug_id=>wwv_flow_imp.id(21698602325160714)
 ,p_prompt=>'Scheme Names'
 ,p_display_as=>'NATIVE_SHUTTLE'
-,p_lov=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'select username as d',
-'     , username as r',
-'from QA_SCHEME_NAMES_FOR_TESTING_V',
-'order by 1'))
+,p_named_lov=>'TEST_SCHEME_NAMES_LOV'
 ,p_cHeight=>1
 ,p_field_template=>wwv_flow_imp.id(50842276801675164)
 ,p_item_template_options=>'#DEFAULT#'

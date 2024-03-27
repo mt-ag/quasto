@@ -22,8 +22,8 @@ wwv_flow_imp_page.create_page(
 ,p_dialog_width=>'1500px'
 ,p_protection_level=>'C'
 ,p_page_component_map=>'03'
-,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20240312123047'
+,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
+,p_last_upd_yyyymmddhh24miss=>'20240327152522'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(51469936526214117)
@@ -35,12 +35,25 @@ wwv_flow_imp_page.create_page_plug(
 ,p_attribute_01=>'N'
 ,p_attribute_02=>'HTML'
 );
+wwv_flow_imp_page.create_page_plug(
+ p_id=>wwv_flow_imp.id(28126781153016714)
+,p_plug_name=>'Info'
+,p_parent_plug_id=>wwv_flow_imp.id(51469936526214117)
+,p_region_template_options=>'#DEFAULT#:t-Alert--horizontal:t-Alert--defaultIcons:t-Alert--info:t-Alert--removeHeading js-removeLandmark'
+,p_plug_template=>wwv_flow_imp.id(50721469375675106)
+,p_plug_display_sequence=>10
+,p_plug_display_point=>'SUB_REGIONS'
+,p_plug_source=>'The following report shows the execution status of recent runs of the scheduler cronjob. Please note that the output only shows whether technical errors occured during the execution of the Unit test logics. It does not indicate whether invalid object'
+||'s have been found or not.'
+,p_attribute_01=>'N'
+,p_attribute_02=>'HTML'
+);
 wwv_flow_imp_page.create_report_region(
  p_id=>wwv_flow_imp.id(51468691337214104)
 ,p_name=>'History Report'
 ,p_parent_plug_id=>wwv_flow_imp.id(51469936526214117)
 ,p_template=>wwv_flow_imp.id(50728801114675111)
-,p_display_sequence=>10
+,p_display_sequence=>20
 ,p_region_template_options=>'#DEFAULT#'
 ,p_component_template_options=>'#DEFAULT#:t-Report--altRowsDefault:t-Report--rowHighlight'
 ,p_display_point=>'SUB_REGIONS'
@@ -53,7 +66,7 @@ wwv_flow_imp_page.create_report_region(
 ,p_ajax_items_to_submit=>'P9_CRONJOB_NAME'
 ,p_lazy_loading=>false
 ,p_query_row_template=>wwv_flow_imp.id(50807155826675144)
-,p_query_num_rows=>15
+,p_query_num_rows=>5
 ,p_query_options=>'DERIVED_REPORT_COLUMNS'
 ,p_query_no_data_found=>'The Cronjob has not run recently.'
 ,p_query_num_rows_type=>'NEXT_PREVIOUS_LINKS'
@@ -89,7 +102,7 @@ wwv_flow_imp_page.create_report_columns(
 ,p_query_column_id=>3
 ,p_column_alias=>'STATUS'
 ,p_column_display_sequence=>30
-,p_column_heading=>'Status'
+,p_column_heading=>'Job Execution Status'
 ,p_use_as_row_header=>'N'
 ,p_heading_alignment=>'LEFT'
 ,p_disable_sort_column=>'N'
