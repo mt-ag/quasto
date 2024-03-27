@@ -1,8 +1,8 @@
-create or replace type running_rule_t force as
+create or replace type qa_running_rule_t force as
 
 /******************************************************************************
-   NAME:       running_rule_t
-   PURPOSE:    Attributes for objects of type running_rule_t
+   NAME:       qa_running_rule_t
+   PURPOSE:    Attributes for objects of type qa_running_rule_t
 
    REVISIONS:
    Release    Date        Author           Description

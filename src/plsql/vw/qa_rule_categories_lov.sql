@@ -1,0 +1,10 @@
+
+  CREATE OR REPLACE FORCE EDITIONABLE VIEW "QA_RULE_CATEGORIES_LOV"
+  AS 
+select QARU_CATEGORY as display_value
+     , QARU_CATEGORY as return_value
+from QA_RULES
+group by QARU_CATEGORY
+order by QARU_CATEGORY asc
+;
+/

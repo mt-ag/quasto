@@ -20,7 +20,7 @@ create or replace package qa_apex_app_pkg is
   (
     pi_page_id          in number
    ,pi_region_static_id in varchar2
-  ) return test_results_table_t pipelined;
+  ) return qa_test_results_table_t pipelined;
 
   /**
    * procedure to upload a json rule file
@@ -54,7 +54,7 @@ create or replace package body qa_apex_app_pkg as
   (
     pi_page_id          in number
    ,pi_region_static_id in varchar2
-  ) return test_results_table_t pipelined
+  ) return qa_test_results_table_t pipelined
   is
     l_region_id number;
     l_context   apex_exec.t_context;
@@ -84,7 +84,7 @@ create or replace package body qa_apex_app_pkg as
     get_column_indexes(pi_columns => varchar2_tab_t('QATR_ID','QATR_DATE', 'QATR_SCHEME_NAME', 'QARU_CATEGORY', 'QATR_RESULT', 'QARU_NAME', 'QARU_LAYER', 'QARU_ERROR_LEVEL', 'QARU_IS_ACTIVE', 'QARU_CLIENT_NAME', 'QATR_PROGRAM_NAME'));
 
     while apex_exec.next_row(p_context => l_context) loop
-      pipe row(test_results_row_t(
+      pipe row(qa_test_results_row_t(
                     apex_exec.get_number  (p_context => l_context, p_column_idx => l_col_index('QATR_ID')),
                     apex_exec.get_date    (p_context => l_context, p_column_idx => l_col_index('QATR_DATE')),
                     apex_exec.get_varchar2(p_context => l_context, p_column_idx => l_col_index('QATR_SCHEME_NAME')),
@@ -133,16 +133,16 @@ create or replace package body qa_apex_app_pkg as
         ,l_file_name
 	from APEX_APPLICATION_TEMP_FILES
     where name = pi_file_name;
-    
+
     if l_mime_type != l_mime_type_json
     then
       raise_application_error(-20001, 'Invalid MIME type of json file: ' || pi_file_name || ' - MIME type: ' || l_mime_type);
     end if;
-   
+
     l_qaif_id := qa_export_import_rules_pkg.f_import_clob_to_qa_import_files(pi_clob     => l_clob_content
                                                                             ,pi_filename => l_file_name
                                                                             ,pi_mimetype => l_mime_type);
-   
+
     qa_export_import_rules_pkg.p_import_clob_to_rules_table(pi_qaif_id => l_qaif_id);
 
   exception
@@ -171,9 +171,9 @@ create or replace package body qa_apex_app_pkg as
                               ,p_val_01  => pi_client_name);
 
     l_clob_json := qa_export_import_rules_pkg.f_export_rules_table_to_clob(pi_client_name => pi_client_name);
-    
+
     l_client_name_unified := qa_utils_pkg.f_get_unified_string(pi_string => pi_client_name, pi_transform_case => 'l');
-    
+
     HTP.init;
     OWA_UTIL.mime_header('application/json', false, 'UTF-8');
     HTP.p('Content-Length: ' || DBMS_LOB.getlength(l_clob_json));
@@ -222,12 +222,12 @@ create or replace package body qa_apex_app_pkg as
         ,l_mime_type
 	from APEX_APPLICATION_TEMP_FILES
     where name = pi_file_name;
-    
+
     if l_mime_type != l_mime_type_xml
     then
       raise_application_error(-20001, 'Invalid MIME type of xml file: ' || pi_file_name || ' - MIME type: ' || l_mime_type);
     end if;
-   
+
     l_qatr_id := qa_unit_tests_pkg.f_import_test_result(pi_xml_clob => l_clob_content);
 
   exception
@@ -256,12 +256,12 @@ create or replace package body qa_apex_app_pkg as
                               ,p_val_01  => pi_qatr_id);
 
     l_clob_xml := qa_unit_tests_pkg.f_export_test_result(pi_qatr_id => pi_qatr_id);
-    
+
     select qatr_added_on
     into l_added_on
     from qa_test_results
     where qatr_id = pi_qatr_id;
-    
+
     HTP.init;
     OWA_UTIL.mime_header('application/xml', false, 'UTF-8');
     HTP.p('Content-Length: ' || DBMS_LOB.getlength(l_clob_xml));

@@ -59,18 +59,18 @@ begin
   l_object_type('QA_RULES_T') := 'TYPE';
   l_object_name('QA_RULE_T') := 'QA_RULE_T';
   l_object_type('QA_RULE_T') := 'TYPE';
-  l_object_name('RUNNING_RULE_T') := 'RUNNING_RULE_T';
-  l_object_type('RUNNING_RULE_T') := 'TYPE';
-  l_object_name('RUNNING_RULES_T') := 'RUNNING_RULES_T';
-  l_object_type('RUNNING_RULES_T') := 'TYPE';
+  l_object_name('QA_RUNNING_RULE_T') := 'QA_RUNNING_RULE_T';
+  l_object_type('QA_RUNNING_RULE_T') := 'TYPE';
+  l_object_name('QA_RUNNING_RULES_T') := 'QA_RUNNING_RULES_T';
+  l_object_type('QA_RUNNING_RULES_T') := 'TYPE';
   l_object_name('QA_SCHEME_OBJECT_AMOUNTS_T') := 'QA_SCHEME_OBJECT_AMOUNTS_T';
   l_object_type('QA_SCHEME_OBJECT_AMOUNTS_T') := 'TYPE';
   l_object_name('QA_SCHEME_OBJECT_AMOUNT_T') := 'QA_SCHEME_OBJECT_AMOUNT_T';
   l_object_type('QA_SCHEME_OBJECT_AMOUNT_T') := 'TYPE';
-  l_object_name('TEST_RESULTS_TABLE_T') := 'TEST_RESULTS_TABLE_T';
-  l_object_type('TEST_RESULTS_TABLE_T') := 'TYPE';
-  l_object_name('TEST_RESULTS_ROW_T') := 'TEST_RESULTS_ROW_T';
-  l_object_type('TEST_RESULTS_ROW_T') := 'TYPE';
+  l_object_name('QA_TEST_RESULTS_TABLE_T') := 'QA_TEST_RESULTS_TABLE_T';
+  l_object_type('QA_TEST_RESULTS_TABLE_T') := 'TYPE';
+  l_object_name('QA_TEST_RESULTS_ROW_T') := 'QA_TEST_RESULTS_ROW_T';
+  l_object_type('QA_TEST_RESULTS_ROW_T') := 'TYPE';
 
   -- sequences
   l_object_name('QARU_SEQ') := 'QARU_SEQ';
@@ -94,18 +94,45 @@ begin
   l_object_name('QA_APPLICATION_OWNER_V') := 'QA_APPLICATION_OWNER_V';
   l_object_type('QA_APPLICATION_OWNER_V') := 'VIEW';
 
-  l_object_name('QA_JOB_RUN_DETAILS_V') := 'QA_JOB_RUN_DETAILS_V';
-  l_object_type('QA_JOB_RUN_DETAILS_V') := 'VIEW';
   l_object_name('QA_OVERVIEW_TESTS_P0001_V') := 'QA_OVERVIEW_TESTS_P0001_V';
   l_object_type('QA_OVERVIEW_TESTS_P0001_V') := 'VIEW';
+  l_object_name('QA_OVERVIEW_QUOTA_P0001_V') := 'QA_OVERVIEW_QUOTA_P0001_V';
+  l_object_type('QA_OVERVIEW_QUOTA_P0001_V') := 'VIEW';
+  l_object_name('QA_OVERVIEW_TIMELINE_ERROR_P0001_V') := 'QA_OVERVIEW_TIMELINE_ERROR_P0001_V';
+  l_object_type('QA_OVERVIEW_TIMELINE_ERROR_P0001_V') := 'VIEW';
+  l_object_name('QA_OVERVIEW_TIMELINE_FAILURE_P0001_V') := 'QA_OVERVIEW_TIMELINE_FAILURE_P0001_V';
+  l_object_type('QA_OVERVIEW_TIMELINE_FAILURE_P0001_V') := 'VIEW';
+  l_object_name('QA_OVERVIEW_TIMELINE_SUCCESS_P0001_V') := 'QA_OVERVIEW_TIMELINE_SUCCESS_P0001_V';
+  l_object_type('QA_OVERVIEW_TIMELINE_SUCCESS_P0001_V') := 'VIEW';
   l_object_name('QA_TEST_RUNTIME_ERROR_P0003_V') := 'QA_TEST_RUNTIME_ERROR_P0003_V';
   l_object_type('QA_TEST_RUNTIME_ERROR_P0003_V') := 'VIEW';
   l_object_name('QA_TEST_RUN_DETAILS_P0004_V') := 'QA_TEST_RUN_DETAILS_P0004_V';
   l_object_type('QA_TEST_RUN_DETAILS_P0004_V') := 'VIEW';
   l_object_name('QA_TEST_RESULT_FILES_P0005_V') := 'QA_TEST_RESULT_FILES_P0005_V';
   l_object_type('QA_TEST_RESULT_FILES_P0005_V') := 'VIEW';
+  l_object_name('QA_RULES_P0006_V') := 'QA_RULES_P0006_V';
+  l_object_type('QA_RULES_P0006_V') := 'VIEW';
+  l_object_name('QA_RULES_P0007_V') := 'QA_RULES_P0007_V';
+  l_object_type('QA_RULES_P0007_V') := 'VIEW';
+  l_object_name('QA_CLIENT_NAMES_P0008_V') := 'QA_CLIENT_NAMES_P0008_V';
+  l_object_type('QA_CLIENT_NAMES_P0008_V') := 'VIEW';
   l_object_name('QA_JOB_DETAILS_P0009_V') := 'QA_JOB_DETAILS_P0009_V';
   l_object_type('QA_JOB_DETAILS_P0009_V') := 'VIEW';
+  l_object_name('QA_JOB_RUN_DETAILS_P0009_V') := 'QA_JOB_RUN_DETAILS_P0009_V';
+  l_object_type('QA_JOB_RUN_DETAILS_P0009_V') := 'VIEW';
+  l_object_name('QA_JOB_RUN_DETAILS_P0011_V') := 'QA_JOB_RUN_DETAILS_P0011_V';
+  l_object_type('QA_JOB_RUN_DETAILS_P0011_V') := 'VIEW';
+
+  l_object_name('QA_RULE_CATEGORIES_LOV') := 'QA_RULE_CATEGORIES_LOV';
+  l_object_type('QA_RULE_CATEGORIES_LOV') := 'VIEW';
+  l_object_name('QA_RULE_ERROR_LEVELS_LOV') := 'QA_RULE_ERROR_LEVELS_LOV';
+  l_object_type('QA_RULE_ERROR_LEVELS_LOV') := 'VIEW';
+  l_object_name('QA_RULE_LAYERS_LOV') := 'QA_RULE_LAYERS_LOV';
+  l_object_type('QA_RULE_LAYERS_LOV') := 'VIEW';
+  l_object_name('QA_TEST_EXECUTION_DATES_LOV') := 'QA_TEST_EXECUTION_DATES_LOV';
+  l_object_type('QA_TEST_EXECUTION_DATES_LOV') := 'VIEW';
+  l_object_name('QA_TEST_SCHEME_NAMES_LOV') := 'QA_TEST_SCHEME_NAMES_LOV';
+  l_object_type('QA_TEST_SCHEME_NAMES_LOV') := 'VIEW';
 
   l_object := l_object_name.first;
   dbms_output.put_line(l_object);
