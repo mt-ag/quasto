@@ -2,139 +2,170 @@ set serveroutput on;
 
 prompt uninstall all objects
 declare
-  type t_vc2_array is table of varchar2(1000) index by varchar2(100);
-
-  l_object_name        t_vc2_array;
-  l_object_type        t_vc2_array;
-  l_object             varchar2(100 char);
-  l_object_type_substr varchar2(100 char);
-  l_key                varchar2(100 char);
-  l_action             varchar2(32767);
-  l_count              number;
+  type t_object_rec is record (
+    object_name varchar2(1000 char),
+    object_type varchar2(1000 char)
+  );
+  type t_object_table is table of t_object_rec index by pls_integer;
+  
+  l_object      t_object_table;
+  l_counter     number := 1;
+  l_count       number;
+  l_index       number := 1;
+  l_action      varchar2(32767);
+  l_action_2    varchar2(32767);
 begin
   -- buffer size extend
   dbms_output.enable(buffer_size => 10000000);
   -- objects:
   -- tables
-  l_object_name('QA_TEST_RUN_INVALID_OBJECTS') := 'QA_TEST_RUN_INVALID_OBJECTS';
-  l_object_type('QA_TEST_RUN_INVALID_OBJECTS') := 'TABLE';
-  l_object_name('QA_TEST_RUNS') := 'QA_TEST_RUNS';
-  l_object_type('QA_TEST_RUNS') := 'TABLE';
-  l_object_name('QA_TEST_RESULTS') := 'QA_TEST_RESULTS';
-  l_object_type('QA_TEST_RESULTS') := 'TABLE';
-  l_object_name('QA_RULES') := 'QA_RULES';
-  l_object_type('QA_RULES') := 'TABLE';
-  l_object_name('QA_IMPORT_FILES') := 'QA_IMPORT_FILES';
-  l_object_type('QA_IMPORT_FILES') := 'TABLE';
-  
+  l_object(l_index).object_name := 'QA_TEST_RUN_INVALID_OBJECTS';
+  l_object(l_index).object_type := 'TABLE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_TEST_RUNS';
+  l_object(l_index).object_type := 'TABLE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_TEST_RESULTS';
+  l_object(l_index).object_type := 'TABLE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_RULES';
+  l_object(l_index).object_type := 'TABLE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_IMPORT_FILES';
+  l_object(l_index).object_type := 'TABLE';
+  l_index := l_index + 1;
+
 
   -- packages
-  l_object_name('QA_EXPORT_IMPORT_RULES_PKG') := 'QA_EXPORT_IMPORT_RULES_PKG';
-  l_object_type('QA_EXPORT_IMPORT_RULES_PKG') := 'PACKAGE';
-  l_object_name('QA_MAIN_PKG') := 'QA_MAIN_PKG';
-  l_object_type('QA_MAIN_PKG') := 'PACKAGE';
-  l_object_name('QA_API_PKG') := 'QA_API_PKG';
-  l_object_type('QA_API_PKG') := 'PACKAGE';
-  l_object_name('QA_LOGGER_PKG') := 'QA_LOGGER_PKG';
-  l_object_type('QA_LOGGER_PKG') := 'PACKAGE';
-  l_object_name('QA_APEX_PKG') := 'QA_APEX_PKG';
-  l_object_type('QA_APEX_PKG') := 'PACKAGE';
-  l_object_name('QA_CONSTANT_PKG') := 'QA_CONSTANT_PKG';
-  l_object_type('QA_CONSTANT_PKG') := 'PACKAGE';
-  l_object_name('QA_UNIT_TESTS_PKG') := 'QA_UNIT_TESTS_PKG';
-  l_object_type('QA_UNIT_TESTS_PKG') := 'PACKAGE';
-  l_object_name('QA_UTILS_PKG') := 'QA_UTILS_PKG';
-  l_object_type('QA_UTILS_PKG') := 'PACKAGE';
-  l_object_name('QA_APEX_APP_PKG') := 'QA_APEX_APP_PKG';
-  l_object_type('QA_APEX_APP_PKG') := 'PACKAGE';
-  l_object_name('QA_APEX_API_PKG') := 'QA_APEX_API_PKG';
-  l_object_type('QA_APEX_API_PKG') := 'PACKAGE';
-  
+  l_object(l_index).object_name := 'QA_EXPORT_IMPORT_RULES_PKG';
+  l_object(l_index).object_type := 'PACKAGE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_MAIN_PKG';
+  l_object(l_index).object_type := 'PACKAGE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_API_PKG';
+  l_object(l_index).object_type := 'PACKAGE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_LOGGER_PKG';
+  l_object(l_index).object_type := 'PACKAGE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_APEX_PKG';
+  l_object(l_index).object_type := 'PACKAGE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_CONSTANT_PKG';
+  l_object(l_index).object_type := 'PACKAGE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_UNIT_TESTS_PKG';
+  l_object(l_index).object_type := 'PACKAGE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_UTILS_PKG';
+  l_object(l_index).object_type := 'PACKAGE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_APEX_APP_PKG';
+  l_object(l_index).object_type := 'PACKAGE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_APEX_API_PKG';
+  l_object(l_index).object_type := 'PACKAGE';
+  l_index := l_index + 1;
+
 
 
   -- types
-  l_object_name('VARCHAR2_TAB_T') := 'VARCHAR2_TAB_T';
-  l_object_type('VARCHAR2_TAB_T') := 'TYPE';
-  l_object_name('QA_RULES_T') := 'QA_RULES_T';
-  l_object_type('QA_RULES_T') := 'TYPE';
-  l_object_name('QA_RULE_T') := 'QA_RULE_T';
-  l_object_type('QA_RULE_T') := 'TYPE';
-  l_object_name('RUNNING_RULE_T') := 'RUNNING_RULE_T';
-  l_object_type('RUNNING_RULE_T') := 'TYPE';
-  l_object_name('RUNNING_RULES_T') := 'RUNNING_RULES_T';
-  l_object_type('RUNNING_RULES_T') := 'TYPE';
-  l_object_name('QA_SCHEME_OBJECT_AMOUNTS_T') := 'QA_SCHEME_OBJECT_AMOUNTS_T';
-  l_object_type('QA_SCHEME_OBJECT_AMOUNTS_T') := 'TYPE';
-  l_object_name('QA_SCHEME_OBJECT_AMOUNT_T') := 'QA_SCHEME_OBJECT_AMOUNT_T';
-  l_object_type('QA_SCHEME_OBJECT_AMOUNT_T') := 'TYPE';
-  l_object_name('TEST_RESULTS_TABLE_T') := 'TEST_RESULTS_TABLE_T';
-  l_object_type('TEST_RESULTS_TABLE_T') := 'TYPE';
-  l_object_name('TEST_RESULTS_ROW_T') := 'TEST_RESULTS_ROW_T';
-  l_object_type('TEST_RESULTS_ROW_T') := 'TYPE';
+  l_object(l_index).object_name := 'VARCHAR2_TAB_T';
+  l_object(l_index).object_type := 'TYPE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_RULES_T';
+  l_object(l_index).object_type := 'TYPE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_RULE_T';
+  l_object(l_index).object_type := 'TYPE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'RUNNING_RULE_T';
+  l_object(l_index).object_type := 'TYPE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'RUNNING_RULES_T';
+  l_object(l_index).object_type := 'TYPE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_SCHEME_OBJECT_AMOUNTS_T';
+  l_object(l_index).object_type := 'TYPE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_SCHEME_OBJECT_AMOUNT_T';
+  l_object(l_index).object_type := 'TYPE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'TEST_RESULTS_TABLE_T';
+  l_object(l_index).object_type := 'TYPE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'TEST_RESULTS_ROW_T';
+  l_object(l_index).object_type := 'TYPE';
+  l_index := l_index + 1;
 
   -- sequences
-  l_object_name('QARU_SEQ') := 'QARU_SEQ';
-  l_object_type('QARU_SEQ') := 'SEQUENCE';
-  l_object_name('QAIF_SEQ') := 'QAIF_SEQ';
-  l_object_type('QAIF_SEQ') := 'SEQUENCE';
-  l_object_name('QATR_SEQ') := 'QATR_SEQ';
-  l_object_type('QATR_SEQ') := 'SEQUENCE';
-  l_object_name('QATO_SEQ') := 'QATO_SEQ';
-  l_object_type('QATO_SEQ') := 'SEQUENCE';
-  l_object_name('QATRU_SEQ') := 'QATRU_SEQ';
-  l_object_type('QATRU_SEQ') := 'SEQUENCE';
+  l_object(l_index).object_name := 'QARU_SEQ';
+  l_object(l_index).object_type := 'SEQUENCE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QAIF_SEQ';
+  l_object(l_index).object_type := 'SEQUENCE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QATR_SEQ';
+  l_object(l_index).object_type := 'SEQUENCE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QATO_SEQ';
+  l_object(l_index).object_type := 'SEQUENCE';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QATRU_SEQ';
+  l_object(l_index).object_type := 'SEQUENCE';
+  l_index := l_index + 1;
 
   -- views
-  l_object_name('QA_PREDECESSOR_ORDER_V') := 'QA_PREDECESSOR_ORDER_V';
-  l_object_type('QA_PREDECESSOR_ORDER_V') := 'VIEW';
-  l_object_name('QA_SCHEME_NAMES_FOR_TESTING_V') := 'QA_SCHEME_NAMES_FOR_TESTING_V';
-  l_object_type('QA_SCHEME_NAMES_FOR_TESTING_V') := 'VIEW';
-  l_object_name('QA_APEX_BLACKLISTED_APPS_V') := 'QA_APEX_BLACKLISTED_APPS_V';
-  l_object_type('QA_APEX_BLACKLISTED_APPS_V') := 'VIEW';
-  l_object_name('QA_APPLICATION_OWNER_V') := 'QA_APPLICATION_OWNER_V';
-  l_object_type('QA_APPLICATION_OWNER_V') := 'VIEW';
+  l_object(l_index).object_name := 'QA_PREDECESSOR_ORDER_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_SCHEME_NAMES_FOR_TESTING_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_APEX_BLACKLISTED_APPS_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_APPLICATION_OWNER_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
 
-  l_object_name('QA_JOB_RUN_DETAILS_V') := 'QA_JOB_RUN_DETAILS_V';
-  l_object_type('QA_JOB_RUN_DETAILS_V') := 'VIEW';
-  l_object_name('QA_OVERVIEW_TESTS_P0001_V') := 'QA_OVERVIEW_TESTS_P0001_V';
-  l_object_type('QA_OVERVIEW_TESTS_P0001_V') := 'VIEW';
-  l_object_name('QA_TEST_RUNTIME_ERROR_P0003_V') := 'QA_TEST_RUNTIME_ERROR_P0003_V';
-  l_object_type('QA_TEST_RUNTIME_ERROR_P0003_V') := 'VIEW';
-  l_object_name('QA_TEST_RUN_DETAILS_P0004_V') := 'QA_TEST_RUN_DETAILS_P0004_V';
-  l_object_type('QA_TEST_RUN_DETAILS_P0004_V') := 'VIEW';
-  l_object_name('QA_TEST_RESULT_FILES_P0005_V') := 'QA_TEST_RESULT_FILES_P0005_V';
-  l_object_type('QA_TEST_RESULT_FILES_P0005_V') := 'VIEW';
-  l_object_name('QA_JOB_DETAILS_P0009_V') := 'QA_JOB_DETAILS_P0009_V';
-  l_object_type('QA_JOB_DETAILS_P0009_V') := 'VIEW';
+  l_object(l_index).object_name := 'QA_JOB_RUN_DETAILS_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_OVERVIEW_TESTS_P0001_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_TEST_RUNTIME_ERROR_P0003_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_TEST_RUN_DETAILS_P0004_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_TEST_RESULT_FILES_P0005_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_JOB_DETAILS_P0009_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
 
-  l_object := l_object_name.first;
-  dbms_output.put_line(l_object);
-  dbms_output.put_line(l_object_type(l_object));
-  dbms_output.put_line(l_object_name.next(l_object));
-  dbms_output.put_line(l_object_name.last);
 
-
-  while l_object is not null
+  while l_counter < l_object.count
   loop
-    if l_object is null
+    if l_object(l_counter).object_type = 'TABLE'
     then
-      return;
-    end if;
-    if l_object_type(l_object) = 'TABLE'
-    then
-      dbms_output.put_line(l_object);
       for i in (select constraint_name
                 from user_constraints
-                where table_name = l_object_name(l_object)
+                where table_name = l_object(l_counter).object_name
                 and constraint_type = 'R')
       loop
-        l_action := 'alter table ' || l_object_name(l_object) || ' drop constraint ' || i.constraint_name;
-		
+        l_action := 'alter table ' || l_object(l_counter).object_name || ' drop constraint ' || i.constraint_name;
+    
         select count(1)
         into l_count
         from user_constraints s
         where constraint_name = i.constraint_name;
-		
+    
         if l_count <> 0
         then
           dbms_output.put_line(l_action);
@@ -143,12 +174,12 @@ begin
         else
           dbms_output.put_line('WARNING: ' || i.constraint_name || ' does not exist.');
         end if;
-		
+    
         select count(1)
         into l_count
         from user_constraints s
         where constraint_name = i.constraint_name;
-		
+    
         if l_count <> 0
         then
           dbms_output.put_line('WARNING: ' || i.constraint_name || ' has not been dropped correctly.');
@@ -156,14 +187,10 @@ begin
       
       end loop;
     end if;
-    l_object := l_object_name.next(l_object);
-  end loop;
-
-  l_object := l_object_name.first;
-  while l_object is not null
-  loop
-    l_action := 'drop ' || l_object_type(l_object) || ' ' || l_object_name(l_object);
-    if l_object_type(l_object) = 'TYPE'
+    
+    
+    l_action := 'drop ' || l_object(l_counter).object_type || ' ' || l_object(l_counter).object_name;
+    if l_object(l_counter).object_type = 'TYPE'
       then
         -- Sortierung aller Objekt Namen kann zu dependency Errors fuehren
         l_action := l_action || ' force';
@@ -172,30 +199,29 @@ begin
     select count(1)
     into l_count
     from user_objects s
-    where object_name = l_object_name(l_object)
-    and object_type = l_object_type(l_object);
-	
+    where object_name = l_object(l_counter).object_name
+    and object_type = l_object(l_counter).object_type;
+  
     if l_count <> 0
     then
       execute immediate (l_action);
-      dbms_output.put_line('INFO: ' || l_object_type(l_object) || ' ' || l_object_name(l_object) || ' dropped.');
+      dbms_output.put_line('INFO: ' || l_object(l_counter).object_type || ' ' || l_object(l_counter).object_name || ' dropped.');
     else
-      dbms_output.put_line('WARNING: ' || l_object_type(l_object) || ' ' || l_object_name(l_object) || ' does not exist.');
+      dbms_output.put_line('WARNING: ' || l_object(l_counter).object_type || ' ' || l_object(l_counter).object_name || ' does not exist.');
     end if;
-	
+  
     select count(1)
     into l_count
     from user_objects s
-    where object_name = l_object_name(l_object)
-    and object_type = l_object_type(l_object);
-	
+    where object_name = l_object(l_counter).object_name
+    and object_type = l_object(l_counter).object_type;
+  
     if l_count <> 0
     then
-      dbms_output.put_line('WARNING: ' || l_object_type(l_object) || ' ' || l_object_name(l_object) || ' has not been dropped correctly.');
+      dbms_output.put_line('WARNING: ' || l_object(l_counter).object_type || ' ' || l_object(l_counter).object_name || ' has not been dropped correctly.');
     end if;
-    l_object := l_object_name.next(l_object);
+    l_counter := l_counter +1;
   end loop;
-
 
 exception
   when others then
@@ -203,6 +229,7 @@ exception
                                                                            ,0
                                                                            ,200));
 end;
+/
 /
 
 PROMPT DROP SCHEDULER JOB JOB_RUN_UNIT_TESTS
