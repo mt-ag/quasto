@@ -22,8 +22,8 @@ wwv_flow_imp_page.create_page(
 ,p_dialog_width=>'1000px'
 ,p_protection_level=>'C'
 ,p_page_component_map=>'03'
-,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20240312123105'
+,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
+,p_last_upd_yyyymmddhh24miss=>'20240327174536'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(104945985645082588)
@@ -58,14 +58,14 @@ wwv_flow_imp_page.create_report_region(
 ,p_component_template_options=>'#DEFAULT#:t-Report--stretch:t-Report--altRowsDefault:t-Report--rowHighlight'
 ,p_source_type=>'NATIVE_SQL_REPORT'
 ,p_query_type=>'TABLE'
-,p_query_table=>'QA_JOB_RUN_DETAILS_V'
+,p_query_table=>'QA_JOB_RUN_DETAILS_P0011_V'
 ,p_query_where=>'JOB_NAME like :P11_CUSTOM_JOB_NAME || ''%'''
 ,p_include_rowid_column=>false
 ,p_ajax_enabled=>'Y'
 ,p_ajax_items_to_submit=>'P11_CUSTOM_JOB_NAME'
 ,p_lazy_loading=>true
 ,p_query_row_template=>wwv_flow_imp.id(50807155826675144)
-,p_query_num_rows=>15
+,p_query_num_rows=>5
 ,p_query_options=>'DERIVED_REPORT_COLUMNS'
 ,p_query_no_data_found=>'No Jobs have run recently for this rule, client and scheme.'
 ,p_query_num_rows_type=>'NEXT_PREVIOUS_LINKS'
@@ -101,7 +101,7 @@ wwv_flow_imp_page.create_report_columns(
 ,p_query_column_id=>3
 ,p_column_alias=>'STATUS'
 ,p_column_display_sequence=>30
-,p_column_heading=>'Status'
+,p_column_heading=>'Job Execution Status'
 ,p_use_as_row_header=>'N'
 ,p_heading_alignment=>'LEFT'
 ,p_disable_sort_column=>'N'
@@ -146,6 +146,18 @@ wwv_flow_imp_page.create_report_columns(
 ,p_include_in_export=>'Y'
 );
 wwv_flow_imp_page.create_page_plug(
+ p_id=>wwv_flow_imp.id(28126610889016713)
+,p_plug_name=>'Info'
+,p_parent_plug_id=>wwv_flow_imp.id(8769661398376820)
+,p_region_template_options=>'#DEFAULT#:t-Alert--horizontal:t-Alert--defaultIcons:t-Alert--info:t-Alert--removeHeading js-removeLandmark'
+,p_plug_template=>wwv_flow_imp.id(50721469375675106)
+,p_plug_display_sequence=>10
+,p_plug_source=>'The following report shows the execution status of scheduler jobs that have recently been executed for this rule and schema. Please note that the output only shows whether technical errors occured during the execution of the Unit test logics. It does'
+||' not indicate whether invalid objects for this rule have been found or not.'
+,p_attribute_01=>'N'
+,p_attribute_02=>'HTML'
+);
+wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(51471888707214136)
 ,p_plug_name=>'Info'
 ,p_parent_plug_id=>wwv_flow_imp.id(104945985645082588)
@@ -178,7 +190,7 @@ wwv_flow_imp_page.create_page_button(
 );
 wwv_flow_imp_page.create_page_button(
  p_id=>wwv_flow_imp.id(21671676825944301)
-,p_button_sequence=>70
+,p_button_sequence=>80
 ,p_button_plug_id=>wwv_flow_imp.id(104945985645082588)
 ,p_button_name=>'UNIT_TEST_IN_PROGRESS'
 ,p_button_action=>'SUBMIT'
@@ -200,7 +212,7 @@ wwv_flow_imp_page.create_page_button(
 );
 wwv_flow_imp_page.create_page_button(
  p_id=>wwv_flow_imp.id(21671976762944304)
-,p_button_sequence=>80
+,p_button_sequence=>90
 ,p_button_plug_id=>wwv_flow_imp.id(104945985645082588)
 ,p_button_name=>'REFRESH'
 ,p_button_action=>'DEFINED_BY_DA'
@@ -300,7 +312,7 @@ wwv_flow_imp_page.create_page_da_action(
 );
 wwv_flow_imp_page.create_page_process(
  p_id=>wwv_flow_imp.id(51471617693214134)
-,p_process_sequence=>10
+,p_process_sequence=>30
 ,p_process_point=>'AFTER_SUBMIT'
 ,p_process_type=>'NATIVE_PLSQL'
 ,p_process_name=>'Create Job'

@@ -9,21 +9,13 @@
 -- --------------------------------------------------------------------------------
 
 -- ----------------------------------------
--- Page: 2 - Unit Test Generation > Page Item: P2_SCHEME_NAMES > List of Values > SQL Query
+-- Page: 2 - Unit Test Generation > Process: Create Unit Tests > Source > PL/SQL Code
 
-select username as d
-     , username as r
-from QA_SCHEME_NAMES_FOR_TESTING_V
-order by 1;
+QA_UNIT_TESTS_PKG.p_create_unit_tests_for_schemes(pi_option => :P2_OPTION
+                                                , pi_scheme_names => :P2_SCHEME_NAMES);
 
 -- ----------------------------------------
 -- Page: 2 - Unit Test Generation > Process: Delete Unit Tests > Source > PL/SQL Code
 
 QA_UNIT_TESTS_PKG.p_delete_unit_tests_for_schemes(pi_scheme_names => :P2_SCHEME_NAMES);
-
--- ----------------------------------------
--- Page: 2 - Unit Test Generation > Process: Create Unit Tests > Source > PL/SQL Code
-
-QA_UNIT_TESTS_PKG.p_create_unit_tests_for_schemes(pi_option => :P2_OPTION
-                                                , pi_scheme_names => :P2_SCHEME_NAMES);
 

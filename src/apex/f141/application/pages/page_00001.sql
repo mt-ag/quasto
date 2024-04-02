@@ -29,7 +29,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'13'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240322175651'
+,p_last_upd_yyyymmddhh24miss=>'20240327153109'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(50026038309358532)
@@ -182,7 +182,7 @@ wwv_flow_imp_page.create_report_columns(
 ,p_heading_alignment=>'LEFT'
 ,p_disable_sort_column=>'N'
 ,p_display_as=>'TEXT_FROM_LOV_ESC'
-,p_named_lov=>wwv_flow_imp.id(55492320191214030)
+,p_named_lov=>wwv_flow_imp.id(28141307571811854)
 ,p_derived_column=>'N'
 ,p_include_in_export=>'Y'
 );
@@ -208,7 +208,7 @@ wwv_flow_imp_page.create_report_columns(
 ,p_heading_alignment=>'LEFT'
 ,p_disable_sort_column=>'N'
 ,p_display_as=>'TEXT_FROM_LOV_ESC'
-,p_named_lov=>wwv_flow_imp.id(42333993626488557)
+,p_named_lov=>wwv_flow_imp.id(28141931342798943)
 ,p_derived_column=>'N'
 ,p_include_in_export=>'Y'
 );
@@ -222,7 +222,7 @@ wwv_flow_imp_page.create_report_columns(
 ,p_heading_alignment=>'LEFT'
 ,p_disable_sort_column=>'N'
 ,p_display_as=>'TEXT_FROM_LOV_ESC'
-,p_named_lov=>wwv_flow_imp.id(54240337370100757)
+,p_named_lov=>wwv_flow_imp.id(28141712169803882)
 ,p_derived_column=>'N'
 ,p_include_in_export=>'Y'
 );
@@ -315,21 +315,10 @@ wwv_flow_imp_page.create_jet_chart_series(
 ,p_chart_id=>wwv_flow_imp.id(53667689137955094)
 ,p_seq=>10
 ,p_name=>'Quota'
-,p_data_source_type=>'SQL'
-,p_data_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'    select qatr_result testcase_status',
-'         , count(1) over (partition by qatr_result) as status_amount',
-'         , case qatr_result',
-'            when ''Failure'' then',
-'               ''#c42222''',
-'            when ''Error'' then',
-'                ''#7a1616''',
-'            else',
-'                ''#1c6d11''',
-'          end as color_hex',
-'    from table(qa_apex_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT''))',
-'     '))
+,p_data_source_type=>'TABLE'
 ,p_ajax_items_to_submit=>'P1_CATEGORIES,P1_PROJECT,P1_SCHEME,P1_TEST_RESULT,P1_ERRORLEVEL,P1_EXECUTION_DATE'
+,p_query_table=>'QA_OVERVIEW_QUOTA_P0001_V'
+,p_include_rowid_column=>false
 ,p_items_value_column_name=>'STATUS_AMOUNT'
 ,p_items_label_column_name=>'TESTCASE_STATUS'
 ,p_items_short_desc_column_name=>'TESTCASE_STATUS'
@@ -381,33 +370,10 @@ wwv_flow_imp_page.create_jet_chart_series(
 ,p_chart_id=>wwv_flow_imp.id(53668181381955099)
 ,p_seq=>10
 ,p_name=>'Success'
-,p_data_source_type=>'SQL'
-,p_data_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'select qatr_result as testcase_status,',
-'       ''#1c6d11'' as color_hex,',
-'       to_char(qatr_date, ''MM/DD/YYYY'') as testcase_date,',
-'       to_char(qatr_date, ''fmMM/DD/YYYY'') as filter_date,',
-'       status_amount',
-'from (',
-'    select qatr_result,',
-'           qatr_date,',
-'           status_amount',
-'    from (',
-'        select qatr_result, ',
-'               qatr_date, ',
-'               count(1) over (partition by qatr_result, qatr_date) as status_amount',
-'        from (',
-'            select qatr_result,',
-'                   trunc(qatr_date) as qatr_date',
-'              from table(qa_apex_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT''))',
-'              order by qatr_date desc',
-'              fetch first 10 rows only',
-'             )',
-'        where qatr_result = ''Success''',
-'    )',
-'    group by qatr_result, qatr_date, status_amount',
-')'))
+,p_data_source_type=>'TABLE'
 ,p_ajax_items_to_submit=>'P1_CATEGORIES,P1_PROJECT,P1_SCHEME,P1_TEST_RESULT,P1_ERRORLEVEL,P1_EXECUTION_DATE'
+,p_query_table=>'QA_OVERVIEW_TIMELINE_SUCCESS_P0001_V'
+,p_include_rowid_column=>false
 ,p_series_name_column_name=>'TESTCASE_STATUS'
 ,p_items_value_column_name=>'STATUS_AMOUNT'
 ,p_items_label_column_name=>'TESTCASE_DATE'
@@ -422,37 +388,14 @@ wwv_flow_imp_page.create_jet_chart_series(
 ,p_link_target_type=>'REDIRECT_PAGE'
 );
 wwv_flow_imp_page.create_jet_chart_series(
- p_id=>wwv_flow_imp.id(53669166727955109)
+ p_id=>wwv_flow_imp.id(28125480259016701)
 ,p_chart_id=>wwv_flow_imp.id(53668181381955099)
-,p_seq=>20
+,p_seq=>30
 ,p_name=>'Failure'
-,p_data_source_type=>'SQL'
-,p_data_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'select qatr_result as testcase_status,',
-'       ''#c42222'' as color_hex,',
-'       to_char(qatr_date, ''MM/DD/YYYY'') as testcase_date,',
-'       to_char(qatr_date, ''fmMM/DD/YYYY'') as filter_date,',
-'       status_amount',
-'from (',
-'    select qatr_result,',
-'           qatr_date,',
-'           status_amount',
-'    from (',
-'        select qatr_result, ',
-'               qatr_date, ',
-'               count(1) over (partition by qatr_result, qatr_date) as status_amount',
-'        from (',
-'            select qatr_result,',
-'                   trunc(qatr_date) as qatr_date',
-'              from table(qa_apex_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT''))',
-'              order by qatr_date desc',
-'              fetch first 10 rows only',
-'             )',
-'        where qatr_result = ''Failure''',
-'    )',
-'    group by qatr_result, qatr_date, status_amount',
-')'))
+,p_data_source_type=>'TABLE'
 ,p_ajax_items_to_submit=>'P1_CATEGORIES,P1_PROJECT,P1_SCHEME,P1_TEST_RESULT,P1_ERRORLEVEL,P1_EXECUTION_DATE'
+,p_query_table=>'QA_OVERVIEW_TIMELINE_FAILURE_P0001_V'
+,p_include_rowid_column=>false
 ,p_series_name_column_name=>'TESTCASE_STATUS'
 ,p_items_value_column_name=>'STATUS_AMOUNT'
 ,p_items_label_column_name=>'TESTCASE_DATE'
@@ -469,35 +412,12 @@ wwv_flow_imp_page.create_jet_chart_series(
 wwv_flow_imp_page.create_jet_chart_series(
  p_id=>wwv_flow_imp.id(22079556541883204)
 ,p_chart_id=>wwv_flow_imp.id(53668181381955099)
-,p_seq=>30
+,p_seq=>40
 ,p_name=>'Error'
-,p_data_source_type=>'SQL'
-,p_data_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'select qatr_result as testcase_status,',
-'       ''#7a1616'' as color_hex,',
-'       to_char(qatr_date, ''MM/DD/YYYY'') as testcase_date,',
-'       to_char(qatr_date, ''fmMM/DD/YYYY'') as filter_date,',
-'       status_amount',
-'from (',
-'    select qatr_result,',
-'           qatr_date,',
-'           status_amount',
-'    from (',
-'        select qatr_result, ',
-'               qatr_date, ',
-'               count(1) over (partition by qatr_result, qatr_date) as status_amount',
-'        from (',
-'            select qatr_result,',
-'                   trunc(qatr_date) as qatr_date',
-'              from table(qa_apex_pkg.get_faceted_search_dashboard_data(:APP_PAGE_ID, ''TEST_REPORT''))',
-'              order by qatr_date desc',
-'              fetch first 10 rows only',
-'             )',
-'        where qatr_result = ''Error''',
-'    )',
-'    group by qatr_result, qatr_date, status_amount',
-')'))
+,p_data_source_type=>'TABLE'
 ,p_ajax_items_to_submit=>'P1_CATEGORIES,P1_PROJECT,P1_SCHEME,P1_TEST_RESULT,P1_ERRORLEVEL,P1_EXECUTION_DATE'
+,p_query_table=>'QA_OVERVIEW_TIMELINE_ERROR_P0001_V'
+,p_include_rowid_column=>false
 ,p_series_name_column_name=>'TESTCASE_STATUS'
 ,p_items_value_column_name=>'STATUS_AMOUNT'
 ,p_items_label_column_name=>'TESTCASE_DATE'
@@ -669,9 +589,7 @@ wwv_flow_imp_page.create_page_item(
 ,p_source=>'QATR_SCHEME_NAME'
 ,p_source_type=>'FACET_COLUMN'
 ,p_display_as=>'NATIVE_CHECKBOX'
-,p_lov=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'SELECT USERNAME as d, USERNAME AS R FROM QA_SCHEME_NAMES_FOR_TESTING_V',
-''))
+,p_named_lov=>'TEST_SCHEME_NAMES_LOV'
 ,p_item_template_options=>'#DEFAULT#'
 ,p_fc_show_label=>true
 ,p_fc_collapsible=>false
@@ -723,8 +641,7 @@ wwv_flow_imp_page.create_page_item(
 ,p_source=>'QARU_ERROR_LEVEL'
 ,p_source_type=>'FACET_COLUMN'
 ,p_display_as=>'NATIVE_CHECKBOX'
-,p_named_lov=>'ERROR_LEVEL_LOV'
-,p_lov=>'.'||wwv_flow_imp.id(54240337370100757)||'.'
+,p_named_lov=>'RULE_ERROR_LEVELS_LOV'
 ,p_item_template_options=>'#DEFAULT#'
 ,p_fc_show_label=>true
 ,p_fc_collapsible=>false
@@ -750,14 +667,9 @@ wwv_flow_imp_page.create_page_item(
 ,p_source=>'QATR_DATE'
 ,p_source_type=>'FACET_COLUMN'
 ,p_display_as=>'NATIVE_CHECKBOX'
-,p_lov=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'select to_char(v.qatr_date, ''MM/DD/YYYY'') as d,',
-'       to_char(v.qatr_date, ''fmMM/DD/YYYY'') as r',
-'  from (select trunc(qatr_date) as qatr_date',
-'        from QA_OVERVIEW_TESTS_P0001_V',
-'        group by trunc(qatr_date)) v',
-'order by v.qatr_date desc'))
+,p_named_lov=>'TEST_EXECUTION_DATES_LOV'
 ,p_item_template_options=>'#DEFAULT#'
+,p_fc_show_label=>true
 ,p_fc_collapsible=>true
 ,p_fc_initial_collapsed=>false
 ,p_fc_compute_counts=>false
@@ -815,30 +727,6 @@ wwv_flow_imp_page.create_page_da_action(
 ,p_affected_region_id=>wwv_flow_imp.id(15081484244011701)
 );
 wwv_flow_imp_page.create_page_da_event(
- p_id=>wwv_flow_imp.id(50234139716848219)
-,p_name=>'Repot neuanordnen'
-,p_event_sequence=>30
-,p_triggering_element_type=>'REGION'
-,p_triggering_region_id=>wwv_flow_imp.id(53667537845955093)
-,p_bind_type=>'bind'
-,p_execution_type=>'IMMEDIATE'
-,p_bind_event_type=>'click'
-,p_required_patch=>wwv_flow_imp.id(50668567409675065)
-);
-wwv_flow_imp_page.create_page_da_action(
- p_id=>wwv_flow_imp.id(50234206967848220)
-,p_event_id=>wwv_flow_imp.id(50234139716848219)
-,p_event_result=>'TRUE'
-,p_action_sequence=>10
-,p_execute_on_page_init=>'N'
-,p_action=>'NATIVE_SET_VALUE'
-,p_affected_elements_type=>'ITEM'
-,p_affected_elements=>'P1_REPORT_STATUS_FILTER'
-,p_attribute_01=>'STATIC_ASSIGNMENT'
-,p_attribute_09=>'N'
-,p_wait_for_result=>'Y'
-);
-wwv_flow_imp_page.create_page_da_event(
  p_id=>wwv_flow_imp.id(50904210902097603)
 ,p_name=>'Filter Regions'
 ,p_event_sequence=>50
@@ -850,10 +738,21 @@ wwv_flow_imp_page.create_page_da_event(
 ,p_bind_event_type_custom=>'facetschange'
 );
 wwv_flow_imp_page.create_page_da_action(
- p_id=>wwv_flow_imp.id(50904357709097604)
+ p_id=>wwv_flow_imp.id(15085258264011739)
 ,p_event_id=>wwv_flow_imp.id(50904210902097603)
 ,p_event_result=>'TRUE'
 ,p_action_sequence=>10
+,p_execute_on_page_init=>'N'
+,p_name=>'Refresh Report'
+,p_action=>'NATIVE_REFRESH'
+,p_affected_elements_type=>'REGION'
+,p_affected_region_id=>wwv_flow_imp.id(15081484244011701)
+);
+wwv_flow_imp_page.create_page_da_action(
+ p_id=>wwv_flow_imp.id(50904357709097604)
+,p_event_id=>wwv_flow_imp.id(50904210902097603)
+,p_event_result=>'TRUE'
+,p_action_sequence=>20
 ,p_execute_on_page_init=>'N'
 ,p_name=>'Refresh Quota Chart'
 ,p_action=>'NATIVE_REFRESH'
@@ -864,23 +763,12 @@ wwv_flow_imp_page.create_page_da_action(
  p_id=>wwv_flow_imp.id(51633519640081204)
 ,p_event_id=>wwv_flow_imp.id(50904210902097603)
 ,p_event_result=>'TRUE'
-,p_action_sequence=>20
+,p_action_sequence=>30
 ,p_execute_on_page_init=>'N'
 ,p_name=>'Refresh Timeline Chart'
 ,p_action=>'NATIVE_REFRESH'
 ,p_affected_elements_type=>'REGION'
 ,p_affected_region_id=>wwv_flow_imp.id(53668118104955098)
-);
-wwv_flow_imp_page.create_page_da_action(
- p_id=>wwv_flow_imp.id(15085258264011739)
-,p_event_id=>wwv_flow_imp.id(50904210902097603)
-,p_event_result=>'TRUE'
-,p_action_sequence=>30
-,p_execute_on_page_init=>'N'
-,p_name=>'Refresh Report'
-,p_action=>'NATIVE_REFRESH'
-,p_affected_elements_type=>'REGION'
-,p_affected_region_id=>wwv_flow_imp.id(15081484244011701)
 );
 wwv_flow_imp.component_end;
 end;

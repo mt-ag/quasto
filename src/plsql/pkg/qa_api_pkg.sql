@@ -129,7 +129,7 @@ create or replace package body qa_api_pkg as
     l_qaru_rule_numbers varchar2_tab_t;
     l_qa_rules          qa_rules_t := new qa_rules_t();
     l_qa_rules_temp     qa_rules_t := new qa_rules_t();
-    l_running_rules     running_rules_t := new running_rules_t();
+    l_running_rules     qa_running_rules_t := new qa_running_rules_t();
   
     l_allowed_to_run number;
     l_success        varchar2(1);
@@ -144,18 +144,18 @@ create or replace package body qa_api_pkg as
       return null;
     end if;
   
-    select running_rule_t(t.qaru_rule_number
-                         ,trim(regexp_substr(t.qaru_predecessor_ids
-                                            ,'[^:]+'
-                                            ,1
-                                            ,levels.column_value))
-                         ,case
-                            when t.qaru_is_active <> 1 then
-                             'N'
-                            else
-                             null
-                          end
-                         ,rownum)
+    select qa_running_rule_t(t.qaru_rule_number
+                            ,trim(regexp_substr(t.qaru_predecessor_ids
+                                               ,'[^:]+'
+                                               ,1
+                                               ,levels.column_value))
+                            ,case
+                               when t.qaru_is_active <> 1 then
+                                'N'
+                               else
+                                null
+                             end
+                            ,rownum)
     bulk collect
     into l_running_rules
     from qa_rules t
