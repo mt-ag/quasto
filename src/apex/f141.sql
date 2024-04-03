@@ -123,7 +123,7 @@ wwv_imp_workspace.create_flow(
 ,p_substitution_string_02=>'DATE_FORMAT'
 ,p_substitution_value_02=>'DD/MM/YYYY'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240403180252'
+,p_last_upd_yyyymmddhh24miss=>'20240403190300'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_files_version=>9
 ,p_print_server_type=>'NATIVE'
@@ -17047,7 +17047,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'03'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240403175809'
+,p_last_upd_yyyymmddhh24miss=>'20240403190240'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(51469936526214117)
@@ -17183,7 +17183,7 @@ wwv_flow_imp_page.create_page_plug(
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(101066088915146542)
-,p_plug_name=>'Settings'
+,p_plug_name=>'Overview'
 ,p_region_template_options=>'#DEFAULT#:t-Region--scrollBody'
 ,p_plug_template=>wwv_flow_imp.id(50780356327675132)
 ,p_plug_display_sequence=>10
@@ -17373,14 +17373,15 @@ wwv_flow_imp_page.create_page_item(
 wwv_flow_imp_page.create_page_item(
  p_id=>wwv_flow_imp.id(59677850853121599)
 ,p_name=>'P9_ENABLE_SCHEDULER_JOB'
-,p_item_sequence=>80
-,p_item_plug_id=>wwv_flow_imp.id(101066088915146542)
-,p_prompt=>'Enable'
+,p_item_sequence=>10
+,p_item_plug_id=>wwv_flow_imp.id(63080644826391011)
+,p_item_display_point=>'NEXT'
+,p_prompt=>'Enable Cronjob'
 ,p_source=>'qa_unit_tests_pkg.f_is_scheduler_cronjob_enabled'
 ,p_source_type=>'EXPRESSION'
 ,p_source_language=>'PLSQL'
 ,p_display_as=>'NATIVE_YES_NO'
-,p_field_template=>wwv_flow_imp.id(50842276801675164)
+,p_field_template=>wwv_flow_imp.id(50842039205675164)
 ,p_item_template_options=>'#DEFAULT#'
 ,p_attribute_01=>'N'
 ,p_attribute_02=>'Y'
@@ -17463,7 +17464,7 @@ wwv_flow_imp_page.create_page_process(
 'select',
 '  to_char(START_DATE, ''DD-MON-YYYY HH24:MI'')',
 ', to_char(LAST_START_DATE, ''DD-MON-YYYY HH24:MI'')',
-', LAST_RUN_DURATION',
+', lpad(extract(hour from LAST_RUN_DURATION),2,''0'') || '':'' || lpad(extract(minute from LAST_RUN_DURATION),2,''0'') || '':'' || lpad(extract(second from LAST_RUN_DURATION),2,''0'')',
 ', to_char(NEXT_RUN_DATE, ''DD-MON-YYYY HH24:MI'')',
 ', REPEAT_INTERVAL',
 ', STATE',
@@ -17495,7 +17496,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'03'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240327174536'
+,p_last_upd_yyyymmddhh24miss=>'20240403185715'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(104945985645082588)

@@ -25,7 +25,7 @@ begin
 select
   to_char(START_DATE, 'DD-MON-YYYY HH24:MI')
 , to_char(LAST_START_DATE, 'DD-MON-YYYY HH24:MI')
-, LAST_RUN_DURATION
+, lpad(extract(hour from LAST_RUN_DURATION),2,'0') || ':' || lpad(extract(minute from LAST_RUN_DURATION),2,'0') || ':' || lpad(extract(second from LAST_RUN_DURATION),2,'0')
 , to_char(NEXT_RUN_DATE, 'DD-MON-YYYY HH24:MI')
 , REPEAT_INTERVAL
 , STATE
