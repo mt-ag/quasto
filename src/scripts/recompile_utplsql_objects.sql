@@ -7,20 +7,16 @@ declare
   );
   type t_object_table is table of t_object_rec index by pls_integer;
   
-  l_object      t_object_table;
-  l_counter     number := 1;
-  l_index       number := 1;
-  l_action      varchar2(32767);
-  l_action_2    varchar2(32767);
+  l_object    t_object_table;
+  l_count     number;
+  l_counter   number := 1;
+  l_index     number := 1;
+  l_action    varchar2(32767);
+  l_action_2  varchar2(32767);
 begin
   -- buffer size extend
   dbms_output.enable(buffer_size => 10000000);
   -- utPLSQL Objects
-    -- Packages
-    l_object(l_index).object_name := 'QA_UNIT_TESTS_PKG';
-    l_object(l_index).object_type := 'PACKAGE';
-    l_index := l_index + 1;
-    
     -- Triggers
     l_object(l_index).object_name := 'QATR_I_TRG';
     l_object(l_index).object_type := 'TRIGGER';
@@ -35,8 +31,20 @@ begin
     l_index := l_index + 1;
 
 
-  while l_counter < l_object.COUNT
+ while l_counter < l_object.count
   loop
+    select count(1)
+    into l_count
+    from user_objects
+    where name = l_object(l_counter).object_name;
+
+    if l_count = 0
+      then
+        dbms_output.put_line('WARNING: object does not exist: ' || l_object(l_counter).object_name);
+        l_counter := l_counter + 1;
+        continue;
+    end if;
+
     l_action_2 := null;
     if l_object(l_counter).object_type = 'PACKAGE'
     then
@@ -52,11 +60,11 @@ begin
         execute immediate (l_action_2);
       end if;
       dbms_output.put_line('INFO: ' || l_object(l_counter).object_type || ' ' || l_object(l_counter).object_name || ' recompiled.');
-      l_counter := l_counter +1;      
+      l_counter := l_counter + 1;
     exception
       when others then
         dbms_output.put_line('ERROR: The object ' || l_object(l_counter).object_type || ' ' || l_object(l_counter).object_name || ' is invalid.');
-        l_counter := l_counter +1;
+        l_counter := l_counter + 1;
     end;
   end loop;
 exception

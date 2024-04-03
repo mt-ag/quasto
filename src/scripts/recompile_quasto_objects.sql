@@ -8,6 +8,7 @@ declare
   type t_object_table is table of t_object_rec index by pls_integer;
 
   l_object   t_object_table;
+  l_count    number;
   l_counter  number := 1;
   l_index    number := 1;
   l_action   varchar2(32767);
@@ -34,11 +35,11 @@ begin
   l_object(l_index).object_type := 'TYPE';
   l_index := l_index + 1;
 
-  l_object(l_index).object_name := 'RUNNING_RULE_T';
+  l_object(l_index).object_name := 'QA_RUNNING_RULE_T';
   l_object(l_index).object_type := 'TYPE';
   l_index := l_index + 1;
 
-  l_object(l_index).object_name := 'RUNNING_RULES_T';
+  l_object(l_index).object_name := 'QA_RUNNING_RULES_T';
   l_object(l_index).object_type := 'TYPE';
   l_index := l_index + 1;
 
@@ -46,11 +47,11 @@ begin
   l_object(l_index).object_type := 'TYPE';
   l_index := l_index + 1;
 
-  l_object(l_index).object_name := 'TEST_RESULTS_TABLE_T';
+  l_object(l_index).object_name := 'QA_TEST_RESULTS_TABLE_T';
   l_object(l_index).object_type := 'TYPE';
   l_index := l_index + 1;
 
-  l_object(l_index).object_name := 'TEST_RESULTS_ROW_T';
+  l_object(l_index).object_name := 'QA_TEST_RESULTS_ROW_T';
   l_object(l_index).object_type := 'TYPE';
   l_index := l_index + 1;
 
@@ -149,6 +150,18 @@ begin
 
   while l_counter < l_object.count
   loop
+    select count(1)
+    into l_count
+    from user_objects
+    where name = l_object(l_counter).object_name;
+
+    if l_count = 0
+      then
+        dbms_output.put_line('WARNING: object does not exist: ' || l_object(l_counter).object_name);
+        l_counter := l_counter + 1;
+        continue;
+    end if;
+
     l_action_2 := null;
     if l_object(l_counter).object_type = 'PACKAGE'
     then
