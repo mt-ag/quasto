@@ -168,7 +168,7 @@ set head on
 -- Constant Package Generation with last argument as current Version
 @@src/scripts/install_constant_package '~1' '~2' '~3' '~4' '23.2'
 
---@@src/~script_name_quasto
---@@src/~script_name_utplsql
+@@src/~script_name_quasto
+@@src/~script_name_utplsql
 @@src/~script_name_quasto_recompile
 @@src/~script_name_utplsql_recompile
