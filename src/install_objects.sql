@@ -99,6 +99,7 @@ begin
 
     l_script_name_utplsql_upgrade := 'install_utplsql_objects_' || replace(l_version_old,'.','_') || '_to_' || replace(:version,'.','_') || '.sql';
     l_script_name_quasto_upgrade  := 'install_quasto_objects_' || replace(l_version_old,'.','_') || '_to_' || replace(:version,'.','_') || '.sql';
+    :script_quasto_recompile   := l_script_name_quasto_recompile;
 
     -- Check if Pre Version exists
     select count(1)

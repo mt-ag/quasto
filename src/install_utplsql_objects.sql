@@ -22,7 +22,7 @@ PROMPT src/ddl/cons/qa_test_results.sql
 PROMPT src/ddl/cons/qa_test_runs.sql
 @src/ddl/cons/qa_test_runs.sql
 PROMPT src/ddl/cons/qa_test_run_invlid_objects.sql
-@src/ddl/cons/qa_test_run_invlid_objects.sql
+@src/ddl/cons/qa_test_run_invalid_objects.sql
 
 PROMPT SEQUENCE
 PROMPT src/ddl/seq/qatr_seq.sql
