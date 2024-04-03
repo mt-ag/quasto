@@ -17,6 +17,11 @@ begin
   -- buffer size extend
   dbms_output.enable(buffer_size => 10000000);
   -- utPLSQL Objects
+
+    -- packages
+    l_object(l_index).object_name := 'QA_UNIT_TESTS_PKG';
+    l_object(l_index).object_type := 'PACKAGE';
+    l_index := l_index + 1;
     -- Triggers
     l_object(l_index).object_name := 'QATR_I_TRG';
     l_object(l_index).object_type := 'TRIGGER';
