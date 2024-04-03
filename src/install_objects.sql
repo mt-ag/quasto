@@ -59,10 +59,10 @@ exec :version := '23.2';
 declare
     l_script_name_utplsql           varchar2(100) := 'install_utplsql_objects.sql';
     l_script_name_utplsql_upgrade   varchar2(100);
-    l_script_name_utplsql_recompile varchar2(100) := 'recompile_utplsql_objects.sql';
+    l_script_name_utplsql_recompile varchar2(100) := 'scripts/recompile_utplsql_objects.sql';
     l_script_name_quasto            varchar2(100) := 'install_quasto_objects.sql';
     l_script_name_quasto_upgrade    varchar2(100);
-    l_script_name_quasto_recompile  varchar2(100) := 'recompile_quasto_objects.sql';
+    l_script_name_quasto_recompile  varchar2(100) := 'scripts/recompile_quasto_objects.sql';
     l_count                         number;
     l_count_utplsql                 number;
     l_version_old                   varchar2 (40 char);
@@ -99,6 +99,7 @@ begin
 
     l_script_name_utplsql_upgrade := 'install_utplsql_objects_' || replace(l_version_old,'.','_') || '_to_' || replace(:version,'.','_') || '.sql';
     l_script_name_quasto_upgrade  := 'install_quasto_objects_' || replace(l_version_old,'.','_') || '_to_' || replace(:version,'.','_') || '.sql';
+    :script_ut_plsql_recompile := l_script_name_utplsql_recompile;
     :script_quasto_recompile   := l_script_name_quasto_recompile;
 
     -- Check if Pre Version exists
@@ -155,6 +156,8 @@ set feedback off
 set head off
 select :script_ut_plsql from dual;
 select :script_quasto from dual;
+select :script_ut_plsql_recompile from dual;
+select :script_quasto_recompile from dual;
 -- DML only does anything if flag stayed Y
 select sysdate from dual
 where :flag = 'Y';
@@ -165,7 +168,7 @@ set head on
 -- Constant Package Generation with last argument as current Version
 @@src/scripts/install_constant_package '~1' '~2' '~3' '~4' '23.2'
 
-@@src/~script_name_quasto
-@@src/~script_name_utplsql
+--@@src/~script_name_quasto
+--@@src/~script_name_utplsql
 @@src/~script_name_quasto_recompile
 @@src/~script_name_utplsql_recompile
