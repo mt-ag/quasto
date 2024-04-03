@@ -142,6 +142,3 @@ PROMPT src/plsql/trg/qaif_i_trg.sql
 PROMPT GRANT
 grant execute on qa_api_pkg to public;
 grant execute on qa_rule_t to public;
-
-prompt recompile_quasto_objects.sql 
-@src/scripts/recompile_quasto_objects.sql

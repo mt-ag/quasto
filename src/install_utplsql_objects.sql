@@ -32,9 +32,6 @@ PROMPT src/ddl/seq/qato_seq.sql
 PROMPT src/ddl/seq/qatru_seq.sql
 @src/ddl/seq/qatru_seq.sql
 
-PROMPT PACKAGE
-@src/plsql/pkg/qa_unit_tests_pkg.sql
-
 PROMPT TRIGGER
 PROMPT src/plsql/trg/qatr_i_trg.sql
 @src/plsql/trg/qatr_i_trg.sql
@@ -46,6 +43,3 @@ PROMPT src/plsql/trg/qatru_i_trg.sql
 PROMPT SCHEDULER JOBS
 PROMPT src/scripts/create_scheduler_job_for_unit_tests.sql
 @src/scripts/create_scheduler_job_for_unit_tests.sql
-
-prompt recompile_utplsql_objects.sql 
-@src/scripts/recompile_utplsql_objects.sql
