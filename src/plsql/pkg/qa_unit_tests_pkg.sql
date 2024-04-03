@@ -1337,7 +1337,7 @@ create or replace package body qa_unit_tests_pkg is
 
     if f_is_job_running(pi_job_name => qa_constant_pkg.gc_utplsql_scheduler_cronjob_name) = 'N'
     then
-      dbms_scheduler.run_job(job_name => qa_constant_pkg.gc_utplsql_scheduler_cronjob_name);
+      dbms_scheduler.run_job(job_name => qa_constant_pkg.gc_utplsql_scheduler_cronjob_name, use_current_session => false);
     else
       raise_application_error(-20001, 'Scheduler Cronjob is currently running: ' || qa_constant_pkg.gc_utplsql_scheduler_cronjob_name);
     end if;
