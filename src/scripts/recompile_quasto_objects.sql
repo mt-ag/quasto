@@ -100,6 +100,11 @@ begin
   l_index := l_index + 1;
 
   -- packages
+  l_object(l_index).object_name := 'QA_UNIT_TESTS_PKG';
+  l_object(l_index).object_type := 'PACKAGE';
+  l_index := l_index + 1;
+    
+
   l_object(l_index).object_name := 'QA_CONSTANT_PKG';
   l_object(l_index).object_type := 'PACKAGE';
   l_index := l_index + 1;

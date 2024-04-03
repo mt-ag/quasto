@@ -117,6 +117,7 @@ select :script_apex from dual;
 @@src/~script_name_apex
 
 PROMPT PACKAGE
+@src/plsql/pkg/qa_unit_tests_pkg.sql
 PROMPT src/plsql/pkg/qa_logger_pkg.sql
 @src/plsql/pkg/qa_logger_pkg.sql
 PROMPT src/plsql/pkg/qa_main_pkg.sql
