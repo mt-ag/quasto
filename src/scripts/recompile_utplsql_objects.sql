@@ -36,7 +36,7 @@ begin
     select count(1)
     into l_count
     from user_objects
-    where name = l_object(l_counter).object_name;
+    where object_name = l_object(l_counter).object_name;
 
     if l_count = 0
       then
