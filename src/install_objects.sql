@@ -7,9 +7,15 @@ set verify off
 COLUMN :script_ut_plsql NEW_VALUE script_name_utplsql NOPRINT
 variable script_ut_plsql VARCHAR2(50)
 
+COLUMN :script_ut_plsql_recompile NEW_VALUE script_name_utplsql_recompile NOPRINT
+variable script_ut_plsql_recompile VARCHAR2(50)
+
 -- Skript for QUASTO Objects
 COLUMN :script_quasto NEW_VALUE script_name_quasto NOPRINT
 variable script_quasto VARCHAR2(50)
+
+COLUMN :script_quasto_recompile NEW_VALUE script_name_quasto_recompile NOPRINT
+variable script_quasto_recompile VARCHAR2(50)
 
 -- current Version installed
 COLUMN :version_old NEW_VALUE script_version_old NOPRINT
@@ -51,15 +57,17 @@ exec :version := '23.2';
 
 -- Block to proceess first Argument
 declare
-    l_script_name_utplsql         varchar2(100) := 'install_utplsql_objects.sql';
-    l_script_name_utplsql_upgrade varchar2(100);
-    l_script_name_quasto          varchar2(100) := 'install_quasto_objects.sql';
-    l_script_name_quasto_upgrade  varchar2(100);
-    l_count                       number;
-    l_count_utplsql               number;
-    l_version_old                 varchar2 (40 char);
-    l_current_version             varchar2 (40 char) := :version;
-    l_arg                         number := '~1';
+    l_script_name_utplsql           varchar2(100) := 'install_utplsql_objects.sql';
+    l_script_name_utplsql_upgrade   varchar2(100);
+    l_script_name_utplsql_recompile varchar2(100) := 'recompile_utplsql_objects.sql';
+    l_script_name_quasto            varchar2(100) := 'install_quasto_objects.sql';
+    l_script_name_quasto_upgrade    varchar2(100);
+    l_script_name_quasto_recompile  varchar2(100) := 'recompile_quasto_objects.sql';
+    l_count                         number;
+    l_count_utplsql                 number;
+    l_version_old                   varchar2 (40 char);
+    l_current_version               varchar2 (40 char) := :version;
+    l_arg                           number := '~1';
 
     function get_version_constant return varchar2 as
       l_ret varchar2 (50 char);
@@ -110,6 +118,7 @@ begin
     elsif 0 = l_arg 
       then
         l_script_name_utplsql := 'null.sql'; 
+        l_script_name_utplsql_recompile := 'null.sql'; 
     end if;
 
     if l_count > 0
@@ -131,8 +140,12 @@ begin
 
     :script_ut_plsql := l_script_name_utplsql;
     :script_quasto   := l_script_name_quasto;
+    :script_ut_plsql_recompile := l_script_name_utplsql_recompile;
+    :script_quasto_recompile   := l_script_name_quasto_recompile;
     dbms_output.put_line(l_script_name_utplsql);
     dbms_output.put_line(l_script_name_quasto);
+    dbms_output.put_line(l_script_name_utplsql_recompile);
+    dbms_output.put_line(l_script_name_quasto_recompile);
 end;
 /
 
@@ -152,4 +165,6 @@ set head on
 @@src/scripts/install_constant_package '~1' '~2' '~3' '~4' '23.2'
 
 @@src/~script_name_quasto
+@@src/~script_name_quasto_recompile
 @@src/~script_name_utplsql
+@@src/~script_name_utplsql_recompile
