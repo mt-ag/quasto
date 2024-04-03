@@ -23,7 +23,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'03'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240327174612'
+,p_last_upd_yyyymmddhh24miss=>'20240403175809'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(51469936526214117)
@@ -43,8 +43,8 @@ wwv_flow_imp_page.create_page_plug(
 ,p_plug_template=>wwv_flow_imp.id(50721469375675106)
 ,p_plug_display_sequence=>10
 ,p_plug_display_point=>'SUB_REGIONS'
-,p_plug_source=>'The following report shows the execution status of recent runs of the scheduler cronjob. Please note that the output only shows whether technical errors occured during the execution of the Unit test logics. It does not indicate whether invalid object'
-||'s have been found or not.'
+,p_plug_source=>'The following report shows the execution status of recent runs of the scheduler cronjob. Please note that the output only shows process states as well as errors if the execution of the Unit test logics failed. It does not indicate whether invalid obj'
+||'ects that do not comply with the QUASTO rules were found or not.'
 ,p_attribute_01=>'N'
 ,p_attribute_02=>'HTML'
 );
@@ -177,7 +177,7 @@ wwv_flow_imp_page.create_page_button(
 ,p_button_template_id=>wwv_flow_imp.id(50844844448675167)
 ,p_button_is_hot=>'Y'
 ,p_button_image_alt=>'Run Cronjob Now'
-,p_button_condition=>'QA_UNIT_TESTS_PKG.f_is_job_running(pi_job_name => ''CRONJOB_RUN_UNIT_TESTS'') = ''N'''
+,p_button_condition=>'QA_UNIT_TESTS_PKG.f_is_job_running(pi_job_name => :P9_CRONJOB_NAME) = ''N'''
 ,p_button_condition2=>'PLSQL'
 ,p_button_condition_type=>'EXPRESSION'
 ,p_icon_css_classes=>'fa-play-circle'
@@ -193,7 +193,7 @@ wwv_flow_imp_page.create_page_button(
 ,p_button_template_id=>wwv_flow_imp.id(50844844448675167)
 ,p_button_is_hot=>'Y'
 ,p_button_image_alt=>'Cronjob is running...'
-,p_button_condition=>'QA_UNIT_TESTS_PKG.f_is_job_running(pi_job_name => ''CRONJOB_RUN_UNIT_TESTS'') = ''Y'''
+,p_button_condition=>'QA_UNIT_TESTS_PKG.f_is_job_running(pi_job_name => :P9_CRONJOB_NAME) = ''Y'''
 ,p_button_condition2=>'PLSQL'
 ,p_button_condition_type=>'EXPRESSION'
 ,p_icon_css_classes=>'fa-refresh fa-anim-spin'
@@ -213,7 +213,7 @@ wwv_flow_imp_page.create_page_button(
 ,p_button_image_alt=>'Refresh'
 ,p_button_execute_validations=>'N'
 ,p_warn_on_unsaved_changes=>null
-,p_button_condition=>'QA_UNIT_TESTS_PKG.f_is_job_running(pi_job_name => ''CRONJOB_RUN_UNIT_TESTS'') = ''Y'''
+,p_button_condition=>'QA_UNIT_TESTS_PKG.f_is_job_running(pi_job_name => :P9_CRONJOB_NAME) = ''Y'''
 ,p_button_condition2=>'PLSQL'
 ,p_button_condition_type=>'EXPRESSION'
 ,p_grid_new_row=>'N'
@@ -427,16 +427,6 @@ wwv_flow_imp_page.create_page_process(
 ,p_process_when_button_id=>wwv_flow_imp.id(21697364121160701)
 ,p_process_success_message=>'Cronjob started.'
 ,p_internal_uid=>21697417730160702
-);
-wwv_flow_imp_page.create_page_process(
- p_id=>wwv_flow_imp.id(42250288169031712)
-,p_process_sequence=>30
-,p_process_point=>'AFTER_SUBMIT'
-,p_process_type=>'NATIVE_CLOSE_WINDOW'
-,p_process_name=>'Close Dialog'
-,p_attribute_02=>'N'
-,p_error_display_location=>'INLINE_IN_NOTIFICATION'
-,p_internal_uid=>42250288169031712
 );
 wwv_flow_imp_page.create_page_process(
  p_id=>wwv_flow_imp.id(51470870455214126)
