@@ -25,43 +25,6 @@ begin
     l_index := l_index + 1;
   end if;
 
-  -- views
-  l_object(l_index).object_name := 'QA_SCHEME_NAMES_FOR_TESTING_V';
-  l_object(l_index).object_type := 'VIEW';
-  l_index := l_index + 1;
-
-  l_object(l_index).object_name := 'QA_PREDECESSOR_ORDER_V';
-  l_object(l_index).object_type := 'VIEW';
-  l_index := l_index + 1;
-
-  l_object(l_index).object_name := 'QA_APPLICATION_OWNER_V';
-  l_object(l_index).object_type := 'VIEW';
-  l_index := l_index + 1;
-
-  l_object(l_index).object_name := 'QA_JOB_RUN_DETAILS_V';
-  l_object(l_index).object_type := 'VIEW';
-  l_index := l_index + 1;
-
-  l_object(l_index).object_name := 'QA_OVERVIEW_TESTS_P0001_V';
-  l_object(l_index).object_type := 'VIEW';
-  l_index := l_index + 1;
-
-  l_object(l_index).object_name := 'QA_TEST_RUNTIME_ERROR_P0003_V';
-  l_object(l_index).object_type := 'VIEW';
-  l_index := l_index + 1;
-
-  l_object(l_index).object_name := 'QA_TEST_RUN_DETAILS_P0004_V';
-  l_object(l_index).object_type := 'VIEW';
-  l_index := l_index + 1;
-
-  l_object(l_index).object_name := 'QA_TEST_RESULT_FILES_P0005_V';
-  l_object(l_index).object_type := 'VIEW';
-  l_index := l_index + 1;
-
-  l_object(l_index).object_name := 'QA_JOB_DETAILS_P0009_V';
-  l_object(l_index).object_type := 'VIEW';
-  l_index := l_index + 1;
-
   -- types
   l_object(l_index).object_name := 'QA_RULE_T';
   l_object(l_index).object_type := 'TYPE';
@@ -143,6 +106,44 @@ begin
   l_index := l_index + 1;
   l_object(l_index).object_name := 'QAIF_I_TRG';
   l_object(l_index).object_type := 'TRIGGER';
+  l_index := l_index + 1;
+
+
+  -- views
+  l_object(l_index).object_name := 'QA_SCHEME_NAMES_FOR_TESTING_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+
+  l_object(l_index).object_name := 'QA_PREDECESSOR_ORDER_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+
+  l_object(l_index).object_name := 'QA_APPLICATION_OWNER_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+
+  l_object(l_index).object_name := 'QA_JOB_RUN_DETAILS_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+
+  l_object(l_index).object_name := 'QA_OVERVIEW_TESTS_P0001_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+
+  l_object(l_index).object_name := 'QA_TEST_RUNTIME_ERROR_P0003_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+
+  l_object(l_index).object_name := 'QA_TEST_RUN_DETAILS_P0004_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+
+  l_object(l_index).object_name := 'QA_TEST_RESULT_FILES_P0005_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+
+  l_object(l_index).object_name := 'QA_JOB_DETAILS_P0009_V';
+  l_object(l_index).object_type := 'VIEW';
   l_index := l_index + 1;
 
 
