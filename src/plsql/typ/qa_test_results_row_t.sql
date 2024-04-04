@@ -1,8 +1,8 @@
 create or replace type qa_test_results_row_t as
 
 /******************************************************************************
-   NAME:       qa_running_rule_t
-   PURPOSE:    Attributes for objects of type qa_running_rule_t
+   NAME:       qa_test_results_row_t
+   PURPOSE:    Attributes for objects of type qa_test_results_row_t
 
    REVISIONS:
    Release    Date        Author           Description

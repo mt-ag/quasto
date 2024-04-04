@@ -1,8 +1,8 @@
 create or replace type qa_test_results_table_t as
 
 /******************************************************************************
-   NAME:       qa_running_rules_t
-   PURPOSE:    PL/SQL table of type qa_running_rule_t
+   NAME:       qa_test_results_table_t
+   PURPOSE:    PL/SQL table of type qa_test_results_row_t
 
    REVISIONS:
    Release    Date        Author           Description
