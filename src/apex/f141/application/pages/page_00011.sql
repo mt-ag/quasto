@@ -23,7 +23,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'03'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240403185715'
+,p_last_upd_yyyymmddhh24miss=>'20240404134243'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(104945985645082588)
@@ -152,8 +152,8 @@ wwv_flow_imp_page.create_page_plug(
 ,p_region_template_options=>'#DEFAULT#:t-Alert--horizontal:t-Alert--defaultIcons:t-Alert--info:t-Alert--removeHeading js-removeLandmark'
 ,p_plug_template=>wwv_flow_imp.id(50721469375675106)
 ,p_plug_display_sequence=>10
-,p_plug_source=>'The following report shows the execution status of scheduler jobs that have recently been executed for this rule and schema. Please note that the output only shows whether technical errors occured during the execution of the Unit test logics. It does'
-||' not indicate whether invalid objects for this rule have been found or not.'
+,p_plug_source=>'The following report shows the execution status of recent runs of scheduler jobs that have been executed for this rule and schema. Please note that the output only shows process states as well as errors if the execution of the Unit test logics failed'
+||'. It does not indicate whether invalid objects that do not comply with the QUASTO rule were found or not.'
 ,p_attribute_01=>'N'
 ,p_attribute_02=>'HTML'
 );

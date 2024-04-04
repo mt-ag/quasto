@@ -102,7 +102,7 @@ wwv_imp_workspace.create_flow(
 ,p_timestamp_tz_format=>'DS'
 ,p_direction_right_to_left=>'N'
 ,p_flow_image_prefix => nvl(wwv_flow_application_install.get_image_prefix,'')
-,p_authentication_id=>wwv_flow_imp.id(50668898619675067)
+,p_authentication_id=>wwv_flow_imp.id(48686292485118198)
 ,p_application_tab_set=>1
 ,p_logo_type=>'T'
 ,p_logo_text=>'QUASTO'
@@ -123,7 +123,7 @@ wwv_imp_workspace.create_flow(
 ,p_substitution_string_02=>'DATE_FORMAT'
 ,p_substitution_value_02=>'DD/MM/YYYY'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240404133824'
+,p_last_upd_yyyymmddhh24miss=>'20240404134243'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_files_version=>9
 ,p_print_server_type=>'NATIVE'
@@ -17499,7 +17499,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'03'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240403185715'
+,p_last_upd_yyyymmddhh24miss=>'20240404134243'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(104945985645082588)
@@ -17628,8 +17628,8 @@ wwv_flow_imp_page.create_page_plug(
 ,p_region_template_options=>'#DEFAULT#:t-Alert--horizontal:t-Alert--defaultIcons:t-Alert--info:t-Alert--removeHeading js-removeLandmark'
 ,p_plug_template=>wwv_flow_imp.id(50721469375675106)
 ,p_plug_display_sequence=>10
-,p_plug_source=>'The following report shows the execution status of scheduler jobs that have recently been executed for this rule and schema. Please note that the output only shows whether technical errors occured during the execution of the Unit test logics. It does'
-||' not indicate whether invalid objects for this rule have been found or not.'
+,p_plug_source=>'The following report shows the execution status of recent runs of scheduler jobs that have been executed for this rule and schema. Please note that the output only shows process states as well as errors if the execution of the Unit test logics failed'
+||'. It does not indicate whether invalid objects that do not comply with the QUASTO rule were found or not.'
 ,p_attribute_01=>'N'
 ,p_attribute_02=>'HTML'
 );
