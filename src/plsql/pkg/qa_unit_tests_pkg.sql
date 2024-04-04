@@ -1386,11 +1386,15 @@ create or replace package body qa_unit_tests_pkg is
   is
     c_unit constant varchar2(32767) := $$plsql_unit || '.f_import_test_result';
     l_param_list qa_logger_pkg.tab_param;
+
+    l_qatr_id number;
   begin
     
     insert into qa_test_results(qatr_xml_result)
-    values (pi_xml_clob);
+    values (pi_xml_clob)
+    returning qatr_id into l_qatr_id;
     
+    return l_qatr_id;
   exception
     when others then
       qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to import a xml test result!'

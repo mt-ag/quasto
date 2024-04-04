@@ -312,6 +312,7 @@ create or replace package body qa_export_import_rules_pkg is
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
+      raise;
   end f_export_rules_to_script_clob;
 
   function f_import_clob_to_qa_import_files
@@ -325,13 +326,12 @@ create or replace package body qa_export_import_rules_pkg is
     l_param_list qa_logger_pkg.tab_param;
 
     l_ret number;
-    l_varchar_clob varchar(4000);
-
+    l_clob_varchar varchar(32767);
   begin
-    l_varchar_clob := dbms_lob.substr(pi_clob);
+    l_clob_varchar := dbms_lob.substr(pi_clob,4000,1);
     qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 =>'pi_clob' 
-                              ,p_val_01  => l_varchar_clob
+                              ,p_name_01 => 'pi_clob'
+                              ,p_val_01  => l_clob_varchar
                               ,p_name_02 => 'pi_file_name'
                               ,p_val_02  => pi_filename
                               ,p_name_03 => 'pi_mimetype'
@@ -360,6 +360,7 @@ create or replace package body qa_export_import_rules_pkg is
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
+      raise;
   end f_import_clob_to_qa_import_files;
 
 
@@ -458,6 +459,7 @@ create or replace package body qa_export_import_rules_pkg is
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
+      raise;
   end p_import_clob_to_rules_table;
 
   function fc_export_qa_rules(pi_client_name in varchar2 default null) return clob is
@@ -676,6 +678,7 @@ create or replace package body qa_export_import_rules_pkg is
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
+      raise;
   end fc_export_qa_rules;
 
 end qa_export_import_rules_pkg;
