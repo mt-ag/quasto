@@ -123,7 +123,7 @@ wwv_imp_workspace.create_flow(
 ,p_substitution_string_02=>'DATE_FORMAT'
 ,p_substitution_value_02=>'DD/MM/YYYY'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240403190300'
+,p_last_upd_yyyymmddhh24miss=>'20240404133824'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_files_version=>9
 ,p_print_server_type=>'NATIVE'
@@ -14620,7 +14620,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'13'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240327153109'
+,p_last_upd_yyyymmddhh24miss=>'20240404132820'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(50026038309358532)
@@ -14669,6 +14669,7 @@ wwv_flow_imp_page.create_report_region(
 ,p_query_num_rows=>15
 ,p_query_options=>'DERIVED_REPORT_COLUMNS'
 ,p_query_break_cols=>'1'
+,p_query_no_data_found=>'No test results found.'
 ,p_query_num_rows_type=>'NEXT_PREVIOUS_LINKS'
 ,p_pagination_display_position=>'BOTTOM_RIGHT'
 ,p_break_type_flag=>'REPEAT_HEADINGS_ON_BREAK_1'
@@ -14900,6 +14901,7 @@ wwv_flow_imp_page.create_jet_chart(
 ,p_legend_rendered=>'off'
 ,p_pie_other_threshold=>0
 ,p_pie_selection_effect=>'highlight'
+,p_no_data_found_message=>'No test results found.'
 );
 wwv_flow_imp_page.create_jet_chart_series(
  p_id=>wwv_flow_imp.id(53667818773955095)
@@ -14955,6 +14957,7 @@ wwv_flow_imp_page.create_jet_chart(
 ,p_show_group_name=>true
 ,p_show_value=>true
 ,p_legend_rendered=>'off'
+,p_no_data_found_message=>'No test results found.'
 );
 wwv_flow_imp_page.create_jet_chart_series(
  p_id=>wwv_flow_imp.id(53668311390955100)
