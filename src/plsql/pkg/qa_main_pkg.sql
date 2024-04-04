@@ -38,6 +38,13 @@ create or replace package qa_main_pkg authid definer as
   ) return number;
 
   /**
+  * function to check whether rules exists or not
+  * @param  pi_qaru_client_name specifies the client name
+  * @return boolean returns the result
+  */
+  function f_exist_rules(pi_qaru_client_name in qa_rules.qaru_client_name%type default null) return boolean;
+
+  /**
   * function to get all rule numbers from one client/project
   * @param  pi_qaru_client_name specifies the client name
   * @throws NO_DATA_FOUND if client name does not exist
@@ -230,6 +237,38 @@ create or replace package body qa_main_pkg as
       raise;
   end f_get_rule_pk;
 
+  function f_exist_rules(pi_qaru_client_name in qa_rules.qaru_client_name%type default null) return boolean is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_exist_rules';
+    l_param_list qa_logger_pkg.tab_param;
+  
+    l_result number;
+  begin
+    qa_logger_pkg.append_param(p_params => l_param_list
+                              ,p_name   => 'pi_qaru_client_name'
+                              ,p_val    => pi_qaru_client_name);
+  
+    select decode(count(1), 0, 0, 1)
+    into l_result
+    from dual
+    where exists (select null
+                  from QA_RULES
+                  where qaru_client_name = pi_qaru_client_name
+                  or pi_qaru_client_name is null);
+
+    if l_result = 0
+    then
+      return false;
+    else
+      return true;
+    end if;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to count rules from qa_rules!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_exist_rules;
 
   function tf_get_rule_numbers(pi_qaru_client_name in qa_rules.qaru_client_name%type) return varchar2_tab_t is
     c_unit constant varchar2(32767) := $$plsql_unit || '.tf_get_rule_numbers';

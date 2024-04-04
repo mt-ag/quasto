@@ -333,6 +333,32 @@ create or replace package body qa_unit_tests_pkg is
       raise;
   end p_validate_input;
 
+  procedure p_verify_rules
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.p_verify_rules';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_exist_rules boolean;
+  begin
+    l_exist_rules := qa_main_pkg.f_exist_rules;
+
+    if l_exist_rules = false
+    then
+      raise_application_error(-20001, 'Verification of rules failed: No rules defined.');
+    end if;
+  exception
+    when others then
+      dbms_output.put_line('--ERROR--');
+      dbms_output.put_line('Verification of rules raised exception.');
+      dbms_output.put_line(sqlerrm);
+      dbms_output.put_line(dbms_utility.format_error_backtrace);
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to verify rules!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end p_verify_rules;
+
   function f_get_all_scheme_names
   return VARCHAR2_TAB_T
   is
@@ -637,6 +663,8 @@ create or replace package body qa_unit_tests_pkg is
 
     p_validate_input(pi_option         => pi_option
                     ,pi_scheme_names   => pi_scheme_names);
+
+    p_verify_rules;
 
     p_delete_unit_test_packages(pi_scheme_names  => pi_scheme_names);
 
