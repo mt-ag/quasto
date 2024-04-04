@@ -4,18 +4,19 @@ set concat on
 set concat .
 set verify off
 
+-- Script for UTPLSQL Objects
 COLUMN :script_ut_plsql NEW_VALUE script_name_utplsql NOPRINT
 variable script_ut_plsql VARCHAR2(50)
 
 COLUMN :script_ut_plsql_recompile NEW_VALUE script_name_utplsql_recompile NOPRINT
 variable script_ut_plsql_recompile VARCHAR2(50)
 
--- Skript for QUASTO Objects
-COLUMN :script_quasto NEW_VALUE script_name_quasto NOPRINT
-variable script_quasto VARCHAR2(50)
+-- Script for Apex Objects
+COLUMN :script_apex NEW_VALUE script_name_apex NOPRINT
+variable script_apex VARCHAR2(50)
 
-COLUMN :script_quasto_recompile NEW_VALUE script_name_quasto_recompile NOPRINT
-variable script_quasto_recompile VARCHAR2(50)
+COLUMN :script_apex_recompile NEW_VALUE script_name_apex_recompile NOPRINT
+variable script_apex_recompile VARCHAR2(50)
 
 -- current Version installed
 COLUMN :version_old NEW_VALUE script_version_old NOPRINT
@@ -53,101 +54,39 @@ exec :flag := 'Y';
 
 -- upgrade version
 variable version varchar2 (50 char)
-exec :version := '23.2';
+exec :version := '24.1';
 
 -- Block to proceess first Argument
 declare
     l_script_name_utplsql           varchar2(100) := 'install_utplsql_objects.sql';
-    l_script_name_utplsql_upgrade   varchar2(100);
     l_script_name_utplsql_recompile varchar2(100) := 'scripts/recompile_utplsql_objects.sql';
-    l_script_name_quasto            varchar2(100) := 'install_quasto_objects.sql';
-    l_script_name_quasto_upgrade    varchar2(100);
-    l_script_name_quasto_recompile  varchar2(100) := 'scripts/recompile_quasto_objects.sql';
-    l_count                         number;
-    l_count_utplsql                 number;
-    l_version_old                   varchar2 (40 char);
-    l_current_version               varchar2 (40 char) := :version;
-    l_arg                           number := '~1';
+    l_script_name_apex              varchar2(100) := 'install_apex_objects.sql';
+    l_script_name_apex_recompile    varchar2(100) := 'scripts/recompile_apex_objects.sql';
+    l_arg_utplsq                    number := '~1';
+    l_arg_apex                      number := '~2';
 
-    function get_version_constant return varchar2 as
-      l_ret varchar2 (50 char);
-    begin
-      select trim(replace(REGEXP_SUBSTR(text, ':=(.*?);', 1, 1, NULL, 1),'''','')) AS version_old
-      into l_ret
-      from user_source
-      where type = 'PACKAGE'
-      and name = 'QA_CONSTANT_PKG'
-      and upper(text) like upper('%gc_quasto_version constant varchar(50 char) :=%');
-      
-      if l_ret is null
-        then
-          l_ret := '1.0';
-      end if;
-
-      return l_ret;
-    exception
-      when others then
-        return '1.0';
-    end;
 begin
-    
-    l_version_old := get_version_constant;
-    if l_version_old = :version
+
+    if 1 != l_arg_utplsq
       then 
-      l_version_old := '1.1';
-    end if;
-
-    l_script_name_utplsql_upgrade := 'install_utplsql_objects_' || replace(l_version_old,'.','_') || '_to_' || replace(:version,'.','_') || '.sql';
-    l_script_name_quasto_upgrade  := 'install_quasto_objects_' || replace(l_version_old,'.','_') || '_to_' || replace(:version,'.','_') || '.sql';
-    :script_ut_plsql_recompile := l_script_name_utplsql_recompile;
-    :script_quasto_recompile   := l_script_name_quasto_recompile;
-
-    -- Check if Pre Version exists
-    select count(1)
-    into l_count
-    from user_objects
-    where object_name = 'QA_MAIN_PKG';
-
-    -- Check if Pre Version exists
-    select count(1)
-    into l_count_utplsql
-    from user_objects
-    where object_name = 'CREATE_UT_TEST_PACKAGES_PKG';
-    
-    if 1 = l_arg and l_count_utplsql > 0
-      then 
-        l_script_name_utplsql := l_script_name_utplsql_upgrade;
-    elsif 0 = l_arg 
-      then
         l_script_name_utplsql := 'null.sql'; 
         l_script_name_utplsql_recompile := 'null.sql'; 
     end if;
 
-    if l_count > 0
-      then
-        if l_current_version != '1.0'
-          then
-            l_script_name_quasto  := l_script_name_quasto_upgrade;
-        end if;
+    if 1 != l_arg_apex
+      then 
+        l_script_name_apex := 'null.sql'; 
+        l_script_name_apex_recompile := 'null.sql'; 
     end if;
-
-    if l_arg is null
-      then
-        l_script_name_utplsql  := 'null.sql';
-        l_script_name_quasto   := 'null.sql';
-        :flag                  := 'N';
-        return;
-    end if;
-
 
     :script_ut_plsql := l_script_name_utplsql;
-    :script_quasto   := l_script_name_quasto;
     :script_ut_plsql_recompile := l_script_name_utplsql_recompile;
-    :script_quasto_recompile   := l_script_name_quasto_recompile;
+    :script_apex := l_script_name_apex;
+    :script_apex_recompile := l_script_name_apex_recompile;
     dbms_output.put_line(l_script_name_utplsql);
-    dbms_output.put_line(l_script_name_quasto);
     dbms_output.put_line(l_script_name_utplsql_recompile);
-    dbms_output.put_line(l_script_name_quasto_recompile);
+    dbms_output.put_line(l_script_name_apex_recompile);
+    dbms_output.put_line(l_script_name_apex);
 end;
 /
 
@@ -155,9 +94,10 @@ end;
 set feedback off
 set head off
 select :script_ut_plsql from dual;
-select :script_quasto from dual;
 select :script_ut_plsql_recompile from dual;
-select :script_quasto_recompile from dual;
+select :script_apex from dual;
+select :script_apex_recompile from dual;
+
 -- DML only does anything if flag stayed Y
 select sysdate from dual
 where :flag = 'Y';
@@ -168,7 +108,8 @@ set head on
 -- Constant Package Generation with last argument as current Version
 @@src/scripts/install_constant_package '~1' '~2' '~3' '~4' '23.2'
 
-@@src/~script_name_quasto
+@src/install_quasto_objects.sql
 @@src/~script_name_utplsql
-@@src/~script_name_quasto_recompile
 @@src/~script_name_utplsql_recompile
+@@src/~script_name_apex
+@@src/~script_name_apex_recompile
