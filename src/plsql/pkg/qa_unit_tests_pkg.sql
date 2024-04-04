@@ -1410,12 +1410,15 @@ create or replace package body qa_unit_tests_pkg is
 
     l_return clob;
   begin
-    
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qatr_id'
+                              ,p_val_01  => pi_qatr_id);
     select qatr_xml_result
     into l_return
     from qa_test_results
     where qatr_id = pi_qatr_id;
-    
+
+    return l_return;
   exception
     when others then
       qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to export a xml test result!'
