@@ -23,7 +23,17 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'03'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240404134243'
+,p_last_upd_yyyymmddhh24miss=>'20240404142906'
+);
+wwv_flow_imp_page.create_page_plug(
+ p_id=>wwv_flow_imp.id(32891540502706101)
+,p_plug_name=>'Buttons Container'
+,p_region_template_options=>'#DEFAULT#'
+,p_plug_template=>wwv_flow_imp.id(50733389987675114)
+,p_plug_display_sequence=>10
+,p_plug_display_point=>'REGION_POSITION_03'
+,p_attribute_01=>'N'
+,p_attribute_02=>'HTML'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(104945985645082588)
@@ -67,7 +77,7 @@ wwv_flow_imp_page.create_report_region(
 ,p_query_row_template=>wwv_flow_imp.id(50807155826675144)
 ,p_query_num_rows=>5
 ,p_query_options=>'DERIVED_REPORT_COLUMNS'
-,p_query_no_data_found=>'No Jobs have run recently for this rule, client and scheme.'
+,p_query_no_data_found=>'No custom Jobs have run recently for this rule, client and scheme.'
 ,p_query_num_rows_type=>'NEXT_PREVIOUS_LINKS'
 ,p_pagination_display_position=>'BOTTOM_RIGHT'
 ,p_csv_output=>'N'
@@ -152,7 +162,7 @@ wwv_flow_imp_page.create_page_plug(
 ,p_region_template_options=>'#DEFAULT#:t-Alert--horizontal:t-Alert--defaultIcons:t-Alert--info:t-Alert--removeHeading js-removeLandmark'
 ,p_plug_template=>wwv_flow_imp.id(50721469375675106)
 ,p_plug_display_sequence=>10
-,p_plug_source=>'The following report shows the execution status of recent runs of scheduler jobs that have been executed for this rule and schema. Please note that the output only shows process states as well as errors if the execution of the Unit test logics failed'
+,p_plug_source=>'The following report shows the execution status of recent runs of scheduler jobs that have been executed for this rule and scheme. Please note that the output only shows process states as well as errors if the execution of the Unit test logics failed'
 ||'. It does not indicate whether invalid objects that do not comply with the QUASTO rule were found or not.'
 ,p_attribute_01=>'N'
 ,p_attribute_02=>'HTML'
@@ -230,6 +240,19 @@ wwv_flow_imp_page.create_page_button(
 ,p_button_condition_type=>'EXPRESSION'
 ,p_grid_new_row=>'N'
 ,p_grid_new_column=>'Y'
+);
+wwv_flow_imp_page.create_page_button(
+ p_id=>wwv_flow_imp.id(32891675511706102)
+,p_button_sequence=>10
+,p_button_plug_id=>wwv_flow_imp.id(32891540502706101)
+,p_button_name=>'CLOSE'
+,p_button_action=>'DEFINED_BY_DA'
+,p_button_template_options=>'#DEFAULT#'
+,p_button_template_id=>wwv_flow_imp.id(50844813129675167)
+,p_button_image_alt=>'Close'
+,p_button_position=>'CLOSE'
+,p_button_execute_validations=>'N'
+,p_warn_on_unsaved_changes=>null
 );
 wwv_flow_imp_page.create_page_item(
  p_id=>wwv_flow_imp.id(8768814433376812)
@@ -309,6 +332,25 @@ wwv_flow_imp_page.create_page_da_action(
 ,p_execute_on_page_init=>'N'
 ,p_action=>'NATIVE_JAVASCRIPT_CODE'
 ,p_attribute_01=>'location.reload();'
+);
+wwv_flow_imp_page.create_page_da_event(
+ p_id=>wwv_flow_imp.id(32891754660706103)
+,p_name=>'Close Dialog'
+,p_event_sequence=>20
+,p_triggering_element_type=>'BUTTON'
+,p_triggering_button_id=>wwv_flow_imp.id(32891675511706102)
+,p_bind_type=>'bind'
+,p_execution_type=>'IMMEDIATE'
+,p_bind_event_type=>'click'
+);
+wwv_flow_imp_page.create_page_da_action(
+ p_id=>wwv_flow_imp.id(32891804187706104)
+,p_event_id=>wwv_flow_imp.id(32891754660706103)
+,p_event_result=>'TRUE'
+,p_action_sequence=>10
+,p_execute_on_page_init=>'N'
+,p_name=>'Close Dialog'
+,p_action=>'NATIVE_DIALOG_CLOSE'
 );
 wwv_flow_imp_page.create_page_process(
  p_id=>wwv_flow_imp.id(51471617693214134)

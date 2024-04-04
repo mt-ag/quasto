@@ -22,8 +22,18 @@ wwv_flow_imp_page.create_page(
 ,p_dialog_width=>'1250'
 ,p_protection_level=>'C'
 ,p_page_component_map=>'18'
-,p_last_updated_by=>'MWILHELM'
-,p_last_upd_yyyymmddhh24miss=>'20240312123018'
+,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
+,p_last_upd_yyyymmddhh24miss=>'20240404143058'
+);
+wwv_flow_imp_page.create_page_plug(
+ p_id=>wwv_flow_imp.id(32891948205706105)
+,p_plug_name=>'Buttons Container'
+,p_region_template_options=>'#DEFAULT#'
+,p_plug_template=>wwv_flow_imp.id(50733389987675114)
+,p_plug_display_sequence=>10
+,p_plug_display_point=>'REGION_POSITION_03'
+,p_attribute_01=>'N'
+,p_attribute_02=>'HTML'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(54068725227447789)
@@ -144,6 +154,19 @@ wwv_flow_imp_page.create_worksheet_rpt(
 ,p_break_on=>'QATR_SCHEME_NAME:0:0:0:0:0'
 ,p_break_enabled_on=>'QATR_SCHEME_NAME:0:0:0:0:0'
 );
+wwv_flow_imp_page.create_page_button(
+ p_id=>wwv_flow_imp.id(32892030610706106)
+,p_button_sequence=>10
+,p_button_plug_id=>wwv_flow_imp.id(32891948205706105)
+,p_button_name=>'CLOSE'
+,p_button_action=>'DEFINED_BY_DA'
+,p_button_template_options=>'#DEFAULT#'
+,p_button_template_id=>wwv_flow_imp.id(50844813129675167)
+,p_button_image_alt=>'Close'
+,p_button_position=>'CLOSE'
+,p_button_execute_validations=>'N'
+,p_warn_on_unsaved_changes=>null
+);
 wwv_flow_imp_page.create_page_item(
  p_id=>wwv_flow_imp.id(54069757078447799)
 ,p_name=>'P4_QATR_ID'
@@ -151,6 +174,25 @@ wwv_flow_imp_page.create_page_item(
 ,p_item_plug_id=>wwv_flow_imp.id(54068725227447789)
 ,p_display_as=>'NATIVE_HIDDEN'
 ,p_attribute_01=>'Y'
+);
+wwv_flow_imp_page.create_page_da_event(
+ p_id=>wwv_flow_imp.id(32892121253706107)
+,p_name=>'Close Dialog'
+,p_event_sequence=>10
+,p_triggering_element_type=>'BUTTON'
+,p_triggering_button_id=>wwv_flow_imp.id(32892030610706106)
+,p_bind_type=>'bind'
+,p_execution_type=>'IMMEDIATE'
+,p_bind_event_type=>'click'
+);
+wwv_flow_imp_page.create_page_da_action(
+ p_id=>wwv_flow_imp.id(32892219343706108)
+,p_event_id=>wwv_flow_imp.id(32892121253706107)
+,p_event_result=>'TRUE'
+,p_action_sequence=>10
+,p_execute_on_page_init=>'N'
+,p_name=>'Close Dialog'
+,p_action=>'NATIVE_DIALOG_CLOSE'
 );
 wwv_flow_imp.component_end;
 end;

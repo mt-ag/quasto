@@ -29,7 +29,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'13'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240404132820'
+,p_last_upd_yyyymmddhh24miss=>'20240404143740'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(50026038309358532)
@@ -562,7 +562,7 @@ wwv_flow_imp_page.create_page_item(
 ,p_source_data_type=>'VARCHAR2'
 ,p_item_sequence=>30
 ,p_item_plug_id=>wwv_flow_imp.id(50026038309358532)
-,p_prompt=>'Project'
+,p_prompt=>'Projects'
 ,p_source=>'QARU_CLIENT_NAME'
 ,p_source_type=>'FACET_COLUMN'
 ,p_display_as=>'NATIVE_CHECKBOX'
@@ -588,7 +588,7 @@ wwv_flow_imp_page.create_page_item(
 ,p_source_data_type=>'VARCHAR2'
 ,p_item_sequence=>40
 ,p_item_plug_id=>wwv_flow_imp.id(50026038309358532)
-,p_prompt=>'Scheme'
+,p_prompt=>'Schemes'
 ,p_source=>'QATR_SCHEME_NAME'
 ,p_source_type=>'FACET_COLUMN'
 ,p_display_as=>'NATIVE_CHECKBOX'
@@ -614,7 +614,7 @@ wwv_flow_imp_page.create_page_item(
 ,p_source_data_type=>'VARCHAR2'
 ,p_item_sequence=>50
 ,p_item_plug_id=>wwv_flow_imp.id(50026038309358532)
-,p_prompt=>'Test Result'
+,p_prompt=>'Test Results'
 ,p_source=>'QATR_RESULT'
 ,p_source_type=>'FACET_COLUMN'
 ,p_display_as=>'NATIVE_CHECKBOX'
@@ -640,7 +640,7 @@ wwv_flow_imp_page.create_page_item(
 ,p_source_data_type=>'VARCHAR2'
 ,p_item_sequence=>60
 ,p_item_plug_id=>wwv_flow_imp.id(50026038309358532)
-,p_prompt=>'Error Level'
+,p_prompt=>'Error Levels'
 ,p_source=>'QARU_ERROR_LEVEL'
 ,p_source_type=>'FACET_COLUMN'
 ,p_display_as=>'NATIVE_CHECKBOX'
@@ -666,7 +666,7 @@ wwv_flow_imp_page.create_page_item(
 ,p_source_data_type=>'VARCHAR2'
 ,p_item_sequence=>70
 ,p_item_plug_id=>wwv_flow_imp.id(50026038309358532)
-,p_prompt=>'Date'
+,p_prompt=>'Dates'
 ,p_source=>'QATR_DATE'
 ,p_source_type=>'FACET_COLUMN'
 ,p_display_as=>'NATIVE_CHECKBOX'
@@ -675,10 +675,15 @@ wwv_flow_imp_page.create_page_item(
 ,p_fc_show_label=>true
 ,p_fc_collapsible=>true
 ,p_fc_initial_collapsed=>false
-,p_fc_compute_counts=>false
+,p_fc_compute_counts=>true
+,p_fc_show_counts=>true
+,p_fc_zero_count_entries=>'H'
 ,p_fc_show_more_count=>7
 ,p_fc_filter_values=>false
+,p_fc_sort_by_top_counts=>true
 ,p_fc_show_selected_first=>false
+,p_fc_show_chart=>true
+,p_fc_initial_chart=>false
 ,p_fc_actions_filter=>true
 ,p_fc_toggleable=>false
 ,p_multi_value_type=>'SEPARATED'
@@ -688,7 +693,7 @@ wwv_flow_imp_page.create_page_item(
 );
 wwv_flow_imp_page.create_page_da_event(
  p_id=>wwv_flow_imp.id(42250668839031716)
-,p_name=>'Refresh Report after Dialog closed (Breadcrumb)'
+,p_name=>'Refresh Reports after Dialog closed (Breadcrumb)'
 ,p_event_sequence=>20
 ,p_triggering_element_type=>'REGION'
 ,p_triggering_region_id=>wwv_flow_imp.id(54282244796258516)
@@ -772,6 +777,49 @@ wwv_flow_imp_page.create_page_da_action(
 ,p_action=>'NATIVE_REFRESH'
 ,p_affected_elements_type=>'REGION'
 ,p_affected_region_id=>wwv_flow_imp.id(53668118104955098)
+);
+wwv_flow_imp_page.create_page_da_event(
+ p_id=>wwv_flow_imp.id(32892749293706113)
+,p_name=>'Refresh Reports after Dialog closed (Test Execution Report)'
+,p_event_sequence=>60
+,p_triggering_element_type=>'REGION'
+,p_triggering_region_id=>wwv_flow_imp.id(15081484244011701)
+,p_bind_type=>'bind'
+,p_execution_type=>'IMMEDIATE'
+,p_bind_event_type=>'apexafterclosedialog'
+);
+wwv_flow_imp_page.create_page_da_action(
+ p_id=>wwv_flow_imp.id(32892829688706114)
+,p_event_id=>wwv_flow_imp.id(32892749293706113)
+,p_event_result=>'TRUE'
+,p_action_sequence=>10
+,p_execute_on_page_init=>'N'
+,p_name=>'Refresh Quota Chart'
+,p_action=>'NATIVE_REFRESH'
+,p_affected_elements_type=>'REGION'
+,p_affected_region_id=>wwv_flow_imp.id(53667537845955093)
+);
+wwv_flow_imp_page.create_page_da_action(
+ p_id=>wwv_flow_imp.id(32892967031706115)
+,p_event_id=>wwv_flow_imp.id(32892749293706113)
+,p_event_result=>'TRUE'
+,p_action_sequence=>20
+,p_execute_on_page_init=>'N'
+,p_name=>'Refresh Timeline Chart'
+,p_action=>'NATIVE_REFRESH'
+,p_affected_elements_type=>'REGION'
+,p_affected_region_id=>wwv_flow_imp.id(53668118104955098)
+);
+wwv_flow_imp_page.create_page_da_action(
+ p_id=>wwv_flow_imp.id(32893057958706116)
+,p_event_id=>wwv_flow_imp.id(32892749293706113)
+,p_event_result=>'TRUE'
+,p_action_sequence=>30
+,p_execute_on_page_init=>'N'
+,p_name=>'Refresh Report'
+,p_action=>'NATIVE_REFRESH'
+,p_affected_elements_type=>'REGION'
+,p_affected_region_id=>wwv_flow_imp.id(15081484244011701)
 );
 wwv_flow_imp.component_end;
 end;
