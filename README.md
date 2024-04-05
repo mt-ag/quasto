@@ -213,7 +213,9 @@ script import_file_to_rules.js "qa_rules_MT_IT_Solutions.json" 1
 ## 4. Installing utPLSQL
 ### Installing Guidelines and Specifications for the utPLSQL framework
 
-These installation instructions are based on the installation instructions of the software provider: http://utplsql.org/utPLSQL/latest/userguide/install.html
+These installation instructions are based on the installation instructions of the software provider: http://utplsql.org/utPLSQL/latest/userguide/install.html.
+
+The following prerequisites and instructions refer to the utPLSQL Framework version 3.1.11. For other versions, the requirements and installation steps may differ.
 
 Prerequisites:
 - The installation of utPLSQL requires a database version of Oracle 11gR2, 12c, 12c R2, 18c, 19c
@@ -349,13 +351,11 @@ Get ready for an exciting update! We're thrilled to announce that Version 24.1 i
 
 ## 6. Latest Releases
 
-### Version 23.2
-[Release 23.3](https://github.com/mt-ag/quasto/releases/tag/v23.2)
+### Version 23.2.1
+[Release 23.2.1](https://github.com/mt-ag/quasto/releases/tag/v23.2.1)
 
 ### Version 1.1
 [Release 1.1](https://github.com/mt-ag/quasto/releases/tag/v1.1)
 
 ### Version 1.0
 [Release 1.0](https://github.com/mt-ag/quasto/releases/tag/v1.0)
-
-
