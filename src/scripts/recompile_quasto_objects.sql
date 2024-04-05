@@ -40,11 +40,11 @@ begin
   l_object(l_index).object_type := 'TYPE';
   l_index := l_index + 1;
 
-  l_object(l_index).object_name := 'QA_TEST_RESULTS_TABLE_T';
+  l_object(l_index).object_name := 'QA_TEST_RESULTS_ROW_T';
   l_object(l_index).object_type := 'TYPE';
   l_index := l_index + 1;
 
-  l_object(l_index).object_name := 'QA_TEST_RESULTS_ROW_T';
+  l_object(l_index).object_name := 'QA_TEST_RESULTS_TABLE_T';
   l_object(l_index).object_type := 'TYPE';
   l_index := l_index + 1;
 

@@ -68,10 +68,6 @@ PROMPT src/plsql/pkg/qa_export_import_rules_pkg.sql
 @src/plsql/pkg/qa_export_import_rules_pkg.sql
 PROMPT src/plsql/pkg/qa_utils_pkg.sql
 @src/plsql/pkg/qa_utils_pkg.sql
-PROMPT src/plsql/pkg/qa_apex_app_pkg.sql
-@src/plsql/pkg/qa_apex_app_pkg.sql
-PROMPT src/plsql/pkg/qa_apex_api_pkg.sql
-@src/plsql/pkg/qa_apex_api_pkg.sql
 
 PROMPT TRIGGER
 PROMPT src/plsql/trg/qaru_iu_trg.sql

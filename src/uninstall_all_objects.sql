@@ -148,6 +148,45 @@ begin
   l_object(l_index).object_name := 'QA_JOB_DETAILS_P0009_V';
   l_object(l_index).object_type := 'VIEW';
   l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_CLIENT_NAMES_P0008_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_OVERVIEW_QUOTA_P0001_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_OVERVIEW_TIMELINE_ERROR_P0001_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_OVERVIEW_TIMELINE_FAILURE_P0001_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_OVERVIEW_TIMELINE_SUCCESS_P0001_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_RULE_CATEGORIES_LOV';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_RULE_ERROR_LEVELS_LOV';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_RULE_LAYERS_LOV';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_RULES_P0006_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_RULES_P0007_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QARU_PREDECESSOR_ORDER_V';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_TEST_EXECUTION_DATES_LOV';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
+  l_object(l_index).object_name := 'QA_TEST_SCHEME_NAMES_LOV';
+  l_object(l_index).object_type := 'VIEW';
+  l_index := l_index + 1;
 
 
   while l_counter < l_object.count
