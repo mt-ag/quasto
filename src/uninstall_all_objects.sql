@@ -1,6 +1,8 @@
 set serveroutput on;
 
-prompt uninstall all objects
+PROMPT #########################
+PROMPT   Uninstall all objects
+PROMPT #########################
 declare
   type t_object_rec is record (
     object_name varchar2(1000 char),
@@ -290,3 +292,7 @@ END;
 /
 -- Empty recyclebin because of lobs in user_objects after dropping objects with lobs
 purge recyclebin;
+
+PROMPT #########################
+PROMPT  Uninstallation finished
+PROMPT #########################
