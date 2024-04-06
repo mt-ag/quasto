@@ -123,7 +123,7 @@ wwv_imp_workspace.create_flow(
 ,p_substitution_string_02=>'DATE_FORMAT'
 ,p_substitution_value_02=>'DD/MM/YYYY'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240404145851'
+,p_last_upd_yyyymmddhh24miss=>'20240406194856'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_files_version=>9
 ,p_print_server_type=>'NATIVE'
@@ -14620,7 +14620,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'13'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240404143740'
+,p_last_upd_yyyymmddhh24miss=>'20240406193953'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(50026038309358532)
@@ -14683,15 +14683,19 @@ wwv_flow_imp_page.create_report_columns(
  p_id=>wwv_flow_imp.id(15081518459011702)
 ,p_query_column_id=>1
 ,p_column_alias=>'QATR_ID'
-,p_column_display_sequence=>150
-,p_hidden_column=>'Y'
+,p_column_display_sequence=>30
+,p_column_heading=>'#ID'
+,p_use_as_row_header=>'N'
+,p_heading_alignment=>'LEFT'
+,p_disable_sort_column=>'N'
 ,p_derived_column=>'N'
+,p_include_in_export=>'Y'
 );
 wwv_flow_imp_page.create_report_columns(
  p_id=>wwv_flow_imp.id(19437053615895714)
 ,p_query_column_id=>2
 ,p_column_alias=>'QATR_SCHEME_NAME'
-,p_column_display_sequence=>10
+,p_column_display_sequence=>20
 ,p_column_heading=>'Scheme Name'
 ,p_use_as_row_header=>'N'
 ,p_heading_alignment=>'LEFT'
@@ -14703,7 +14707,7 @@ wwv_flow_imp_page.create_report_columns(
  p_id=>wwv_flow_imp.id(19435893579895702)
 ,p_query_column_id=>3
 ,p_column_alias=>'QATR_DATE'
-,p_column_display_sequence=>20
+,p_column_display_sequence=>40
 ,p_column_heading=>'Date'
 ,p_use_as_row_header=>'N'
 ,p_column_format=>'MM/DD/YYYY HH24:MI'
@@ -14716,7 +14720,7 @@ wwv_flow_imp_page.create_report_columns(
  p_id=>wwv_flow_imp.id(19435974686895703)
 ,p_query_column_id=>4
 ,p_column_alias=>'QATR_RESULT'
-,p_column_display_sequence=>40
+,p_column_display_sequence=>50
 ,p_column_heading=>'Test Result'
 ,p_use_as_row_header=>'N'
 ,p_heading_alignment=>'LEFT'
@@ -14728,7 +14732,7 @@ wwv_flow_imp_page.create_report_columns(
  p_id=>wwv_flow_imp.id(19436034312895704)
 ,p_query_column_id=>5
 ,p_column_alias=>'QARU_CLIENT_NAME'
-,p_column_display_sequence=>50
+,p_column_display_sequence=>60
 ,p_column_heading=>'Client Name'
 ,p_use_as_row_header=>'N'
 ,p_heading_alignment=>'LEFT'
@@ -14740,7 +14744,7 @@ wwv_flow_imp_page.create_report_columns(
  p_id=>wwv_flow_imp.id(19436166168895705)
 ,p_query_column_id=>6
 ,p_column_alias=>'QATR_DETAILS'
-,p_column_display_sequence=>60
+,p_column_display_sequence=>70
 ,p_column_heading=>'Details'
 ,p_use_as_row_header=>'N'
 ,p_column_link=>'#QATR_DETAILS#'
@@ -14754,7 +14758,7 @@ wwv_flow_imp_page.create_report_columns(
  p_id=>wwv_flow_imp.id(19436210269895706)
 ,p_query_column_id=>7
 ,p_column_alias=>'QATR_RESTART_UNIT_TEST'
-,p_column_display_sequence=>70
+,p_column_display_sequence=>80
 ,p_column_heading=>'Restart'
 ,p_use_as_row_header=>'N'
 ,p_column_link=>'#QATR_RESTART_UNIT_TEST#'
@@ -14768,7 +14772,7 @@ wwv_flow_imp_page.create_report_columns(
  p_id=>wwv_flow_imp.id(19436316129895707)
 ,p_query_column_id=>8
 ,p_column_alias=>'QARU_CATEGORY'
-,p_column_display_sequence=>80
+,p_column_display_sequence=>90
 ,p_column_heading=>'Category'
 ,p_use_as_row_header=>'N'
 ,p_heading_alignment=>'LEFT'
@@ -14782,7 +14786,7 @@ wwv_flow_imp_page.create_report_columns(
  p_id=>wwv_flow_imp.id(19436487388895708)
 ,p_query_column_id=>9
 ,p_column_alias=>'QARU_NAME'
-,p_column_display_sequence=>90
+,p_column_display_sequence=>100
 ,p_column_heading=>'Rule Name'
 ,p_use_as_row_header=>'N'
 ,p_heading_alignment=>'LEFT'
@@ -14794,7 +14798,7 @@ wwv_flow_imp_page.create_report_columns(
  p_id=>wwv_flow_imp.id(19436571248895709)
 ,p_query_column_id=>10
 ,p_column_alias=>'QARU_LAYER'
-,p_column_display_sequence=>100
+,p_column_display_sequence=>110
 ,p_column_heading=>'Layer'
 ,p_use_as_row_header=>'N'
 ,p_heading_alignment=>'LEFT'
@@ -14808,7 +14812,7 @@ wwv_flow_imp_page.create_report_columns(
  p_id=>wwv_flow_imp.id(19436620060895710)
 ,p_query_column_id=>11
 ,p_column_alias=>'QARU_ERROR_LEVEL'
-,p_column_display_sequence=>110
+,p_column_display_sequence=>120
 ,p_column_heading=>'Error Level'
 ,p_use_as_row_header=>'N'
 ,p_heading_alignment=>'LEFT'
@@ -14822,7 +14826,7 @@ wwv_flow_imp_page.create_report_columns(
  p_id=>wwv_flow_imp.id(19436765678895711)
 ,p_query_column_id=>12
 ,p_column_alias=>'QARU_IS_ACTIVE'
-,p_column_display_sequence=>120
+,p_column_display_sequence=>130
 ,p_column_heading=>'Active'
 ,p_use_as_row_header=>'N'
 ,p_heading_alignment=>'LEFT'
@@ -14836,7 +14840,7 @@ wwv_flow_imp_page.create_report_columns(
  p_id=>wwv_flow_imp.id(19436843297895712)
 ,p_query_column_id=>13
 ,p_column_alias=>'QATR_RUNTIME_ERROR'
-,p_column_display_sequence=>130
+,p_column_display_sequence=>140
 ,p_column_heading=>'Runtime Error'
 ,p_use_as_row_header=>'N'
 ,p_column_alignment=>'CENTER'
@@ -14848,7 +14852,7 @@ wwv_flow_imp_page.create_report_columns(
  p_id=>wwv_flow_imp.id(19436973654895713)
 ,p_query_column_id=>14
 ,p_column_alias=>'QATR_PROGRAM_NAME'
-,p_column_display_sequence=>140
+,p_column_display_sequence=>150
 ,p_column_heading=>'Program Name'
 ,p_use_as_row_header=>'N'
 ,p_heading_alignment=>'LEFT'
@@ -16164,7 +16168,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'18'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240327133626'
+,p_last_upd_yyyymmddhh24miss=>'20240404151715'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(54073327692447835)
@@ -16220,6 +16224,7 @@ wwv_flow_imp_page.create_page_plug(
 wwv_flow_imp_page.create_worksheet(
  p_id=>wwv_flow_imp.id(42907229798653329)
 ,p_max_row_count=>'1000000'
+,p_no_data_found_message=>'No rules defined.'
 ,p_pagination_type=>'ROWS_X_TO_Y'
 ,p_pagination_display_pos=>'BOTTOM_RIGHT'
 ,p_report_list_mode=>'TABS'
@@ -18186,7 +18191,9 @@ end;
 /
 prompt --application/deployment/definition
 begin
-null;
+wwv_flow_imp_shared.create_install(
+ p_id=>wwv_flow_imp.id(34081363617504431)
+);
 end;
 /
 prompt --application/deployment/checks

@@ -11,7 +11,9 @@ wwv_flow_imp.component_begin (
 ,p_default_id_offset=>33662320935301187
 ,p_default_owner=>'QUASTO'
 );
-null;
+wwv_flow_imp_shared.create_install(
+ p_id=>wwv_flow_imp.id(34081363617504431)
+);
 wwv_flow_imp.component_end;
 end;
 /

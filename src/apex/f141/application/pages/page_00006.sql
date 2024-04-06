@@ -21,7 +21,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'18'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240327133626'
+,p_last_upd_yyyymmddhh24miss=>'20240404151715'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(54073327692447835)
@@ -77,6 +77,7 @@ wwv_flow_imp_page.create_page_plug(
 wwv_flow_imp_page.create_worksheet(
  p_id=>wwv_flow_imp.id(42907229798653329)
 ,p_max_row_count=>'1000000'
+,p_no_data_found_message=>'No rules defined.'
 ,p_pagination_type=>'ROWS_X_TO_Y'
 ,p_pagination_display_pos=>'BOTTOM_RIGHT'
 ,p_report_list_mode=>'TABS'
