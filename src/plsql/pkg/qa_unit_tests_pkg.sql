@@ -1096,17 +1096,17 @@ create or replace package body qa_unit_tests_pkg is
     loop
       if rec_scheme_objects.object_amount = 0
       then
-        dbms_output.put_line('<Scheme name="'||DBMS_XMLGEN.CONVERT(rec_scheme_objects.scheme_name)||'" result="'||qa_constant_pkg.gc_utplsql_scheme_result_success||'"></Scheme>');
         l_qatr_id := f_save_scheme_result(pi_scheme_name  => rec_scheme_objects.scheme_name
                                          ,pi_program_name => pi_program_name
                                          ,pi_qaru_id      => l_qaru_id
                                          ,pi_result       => qa_constant_pkg.gc_utplsql_scheme_result_success);
+        dbms_output.put_line('<Scheme name="'||DBMS_XMLGEN.CONVERT(rec_scheme_objects.scheme_name)||'" testresultid="'||l_qatr_id||'" result="'||qa_constant_pkg.gc_utplsql_scheme_result_success||'" datetime="'||to_char(sysdate, '''MM/DD/YYYY HH24:MI:SS''')||'"></Scheme>');
       else
-        dbms_output.put_line('<Scheme name="'||DBMS_XMLGEN.CONVERT(rec_scheme_objects.scheme_name)||'" result="'||qa_constant_pkg.gc_utplsql_scheme_result_failure||'">');
         l_qatr_id := f_save_scheme_result(pi_scheme_name  => rec_scheme_objects.scheme_name
                                          ,pi_program_name => pi_program_name
                                          ,pi_qaru_id      => l_qaru_id
                                          ,pi_result       => qa_constant_pkg.gc_utplsql_scheme_result_failure);
+        dbms_output.put_line('<Scheme name="'||DBMS_XMLGEN.CONVERT(rec_scheme_objects.scheme_name)||'" testresultid="'||l_qatr_id||'" result="'||qa_constant_pkg.gc_utplsql_scheme_result_failure||'" datetime="'||to_char(sysdate, '''MM/DD/YYYY HH24:MI:SS''')||'">');
         
         for rec_scheme_invalid_objects in ( select object_name
                                                   ,object_details

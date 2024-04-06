@@ -7,7 +7,7 @@ create or replace package qa_main_pkg authid definer as
      REVISIONS:
      Release    Date        Author           Description
      ---------  ----------  ---------------  ------------------------------------
-     0.91       29.08.2022  olemm            Package has been added to QUASTO
+     0.91       29.08.2022  olemm/mwilhelm   Package has been added to QUASTO
      1.1        21.04.2023  sprang/pdahlem   Added predecessor and exclude objects logic
   ******************************************************************************/
 
