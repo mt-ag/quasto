@@ -80,10 +80,10 @@ begin
   l_object(l_index).object_name := 'QA_RULE_T';
   l_object(l_index).object_type := 'TYPE';
   l_index := l_index + 1;
-  l_object(l_index).object_name := 'RUNNING_RULE_T';
+  l_object(l_index).object_name := 'QA_RUNNING_RULE_T';
   l_object(l_index).object_type := 'TYPE';
   l_index := l_index + 1;
-  l_object(l_index).object_name := 'RUNNING_RULES_T';
+  l_object(l_index).object_name := 'QA_RUNNING_RULES_T';
   l_object(l_index).object_type := 'TYPE';
   l_index := l_index + 1;
   l_object(l_index).object_name := 'QA_SCHEME_OBJECT_AMOUNTS_T';
@@ -92,10 +92,10 @@ begin
   l_object(l_index).object_name := 'QA_SCHEME_OBJECT_AMOUNT_T';
   l_object(l_index).object_type := 'TYPE';
   l_index := l_index + 1;
-  l_object(l_index).object_name := 'TEST_RESULTS_TABLE_T';
+  l_object(l_index).object_name := 'QA_TEST_RESULTS_TABLE_T';
   l_object(l_index).object_type := 'TYPE';
   l_index := l_index + 1;
-  l_object(l_index).object_name := 'TEST_RESULTS_ROW_T';
+  l_object(l_index).object_name := 'QA_TEST_RESULTS_ROW_T';
   l_object(l_index).object_type := 'TYPE';
   l_index := l_index + 1;
 
@@ -178,7 +178,7 @@ begin
   l_object(l_index).object_name := 'QA_RULES_P0007_V';
   l_object(l_index).object_type := 'VIEW';
   l_index := l_index + 1;
-  l_object(l_index).object_name := 'QARU_PREDECESSOR_ORDER_V';
+  l_object(l_index).object_name := 'QA_PREDECESSOR_ORDER_V';
   l_object(l_index).object_type := 'VIEW';
   l_index := l_index + 1;
   l_object(l_index).object_name := 'QA_TEST_EXECUTION_DATES_LOV';
