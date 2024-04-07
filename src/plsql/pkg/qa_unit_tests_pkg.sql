@@ -90,7 +90,7 @@ create or replace package qa_unit_tests_pkg authid definer is
   (
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
-   ,pi_qaru_layer       in varchar2
+   ,pi_qaru_layer       in qa_rules.qaru_layer%type
    ,pi_scheme_objects   in qa_scheme_object_amounts_t
    ,pi_invalid_objects  in qa_rules_t
    ,pi_result           in number
@@ -547,7 +547,7 @@ create or replace package body qa_unit_tests_pkg is
     pi_previous_clob            in clob
    ,pi_qaru_rule_number         in qa_rules.qaru_rule_number%type
    ,pi_qaru_rule_number_unified in varchar2
-   ,pi_qaru_layer               in varchar2
+   ,pi_qaru_layer               in qa_rules.qaru_layer%type
    ,pi_scheme_name              in varchar2
   )
   return clob
@@ -1082,7 +1082,7 @@ create or replace package body qa_unit_tests_pkg is
   procedure p_handle_test_result(
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
-   ,pi_qaru_layer       in varchar2
+   ,pi_qaru_layer       in qa_rules.qaru_layer%type
    ,pi_scheme_objects   in qa_scheme_object_amounts_t
    ,pi_invalid_objects  in qa_rules_t
    ,pi_result           in number
