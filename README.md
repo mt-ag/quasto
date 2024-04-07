@@ -21,23 +21,23 @@ Project uses the MIT License.
 
 To install the QUASTO Quality Assurance Tool on your oracle database from scratch, run the install.sql file in the root directory of the repository.
 
-This file will install all necessary objects for utPLSQL tests and QUASTO.
+This file will install all necessary objects for QUASTO.
 
-It is possible to run QUASTO standalone without a valid APEX or utPLSQL Installation.
+It is possible to run QUASTO standalone without a valid APEX or utPLSQL installation.
 In order to install the tool the user needs to move into the root directory of the downloaded folder. 
-You can either clone the repository on git itself or download a zip.file.
+You can either clone the repository on git itself or download the .zip file.
 
-To start the Installation process you need to move into the root directory of the downloaded folder.
-In the next step the user connects to the database via sqlplus or sqlCL.
-To ensure all tables and packages are installed into the right schema make sure to check the current user and switch schema if required.
+To start the installation, you need to connect to the database scheme in which you want to install QUASTO using SQL*Plus or SQLcl.
 
-In order to use QUASTO in other schemas a public synonym is required on the type "QA_RULE_T".
+In order to use QUASTO in other schemes, a public synonym is required on the type "QA_RULE_T".
 The user has to create this outside of the regular QUASTO installation.
-Note: To drop a public synonym the user needs the drop any synonym grant!
+
+<b>Note:</b> To drop a public synonym, the user needs the DROP PUBLIC SYNONYM or DROP ANY SYNONYM privilege.
 
 ### Minimal user rights
-If you install QUASTO in a blank new scheme the user needs the following rights:
-```
+If you install QUASTO in a blank new scheme, the user needs the following rights:
+
+```sql
 grant create procedure, public synonym, sequence, table, trigger, type, view, job to quasto;
 
 grant create session to quasto;
@@ -45,51 +45,53 @@ grant create session to quasto;
 
 ### Optional user rights
 If you want to run APEX Tests, you should grant the APEX_ADMINISTRATOR_ROLE to QUASTO. Otherwise QUASTO has no rights to see APEX Objects from other schemes:
-```
+
+```sql
 grant APEX_ADMINISTRATOR_ROLE to quasto;
 ```
 
 #### Running the Install Script:
 ```
-@install [1/0] [1/0] [1/0] [1/0]
+@install.sql [1/0] [1/0] [1/0] [1/0]
 ```
 
-To ensure a clean installation it is important to decide what you want to install.
-It is not mandatory to install APEX or utPLSQL. But if you have one or both of these, you get more features for your quality approach.
+To ensure a clean installation, it is important to decide what you want to install.
+It is not mandatory to install APEX or utPLSQL. However, you get more features for your quality approach.
 
 Arguments that are required to be passed to the script:
-1. Do you want to install supporting objects for utPLSQL usage? 1=yes / 0=no (you need to install utPLSQL seperatly)
-2. Do you want to install supporting objects for APEX usage? 1=yes / 0=no (you need to install APEX seperatly)
-3. Do you want to install supporting objects for Jenkins usage? 1=yes / 0=no (you need to run Jenkins seperatly)
+1. Do you want to install supporting objects for utPLSQL usage? 1=yes / 0=no (you need to install utPLSQL separatly)
+2. Do you want to install supporting objects for APEX usage? 1=yes / 0=no (you need to install APEX separatly)
+3. Do you want to install supporting objects for Jenkins usage? 1=yes / 0=no (you need to run Jenkins separatly)
 4. Do you have the offical oracle logger framework installed? 1=yes / 0=no (required for conditional compilation of a package)
 
-It is possible to install utPLSQL, APEX or Jenkins objects later
-To do this the user needs to move from the root Directory of the project into the /src directory.
+It is possible to install utPLSQL, APEX or Jenkins objects later.
+To do this, the user needs to move from the root directory of the project into the /src/ directory.
+
 There are the three installer scripts:
 1. install_utplsql_objects.sql
 2. install_apex_objects.sql
 3. install_jenkins_objects.sql
-All of these scripts can be run without arguments and should be executed in the same schema as the original schema of QUASTO.
+
+All of these scripts can be run without arguments and should be executed in the scheme in which QUASTO was installed.
 
 Example:
-```
+```sql
 @install_utplsql_objects.sql 1 1 0 0
 ```
 
-### Upgrading from a prior Version to the latest
-In Order to Upgrade, the user has to follow the same steps like above.
-Just like installing the software for the first time we run:
+### Upgrading from a prior Version to the latest version
+In Order to upgrade, the user has to follow the same steps like above.
+
+Just like installing the tool for the first time, we run:
+```sql
+@install.sql [1/0] [1/0] [1/0] [1/0]
 ```
-@install [1/0] [1/0] [1/0] [1/0]
-```
 
-The script automatically detects if no Version is installed or one of the previous Versions (1.0,1.1) has been installed,
-and upgrades to the latest release.
+The script automatically detects if no version or one of the previous versions (1.0, 1.1) has been installed, and upgrades to the latest release.
 
-An alternative way to install the new release is to fully remove the old version and install the latest one.
+An alternative way to install the new release is to fully remove the old version and install the latest one by using the unistall and install scripts.
 
-#Please be aware that this means that the qa_rules tables gets removed.#
-#This means that prior to the uninstall process you need to export or backup all your Rules and reimport them once the full installation process is finished.#
+<b>Note:</b> Please be aware that the uninstall will remove all QUASTO objects including the table QA_RULES and its data. Therefore it is recommended to export or backup all rules and reimport them once the full installation process is finished. More information on how to backup rules, you can find in the section [Export and Import Rules](https://github.com/mt-ag/quasto#export-and-import-rules).
 
 
 ### Uninstalling utPLSQL and QUASTO objects
@@ -99,10 +101,11 @@ To uninstall the utPLSQL test and QUASTO objects, run the script uninstall.sql i
 ## 3. Using QUASTO
 ### Define a rule
 For using QUASTO you have to define rules based on SQL queries which have to be saved inside the QA_RULES table.
-The query for every rule should name every object which does not match you quality standards.
-A first example could be, that every table needs to have a primary key.
-Here is an example for this rule:
-```
+The query for every rule should return every object which does not match you quality standards.
+
+The following example shows a query which returns all table names that do not have a primary key defined:
+
+```sql
 with param as
  (select :1 scheme
         ,:2 qaru_id
@@ -137,37 +140,44 @@ and not exists (select null
        and cons.constraint_type = 'P'
        and cons.status = 'ENABLED')
 ```
+
 ### Running rules
 After you defined one or more rules, you can run these rules. The easiest way is to call them in your SQL tool.
-The QA_API_PKG is the Package to run your rules. 
-You can run a single rule, or a complete rulesset for one project only with a single SQL query.
-For running one rule you need the rule number, the client name and the target schema
-```
+To run rules, you can use the package QA_API_PKG. It allows you to run a single rule, or a complete ruleset for one project only with a single SQL query.
+For running one rule you need the rule number, the client name and the scheme in which you want to search for.
+
+```sql
 select *
 from qa_api_pkg.tf_run_rule(pi_qaru_rule_number => '23.1'
                            ,pi_qaru_client_name => 'MT AG'
                            ,pi_target_scheme    => 'QUASTO')
 ```
-In this example the rule 23.1 from the client/project MT AG is used inside the schema QUASTO. If you don't provide a schema, all schemas are used which are able to reach. The sql output gives now every object in a row which is not matching your rule.
-If you wanna run all rules from one client/project simply call
-```
+
+In this example, the rule 23.1 from the client "MT AG" is used inside the scheme QUASTO. If you don't provide a scheme, all schemes are tested, excluding Oracle-preserved ones. The return of the SQL query will list all found objects that do not comply the rule.
+
+If you want to run all rules from one client simply call the following query:
+
+```sql
 select *
 from qa_api_pkg.tf_run_rules(pi_qaru_client_name => 'MT AG'
                             ,pi_target_scheme    => 'QUASTO')
 ```
 
 ### Exclude objects in rules
-Sometimes a rule is valid for all objects except one. For this object it is possible to exclude the run. In the Table QA_RULES there exists the column QARU_EXCLUDE_OBJECTS. In this column you can add all objects you want to exclude from this rule.
-If you want to enter more than one object, you have to separate them with a ':'. Example: OBJECT_ONE:OBJECT_TWO
-When you test a rule, the specified Objects will not run for this test and therefore will not give any feedback of the test run. The addition or deletion in the QARU_EXCLUDE_OBJECTS column will have impact in the next run immediatly.
+Sometimes a rule is valid for all objects except one. For this object it is possible to exclude the run. The table QA_RULES includes a column named QARU_EXCLUDE_OBJECTS in which you can save object names to be excluded.
+If you want to enter more than one object, you have to separate them with a colon (':'). Example: OBJECT_ONE:OBJECT_TWO.
+
+When you test a rule, the specified objects will not run for this test and therefore will not give any feedback of the test run. The addition or deletion in the QARU_EXCLUDE_OBJECTS column will have impact in the next run immediatly.
 
 
 ### Defining a test-run-order
-With the Column QARU_PREDECESSOR_IDS in the table QA_RULES it is possible to give an order to the test run. In this column you can define which rules have to run successful before another rule can start.
-Therefore you have to add the rule names separated with a colon ':'. You can add one or more rules. Example: 12.3:4:1
-Be careful, that there is no recursive connection between the rules. Otherwise an exception is raised an the run is stopped immediatly.
-If you have defined predecessors, the rules will be ordered first and the will be run in the predefined order.
-If one or more predecessors of one rule failed, the rule will not run. You have to fix the errors first. Even if all predecessors of a rule run successfully this rule will also run.
+With the column QARU_PREDECESSOR_IDS in the table QA_RULES it is possible to give an order to the test run. In this column you can define which rules have to run successful before another rule can start.
+
+Therefore, you have to add the rule names separated with a colon (':'). You can add one or more rules. Example: 12.3:4:1.
+
+Be careful, that there is no recursive connection between the rules. Otherwise an exception is raised and the run is stopped immediatly.
+If you have defined predecessors, the rules will be ordered first and will be executed in the predefined order.
+If one or more predecessors of one rule failed, the rule will not run. You have to fix the errors first. Even if all predecessors of a rule run successful, this rule will also run.
 
 With this option you have the ability to control, which rule will run under which circumstances. It can also protect you to get a big log of failures. For example, there could be a rule to check if APEX exists.
 
@@ -177,36 +187,37 @@ All rules that belong to an APEX scheme have this rule as predecessor. So if thi
 
 #### Exporting Rules:
 
-In order to export a JSON file of the currently exisiting rules of the QA_RULES table we need to connect to the database via SQL*Plus inside the Installation folder.
-For example open up cmd. And change with cd into the folder where your QUASTO is located. It is required to be in the oracle-qa-tool\src\scripts Folder.
-Afterwards you connect to the DB via SQL*Plus and run the following command:
+In order to export a JSON file of the currently existing rules of the QA_RULES table, change into the folder /src/scripts/ and connect to the database via SQL*Plus or SQLcl executing the following command:
 
-```
+```sh
 @export_rules_to_file.sql "[Client Name]" "[Category (optional)]"
 ```
-Here we use two paramters.
-1. The name of the Client we want to export the rules. This name needs to be the exact entry of the Client Name inside the QA_RULES table!
-2. The optional name of the Category for which rules we want to export.
+
+Here we use two qrguments.
+1. The name of the client we want to export the rules for. This name needs to be the exact entry of the client name inside the QA_RULES table!
+2. The optional name of the category for which rules we want to export.
+
 Note: Leaving the brackets empty is required in case the user wants to export all categories at once.
 
 Example:
-```
+```sh
 @export_rules_to_file.sql "MT IT-Solutions" ""
 ```
 
 #### Importing Rules:
-In order to import Rules, SQLcl is required. The user has to either download it and unzip the client or can use any existing installation.
-We need to switch into the scripts folder on command line again before connecting to the Database. Then we connect via SQLcl and run the import command which is build as follows:
+In order to import rules, SQLcl is required. The user has to either download it and unzip the client or can use any existing installation.
+We need to switch into the scripts folder on command line again before connecting to the database. Then we connect via SQLcl and run the import command which is structured as follows:
 
-```
+```sh
 script import_file_to_rules.js "[Filename.json]" "[Flag 1/0 - to determine Full Import]"
 ```
 1. First parameter defines the exact Json-Filename that is required
 2. Second Paramter defines if the File is only going to be imported into a table qa_import_files or fully migrated into the QA_RULES table
-   To fully import the Rules choose the Flag 1. Remember that this parameter is always required to run the Script successfully
+
+To fully import the Rules choose the Flag 1. Remember that this argument is always required to run the script successfully.
   
-Example Script-Call:
-```
+Example script call:
+```sh
 script import_file_to_rules.js "qa_rules_MT_IT_Solutions.json" 1
 ```
 
@@ -216,6 +227,8 @@ script import_file_to_rules.js "qa_rules_MT_IT_Solutions.json" 1
 These installation instructions are based on the installation instructions of the software provider: http://utplsql.org/utPLSQL/latest/userguide/install.html.
 
 The following prerequisites and instructions refer to the utPLSQL Framework version 3.1.11. For other versions, the requirements and installation steps may differ.
+
+For the installation the user needs to have SYS privilege.
 
 Prerequisites:
 - The installation of utPLSQL requires a database version of Oracle 11gR2, 12c, 12c R2, 18c, 19c
@@ -274,22 +287,24 @@ For the installation the script create_utplsql_owner.sql in the source directory
 3. tablespace name, e.g. users
 
 Example invocation:
-```
+```sh
 sqlplus sys/sys_password@database as sysdba @create_utPLSQL_owner.sql ut3 ut3 users
 ```
 
 ##### Necessary Grants for ut3
-
-- CREATE SESSION
-- CREATE PROCEDURE
-- CREATE TYPE
-- CREATE TABLE
-- CREATE SEQUENCE
-- CREATE VIEW
-- CREATE SYNONYM / PUBLIC SYNONYM
-- ALTER SESSION
-- CREATE TRIGGER
-- CREATE ANY CONTEXT
+```sql
+CREATE SESSION
+CREATE PROCEDURE
+CREATE TYPE
+CREATE TABLE
+CREATE SEQUENCE
+CREATE VIEW
+CREATE SYNONYM
+CREATE PUBLIC SYNONYM
+ALTER SESSION
+CREATE TRIGGER
+CREATE ANY CONTEXT
+```
 
 
 #### Installing utPLSQL
@@ -297,7 +312,7 @@ sqlplus sys/sys_password@database as sysdba @create_utPLSQL_owner.sql ut3 ut3 us
 To install the utPLSQL framework the script install.sql in the source directory has to be executed specifying the schema name created previously:
 
 Example invocation:
-```
+```sh
 sqlplus ut3/ut3@database @install.sql ut3
 ```
 
@@ -306,7 +321,7 @@ sqlplus ut3/ut3@database @install.sql ut3
 To minimize startup time of the utPLSQL framework it is recommended to install DDL trigger for utPLSQL to enable utPLSQL annotation to be updated at compile-time. To install the DDL trigger the script install_ddl_trigger.sql in the source directory must be run providing the schema name for utPLSQL:
 
 Example invocation:
-```
+```sh
 sqlplus ut3/ut3@database @install_ddl_trigger.sql ut3
 ```
 
@@ -317,14 +332,14 @@ There are two ways to grant access rights to the utPLSQL framework to other user
 To grant access to all users, the script create_synonyms_and_grants_for_public.sql in the source directory must be run to create grants and synonyms for the utPLSQL schema.
 
 Example invocation:
-```
+```sh
 sqlplus ut3/ut3@database @create_synonyms_and_grants_for_public.sql ut3  
 ```
 
 To grant access only to specific users, the create_user_grants.sql and create_user_synonyms.sql scripts in the source directory must be run to create grants and synonyms for the utPLSQL schema.
 
 Example invocation for granting and creating synonyms for user hr:
-```
+```sh
 sqlplus ut3/ut3@database @create_user_grants.sql ut3 hr
 sqlplus ut3/ut3@database @create_user_synonyms.sql ut3 hr
 ```
@@ -333,7 +348,7 @@ sqlplus ut3/ut3@database @create_user_synonyms.sql ut3 hr
 
 To check the framework version the following query must be executed:
 
-```
+```sql
 select substr(ut.version(),1,60) as ut_version from dual;
 ```
 
@@ -341,13 +356,15 @@ select substr(ut.version(),1,60) as ut_version from dual;
 
 To uninstall the utPLSQL framework, run the script uninstall.sql in the source directory by giving the schema name utPLSQL is installed in.
 
-```
+```sh
 sqlplus admin/admins_password@database @uninstall.sql ut3
 ```
 
 ## 5. Upcoming Features
 
 Get ready for an exciting update! We're thrilled to announce that Version 24.1 is on the horizon, bringing a wave of new and anticipated features. Stay tuned as we reveal the incredible enhancements coming your way very soon!
+
+The new features will include a major overhaul of the unit test generation. The APEX app can now be used to export and import the QUASTO rules as well as the test results of the rules in a JUnit compatible XML format. In addition, new unit tests can be generated and deleted via the app UI and every tests can be restarted by the user.
 
 ## 6. Latest Releases
 
