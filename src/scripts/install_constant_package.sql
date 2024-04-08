@@ -56,7 +56,7 @@ begin
     gc_utplsql_scheme_result_success      constant number := ' || '''' || l_utplsql_scheme_result_success || '''' || ';
     gc_utplsql_scheme_result_error        constant number := ' || '''' || l_utplsql_scheme_result_error || '''' || ';
 
-    function get_constant_value (
+    function f_get_constant_value (
       pi_constant_name in varchar2
     ) return varchar2 deterministic;
 
@@ -64,7 +64,7 @@ end;';
 
   l_action_pkg_body := 'create or replace package body qa_constant_pkg as
 
-  function get_constant_value (
+  function f_get_constant_value (
     pi_constant_name in varchar2
   ) return varchar2 deterministic
   as
@@ -91,7 +91,7 @@ end;';
   exception
     when others then
       null;
-  end get_constant_value;
+  end f_get_constant_value;
 
 end qa_constant_pkg;';
 
