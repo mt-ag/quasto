@@ -55,20 +55,35 @@ create or replace package body qa_api_pkg as
   
     c_unit constant varchar2(32767) := $$plsql_unit || '.tf_run_rule';
     l_param_list qa_logger_pkg.tab_param;
-  
-    l_qa_rule  qa_rule_t;
-    l_qa_rules qa_rules_t;
+
+    l_rule_active boolean;
+    l_qa_rule     qa_rule_t;
+    l_qa_rules    qa_rules_t;
   
   begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qaru_rule_number'
+                              ,p_val_01  => pi_qaru_rule_number
+                              ,p_name_02 => 'pi_qaru_client_name'
+                              ,p_val_02  => pi_qaru_client_name
+                              ,p_name_03 => 'pi_target_scheme'
+                              ,p_val_03  => pi_target_scheme);
+
+    if pi_qaru_rule_number is null or pi_qaru_client_name is null or pi_target_scheme is null
+    then
+      raise_application_error(-20001, 'Missing input parameter value for pi_qaru_rule_number: ' || pi_qaru_rule_number || ' or pi_qaru_client_name: ' || pi_qaru_client_name || ' or pi_target_scheme: ' || pi_target_scheme);
+    end if;
+
     if qa_main_pkg.f_is_owner_black_listed(pi_user_name => pi_target_scheme) = false
     then
-      qa_logger_pkg.append_param(p_params  => l_param_list
-                                ,p_name_01 => 'pi_qaru_rule_number'
-                                ,p_val_01  => pi_qaru_rule_number
-                                ,p_name_02 => 'pi_qaru_client_name'
-                                ,p_val_02  => pi_qaru_client_name);
-    
-    
+
+      l_rule_active := qa_main_pkg.f_is_rule_active(pi_qaru_rule_number => pi_qaru_rule_number
+                                                   ,pi_qaru_client_name => pi_qaru_client_name);
+      if l_rule_active = false
+      then
+        raise_application_error(-20001, 'Rule is not set to active for rule number: ' || pi_qaru_rule_number || ' and client name: ' || pi_qaru_client_name);
+      end if;
+
       l_qa_rule := qa_main_pkg.f_get_rule(pi_qaru_rule_number => pi_qaru_rule_number
                                          ,pi_qaru_client_name => pi_qaru_client_name);
     
@@ -136,6 +151,17 @@ create or replace package body qa_api_pkg as
     l_no_loop        qa_rules.qaru_rule_number%type;
   
   begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qaru_client_name'
+                              ,p_val_01  => pi_qaru_client_name
+                              ,p_name_02 => 'pi_target_scheme'
+                              ,p_val_02  => pi_target_scheme);
+
+    if pi_qaru_client_name is null or pi_target_scheme is null
+    then
+      raise_application_error(-20001, 'Missing input parameter value for pi_qaru_client_name: ' || pi_qaru_client_name || ' or pi_target_scheme: ' || pi_target_scheme);
+    end if;
+
     --check for loops in predecessor order (raises error if cycle is detected so no if clause is needed)
     l_no_loop := qa_main_pkg.f_check_for_loop(pi_qaru_rule_number => null
                                              ,pi_client_name      => pi_qaru_client_name);
@@ -164,13 +190,6 @@ create or replace package body qa_api_pkg as
                      connect by level <= length(regexp_replace(t.qaru_predecessor_ids
                                                               ,'[^:]+')) + 1) as sys.odcinumberlist)) levels
     where t.qaru_client_name = pi_qaru_client_name;
-  
-  
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_qaru_client_name'
-                              ,p_val_01  => pi_qaru_client_name
-                              ,p_name_02 => 'pi_target_scheme'
-                              ,p_val_02  => pi_target_scheme);
   
     l_qaru_rule_numbers := qa_main_pkg.tf_get_rule_numbers(pi_qaru_client_name => pi_qaru_client_name);
   

@@ -38,6 +38,66 @@ create or replace package qa_main_pkg authid definer as
   ) return number;
 
   /**
+  * function to check if rule is active
+  * @param  pi_qaru_rule_number specifies the rule number
+  * @param  pi_qaru_client_name specifies the client name
+  * @return boolean returns the result
+  */
+  function f_is_rule_active
+  (
+    pi_qaru_rule_number in qa_rules.qaru_rule_number%type
+   ,pi_qaru_client_name in qa_rules.qaru_client_name%type
+  ) return boolean;
+
+  /**
+  * function to get the rule category
+  * @param  pi_qaru_rule_number specifies the rule number
+  * @param  pi_qaru_client_name specifies the client name
+  * @return varchar2 returns the rule category
+  */
+  function f_get_rule_category
+  (
+    pi_qaru_rule_number in qa_rules.qaru_rule_number%type
+   ,pi_qaru_client_name in qa_rules.qaru_client_name%type
+  ) return varchar2;
+
+  /**
+  * function to get the rule name
+  * @param  pi_qaru_rule_number specifies the rule number
+  * @param  pi_qaru_client_name specifies the client name
+  * @return varchar2 returns the rule name
+  */
+  function f_get_rule_name
+  (
+    pi_qaru_rule_number in qa_rules.qaru_rule_number%type
+   ,pi_qaru_client_name in qa_rules.qaru_client_name%type
+  ) return varchar2;
+
+  /**
+  * function to get the rule layer
+  * @param  pi_qaru_rule_number specifies the rule number
+  * @param  pi_qaru_client_name specifies the client name
+  * @return varchar2 returns the rule layer
+  */
+  function f_get_rule_layer
+  (
+    pi_qaru_rule_number in qa_rules.qaru_rule_number%type
+   ,pi_qaru_client_name in qa_rules.qaru_client_name%type
+  ) return varchar2;
+
+  /**
+  * function to get the rule error level
+  * @param  pi_qaru_rule_number specifies the rule number
+  * @param  pi_qaru_client_name specifies the client name
+  * @return varchar2 returns the rule error level
+  */
+  function f_get_rule_error_level
+  (
+    pi_qaru_rule_number in qa_rules.qaru_rule_number%type
+   ,pi_qaru_client_name in qa_rules.qaru_client_name%type
+  ) return varchar2;
+
+  /**
   * function to check whether rules exists or not
   * @param  pi_qaru_client_name specifies the client name
   * @return boolean returns the result
@@ -197,6 +257,7 @@ create or replace package body qa_main_pkg as
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
+      raise;
     when others then
       qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to select from qa_rules!'
                             ,p_scope  => c_unit
@@ -236,6 +297,176 @@ create or replace package body qa_main_pkg as
                             ,p_params => l_param_list);
       raise;
   end f_get_rule_pk;
+
+  function f_is_rule_active
+  (
+    pi_qaru_rule_number in qa_rules.qaru_rule_number%type
+   ,pi_qaru_client_name in qa_rules.qaru_client_name%type
+  ) return boolean
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_is_rule_active';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_qaru_is_active number;
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qaru_rule_number'
+                              ,p_val_01  => pi_qaru_rule_number
+                              ,p_name_02 => 'pi_qaru_client_name'
+                              ,p_val_02  => pi_qaru_client_name);
+  
+    select qaru_is_active
+    into l_qaru_is_active
+    from QA_RULES
+    where qaru_client_name = pi_qaru_client_name
+    and qaru_rule_number = pi_qaru_rule_number;
+
+    if l_qaru_is_active = 0
+    then
+      return false;
+    else
+      return true;
+    end if;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to check if the rule is active!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_is_rule_active;
+
+  function f_get_rule_category
+  (
+    pi_qaru_rule_number in qa_rules.qaru_rule_number%type
+   ,pi_qaru_client_name in qa_rules.qaru_client_name%type
+  ) return varchar2
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_rule_category';
+    l_param_list qa_logger_pkg.tab_param;
+    
+    l_qaru_category qa_rules.qaru_category%type;
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qaru_rule_number'
+                              ,p_val_01  => pi_qaru_rule_number
+                              ,p_name_02 => 'pi_qaru_client_name'
+                              ,p_val_02  => pi_qaru_client_name);
+  
+    select qaru_category
+    into l_qaru_category
+    from QA_RULES
+    where qaru_client_name = pi_qaru_client_name
+    and qaru_rule_number = pi_qaru_rule_number;
+  
+    return l_qaru_category;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get the rule category of a given rule number and client name!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_get_rule_category;
+
+  function f_get_rule_name
+  (
+    pi_qaru_rule_number in qa_rules.qaru_rule_number%type
+   ,pi_qaru_client_name in qa_rules.qaru_client_name%type
+  ) return varchar2
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_rule_name';
+    l_param_list qa_logger_pkg.tab_param;
+    
+    l_qaru_name qa_rules.qaru_name%type;
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qaru_rule_number'
+                              ,p_val_01  => pi_qaru_rule_number
+                              ,p_name_02 => 'pi_qaru_client_name'
+                              ,p_val_02  => pi_qaru_client_name);
+  
+    select qaru_name
+    into l_qaru_name
+    from QA_RULES
+    where qaru_client_name = pi_qaru_client_name
+    and qaru_rule_number = pi_qaru_rule_number;
+  
+    return l_qaru_name;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get the rule name of a given rule number and client name!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_get_rule_name;
+
+  function f_get_rule_layer
+  (
+    pi_qaru_rule_number in qa_rules.qaru_rule_number%type
+   ,pi_qaru_client_name in qa_rules.qaru_client_name%type
+  ) return varchar2
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_rule_layer';
+    l_param_list qa_logger_pkg.tab_param;
+    
+    l_qaru_layer qa_rules.qaru_layer%type;
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qaru_rule_number'
+                              ,p_val_01  => pi_qaru_rule_number
+                              ,p_name_02 => 'pi_qaru_client_name'
+                              ,p_val_02  => pi_qaru_client_name);
+  
+    select qaru_layer
+    into l_qaru_layer
+    from QA_RULES
+    where qaru_client_name = pi_qaru_client_name
+    and qaru_rule_number = pi_qaru_rule_number;
+  
+    return l_qaru_layer;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get the rule layer of a given rule number and client name!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_get_rule_layer;
+
+  function f_get_rule_error_level
+  (
+    pi_qaru_rule_number in qa_rules.qaru_rule_number%type
+   ,pi_qaru_client_name in qa_rules.qaru_client_name%type
+  ) return varchar2
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_rule_error_level';
+    l_param_list qa_logger_pkg.tab_param;
+    
+    l_qaru_error_level qa_rules.qaru_error_level%type;
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qaru_rule_number'
+                              ,p_val_01  => pi_qaru_rule_number
+                              ,p_name_02 => 'pi_qaru_client_name'
+                              ,p_val_02  => pi_qaru_client_name);
+  
+    select qaru_error_level
+    into l_qaru_error_level
+    from QA_RULES
+    where qaru_client_name = pi_qaru_client_name
+    and qaru_rule_number = pi_qaru_rule_number;
+  
+    return l_qaru_error_level;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get the rule error level of a given rule number and client name!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_get_rule_error_level;
 
   function f_exist_rules(pi_qaru_client_name in qa_rules.qaru_client_name%type default null) return boolean is
     c_unit constant varchar2(32767) := $$plsql_unit || '.f_exist_rules';
@@ -345,7 +576,7 @@ create or replace package body qa_main_pkg as
       raise;
   end f_get_excluded_objects;
 
-  -- get invalid objects for a rule by providing one or more scheme
+  -- get invalid objects for a rule by providing one or more schemes
   function f_get_invalid_objects
   (
     pi_qaru_client_name in qa_rules.qaru_client_name%type

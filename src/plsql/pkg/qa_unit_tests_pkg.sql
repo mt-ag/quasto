@@ -80,7 +80,6 @@ create or replace package qa_unit_tests_pkg authid definer is
    * procedure to handle the unit test result, generate xml and save the data in database - called by generated test packages
    * @param pi_qaru_rule_number defines the rule number
    * @param pi_qaru_client_name defines the client name of the rule
-   * @param pi_qaru_layer defines the layer
    * @param pi_scheme_objects defines schemes with amount of invalid objects
    * @param pi_invalid_objects defines invalid object details and their schemes
    * @param pi_result defines the test result
@@ -90,7 +89,6 @@ create or replace package qa_unit_tests_pkg authid definer is
   (
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
-   ,pi_qaru_layer       in qa_rules.qaru_layer%type
    ,pi_scheme_objects   in qa_scheme_object_amounts_t
    ,pi_invalid_objects  in qa_rules_t
    ,pi_result           in number
@@ -547,7 +545,6 @@ create or replace package body qa_unit_tests_pkg is
     pi_previous_clob            in clob
    ,pi_qaru_rule_number         in qa_rules.qaru_rule_number%type
    ,pi_qaru_rule_number_unified in varchar2
-   ,pi_qaru_layer               in qa_rules.qaru_layer%type
    ,pi_scheme_name              in varchar2
   )
   return clob
@@ -562,10 +559,8 @@ create or replace package body qa_unit_tests_pkg is
                                 ,p_val_01  => pi_qaru_rule_number
                                 ,p_name_02 => 'pi_qaru_rule_number_unified'
                                 ,p_val_02  => pi_qaru_rule_number_unified
-                                ,p_name_03 => 'pi_qaru_layer'
-                                ,p_val_03  => pi_qaru_layer
-                                ,p_name_04 => 'pi_scheme_name'
-                                ,p_val_04  => pi_scheme_name);
+                                ,p_name_03 => 'pi_scheme_name'
+                                ,p_val_03  => pi_scheme_name);
 
         l_clob := pi_previous_clob || '  PROCEDURE p_ut_rule_' || pi_qaru_rule_number_unified || chr(10);
         l_clob := l_clob || '  IS' || chr(10);
@@ -573,7 +568,6 @@ create or replace package body qa_unit_tests_pkg is
         l_clob := l_clob || '    l_invalid_objects qa_rules_t := new qa_rules_t();' || chr(10);
         l_clob := l_clob || '    l_program_name varchar2(4000) := utl_call_stack.concatenate_subprogram(utl_call_stack.subprogram(1));' || chr(10);
         l_clob := l_clob || '    l_qaru_rule_number qa_rules.qaru_rule_number%type := ''' || pi_qaru_rule_number || ''';' || chr(10);
-        l_clob := l_clob || '    l_qaru_layer qa_rules.qaru_layer%type := ''' || pi_qaru_layer || ''';' || chr(10);
         l_clob := l_clob || '    l_result NUMBER;' || chr(10);
         l_clob := l_clob || '  BEGIN' || chr(10);
 
@@ -586,7 +580,6 @@ create or replace package body qa_unit_tests_pkg is
 
         l_clob := l_clob || '    qa_unit_tests_pkg.p_handle_test_result(pi_qaru_rule_number => l_qaru_rule_number' || chr(10);
         l_clob := l_clob || '                                          ,pi_qaru_client_name => c_client_name' || chr(10);
-        l_clob := l_clob || '                                          ,pi_qaru_layer       => l_qaru_layer' || chr(10);
         l_clob := l_clob || '                                          ,pi_scheme_objects   => l_scheme_objects' || chr(10);
         l_clob := l_clob || '                                          ,pi_invalid_objects  => l_invalid_objects' || chr(10);
         l_clob := l_clob || '                                          ,pi_result           => l_result' || chr(10);
@@ -723,7 +716,6 @@ create or replace package body qa_unit_tests_pkg is
 
          for rec_rules in (select qaru_rule_number
                                  ,qa_utils_pkg.f_get_unified_string(pi_string => qaru_rule_number, pi_transform_case => 'l') as qaru_rule_number_unified
-                                 ,qaru_layer
                            from qa_rules
                            where qaru_client_name = rec_clients.qaru_client_name
                            and qaru_is_active = 1 
@@ -733,7 +725,6 @@ create or replace package body qa_unit_tests_pkg is
            l_clob := f_get_package_body_content(pi_previous_clob            => l_clob
                                                ,pi_qaru_rule_number         => rec_rules.qaru_rule_number
                                                ,pi_qaru_rule_number_unified => rec_rules.qaru_rule_number_unified
-                                               ,pi_qaru_layer               => rec_rules.qaru_layer
                                                ,pi_scheme_name              => l_scheme_names(rec_schemes));
 
          end loop;
@@ -760,14 +751,12 @@ create or replace package body qa_unit_tests_pkg is
                                        ,qa_utils_pkg.f_get_unified_string(pi_string => qaru_client_name, pi_transform_case => 'l') as qaru_client_name_unified
                                        ,qa_utils_pkg.f_get_unified_string(pi_string => qaru_rule_number, pi_transform_case => 'l') as qaru_rule_number_unified
                                        ,qa_utils_pkg.f_get_unified_string(pi_string => qaru_name, pi_transform_case => 'l') as qaru_name_unified
-                                       ,qaru_layer
                                  from qa_rules
                                  where qaru_is_active = 1 
                                  group by qaru_id
                                          ,qaru_client_name
                                          ,qaru_rule_number
                                          ,qaru_name
-                                         ,qaru_layer
                                  order by qaru_id asc)
         loop
 
@@ -793,7 +782,6 @@ create or replace package body qa_unit_tests_pkg is
           l_clob := f_get_package_body_content(pi_previous_clob            => l_clob
                                               ,pi_qaru_rule_number         => rec_client_rules.qaru_rule_number
                                               ,pi_qaru_rule_number_unified => rec_client_rules.qaru_rule_number_unified
-                                              ,pi_qaru_layer               => rec_client_rules.qaru_layer
                                               ,pi_scheme_name              => l_scheme_names(rec_schemes));
 
           l_clob := f_get_package_body_footer(pi_previous_clob => l_clob
@@ -838,7 +826,7 @@ create or replace package body qa_unit_tests_pkg is
         for rec_packages in (select object_name
                              from user_objects
                              where object_type = 'PACKAGE'
-                             and object_name like upper(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix || pi_scheme_names(rec_scheme_names) || '_%'))
+                             and object_name like replace(upper(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix || pi_scheme_names(rec_scheme_names)) || '_%', '_', '\_') escape '\')
         loop
           l_package_name := rec_packages.object_name;
           execute immediate 'DROP PACKAGE ' || l_package_name;
@@ -849,7 +837,7 @@ create or replace package body qa_unit_tests_pkg is
      for rec_packages in (select object_name
                           from user_objects
                           where object_type = 'PACKAGE'
-                          and object_name like upper(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix || '%'))
+                          and object_name like replace(upper(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix) || '%', '_', '\_') escape '\')
      loop
        l_package_name := rec_packages.object_name;
        execute immediate 'DROP PACKAGE ' || l_package_name;
@@ -1038,12 +1026,12 @@ create or replace package body qa_unit_tests_pkg is
   function f_save_scheme_result(
     pi_scheme_name  in varchar2
    ,pi_program_name in varchar2
-   ,pi_qaru_id      in number
+   ,pi_qaru_id      in qa_rules.qaru_id%type
    ,pi_result       in number
   ) return number
   is
   pragma autonomous_transaction;  
-    l_qatr_id number;
+    l_qatr_id qa_test_runs.qatr_id%type;
   begin
     if pi_result not in (qa_constant_pkg.gc_utplsql_scheme_result_failure
                         ,qa_constant_pkg.gc_utplsql_scheme_result_success
@@ -1067,7 +1055,7 @@ create or replace package body qa_unit_tests_pkg is
   procedure p_save_scheme_faulty_objects(
     pi_object_name    in varchar2
    ,pi_object_details in varchar2
-   ,pi_qatr_id        in number
+   ,pi_qatr_id        in qa_test_runs.qatr_id%type
   ) is
   pragma autonomous_transaction;
   begin
@@ -1082,22 +1070,33 @@ create or replace package body qa_unit_tests_pkg is
   procedure p_handle_test_result(
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
-   ,pi_qaru_layer       in qa_rules.qaru_layer%type
    ,pi_scheme_objects   in qa_scheme_object_amounts_t
    ,pi_invalid_objects  in qa_rules_t
    ,pi_result           in number
    ,pi_program_name     in varchar2
   )
   is
-    l_qaru_id number;
-    l_qatr_id number;
+    l_qaru_id qa_rules.qaru_id%type;
+    l_qaru_category qa_rules.qaru_category%type;
+    l_qaru_name qa_rules.qaru_name%type;
+    l_qaru_layer qa_rules.qaru_layer%type;
+    l_qaru_error_level qa_rules.qaru_error_level%type;
+    l_qatr_id qa_test_runs.qatr_id%type;
   begin
 
     ut.expect(pi_result).to_equal(1);
     l_qaru_id := qa_main_pkg.f_get_rule_pk(pi_qaru_rule_number => pi_qaru_rule_number
                                           ,pi_qaru_client_name => pi_qaru_client_name);
+    l_qaru_category := qa_main_pkg.f_get_rule_category(pi_qaru_rule_number => pi_qaru_rule_number
+                                                      ,pi_qaru_client_name => pi_qaru_client_name);
+    l_qaru_name := qa_main_pkg.f_get_rule_name(pi_qaru_rule_number => pi_qaru_rule_number
+                                              ,pi_qaru_client_name => pi_qaru_client_name);
+    l_qaru_layer := qa_main_pkg.f_get_rule_layer(pi_qaru_rule_number => pi_qaru_rule_number
+                                                ,pi_qaru_client_name => pi_qaru_client_name);
+    l_qaru_error_level := qa_main_pkg.f_get_rule_error_level(pi_qaru_rule_number => pi_qaru_rule_number
+                                                            ,pi_qaru_client_name => pi_qaru_client_name);
 
-    dbms_output.put_line('<Results rulenumber="' || DBMS_XMLGEN.CONVERT(pi_qaru_rule_number) || '" layer="' || DBMS_XMLGEN.CONVERT(pi_qaru_layer) || '" result="'||pi_result||'">');
+    dbms_output.put_line('<Results rulenumber="' || DBMS_XMLGEN.CONVERT(pi_qaru_rule_number) || '" category="' || DBMS_XMLGEN.CONVERT(l_qaru_category) || '" name="' || DBMS_XMLGEN.CONVERT(l_qaru_name) || '" layer="' || DBMS_XMLGEN.CONVERT(l_qaru_layer) || '" errorlevel="' || DBMS_XMLGEN.CONVERT(l_qaru_error_level) || '" result="'||pi_result||'">');
     for rec_scheme_objects in ( select scheme_name
                                       ,object_amount
                                 from table(pi_scheme_objects)
