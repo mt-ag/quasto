@@ -123,7 +123,7 @@ wwv_imp_workspace.create_flow(
 ,p_substitution_string_02=>'DATE_FORMAT'
 ,p_substitution_value_02=>'DD/MM/YYYY'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240408141535'
+,p_last_upd_yyyymmddhh24miss=>'20240408150217'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_files_version=>9
 ,p_print_server_type=>'NATIVE'
@@ -17262,7 +17262,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'03'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240403190240'
+,p_last_upd_yyyymmddhh24miss=>'20240408144543'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(51469936526214117)
@@ -17299,10 +17299,8 @@ wwv_flow_imp_page.create_report_region(
 ,p_source_type=>'NATIVE_SQL_REPORT'
 ,p_query_type=>'TABLE'
 ,p_query_table=>'QA_JOB_RUN_DETAILS_P0009_V'
-,p_query_where=>'JOB_NAME = :P9_CRONJOB_NAME'
 ,p_include_rowid_column=>false
 ,p_ajax_enabled=>'Y'
-,p_ajax_items_to_submit=>'P9_CRONJOB_NAME'
 ,p_lazy_loading=>false
 ,p_query_row_template=>wwv_flow_imp.id(50807155826675144)
 ,p_query_num_rows=>5
