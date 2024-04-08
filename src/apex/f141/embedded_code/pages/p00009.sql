@@ -16,7 +16,7 @@ qa_unit_tests_pkg.p_trigger_scheduler_cronjob;
 -- ----------------------------------------
 -- Page: 9 - Config Scheduler Job > Process: Save Scheduler Job Status > Source > PL/SQL Code
 
-qa_unit_tests_pkg.p_enable_scheduler_job(pi_status => :P9_ENABLE_SCHEDULER_JOB);
+qa_unit_tests_pkg.p_enable_scheduler_cronjob(pi_status => :P9_ENABLE_SCHEDULER_JOB);
 
 -- ----------------------------------------
 -- Page: 9 - Config Scheduler Job > Process: Load information > Source > PL/SQL Code
@@ -25,7 +25,7 @@ begin
 select
   to_char(START_DATE, 'DD-MON-YYYY HH24:MI')
 , to_char(LAST_START_DATE, 'DD-MON-YYYY HH24:MI')
-, lpad(extract(hour from LAST_RUN_DURATION),2,'0') || ':' || lpad(extract(minute from LAST_RUN_DURATION),2,'0') || ':' || lpad(extract(second from LAST_RUN_DURATION),2,'0')
+, LAST_RUN_DURATION
 , to_char(NEXT_RUN_DATE, 'DD-MON-YYYY HH24:MI')
 , REPEAT_INTERVAL
 , STATE

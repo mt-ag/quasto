@@ -23,7 +23,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'03'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240404142906'
+,p_last_upd_yyyymmddhh24miss=>'20240408180047'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(32891540502706101)

@@ -23,7 +23,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'03'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240408144543'
+,p_last_upd_yyyymmddhh24miss=>'20240408164048'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(51469936526214117)
@@ -407,7 +407,7 @@ wwv_flow_imp_page.create_page_process(
 ,p_process_point=>'AFTER_SUBMIT'
 ,p_process_type=>'NATIVE_PLSQL'
 ,p_process_name=>'Save Scheduler Job Status'
-,p_process_sql_clob=>'qa_unit_tests_pkg.p_enable_scheduler_job(pi_status => :P9_ENABLE_SCHEDULER_JOB);'
+,p_process_sql_clob=>'qa_unit_tests_pkg.p_enable_scheduler_cronjob(pi_status => :P9_ENABLE_SCHEDULER_JOB);'
 ,p_process_clob_language=>'PLSQL'
 ,p_error_display_location=>'INLINE_IN_NOTIFICATION'
 ,p_process_when_button_id=>wwv_flow_imp.id(59677201614121593)
@@ -438,7 +438,7 @@ wwv_flow_imp_page.create_page_process(
 'select',
 '  to_char(START_DATE, ''DD-MON-YYYY HH24:MI'')',
 ', to_char(LAST_START_DATE, ''DD-MON-YYYY HH24:MI'')',
-', lpad(extract(hour from LAST_RUN_DURATION),2,''0'') || '':'' || lpad(extract(minute from LAST_RUN_DURATION),2,''0'') || '':'' || lpad(extract(second from LAST_RUN_DURATION),2,''0'')',
+', LAST_RUN_DURATION',
 ', to_char(NEXT_RUN_DATE, ''DD-MON-YYYY HH24:MI'')',
 ', REPEAT_INTERVAL',
 ', STATE',
