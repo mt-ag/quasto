@@ -51,9 +51,6 @@ begin
   l_object(l_index).object_name := 'QA_LOGGER_PKG';
   l_object(l_index).object_type := 'PACKAGE';
   l_index := l_index + 1;
-  l_object(l_index).object_name := 'QA_APEX_PKG';
-  l_object(l_index).object_type := 'PACKAGE';
-  l_index := l_index + 1;
   l_object(l_index).object_name := 'QA_CONSTANT_PKG';
   l_object(l_index).object_type := 'PACKAGE';
   l_index := l_index + 1;
