@@ -21,9 +21,9 @@ wwv_flow_imp_page.create_page(
 ,p_page_template_options=>'#DEFAULT#'
 ,p_dialog_width=>'1500px'
 ,p_protection_level=>'C'
-,p_page_component_map=>'16'
+,p_page_component_map=>'03'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240327153109'
+,p_last_upd_yyyymmddhh24miss=>'20240408140907'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(21698602325160714)
@@ -46,6 +46,77 @@ wwv_flow_imp_page.create_page_plug(
 '<p>In case of generation, a Unit Test procedure will be created for each QUASTO rule. If Unit Test procedures already existed for an affected scheme, they will be removed before they get recreated.</p>'))
 ,p_attribute_01=>'N'
 ,p_attribute_02=>'HTML'
+);
+wwv_flow_imp_page.create_page_plug(
+ p_id=>wwv_flow_imp.id(35261442189757201)
+,p_plug_name=>'Generated Unit Test Packages'
+,p_parent_plug_id=>wwv_flow_imp.id(21698602325160714)
+,p_region_template_options=>'#DEFAULT#:is-collapsed:t-Region--scrollBody'
+,p_plug_template=>wwv_flow_imp.id(50747098537675120)
+,p_plug_display_sequence=>40
+,p_attribute_01=>'N'
+,p_attribute_02=>'HTML'
+);
+wwv_flow_imp_page.create_report_region(
+ p_id=>wwv_flow_imp.id(35261805006757205)
+,p_name=>'Package Report'
+,p_parent_plug_id=>wwv_flow_imp.id(35261442189757201)
+,p_template=>wwv_flow_imp.id(50790142840675136)
+,p_display_sequence=>10
+,p_region_template_options=>'#DEFAULT#'
+,p_component_template_options=>'#DEFAULT#:t-Report--stretch:t-Report--altRowsDefault:t-Report--rowHighlight'
+,p_display_point=>'SUB_REGIONS'
+,p_source_type=>'NATIVE_SQL_REPORT'
+,p_query_type=>'TABLE'
+,p_query_table=>'QA_UNIT_TEST_PACKAGES_P0002_V'
+,p_include_rowid_column=>false
+,p_ajax_enabled=>'Y'
+,p_lazy_loading=>false
+,p_query_row_template=>wwv_flow_imp.id(50807155826675144)
+,p_query_num_rows=>15
+,p_query_options=>'DERIVED_REPORT_COLUMNS'
+,p_query_num_rows_type=>'NEXT_PREVIOUS_LINKS'
+,p_pagination_display_position=>'BOTTOM_RIGHT'
+,p_csv_output=>'N'
+,p_prn_output=>'N'
+,p_sort_null=>'L'
+,p_plug_query_strip_html=>'N'
+);
+wwv_flow_imp_page.create_report_columns(
+ p_id=>wwv_flow_imp.id(35262163789757208)
+,p_query_column_id=>1
+,p_column_alias=>'PACKAGE_NAME'
+,p_column_display_sequence=>10
+,p_column_heading=>'Package Name'
+,p_use_as_row_header=>'N'
+,p_heading_alignment=>'LEFT'
+,p_disable_sort_column=>'N'
+,p_derived_column=>'N'
+,p_include_in_export=>'Y'
+);
+wwv_flow_imp_page.create_report_columns(
+ p_id=>wwv_flow_imp.id(35262412258757211)
+,p_query_column_id=>2
+,p_column_alias=>'PACKAGE_STATUS'
+,p_column_display_sequence=>20
+,p_column_heading=>'Package Status'
+,p_use_as_row_header=>'N'
+,p_heading_alignment=>'LEFT'
+,p_disable_sort_column=>'N'
+,p_derived_column=>'N'
+,p_include_in_export=>'Y'
+);
+wwv_flow_imp_page.create_report_columns(
+ p_id=>wwv_flow_imp.id(35262281910757209)
+,p_query_column_id=>3
+,p_column_alias=>'LAST_COMPILATION'
+,p_column_display_sequence=>30
+,p_column_heading=>'Last Compilation'
+,p_use_as_row_header=>'N'
+,p_heading_alignment=>'LEFT'
+,p_disable_sort_column=>'N'
+,p_derived_column=>'N'
+,p_include_in_export=>'Y'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(84857843388194264)
@@ -100,7 +171,7 @@ wwv_flow_imp_page.create_page_button(
 wwv_flow_imp_page.create_page_item(
  p_id=>wwv_flow_imp.id(21698960154160717)
 ,p_name=>'P2_OPTION'
-,p_item_sequence=>40
+,p_item_sequence=>50
 ,p_item_plug_id=>wwv_flow_imp.id(21698602325160714)
 ,p_prompt=>'Option'
 ,p_display_as=>'NATIVE_RADIOGROUP'
