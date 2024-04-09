@@ -36,7 +36,7 @@ begin
      ---------  ----------  ---------------  ------------------------------------
      1.1        21.04.2023  pdahlem          Package has been added to QUASTO
      23.2       05.11.2023  mwilhelm         Added new constants for utPLSQL objects
-     24.1       08.04.2024  mwilhelm         Added function get_constant_value
+     24.1       08.04.2024  mwilhelm         Added functions to get constant values
   ******************************************************************************/
 
     gc_quasto_name               constant varchar(50 char)     := ''QUASTO'';
@@ -56,39 +56,65 @@ begin
     gc_utplsql_scheme_result_success      constant number := ' || '''' || l_utplsql_scheme_result_success || '''' || ';
     gc_utplsql_scheme_result_error        constant number := ' || '''' || l_utplsql_scheme_result_error || '''' || ';
 
-    function f_get_constant_value (
+    function f_get_constant_string_value (
       pi_constant_name in varchar2
-    ) return varchar2 deterministic;
+    ) return varchar2;
+
+    function f_get_constant_number_value (
+      pi_constant_name in varchar2
+    ) return number;
 
 end;';
 
   l_action_pkg_body := 'create or replace package body qa_constant_pkg as
 
-  function f_get_constant_value (
+  function f_get_constant_string_value (
     pi_constant_name in varchar2
-  ) return varchar2 deterministic
+  ) return varchar2
   as
-    l_package_name varchar2(50) := $$plsql_unit;
-    l_constant_name varchar2(255);
-    l_constant_value varchar2(255);
+    l_constant_value varchar2(4000);
   begin
-    select ident2.name
-    into l_constant_name
-    from user_identifiers ident
-    join user_identifiers ident2
-    on ident.object_type = ident2.object_type
-    and ident.object_name = ident2.object_name
-    and ident.usage_id = ident2.usage_context_id
-    where ident.name = l_package_name
-    and ident2.object_type = ''PACKAGE''
-    and ident2.usage = ''DECLARATION''
-    and ident2.type = ''CONSTANT''
-    and ident2.name = upper(pi_constant_name);
+    case upper(pi_constant_name)
+      -- core constants
+      when upper(''gc_quasto_name'')                       then l_constant_value := gc_quasto_name;
+      when upper(''gc_quasto_version'')                    then l_constant_value := gc_quasto_version;
+      when upper(''gc_black_list_exception_text'')         then l_constant_value := gc_black_list_exception_text;
+      
+      -- utPLSQL Unit test constants
+      when upper(''gc_utplsql_ut_test_packages_prefix'')   then l_constant_value := gc_utplsql_ut_test_packages_prefix;
+      when upper(''gc_utplsql_scheduler_cronjob_name'')    then l_constant_value := gc_utplsql_scheduler_cronjob_name;
+      when upper(''gc_utplsql_custom_scheduler_job_name'') then l_constant_value := gc_utplsql_custom_scheduler_job_name;
 
-    execute immediate ''begin :l_constant_value := to_char('' || l_package_name || ''.'' || l_constant_name || ''); end;'' using out l_constant_value;
+      else raise_application_error(-20001, ''Invalid input parameter value for pi_constant_name: '' || pi_constant_name);
+    end case;
      
     return l_constant_value;
-  end f_get_constant_value;
+  end f_get_constant_string_value;
+
+  function f_get_constant_number_value (
+    pi_constant_name in varchar2
+  ) return number
+  as
+    l_constant_value number;
+  begin
+    case upper(pi_constant_name)
+      -- core constants
+      when upper(''gc_utplsql_flag'')                      then l_constant_value := gc_utplsql_flag;
+      when upper(''gc_apex_flag'')                         then l_constant_value := gc_apex_flag;
+      when upper(''gc_logger_flag'')                       then l_constant_value := gc_logger_flag;
+
+      -- utPLSQL Unit test constants
+      when upper(''gc_utplsql_single_package'')            then l_constant_value := gc_utplsql_single_package;
+      when upper(''gc_utplsql_single_package_per_rule'')   then l_constant_value := gc_utplsql_single_package_per_rule;
+      when upper(''gc_utplsql_scheme_result_failure'')     then l_constant_value := gc_utplsql_scheme_result_failure;
+      when upper(''gc_utplsql_scheme_result_success'')     then l_constant_value := gc_utplsql_scheme_result_success;
+      when upper(''gc_utplsql_scheme_result_error'')       then l_constant_value := gc_utplsql_scheme_result_error;
+
+      else raise_application_error(-20001, ''Invalid input parameter value for pi_constant_name: '' || pi_constant_name);
+    end case;
+     
+    return l_constant_value;
+  end f_get_constant_number_value;
 
 end qa_constant_pkg;';
 
