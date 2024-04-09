@@ -39,22 +39,25 @@ begin
      24.1       08.04.2024  mwilhelm         Added functions to get constant values
   ******************************************************************************/
 
+    -- Constants
     gc_quasto_name               constant varchar(50 char)     := ''QUASTO'';
     gc_quasto_version            constant varchar(50 char)     := ' || '''' || l_apex_version || '''' || ';
     gc_utplsql_flag              constant number               := ' || l_utplsql_flag || ';
     gc_apex_flag                 constant number               := ' || l_apex_flag || ';
     gc_logger_flag               constant number               := ' || l_logger_flag || ';
-    gc_black_list_exception_text constant varchar2 (5000 char) := ' || '''' || 'A User has tried to be tested that is blacklisted in the View qa_scheme_names_for_testing_v!' || '''' || '|| chr(13) ||' || '''' || 'To edit blacklisted users please edit the View mentioned above!' || '''' || ' || chr(13) ||' || '''' || 'User:' || '''' || ';
-
+    
     gc_utplsql_single_package             constant number := ' || l_utplsql_single_package || ';
     gc_utplsql_single_package_per_rule    constant number := ' || l_utplsql_single_package_per_rule || ';
     gc_utplsql_ut_test_packages_prefix    constant varchar2(10) := ' || '''' || l_utplsql_ut_test_packages_prefix || '''' || ';
     gc_utplsql_scheduler_cronjob_name     constant varchar2(30) := ' || '''' || l_utplsql_scheduler_cronjob_name || '''' || ';
     gc_utplsql_custom_scheduler_job_name  constant varchar2(30) := ' || '''' || l_utplsql_custom_scheduler_job_name || '''' || ';
-
     gc_utplsql_scheme_result_failure      constant number := ' || '''' || l_utplsql_scheme_result_failure || '''' || ';
     gc_utplsql_scheme_result_success      constant number := ' || '''' || l_utplsql_scheme_result_success || '''' || ';
     gc_utplsql_scheme_result_error        constant number := ' || '''' || l_utplsql_scheme_result_error || '''' || ';
+
+    -- Exceptions
+    gc_black_list_exception_text constant varchar2 (5000 char) := ' || '''' || 'A User has tried to be tested that is blacklisted in the View qa_scheme_names_for_testing_v!' || '''' || '|| chr(13) ||' || '''' || 'To edit blacklisted users please edit the View mentioned above!' || '''' || ' || chr(13) ||' || '''' || 'User:' || '''' || ';
+    gc_invalid_constant_exception_text constant varchar2(50 char) := ''Constant name does not exist'';
 
     function f_get_constant_string_value (
       pi_constant_name in varchar2
@@ -72,8 +75,17 @@ end;';
     pi_constant_name in varchar2
   ) return varchar2
   as
+    c_unit constant varchar2(32767) := $$plsql_unit || ''.f_get_constant_string_value'';
+    l_param_list qa_logger_pkg.tab_param;
+    e_constant_not_found exception;
+    pragma exception_init(e_constant_not_found, -20001);
+
     l_constant_value varchar2(4000);
   begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => ''pi_constant_name''
+                              ,p_val_01  => pi_constant_name);
+
     case upper(pi_constant_name)
       -- core constants
       when upper(''gc_quasto_name'')                       then l_constant_value := gc_quasto_name;
@@ -85,18 +97,40 @@ end;';
       when upper(''gc_utplsql_scheduler_cronjob_name'')    then l_constant_value := gc_utplsql_scheduler_cronjob_name;
       when upper(''gc_utplsql_custom_scheduler_job_name'') then l_constant_value := gc_utplsql_custom_scheduler_job_name;
 
-      else raise_application_error(-20001, ''Invalid input parameter value for pi_constant_name: '' || pi_constant_name);
+      else raise e_constant_not_found;
     end case;
      
     return l_constant_value;
+  exception
+    when e_constant_not_found then
+      qa_logger_pkg.p_qa_log(p_text   => ''The given constant name does not exist!''
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise_application_error(-20001, gc_invalid_constant_exception_text || '': '' || pi_constant_name);
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => ''There has been an error while trying to get the constant value!''
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
   end f_get_constant_string_value;
 
   function f_get_constant_number_value (
     pi_constant_name in varchar2
   ) return number
   as
+    c_unit constant varchar2(32767) := $$plsql_unit || ''.f_get_constant_number_value'';
+    l_param_list qa_logger_pkg.tab_param;
+    e_constant_not_found exception;
+    pragma exception_init(e_constant_not_found, -20001);
+
     l_constant_value number;
   begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => ''pi_constant_name''
+                              ,p_val_01  => pi_constant_name);
+
     case upper(pi_constant_name)
       -- core constants
       when upper(''gc_utplsql_flag'')                      then l_constant_value := gc_utplsql_flag;
@@ -110,10 +144,23 @@ end;';
       when upper(''gc_utplsql_scheme_result_success'')     then l_constant_value := gc_utplsql_scheme_result_success;
       when upper(''gc_utplsql_scheme_result_error'')       then l_constant_value := gc_utplsql_scheme_result_error;
 
-      else raise_application_error(-20001, ''Invalid input parameter value for pi_constant_name: '' || pi_constant_name);
+      else raise e_constant_not_found;
     end case;
      
     return l_constant_value;
+  exception
+    when e_constant_not_found then
+      qa_logger_pkg.p_qa_log(p_text   => ''The given constant name does not exist!''
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise_application_error(-20001, gc_invalid_constant_exception_text || '': '' || pi_constant_name);
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => ''There has been an error while trying to get the constant value!''
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
   end f_get_constant_number_value;
 
 end qa_constant_pkg;';

@@ -77,6 +77,10 @@ begin
   l_object(l_index).object_type := 'PACKAGE';
   l_index := l_index + 1;
 
+  l_object(l_index).object_name := 'QA_CONSTANT_PKG';
+  l_object(l_index).object_type := 'PACKAGE';
+  l_index := l_index + 1;
+
   -- triggers
   l_object(l_index).object_name := 'QARU_IU_TRG';
   l_object(l_index).object_type := 'TRIGGER';
