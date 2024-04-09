@@ -40,5 +40,10 @@ select qatr.qatr_id,
 from QA_TEST_RUNS qatr
 join QA_RULES qaru
 on qaru.qaru_id = qatr.qatr_qaru_id
+order by qaru.qaru_client_name,
+         qatr.qatr_date,
+         qatr.qatr_scheme_name,
+         qaru.qaru_category,
+         qaru.qaru_name
 ;
 /
