@@ -88,9 +88,6 @@ end;';
     execute immediate ''begin :l_constant_value := to_char('' || l_package_name || ''.'' || l_constant_name || ''); end;'' using out l_constant_value;
      
     return l_constant_value;
-  exception
-    when others then
-      null;
   end f_get_constant_value;
 
 end qa_constant_pkg;';
