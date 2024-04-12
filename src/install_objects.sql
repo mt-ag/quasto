@@ -1,4 +1,4 @@
-PROMPT SQL file for installing the utPLSQL and QUASTO objects on a database. Called from install.sql.
+PROMPT SQL file for installing all necessary objects on the database. Called from install.sql.
 set define '~'
 set concat on
 set concat .

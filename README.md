@@ -17,9 +17,9 @@ You need to have installed Oracle 19c or higher to be able to install and use QU
 Project uses the MIT License.
 
 ## 2. Installing QUASTO
-### Installing Guidelines for the QUASTO Quality Assurance Tool
+### Installing Guidelines for QUASTO
 
-To install the QUASTO Quality Assurance Tool on your oracle database from scratch, run the install.sql file in the root directory of the repository.
+To install QUASTO on your oracle database from scratch, run the install.sql file in the root directory of the repository.
 
 This file will install all necessary objects for QUASTO.
 
@@ -50,7 +50,7 @@ If you want to run APEX Tests, you should grant the APEX_ADMINISTRATOR_ROLE to Q
 grant APEX_ADMINISTRATOR_ROLE to quasto;
 ```
 
-#### Running the Install Script:
+### Running the Install Script:
 ```
 @install.sql [1/0] [1/0] [1/0] [1/0]
 ```
@@ -193,7 +193,7 @@ In order to export a JSON file of the currently existing rules of the QA_RULES t
 @export_rules_to_file.sql "[Client Name]" "[Category (optional)]"
 ```
 
-Here we use two qrguments.
+Here we use two arguments.
 1. The name of the client we want to export the rules for. This name needs to be the exact entry of the client name inside the QA_RULES table!
 2. The optional name of the category for which rules we want to export.
 
@@ -228,7 +228,7 @@ These installation instructions are based on the installation instructions of th
 
 The following prerequisites and instructions refer to the utPLSQL Framework version 3.1.11. For other versions, the requirements and installation steps may differ.
 
-For the installation the user needs to have SYS privilege.
+For the installation of DDL triggers, the user needs to have SYS privileges.
 
 Prerequisites:
 - The installation of utPLSQL requires a database version of Oracle 11gR2, 12c, 12c R2, 18c, 19c
