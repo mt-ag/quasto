@@ -71,15 +71,16 @@ PROMPT src/plsql/vw/qa_scheme_names_for_testing_v.sql
 PROMPT ################
 PROMPT     PACKAGES
 PROMPT ################
+PROMPT src/plsql/pkg/qa_logger_pkg.sql
 @src/plsql/pkg/qa_logger_pkg.sql
+PROMPT src/plsql/pkg/qa_utils_pkg.sql
+@src/plsql/pkg/qa_utils_pkg.sql
 PROMPT src/plsql/pkg/qa_main_pkg.sql
 @src/plsql/pkg/qa_main_pkg.sql
 PROMPT src/plsql/pkg/qa_api_pkg.sql
 @src/plsql/pkg/qa_api_pkg.sql
 PROMPT src/plsql/pkg/qa_export_import_rules_pkg.sql
 @src/plsql/pkg/qa_export_import_rules_pkg.sql
-PROMPT src/plsql/pkg/qa_utils_pkg.sql
-@src/plsql/pkg/qa_utils_pkg.sql
 
 PROMPT ################
 PROMPT     TRIGGERS

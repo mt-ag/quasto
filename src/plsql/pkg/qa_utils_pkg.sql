@@ -67,7 +67,7 @@ create or replace package qa_utils_pkg is
 
   /**
    * procedure to print a given varchar2 string to dbms_output
-   * @param pi_text defines the string
+   * @param  pi_text defines the string
    * @throws NO_DATA_FOUND if no data found in given string
   */
   procedure p_print_to_dbms_output
@@ -82,8 +82,28 @@ create or replace package qa_utils_pkg is
   */
   procedure p_print_to_dbms_output
   (
-   pi_string  in clob
+    pi_string  in clob
   ) deterministic;
+
+  /**
+   * function to return the value of a given constant of type varchar2
+   * @param  pi_constant_name specifies the constant
+   * @throws e_constant_not_found if constant does not exist
+   * @return varchar2 returns the constant value
+  */
+  function f_get_constant_string_value (
+    pi_constant_name in varchar2
+  ) return varchar2;
+
+  /**
+   * function to return the value of a given constant of type number
+   * @param  pi_constant_name specifies the constant
+   * @throws e_constant_not_found if constant does not exist
+   * @return number returns the constant value
+  */
+  function f_get_constant_number_value (
+    pi_constant_name in varchar2
+  ) return number;
 
 end qa_utils_pkg;
 /
@@ -343,6 +363,98 @@ create or replace package body qa_utils_pkg is
                             ,p_params => l_param_list);
       raise;
   end p_print_to_dbms_output;
+
+  function f_get_constant_string_value (
+    pi_constant_name in varchar2
+  ) return varchar2
+  as
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_constant_string_value';
+    l_param_list qa_logger_pkg.tab_param;
+    e_constant_not_found exception;
+    pragma exception_init(e_constant_not_found, -20001);
+
+    l_constant_value varchar2(4000);
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_constant_name'
+                              ,p_val_01  => pi_constant_name);
+
+    case upper(pi_constant_name)
+      -- core constants
+      when upper('gc_quasto_name')                       then l_constant_value := qa_constant_pkg.gc_quasto_name;
+      when upper('gc_quasto_version')                    then l_constant_value := qa_constant_pkg.gc_quasto_version;
+      when upper('gc_black_list_exception_text')         then l_constant_value := qa_constant_pkg.gc_black_list_exception_text;
+      
+      -- utPLSQL Unit test constants
+      when upper('gc_utplsql_ut_test_packages_prefix')   then l_constant_value := qa_constant_pkg.gc_utplsql_ut_test_packages_prefix;
+      when upper('gc_utplsql_scheduler_cronjob_name')    then l_constant_value := qa_constant_pkg.gc_utplsql_scheduler_cronjob_name;
+      when upper('gc_utplsql_custom_scheduler_job_name') then l_constant_value := qa_constant_pkg.gc_utplsql_custom_scheduler_job_name;
+
+      else raise e_constant_not_found;
+    end case;
+     
+    return l_constant_value;
+  exception
+    when e_constant_not_found then
+      qa_logger_pkg.p_qa_log(p_text   => 'The given constant name does not exist!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise_application_error(-20001, qa_constant_pkg.gc_invalid_constant_exception_text || ': ' || pi_constant_name);
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get the constant value!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_get_constant_string_value;
+
+  function f_get_constant_number_value (
+    pi_constant_name in varchar2
+  ) return number
+  as
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_constant_number_value';
+    l_param_list qa_logger_pkg.tab_param;
+    e_constant_not_found exception;
+    pragma exception_init(e_constant_not_found, -20001);
+
+    l_constant_value number;
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_constant_name'
+                              ,p_val_01  => pi_constant_name);
+
+    case upper(pi_constant_name)
+      -- core constants
+      when upper('gc_utplsql_flag')                      then l_constant_value := qa_constant_pkg.gc_utplsql_flag;
+      when upper('gc_apex_flag')                         then l_constant_value := qa_constant_pkg.gc_apex_flag;
+      when upper('gc_logger_flag')                       then l_constant_value := qa_constant_pkg.gc_logger_flag;
+
+      -- utPLSQL Unit test constants
+      when upper('gc_utplsql_single_package')            then l_constant_value := qa_constant_pkg.gc_utplsql_single_package;
+      when upper('gc_utplsql_single_package_per_rule')   then l_constant_value := qa_constant_pkg.gc_utplsql_single_package_per_rule;
+      when upper('gc_utplsql_scheme_result_failure')     then l_constant_value := qa_constant_pkg.gc_utplsql_scheme_result_failure;
+      when upper('gc_utplsql_scheme_result_success')     then l_constant_value := qa_constant_pkg.gc_utplsql_scheme_result_success;
+      when upper('gc_utplsql_scheme_result_error')       then l_constant_value := qa_constant_pkg.gc_utplsql_scheme_result_error;
+
+      else raise e_constant_not_found;
+    end case;
+     
+    return l_constant_value;
+  exception
+    when e_constant_not_found then
+      qa_logger_pkg.p_qa_log(p_text   => 'The given constant name does not exist!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise_application_error(-20001, qa_constant_pkg.gc_invalid_constant_exception_text || ': ' || pi_constant_name);
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get the constant value!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_get_constant_number_value;
 
 end qa_utils_pkg;
 /

@@ -57,15 +57,7 @@ begin
   l_index := l_index + 1;
 
   -- packages
-  l_object(l_index).object_name := 'QA_MAIN_PKG';
-  l_object(l_index).object_type := 'PACKAGE';
-  l_index := l_index + 1;
-
-  l_object(l_index).object_name := 'QA_API_PKG';
-  l_object(l_index).object_type := 'PACKAGE';
-  l_index := l_index + 1;
-
-  l_object(l_index).object_name := 'QA_EXPORT_IMPORT_RULES_PKG';
+  l_object(l_index).object_name := 'QA_CONSTANT_PKG';
   l_object(l_index).object_type := 'PACKAGE';
   l_index := l_index + 1;
 
@@ -77,7 +69,15 @@ begin
   l_object(l_index).object_type := 'PACKAGE';
   l_index := l_index + 1;
 
-  l_object(l_index).object_name := 'QA_CONSTANT_PKG';
+  l_object(l_index).object_name := 'QA_MAIN_PKG';
+  l_object(l_index).object_type := 'PACKAGE';
+  l_index := l_index + 1;
+
+  l_object(l_index).object_name := 'QA_API_PKG';
+  l_object(l_index).object_type := 'PACKAGE';
+  l_index := l_index + 1;
+
+  l_object(l_index).object_name := 'QA_EXPORT_IMPORT_RULES_PKG';
   l_object(l_index).object_type := 'PACKAGE';
   l_index := l_index + 1;
 
