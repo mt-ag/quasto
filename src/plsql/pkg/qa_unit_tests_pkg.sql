@@ -1030,7 +1030,6 @@ create or replace package body qa_unit_tests_pkg is
    ,pi_result       in number
   ) return number
   is
-  pragma autonomous_transaction;  
     l_qatr_id qa_test_runs.qatr_id%type;
   begin
     if pi_result not in (qa_constant_pkg.gc_utplsql_scheme_result_failure
@@ -1044,12 +1043,8 @@ create or replace package body qa_unit_tests_pkg is
     insert into QA_TEST_RUNS (qatr_scheme_name, qatr_date, qatr_result, qatr_qaru_id, qatr_program_name)
     values (pi_scheme_name, sysdate, pi_result, pi_qaru_id, pi_program_name)
     returning qatr_id into l_qatr_id;
-    commit;
     
     return l_qatr_id;
-  exception
-    when others then
-      raise;
   end f_save_scheme_result;
 
   procedure p_save_scheme_faulty_objects(
@@ -1057,14 +1052,9 @@ create or replace package body qa_unit_tests_pkg is
    ,pi_object_details in varchar2
    ,pi_qatr_id        in qa_test_runs.qatr_id%type
   ) is
-  pragma autonomous_transaction;
   begin
     insert into QA_TEST_RUN_INVALID_OBJECTS (qato_object_name, qato_object_details, qato_qatr_id)
     values (pi_object_name, pi_object_details, pi_qatr_id);
-    commit;
-  exception
-    when others then
-      raise;
   end p_save_scheme_faulty_objects;
 
   procedure p_handle_test_result(
@@ -1076,6 +1066,7 @@ create or replace package body qa_unit_tests_pkg is
    ,pi_program_name     in varchar2
   )
   is
+  pragma autonomous_transaction;
     l_qaru_id qa_rules.qaru_id%type;
     l_qaru_category qa_rules.qaru_category%type;
     l_qaru_name qa_rules.qaru_name%type;
@@ -1108,13 +1099,13 @@ create or replace package body qa_unit_tests_pkg is
                                          ,pi_program_name => pi_program_name
                                          ,pi_qaru_id      => l_qaru_id
                                          ,pi_result       => qa_constant_pkg.gc_utplsql_scheme_result_success);
-        dbms_output.put_line('<Scheme name="'||DBMS_XMLGEN.CONVERT(rec_scheme_objects.scheme_name)||'" testresultid="'||l_qatr_id||'" result="'||qa_constant_pkg.gc_utplsql_scheme_result_success||'" datetime="'||to_char(sysdate, '''MM/DD/YYYY HH24:MI:SS''')||'"></Scheme>');
+        dbms_output.put_line('<Scheme name="'||DBMS_XMLGEN.CONVERT(rec_scheme_objects.scheme_name)||'" testresultid="'||l_qatr_id||'" result="'||qa_constant_pkg.gc_utplsql_scheme_result_success||'" datetime="'||to_char(sysdate, 'MM/DD/YYYY HH24:MI:SS')||'"></Scheme>');
       else
         l_qatr_id := f_save_scheme_result(pi_scheme_name  => rec_scheme_objects.scheme_name
                                          ,pi_program_name => pi_program_name
                                          ,pi_qaru_id      => l_qaru_id
                                          ,pi_result       => qa_constant_pkg.gc_utplsql_scheme_result_failure);
-        dbms_output.put_line('<Scheme name="'||DBMS_XMLGEN.CONVERT(rec_scheme_objects.scheme_name)||'" testresultid="'||l_qatr_id||'" result="'||qa_constant_pkg.gc_utplsql_scheme_result_failure||'" datetime="'||to_char(sysdate, '''MM/DD/YYYY HH24:MI:SS''')||'">');
+        dbms_output.put_line('<Scheme name="'||DBMS_XMLGEN.CONVERT(rec_scheme_objects.scheme_name)||'" testresultid="'||l_qatr_id||'" result="'||qa_constant_pkg.gc_utplsql_scheme_result_failure||'" datetime="'||to_char(sysdate, 'MM/DD/YYYY HH24:MI:SS')||'">');
         
         for rec_scheme_invalid_objects in ( select object_name
                                                   ,object_details
@@ -1133,10 +1124,8 @@ create or replace package body qa_unit_tests_pkg is
       end if;
     end loop;
     dbms_output.put_line('</Results>');
+    commit;
 
-  exception
-    when others then
-      raise;
   end p_handle_test_result;
 
   procedure p_handle_test_exception(
@@ -1164,9 +1153,6 @@ create or replace package body qa_unit_tests_pkg is
     set qatr_runtime_error = pi_runtime_error
     where qatr_id = l_qatr_id;
     commit;
-  exception
-    when others then
-      raise;
   end p_handle_test_exception;
 
   function f_get_job_name(
