@@ -33,6 +33,9 @@ begin
     l_object(l_index).object_name := 'QA_APEX_API_PKG';
     l_object(l_index).object_type := 'PACKAGE';
     l_index := l_index + 1;
+    l_object(l_index).object_name := 'QA_APEX_PLUGIN_PKG';
+    l_object(l_index).object_type := 'PACKAGE';
+    l_index := l_index + 1;
 
     -- views
     l_object(l_index).object_name := 'QA_APEX_BLACKLISTED_APPS_V';
