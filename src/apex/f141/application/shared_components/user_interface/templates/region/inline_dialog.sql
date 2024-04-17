@@ -103,7 +103,7 @@ wwv_flow_imp_shared.create_plug_tmpl_display_point(
 ,p_placeholder=>'NEXT'
 ,p_has_grid_support=>false
 ,p_has_region_support=>false
-,p_has_item_support=>true
+,p_has_item_support=>false
 ,p_has_button_support=>true
 ,p_glv_new_row=>true
 );
@@ -114,7 +114,7 @@ wwv_flow_imp_shared.create_plug_tmpl_display_point(
 ,p_placeholder=>'PREVIOUS'
 ,p_has_grid_support=>false
 ,p_has_region_support=>false
-,p_has_item_support=>true
+,p_has_item_support=>false
 ,p_has_button_support=>true
 ,p_glv_new_row=>true
 );

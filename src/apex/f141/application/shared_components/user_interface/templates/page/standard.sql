@@ -270,8 +270,8 @@ wwv_flow_imp_shared.create_page_tmpl_display_point(
 ,p_placeholder=>'REGION_POSITION_05'
 ,p_has_grid_support=>true
 ,p_has_region_support=>true
-,p_has_item_support=>true
-,p_has_button_support=>true
+,p_has_item_support=>false
+,p_has_button_support=>false
 ,p_glv_new_row=>true
 ,p_max_fixed_grid_columns=>12
 );

@@ -23,7 +23,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'03'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240408164048'
+,p_last_upd_yyyymmddhh24miss=>'20240417122510'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(51469936526214117)
@@ -232,7 +232,7 @@ wwv_flow_imp_page.create_page_button(
 );
 wwv_flow_imp_page.create_page_button(
  p_id=>wwv_flow_imp.id(59677201614121593)
-,p_button_sequence=>20
+,p_button_sequence=>30
 ,p_button_plug_id=>wwv_flow_imp.id(63080644826391011)
 ,p_button_name=>'SAVE'
 ,p_button_action=>'SUBMIT'
@@ -349,7 +349,6 @@ wwv_flow_imp_page.create_page_item(
 ,p_name=>'P9_ENABLE_SCHEDULER_JOB'
 ,p_item_sequence=>10
 ,p_item_plug_id=>wwv_flow_imp.id(63080644826391011)
-,p_item_display_point=>'NEXT'
 ,p_prompt=>'Enable Cronjob'
 ,p_source=>'qa_unit_tests_pkg.f_is_scheduler_cronjob_enabled'
 ,p_source_type=>'EXPRESSION'

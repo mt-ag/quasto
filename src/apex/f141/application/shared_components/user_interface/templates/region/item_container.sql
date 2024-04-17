@@ -30,14 +30,25 @@ wwv_flow_imp_shared.create_plug_template(
 ,p_translate_this_template=>'N'
 );
 wwv_flow_imp_shared.create_plug_tmpl_display_point(
+ p_id=>wwv_flow_imp.id(38225149545412517)
+,p_plug_template_id=>wwv_flow_imp.id(50708960473675102)
+,p_name=>'Sub Regions'
+,p_placeholder=>'SUB_REGIONS'
+,p_has_grid_support=>true
+,p_has_region_support=>true
+,p_has_item_support=>false
+,p_has_button_support=>false
+,p_glv_new_row=>true
+);
+wwv_flow_imp_shared.create_plug_tmpl_display_point(
  p_id=>wwv_flow_imp.id(50709231164675102)
 ,p_plug_template_id=>wwv_flow_imp.id(50708960473675102)
 ,p_name=>'Item'
 ,p_placeholder=>'BODY'
 ,p_has_grid_support=>false
-,p_has_region_support=>false
+,p_has_region_support=>true
 ,p_has_item_support=>true
-,p_has_button_support=>false
+,p_has_button_support=>true
 ,p_glv_new_row=>true
 );
 wwv_flow_imp_shared.create_plug_tmpl_display_point(

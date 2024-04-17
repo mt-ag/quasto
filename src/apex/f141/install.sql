@@ -21,6 +21,7 @@ prompt --install
 @@application/shared_components/logic/application_settings.sql
 @@application/shared_components/navigation/tabs/standard.sql
 @@application/shared_components/navigation/tabs/parent.sql
+@@application/shared_components/user_interface/lovs/apex_rules_lov.sql
 @@application/shared_components/user_interface/lovs/rule_categories_lov.sql
 @@application/shared_components/user_interface/lovs/rule_error_levels_lov.sql
 @@application/shared_components/user_interface/lovs/rule_layers_lov.sql
@@ -110,6 +111,8 @@ prompt --install
 @@application/shared_components/globalization/dyntranslations.sql
 @@application/shared_components/security/authentications/opendoor.sql
 @@application/shared_components/security/authentications/oracle_apex_accounts.sql
+@@application/shared_components/plugins/region_type/qa_region_plugin.sql
+@@application/shared_components/plugins/region_type/com_mtag_olemm_qa_region.sql
 @@application/user_interfaces/combined_files.sql
 @@application/pages/page_00000.sql
 @@application/pages/page_00001.sql
