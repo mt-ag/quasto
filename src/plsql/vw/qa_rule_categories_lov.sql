@@ -1,10 +1,21 @@
 
   CREATE OR REPLACE FORCE EDITIONABLE VIEW "QA_RULE_CATEGORIES_LOV"
   AS 
-select QARU_CATEGORY as display_value
-     , QARU_CATEGORY as return_value
-from QA_RULES
-group by QARU_CATEGORY
-order by QARU_CATEGORY asc
+select display_value, return_value
+  from (
+      select 'APEX' as display_value
+           , 'APEX' as return_value
+      from dual
+      union all
+      select 'DDL' as display_value
+           , 'DDL' as return_value
+      from dual
+      union all
+      select 'DATA' as display_value
+           , 'DATA' as return_value
+      from dual
+  )
+group by display_value, return_value
+order by 1 asc
 ;
 /

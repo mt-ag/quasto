@@ -1,15 +1,21 @@
 
   CREATE OR REPLACE FORCE EDITIONABLE VIEW "QA_RULE_ERROR_LEVELS_LOV"
   AS 
-select case QARU_ERROR_LEVEL
-         when 1 then 'Error'
-         when 2 then 'Warning'
-         when 4 then 'Info'
-         else to_char(QARU_ERROR_LEVEL)
-       end as display_value
-     , QARU_ERROR_LEVEL as return_value
-from QA_RULES
-group by QARU_ERROR_LEVEL
-order by QARU_ERROR_LEVEL asc
+select display_value, return_value
+  from (
+      select 'Error' as display_value
+           , 1 as return_value
+      from dual
+      union all
+      select 'Warning' as display_value
+           , 2 as return_value
+      from dual
+      union all
+      select 'Info' as display_value
+           , 4 as return_value
+      from dual
+  )
+group by display_value, return_value
+order by 1 asc
 ;
 /
