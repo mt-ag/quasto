@@ -126,7 +126,7 @@ wwv_imp_workspace.create_flow(
 ,p_substitution_string_03=>'PROVIDER_SLOGAN'
 ,p_substitution_value_03=>'Copyright 2024 Hyand Solutions GmbH'
 ,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240417150726'
+,p_last_upd_yyyymmddhh24miss=>'20240418102713'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_files_version=>9
 ,p_print_server_type=>'NATIVE'
@@ -14699,9 +14699,21 @@ wwv_flow_imp_shared.create_plugin_attribute(
 ,p_attribute_scope=>'COMPONENT'
 ,p_attribute_sequence=>3
 ,p_display_sequence=>30
-,p_prompt=>'Rule_Number'
+,p_prompt=>'Rule Number'
 ,p_attribute_type=>'TEXT'
 ,p_is_required=>false
+,p_is_translatable=>false
+);
+wwv_flow_imp_shared.create_plugin_attribute(
+ p_id=>wwv_flow_imp.id(42928268040208441)
+,p_plugin_id=>wwv_flow_imp.id(2515948831078540410)
+,p_attribute_scope=>'COMPONENT'
+,p_attribute_sequence=>4
+,p_display_sequence=>40
+,p_prompt=>'Client Name'
+,p_attribute_type=>'TEXT'
+,p_is_required=>false
+,p_default_value=>'MT AG'
 ,p_is_translatable=>false
 );
 end;
@@ -14722,7 +14734,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'D'
 ,p_page_component_map=>'14'
 ,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240417150726'
+,p_last_upd_yyyymmddhh24miss=>'20240418102713'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(18125858190567134)
@@ -14732,10 +14744,10 @@ wwv_flow_imp_page.create_page_plug(
 ,p_plug_display_sequence=>10
 ,p_plug_display_point=>'REGION_POSITION_05'
 ,p_plug_source_type=>'PLUGIN_COM.MTAG.OLEMM.QA.REGION'
-,p_required_patch=>wwv_flow_imp.id(50668567409675065)
 ,p_attribute_01=>'&APP_ID.'
 ,p_attribute_02=>'&APP_PAGE_ID.'
 ,p_attribute_03=>'&P0_RULE_SELECTION.'
+,p_attribute_04=>'MT AG'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(37433164330732402)
@@ -14791,7 +14803,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'13'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240417150517'
+,p_last_upd_yyyymmddhh24miss=>'20240417151225'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(50026038309358532)
@@ -15262,20 +15274,6 @@ wwv_flow_imp_page.create_page_button(
 ,p_button_position=>'CREATE'
 ,p_button_redirect_url=>'f?p=&APP_ID.:9:&SESSION.::&DEBUG.:::'
 ,p_icon_css_classes=>'fa-clock-o'
-);
-wwv_flow_imp_page.create_page_button(
- p_id=>wwv_flow_imp.id(21698581924160713)
-,p_button_sequence=>30
-,p_button_plug_id=>wwv_flow_imp.id(54282244796258516)
-,p_button_name=>'UNIT_TEST_GENERATION'
-,p_button_action=>'REDIRECT_PAGE'
-,p_button_template_options=>'#DEFAULT#:t-Button--iconLeft:t-Button--gapTop'
-,p_button_template_id=>wwv_flow_imp.id(50844844448675167)
-,p_button_is_hot=>'Y'
-,p_button_image_alt=>'Unit Test Generation'
-,p_button_position=>'CREATE'
-,p_button_redirect_url=>'f?p=&APP_ID.:2:&SESSION.::&DEBUG.:::'
-,p_icon_css_classes=>'fa-procedure'
 );
 wwv_flow_imp_page.create_page_button(
  p_id=>wwv_flow_imp.id(54282394419258517)
@@ -16418,8 +16416,8 @@ wwv_flow_imp_page.create_page(
 ,p_page_template_options=>'#DEFAULT#'
 ,p_protection_level=>'C'
 ,p_page_component_map=>'18'
-,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240415164227'
+,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
+,p_last_upd_yyyymmddhh24miss=>'20240417151203'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(54073327692447835)
@@ -16667,8 +16665,22 @@ wwv_flow_imp_page.create_page_button(
 ,p_icon_css_classes=>'fa-plus-square'
 );
 wwv_flow_imp_page.create_page_button(
- p_id=>wwv_flow_imp.id(54468222926367591)
+ p_id=>wwv_flow_imp.id(42528929448130001)
 ,p_button_sequence=>30
+,p_button_plug_id=>wwv_flow_imp.id(54282053948258514)
+,p_button_name=>'UNIT_TEST_GENERATION'
+,p_button_action=>'REDIRECT_PAGE'
+,p_button_template_options=>'#DEFAULT#:t-Button--iconLeft:t-Button--gapTop'
+,p_button_template_id=>wwv_flow_imp.id(50844844448675167)
+,p_button_is_hot=>'Y'
+,p_button_image_alt=>'Unit Test Generation'
+,p_button_position=>'CREATE'
+,p_button_redirect_url=>'f?p=&APP_ID.:2:&SESSION.::&DEBUG.:::'
+,p_icon_css_classes=>'fa-procedure'
+);
+wwv_flow_imp_page.create_page_button(
+ p_id=>wwv_flow_imp.id(54468222926367591)
+,p_button_sequence=>40
 ,p_button_plug_id=>wwv_flow_imp.id(54282053948258514)
 ,p_button_name=>'RULE_FILES'
 ,p_button_action=>'REDIRECT_PAGE'
@@ -17445,7 +17457,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'03'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240417122510'
+,p_last_upd_yyyymmddhh24miss=>'20240417151448'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(51469936526214117)
@@ -17771,7 +17783,7 @@ wwv_flow_imp_page.create_page_item(
 ,p_name=>'P9_ENABLE_SCHEDULER_JOB'
 ,p_item_sequence=>10
 ,p_item_plug_id=>wwv_flow_imp.id(63080644826391011)
-,p_prompt=>'Enable Cronjob'
+,p_prompt=>'Enable schedule for Cronjob'
 ,p_source=>'qa_unit_tests_pkg.f_is_scheduler_cronjob_enabled'
 ,p_source_type=>'EXPRESSION'
 ,p_source_language=>'PLSQL'
