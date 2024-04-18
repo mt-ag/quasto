@@ -71,8 +71,8 @@ PROMPT src/plsql/pkg/qa_apex_plugin_pkg.sql
 @src/plsql/pkg/qa_apex_plugin_pkg.sql
 
 PROMPT PLUGIN
-PROMPT src/plugin/region_type_plugin_com_mtag_olemm_qa_region.sql
-@src/plugin/region_type_plugin_com_mtag_olemm_qa_region.sql
+PROMPT src/plugin/region_type_plugin_quasto_region.sql
+--@src/plugin/region_type_plugin_quasto_region.sql
 
 
 PROMPT #######################################
