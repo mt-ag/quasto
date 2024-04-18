@@ -58,9 +58,21 @@ wwv_flow_imp_shared.create_plugin_attribute(
 ,p_attribute_scope=>'COMPONENT'
 ,p_attribute_sequence=>3
 ,p_display_sequence=>30
-,p_prompt=>'Rule_Number'
+,p_prompt=>'Rule Number'
 ,p_attribute_type=>'TEXT'
 ,p_is_required=>false
+,p_is_translatable=>false
+);
+wwv_flow_imp_shared.create_plugin_attribute(
+ p_id=>wwv_flow_imp.id(42928268040208441)
+,p_plugin_id=>wwv_flow_imp.id(2515948831078540410)
+,p_attribute_scope=>'COMPONENT'
+,p_attribute_sequence=>4
+,p_display_sequence=>40
+,p_prompt=>'Client Name'
+,p_attribute_type=>'TEXT'
+,p_is_required=>false
+,p_default_value=>'MT AG'
 ,p_is_translatable=>false
 );
 wwv_flow_imp.component_end;

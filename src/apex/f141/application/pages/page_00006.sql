@@ -20,8 +20,8 @@ wwv_flow_imp_page.create_page(
 ,p_page_template_options=>'#DEFAULT#'
 ,p_protection_level=>'C'
 ,p_page_component_map=>'18'
-,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240415164227'
+,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
+,p_last_upd_yyyymmddhh24miss=>'20240417151203'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(54073327692447835)
@@ -269,8 +269,22 @@ wwv_flow_imp_page.create_page_button(
 ,p_icon_css_classes=>'fa-plus-square'
 );
 wwv_flow_imp_page.create_page_button(
- p_id=>wwv_flow_imp.id(54468222926367591)
+ p_id=>wwv_flow_imp.id(42528929448130001)
 ,p_button_sequence=>30
+,p_button_plug_id=>wwv_flow_imp.id(54282053948258514)
+,p_button_name=>'UNIT_TEST_GENERATION'
+,p_button_action=>'REDIRECT_PAGE'
+,p_button_template_options=>'#DEFAULT#:t-Button--iconLeft:t-Button--gapTop'
+,p_button_template_id=>wwv_flow_imp.id(50844844448675167)
+,p_button_is_hot=>'Y'
+,p_button_image_alt=>'Unit Test Generation'
+,p_button_position=>'CREATE'
+,p_button_redirect_url=>'f?p=&APP_ID.:2:&SESSION.::&DEBUG.:::'
+,p_icon_css_classes=>'fa-procedure'
+);
+wwv_flow_imp_page.create_page_button(
+ p_id=>wwv_flow_imp.id(54468222926367591)
+,p_button_sequence=>40
 ,p_button_plug_id=>wwv_flow_imp.id(54282053948258514)
 ,p_button_name=>'RULE_FILES'
 ,p_button_action=>'REDIRECT_PAGE'
