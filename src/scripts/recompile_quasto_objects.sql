@@ -114,7 +114,7 @@ begin
     end if;
 
     l_action_2 := null;
-    if l_object(l_counter).object_type = 'PACKAGE'
+    if l_object(l_counter).object_type = 'PACKAGE' and l_object(l_counter).object_name != 'QA_CONSTANT_PKG'
     then
       l_action   := 'alter package ' || l_object(l_counter).object_name || ' compile';
       l_action_2 := 'alter package ' || l_object(l_counter).object_name || ' compile body';
