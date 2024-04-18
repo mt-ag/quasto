@@ -1,4 +1,4 @@
-create or replace package qa_apex_plugin_pkg authid current_user as 
+create or replace package qa_apex_plugin_pkg authid current_user as
 
   c_plugin_qa_collection_name constant varchar2(30) := 'PLUGIN_QA_COLLECTION';
 
@@ -15,42 +15,10 @@ create or replace package qa_apex_plugin_pkg authid current_user as
    ,p_plugin              in apex_plugin.t_plugin
    ,p_is_printer_friendly in boolean
   ) return apex_plugin.t_region_render_result;
-
-  -- function is used in the apex process plugin
-  -- %param p_process
-  -- %param p_plugin properties of the plugin itself
-  function execute_process
-  (
-    p_process in apex_plugin.t_process
-   ,p_plugin  in apex_plugin.t_plugin
-  ) return apex_plugin.t_process_exec_result;
-
-  --########################################
-  --test spec
-  function get_html_region_header return varchar2;
-
-  function get_html_rule_line
-  (
-    p_nr        in pls_integer
-   ,p_qa_rule_t in qa_rule_t
-  ) return varchar2;
-
-  function tf_run_rule
-  (
-    pi_app_id           in apex_application_items.application_id%type
-   ,pi_page_id          in apex_application_pages.page_id%type
-   ,pi_qaru_rule_number in qa_rules.qaru_rule_number%type
-   ,pi_qaru_client_name in qa_rules.qaru_client_name%type
-   ,pi_target_scheme    in varchar2 default user
-  ) return qa_rules_t;
-
+  
 end qa_apex_plugin_pkg;
 /
-
 create or replace package body qa_apex_plugin_pkg as
-
-  c_debugging constant boolean := false;
-
   -- same as t_qa_rule_t.qaru_object_types
   subtype t_object_type is varchar2(30);
 
@@ -74,86 +42,6 @@ create or replace package body qa_apex_plugin_pkg as
   begin
     return c_plugin_qa_collection_name;
   end get_collection_name;
-
-  function tf_run_rule
-  (
-    pi_app_id           in apex_application_items.application_id%type
-   ,pi_page_id          in apex_application_pages.page_id%type
-   ,pi_qaru_rule_number in qa_rules.qaru_rule_number%type
-   ,pi_qaru_client_name in qa_rules.qaru_client_name%type
-   ,pi_target_scheme    in varchar2 default user
-  ) return qa_rules_t is
-  
-    c_unit constant varchar2(32767) := $$plsql_unit || '.tf_run_rule';
-    l_param_list qa_logger_pkg.tab_param;
-  
-    l_rule_active boolean;
-    l_qa_rule     qa_rule_t;
-    l_qa_rules    qa_rules_t;
-    l_qa_rules_tmp  qa_rules_t;
-  
-  begin
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_qaru_rule_number'
-                              ,p_val_01  => pi_qaru_rule_number
-                              ,p_name_02 => 'pi_qaru_client_name'
-                              ,p_val_02  => pi_qaru_client_name
-                              ,p_name_03 => 'pi_target_scheme'
-                              ,p_val_03  => pi_target_scheme);
-  
-    if pi_qaru_rule_number is null or
-       pi_qaru_client_name is null or
-       pi_target_scheme is null
-    then
-      raise_application_error(-20001
-                             ,'Missing input parameter value for pi_qaru_rule_number: ' || pi_qaru_rule_number || ' or pi_qaru_client_name: ' || pi_qaru_client_name || ' or pi_target_scheme: ' || pi_target_scheme);
-    end if;
-  
-    if qa_main_pkg.f_is_owner_black_listed(pi_user_name => pi_target_scheme) = false
-    then
-    
-      l_rule_active := qa_main_pkg.f_is_rule_active(pi_qaru_rule_number => pi_qaru_rule_number
-                                                   ,pi_qaru_client_name => pi_qaru_client_name);
-      if l_rule_active = false
-      then
-        raise_application_error(-20001
-                               ,'Rule is not set to active for rule number: ' || pi_qaru_rule_number || ' and client name: ' || pi_qaru_client_name);
-      end if;
-    
-      l_qa_rule := qa_main_pkg.f_get_rule(pi_qaru_rule_number => pi_qaru_rule_number
-                                         ,pi_qaru_client_name => pi_qaru_client_name);
-    
-      execute immediate l_qa_rule.qaru_sql bulk collect
-        into l_qa_rules
-      -- :1 scheme
-      -- :2 qaru_id
-      -- :3 qaru_category
-      -- :4 qaru_error_level
-      -- :5 qaru_object_types
-      -- :6 qaru_error_message    
-      -- :7 qaru_sql
-      -- :8 app_id
-      -- :9 page_id
-        using pi_target_scheme, l_qa_rule.qaru_id, l_qa_rule.qaru_category, l_qa_rule.qaru_error_level, l_qa_rule.qaru_object_types, l_qa_rule.qaru_error_message, l_qa_rule.qaru_sql, pi_app_id, pi_page_id;
-      --Remove entries that dont belong to the current owner
-     
-      return l_qa_rules;
-    else
-      return null;
-    end if;
-  exception
-    when no_data_found then
-      qa_logger_pkg.p_qa_log(p_text   => 'No Data found while selecting from qa_rules'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-    when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to select from qa_rules!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-      raise;
-  end tf_run_rule;
 
   -- Edit Link to jump directly into the Application Builder
   -- Links based on the View wwv_flow_dictionary_views in column link_url
@@ -331,15 +219,7 @@ create or replace package body qa_apex_plugin_pkg as
                 '<th>Objecttype</th>' || --
                 '<th>Objectname</th>' || --
                 '<th>Message</th>' || --
-                '<th>Link</th>' || --
-                '</tr>' || '<label for="cars">Choose a car:</label>
-
-<select name="cars" id="cars">
-  <option value="volvo">Volvo</option>
-  <option value="saab">Saab</option>
-  <option value="mercedes">Mercedes</option>
-  <option value="audi">Audi</option>
-</select>';
+                '</tr>';
   
     return l_header;
   end get_html_region_header;
@@ -365,7 +245,6 @@ create or replace package body qa_apex_plugin_pkg as
               '<td>' || p_qa_rule_t.object_details || '</td>' || --
               '<td>' || p_qa_rule_t.object_name || '</td>' || --
               '<td>' || p_qa_rule_t.qaru_error_message || '</td>' || --
-              '<td>' || '<a href="' || get_edit_link(p_qa_rule_t => p_qa_rule_t) || '">edit</a>' || '</td>' || --
               '</tr>';
     return l_line;
   end get_html_rule_line;
@@ -405,14 +284,22 @@ create or replace package body qa_apex_plugin_pkg as
     -- variables
     l_app_id      apex_application_page_regions.attribute_01%type := p_region.attribute_01;
     l_app_page_id apex_application_page_regions.attribute_02%type := p_region.attribute_02;
-    -- Yes => Y / No => N
-    l_debug varchar2(1) := p_region.attribute_03;
+    l_rule_number apex_application_page_regions.attribute_03%type := p_region.attribute_03;
+    l_client_name apex_application_page_regions.attribute_04%type := p_region.attribute_04;
   begin
-    l_qa_rules_t := tf_run_rule(pi_app_id           => l_app_id
-                               ,pi_page_id          => l_app_page_id
-                               ,pi_qaru_rule_number => 1
-                               ,pi_qaru_client_name => 'MT AG'
-                               ,pi_target_scheme    => 'QUASTO');
+  
+    if l_rule_number is not null
+    then
+      l_qa_rules_t := qa_apex_api_pkg.tf_run_rule(pi_app_id           => l_app_id
+                                 ,pi_page_id          => l_app_page_id
+                                 ,pi_qaru_rule_number => l_rule_number
+                                 ,pi_qaru_client_name => l_client_name
+                                 ,pi_target_scheme    => null);
+    else
+      l_qa_rules_t := qa_apex_api_pkg.tf_run_rules(pi_app_id           => l_app_id
+                                  ,pi_page_id          => l_app_page_id
+                                  ,pi_qaru_client_name => l_client_name);
+    end if;
     dbms_output.put_line('Reached print Result');
     if l_qa_rules_t.count > 0 and
        l_qa_rules_t is not null
@@ -422,32 +309,6 @@ create or replace package body qa_apex_plugin_pkg as
   
     return l_region_render_result;
   end render_qa_region;
-
-  -- @see spec
-  function execute_process
-  (
-    p_process in apex_plugin.t_process
-   ,p_plugin  in apex_plugin.t_plugin
-  ) return apex_plugin.t_process_exec_result is
-  
-    l_qa_rules_t          qa_rules_t;
-    l_process_exec_result apex_plugin.t_process_exec_result;
-  
-    -- variables
-    l_app_id      apex_application_page_regions.attribute_01%type := p_process.attribute_01;
-    l_app_page_id apex_application_page_regions.attribute_02%type := p_process.attribute_02;
-    l_debug       apex_application_page_regions.attribute_02%type := p_process.attribute_03;
-  begin
-    l_qa_rules_t := tf_run_rule(pi_app_id => l_app_id
-                                          ,pi_page_id => l_app_page_id
-                                          ,pi_qaru_rule_number => 1
-                                          ,pi_qaru_client_name => 'MT AG'
-                                          ,pi_target_scheme    => 'QUASTO');
-  
-    rules_2_collection(pi_qa_rules_t => l_qa_rules_t);
-  
-    return l_process_exec_result;
-  end execute_process;
 
 end qa_apex_plugin_pkg;
 /
