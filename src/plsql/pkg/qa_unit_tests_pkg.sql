@@ -167,6 +167,18 @@ create or replace package qa_unit_tests_pkg authid definer is
   procedure p_trigger_scheduler_cronjob;
 
   /**
+   * function to check if a rule has test results
+   * @param  pi_qaru_rule_number defines the rule number
+   * @param  pi_qaru_client_name defines the client name
+   * @return boolean returns the result
+  */
+  function f_has_rule_test_results
+  (
+    pi_qaru_rule_number in qa_rules.qaru_rule_number%type
+   ,pi_qaru_client_name in qa_rules.qaru_client_name%type
+  ) return boolean;
+
+  /**
    * function to import an unit test file clob
    * @param pi_xml_clob defines the clob
    * @return number returns the id
@@ -1372,6 +1384,53 @@ create or replace package body qa_unit_tests_pkg is
                             ,p_params => l_param_list);
       raise;
   end p_trigger_scheduler_cronjob;
+
+  function f_has_rule_test_results
+  (
+    pi_qaru_rule_number in qa_rules.qaru_rule_number%type
+   ,pi_qaru_client_name in qa_rules.qaru_client_name%type
+  ) return boolean
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_has_rule_test_results';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_qaru_id qa_rules.qaru_id%type;
+    l_result number;
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qaru_rule_number'
+                              ,p_val_01  => pi_qaru_rule_number
+                              ,p_name_02 => 'pi_qaru_client_name'
+                              ,p_val_02  => pi_qaru_client_name);
+
+    if pi_qaru_rule_number is null or pi_qaru_client_name is null
+    then
+      raise_application_error(-20001, 'Missing input parameter value for pi_qaru_rule_number: ' || pi_qaru_rule_number || ' or pi_qaru_client_name: ' || pi_qaru_client_name);
+    end if;
+  
+    l_qaru_id := qa_main_pkg.f_get_rule_pk(pi_qaru_rule_number => pi_qaru_rule_number
+                                          ,pi_qaru_client_name => pi_qaru_client_name);
+    select decode(count(1), 0, 0, 1)
+    into l_result
+    from dual
+    where exists (select null
+                  from qa_test_runs
+                  where qatr_qaru_id = l_qaru_id);
+
+    if l_result = 1
+    then
+      return true;
+    else
+      return false;
+    end if;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to check if the rule has test results!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_has_rule_test_results;
 
   function f_import_test_result
   (
