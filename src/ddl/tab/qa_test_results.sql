@@ -6,7 +6,8 @@ declare
   qatr_id              NUMBER not null,
   qatr_xml_result      CLOB not null,
   qatr_added_on        DATE not null,
-  qatr_added_by	       VARCHAR2(255 CHAR) not null
+  qatr_added_by	       VARCHAR2(255 CHAR) not null,
+  qatr_description     VARCHAR2(255 CHAR) not null
 )';
   l_count number;
 begin
@@ -25,6 +26,7 @@ begin
 	  execute immediate q'#comment on column QA_TEST_RESULTS.qatr_xml_result is 'xml result of utplsql tests execution as clob'#';
 	  execute immediate q'#comment on column QA_TEST_RESULTS.qatr_added_on is 'when is the test result added'#';
 	  execute immediate q'#comment on column QA_TEST_RESULTS.qatr_added_by is 'who has the test result added'#';
+    execute immediate q'#comment on column QA_TEST_RESULTS.qatr_description is 'description about the test result'#';
 	
     select count(1)
       into l_count

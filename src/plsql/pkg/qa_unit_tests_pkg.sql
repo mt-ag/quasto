@@ -961,8 +961,8 @@ create or replace package body qa_unit_tests_pkg is
     from table(ut.run(a_path => pi_quasto_scheme || ':' || l_suitepath, a_reporter => ut_junit_reporter(), a_client_character_set => pi_character_set));
     dbms_output.disable();
 
-    insert into QA_TEST_RESULTS(QATR_XML_RESULT)
-    values (l_xml_result);
+    insert into QA_TEST_RESULTS(QATR_XML_RESULT, QATR_DESCRIPTION)
+    values (l_xml_result, 'Executed by Suite Path: ' || pi_quasto_scheme || ':' || l_suitepath);
 
     return l_xml_result;
   exception
@@ -1010,8 +1010,8 @@ create or replace package body qa_unit_tests_pkg is
     from table(ut.run(a_path => l_utplsql_call, a_reporter => ut_junit_reporter(), a_client_character_set => pi_character_set));
     dbms_output.disable();
     
-    insert into QA_TEST_RESULTS(QATR_XML_RESULT)
-    values (l_xml_result);
+    insert into QA_TEST_RESULTS(QATR_XML_RESULT, QATR_DESCRIPTION)
+    values (l_xml_result, 'Executed by PL/SQL Call: ' || l_utplsql_call);
 
   exception
     when others then
@@ -1384,8 +1384,8 @@ create or replace package body qa_unit_tests_pkg is
     l_qatr_id number;
   begin
     
-    insert into qa_test_results(qatr_xml_result)
-    values (pi_xml_clob)
+    insert into qa_test_results(qatr_xml_result, qatr_description)
+    values (pi_xml_clob, 'Imported by User')
     returning qatr_id into l_qatr_id;
     
     return l_qatr_id;
