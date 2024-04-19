@@ -20,7 +20,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'D'
 ,p_page_component_map=>'14'
 ,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240418102713'
+,p_last_upd_yyyymmddhh24miss=>'20240418112417'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(18125858190567134)
@@ -29,7 +29,7 @@ wwv_flow_imp_page.create_page_plug(
 ,p_plug_template=>wwv_flow_imp.id(50780356327675132)
 ,p_plug_display_sequence=>10
 ,p_plug_display_point=>'REGION_POSITION_05'
-,p_plug_source_type=>'PLUGIN_COM.MTAG.OLEMM.QA.REGION'
+,p_plug_source_type=>'PLUGIN_QUASTO_REGION'
 ,p_attribute_01=>'&APP_ID.'
 ,p_attribute_02=>'&APP_PAGE_ID.'
 ,p_attribute_03=>'&P0_RULE_SELECTION.'

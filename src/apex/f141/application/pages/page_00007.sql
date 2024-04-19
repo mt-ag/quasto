@@ -22,7 +22,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'02'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240417150344'
+,p_last_upd_yyyymmddhh24miss=>'20240418145752'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(54280765006258501)
@@ -438,6 +438,19 @@ wwv_flow_imp_page.create_page_item(
 ,p_attribute_02=>'N'
 ,p_attribute_03=>'N'
 ,p_attribute_04=>'BOTH'
+);
+wwv_flow_imp_page.create_page_validation(
+ p_id=>wwv_flow_imp.id(43123261717871103)
+,p_validation_name=>'Validate if rule can be deleted'
+,p_validation_sequence=>10
+,p_validation=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'NOT qa_unit_tests_pkg.f_has_rule_test_results(pi_qaru_rule_number => :P7_QARU_RULE_NUMBER',
+'                                            , pi_qaru_client_name => :P7_QARU_CLIENT_NAME)'))
+,p_validation2=>'PLSQL'
+,p_validation_type=>'EXPRESSION'
+,p_error_message=>'The Rule has saved test results and therefore cannot be deleted. Please set it to "Inactive" instead.'
+,p_when_button_pressed=>wwv_flow_imp.id(54468111224367589)
+,p_error_display_location=>'INLINE_WITH_FIELD_AND_NOTIFICATION'
 );
 wwv_flow_imp_page.create_page_da_event(
  p_id=>wwv_flow_imp.id(54281541618258509)

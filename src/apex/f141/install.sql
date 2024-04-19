@@ -111,8 +111,7 @@ prompt --install
 @@application/shared_components/globalization/dyntranslations.sql
 @@application/shared_components/security/authentications/opendoor.sql
 @@application/shared_components/security/authentications/oracle_apex_accounts.sql
-@@application/shared_components/plugins/region_type/qa_region_plugin.sql
-@@application/shared_components/plugins/region_type/com_mtag_olemm_qa_region.sql
+@@application/shared_components/plugins/region_type/quasto_region.sql
 @@application/user_interfaces/combined_files.sql
 @@application/pages/page_00000.sql
 @@application/pages/page_00001.sql

@@ -38,7 +38,7 @@ prompt APPLICATION 141 - QUASTO
 --   Export Type:     Application Export
 --     Pages:                     12
 --       Items:                   43
---       Validations:              1
+--       Validations:              2
 --       Processes:               16
 --       Regions:                 47
 --       Buttons:                 28
@@ -67,7 +67,7 @@ prompt APPLICATION 141 - QUASTO
 --           Button:               3
 --           Report:              12
 --         LOVs:                   7
---         Plug-ins:               2
+--         Plug-ins:               1
 --       PWA:
 --       Globalization:
 --       Reports:
@@ -125,8 +125,8 @@ wwv_imp_workspace.create_flow(
 ,p_substitution_value_02=>'MM/DD/YYYY'
 ,p_substitution_string_03=>'PROVIDER_SLOGAN'
 ,p_substitution_value_03=>'Copyright 2024 Hyand Solutions GmbH'
-,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240418102713'
+,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
+,p_last_upd_yyyymmddhh24miss=>'20240418151932'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_files_version=>9
 ,p_print_server_type=>'NATIVE'
@@ -14628,48 +14628,25 @@ wwv_flow_imp_shared.create_authentication(
 );
 end;
 /
-prompt --application/shared_components/plugins/region_type/qa_region_plugin
+prompt --application/shared_components/plugins/region_type/quasto_region
 begin
 wwv_flow_imp_shared.create_plugin(
- p_id=>wwv_flow_imp.id(37287349313647022)
+ p_id=>wwv_flow_imp.id(42944716633863174)
 ,p_plugin_type=>'REGION TYPE'
-,p_name=>'QA_REGION_PLUGIN'
-,p_display_name=>'qa_region_plugin'
-,p_image_prefix => nvl(wwv_flow_application_install.get_static_plugin_file_prefix('REGION TYPE','QA_REGION_PLUGIN'),'')
-,p_plsql_code=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'begin',
-'return ''Test'';',
-'end;',
-''))
+,p_name=>'QUASTO_REGION'
+,p_display_name=>'Quasto - Region'
+,p_image_prefix => nvl(wwv_flow_application_install.get_static_plugin_file_prefix('REGION TYPE','QUASTO_REGION'),'')
 ,p_default_escape_mode=>'HTML'
 ,p_api_version=>2
-,p_standard_attributes=>'AJAX_ITEMS_TO_SUBMIT:NO_DATA_FOUND_MESSAGE'
+,p_render_function=>'qa_apex_plugin_pkg.render_qa_region'
 ,p_substitute_attributes=>true
 ,p_subscribe_plugin_settings=>true
 ,p_version_identifier=>'1.0'
-);
-end;
-/
-prompt --application/shared_components/plugins/region_type/com_mtag_olemm_qa_region
-begin
-wwv_flow_imp_shared.create_plugin(
- p_id=>wwv_flow_imp.id(2515948831078540410)
-,p_plugin_type=>'REGION TYPE'
-,p_name=>'COM.MTAG.OLEMM.QA.REGION'
-,p_display_name=>'Quality Assurance - Region'
-,p_image_prefix => nvl(wwv_flow_application_install.get_static_plugin_file_prefix('REGION TYPE','COM.MTAG.OLEMM.QA.REGION'),'')
-,p_default_escape_mode=>'HTML'
-,p_api_version=>1
-,p_render_function=>'qa_apex_plugin_pkg.render_qa_region'
-,p_standard_attributes=>'AJAX_ITEMS_TO_SUBMIT'
-,p_substitute_attributes=>true
-,p_subscribe_plugin_settings=>true
-,p_version_identifier=>'0.1'
-,p_about_url=>'http://oliverlemm.blogspot.de/'
+,p_about_url=>'https://github.com/mt-ag/quasto'
 );
 wwv_flow_imp_shared.create_plugin_attribute(
- p_id=>wwv_flow_imp.id(1278445103286538184)
-,p_plugin_id=>wwv_flow_imp.id(2515948831078540410)
+ p_id=>wwv_flow_imp.id(42945167529859485)
+,p_plugin_id=>wwv_flow_imp.id(42944716633863174)
 ,p_attribute_scope=>'COMPONENT'
 ,p_attribute_sequence=>1
 ,p_display_sequence=>10
@@ -14677,12 +14654,11 @@ wwv_flow_imp_shared.create_plugin_attribute(
 ,p_attribute_type=>'INTEGER'
 ,p_is_required=>true
 ,p_default_value=>'&APP_ID.'
-,p_display_length=>20
 ,p_is_translatable=>false
 );
 wwv_flow_imp_shared.create_plugin_attribute(
- p_id=>wwv_flow_imp.id(1278453516099541896)
-,p_plugin_id=>wwv_flow_imp.id(2515948831078540410)
+ p_id=>wwv_flow_imp.id(42945556833857316)
+,p_plugin_id=>wwv_flow_imp.id(42944716633863174)
 ,p_attribute_scope=>'COMPONENT'
 ,p_attribute_sequence=>2
 ,p_display_sequence=>20
@@ -14690,12 +14666,11 @@ wwv_flow_imp_shared.create_plugin_attribute(
 ,p_attribute_type=>'INTEGER'
 ,p_is_required=>false
 ,p_default_value=>'&APP_PAGE_ID.'
-,p_display_length=>20
 ,p_is_translatable=>false
 );
 wwv_flow_imp_shared.create_plugin_attribute(
- p_id=>wwv_flow_imp.id(42509471391281805)
-,p_plugin_id=>wwv_flow_imp.id(2515948831078540410)
+ p_id=>wwv_flow_imp.id(42945845694856499)
+,p_plugin_id=>wwv_flow_imp.id(42944716633863174)
 ,p_attribute_scope=>'COMPONENT'
 ,p_attribute_sequence=>3
 ,p_display_sequence=>30
@@ -14705,8 +14680,8 @@ wwv_flow_imp_shared.create_plugin_attribute(
 ,p_is_translatable=>false
 );
 wwv_flow_imp_shared.create_plugin_attribute(
- p_id=>wwv_flow_imp.id(42928268040208441)
-,p_plugin_id=>wwv_flow_imp.id(2515948831078540410)
+ p_id=>wwv_flow_imp.id(42946171306855018)
+,p_plugin_id=>wwv_flow_imp.id(42944716633863174)
 ,p_attribute_scope=>'COMPONENT'
 ,p_attribute_sequence=>4
 ,p_display_sequence=>40
@@ -14734,7 +14709,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'D'
 ,p_page_component_map=>'14'
 ,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240418102713'
+,p_last_upd_yyyymmddhh24miss=>'20240418112417'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(18125858190567134)
@@ -14743,7 +14718,7 @@ wwv_flow_imp_page.create_page_plug(
 ,p_plug_template=>wwv_flow_imp.id(50780356327675132)
 ,p_plug_display_sequence=>10
 ,p_plug_display_point=>'REGION_POSITION_05'
-,p_plug_source_type=>'PLUGIN_COM.MTAG.OLEMM.QA.REGION'
+,p_plug_source_type=>'PLUGIN_QUASTO_REGION'
 ,p_attribute_01=>'&APP_ID.'
 ,p_attribute_02=>'&APP_PAGE_ID.'
 ,p_attribute_03=>'&P0_RULE_SELECTION.'
@@ -14803,7 +14778,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'13'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240417151225'
+,p_last_upd_yyyymmddhh24miss=>'20240418140800'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(50026038309358532)
@@ -15505,6 +15480,17 @@ wwv_flow_imp_page.create_page_da_action(
 ,p_affected_elements_type=>'REGION'
 ,p_affected_region_id=>wwv_flow_imp.id(15081484244011701)
 );
+wwv_flow_imp_page.create_page_da_action(
+ p_id=>wwv_flow_imp.id(43123012308871101)
+,p_event_id=>wwv_flow_imp.id(42250668839031716)
+,p_event_result=>'TRUE'
+,p_action_sequence=>50
+,p_execute_on_page_init=>'N'
+,p_name=>'Refresh Filter region'
+,p_action=>'NATIVE_REFRESH'
+,p_affected_elements_type=>'REGION'
+,p_affected_region_id=>wwv_flow_imp.id(50026038309358532)
+);
 wwv_flow_imp_page.create_page_da_event(
  p_id=>wwv_flow_imp.id(50904210902097603)
 ,p_name=>'Filter Regions'
@@ -15591,6 +15577,17 @@ wwv_flow_imp_page.create_page_da_action(
 ,p_action=>'NATIVE_REFRESH'
 ,p_affected_elements_type=>'REGION'
 ,p_affected_region_id=>wwv_flow_imp.id(15081484244011701)
+);
+wwv_flow_imp_page.create_page_da_action(
+ p_id=>wwv_flow_imp.id(43123119688871102)
+,p_event_id=>wwv_flow_imp.id(32892749293706113)
+,p_event_result=>'TRUE'
+,p_action_sequence=>40
+,p_execute_on_page_init=>'N'
+,p_name=>'Refresh Filter region'
+,p_action=>'NATIVE_REFRESH'
+,p_affected_elements_type=>'REGION'
+,p_affected_region_id=>wwv_flow_imp.id(50026038309358532)
 );
 end;
 /
@@ -16160,7 +16157,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'18'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240417144820'
+,p_last_upd_yyyymmddhh24miss=>'20240418151932'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(19585581091742406)
@@ -16254,6 +16251,16 @@ wwv_flow_imp_page.create_worksheet_column(
 ,p_use_as_row_header=>'N'
 );
 wwv_flow_imp_page.create_worksheet_column(
+ p_id=>wwv_flow_imp.id(43123324466871104)
+,p_db_column_name=>'QATR_DESCRIPTION'
+,p_display_order=>20
+,p_column_identifier=>'E'
+,p_column_label=>'Description'
+,p_column_type=>'STRING'
+,p_heading_alignment=>'LEFT'
+,p_use_as_row_header=>'N'
+);
+wwv_flow_imp_page.create_worksheet_column(
  p_id=>wwv_flow_imp.id(19586029409742411)
 ,p_db_column_name=>'QATR_ADDED_ON'
 ,p_display_order=>30
@@ -16282,7 +16289,7 @@ wwv_flow_imp_page.create_worksheet_rpt(
 ,p_report_alias=>'196131'
 ,p_status=>'PUBLIC'
 ,p_is_default=>'Y'
-,p_report_columns=>'QATR_ID:QATR_ADDED_ON:QATR_ADDED_BY'
+,p_report_columns=>'QATR_ID:QATR_DESCRIPTION:QATR_ADDED_ON:QATR_ADDED_BY:'
 ,p_sort_column_1=>'QATR_ADDED_ON'
 ,p_sort_direction_1=>'DESC'
 );
@@ -16749,7 +16756,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'02'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240417150344'
+,p_last_upd_yyyymmddhh24miss=>'20240418145752'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(54280765006258501)
@@ -17165,6 +17172,19 @@ wwv_flow_imp_page.create_page_item(
 ,p_attribute_02=>'N'
 ,p_attribute_03=>'N'
 ,p_attribute_04=>'BOTH'
+);
+wwv_flow_imp_page.create_page_validation(
+ p_id=>wwv_flow_imp.id(43123261717871103)
+,p_validation_name=>'Validate if rule can be deleted'
+,p_validation_sequence=>10
+,p_validation=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'NOT qa_unit_tests_pkg.f_has_rule_test_results(pi_qaru_rule_number => :P7_QARU_RULE_NUMBER',
+'                                            , pi_qaru_client_name => :P7_QARU_CLIENT_NAME)'))
+,p_validation2=>'PLSQL'
+,p_validation_type=>'EXPRESSION'
+,p_error_message=>'The Rule has saved test results and therefore cannot be deleted. Please set it to "Inactive" instead.'
+,p_when_button_pressed=>wwv_flow_imp.id(54468111224367589)
+,p_error_display_location=>'INLINE_WITH_FIELD_AND_NOTIFICATION'
 );
 wwv_flow_imp_page.create_page_da_event(
  p_id=>wwv_flow_imp.id(54281541618258509)

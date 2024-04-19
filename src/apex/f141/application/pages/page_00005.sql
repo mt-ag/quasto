@@ -22,7 +22,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'18'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240417144820'
+,p_last_upd_yyyymmddhh24miss=>'20240418151932'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(19585581091742406)
@@ -116,6 +116,16 @@ wwv_flow_imp_page.create_worksheet_column(
 ,p_use_as_row_header=>'N'
 );
 wwv_flow_imp_page.create_worksheet_column(
+ p_id=>wwv_flow_imp.id(43123324466871104)
+,p_db_column_name=>'QATR_DESCRIPTION'
+,p_display_order=>20
+,p_column_identifier=>'E'
+,p_column_label=>'Description'
+,p_column_type=>'STRING'
+,p_heading_alignment=>'LEFT'
+,p_use_as_row_header=>'N'
+);
+wwv_flow_imp_page.create_worksheet_column(
  p_id=>wwv_flow_imp.id(19586029409742411)
 ,p_db_column_name=>'QATR_ADDED_ON'
 ,p_display_order=>30
@@ -144,7 +154,7 @@ wwv_flow_imp_page.create_worksheet_rpt(
 ,p_report_alias=>'196131'
 ,p_status=>'PUBLIC'
 ,p_is_default=>'Y'
-,p_report_columns=>'QATR_ID:QATR_ADDED_ON:QATR_ADDED_BY'
+,p_report_columns=>'QATR_ID:QATR_DESCRIPTION:QATR_ADDED_ON:QATR_ADDED_BY:'
 ,p_sort_column_1=>'QATR_ADDED_ON'
 ,p_sort_direction_1=>'DESC'
 );
