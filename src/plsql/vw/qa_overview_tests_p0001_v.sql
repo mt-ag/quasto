@@ -3,7 +3,7 @@
   AS 
 select qatr.qatr_id, 
        qatr.qatr_scheme_name,
-       qatr.qatr_date,
+       trunc(qatr.qatr_date) as qatr_date,
        case qatr.qatr_result
          when 0 then 'Failure'
          when 1 then 'Success'
@@ -42,7 +42,6 @@ join QA_RULES qaru
 on qaru.qaru_id = qatr.qatr_qaru_id
 order by qaru.qaru_client_name asc,
          qatr.qatr_scheme_name asc,
-         qatr.qatr_id desc,
          qatr.qatr_date desc,
          qaru.qaru_category asc,
          qaru.qaru_name asc
