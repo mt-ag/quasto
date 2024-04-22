@@ -29,7 +29,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'13'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240418140800'
+,p_last_upd_yyyymmddhh24miss=>'20240422204027'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(50026038309358532)
@@ -77,7 +77,7 @@ wwv_flow_imp_page.create_report_region(
 ,p_query_row_template=>wwv_flow_imp.id(50807155826675144)
 ,p_query_num_rows=>15
 ,p_query_options=>'DERIVED_REPORT_COLUMNS'
-,p_query_break_cols=>'1:2'
+,p_query_break_cols=>'1:2:3'
 ,p_query_no_data_found=>'No test results found.'
 ,p_query_num_rows_type=>'NEXT_PREVIOUS_LINKS'
 ,p_pagination_display_position=>'BOTTOM_RIGHT'
@@ -96,8 +96,6 @@ wwv_flow_imp_page.create_report_columns(
 ,p_column_heading=>'ID'
 ,p_use_as_row_header=>'N'
 ,p_heading_alignment=>'LEFT'
-,p_default_sort_column_sequence=>3
-,p_default_sort_dir=>'desc'
 ,p_disable_sort_column=>'N'
 ,p_derived_column=>'N'
 ,p_include_in_export=>'Y'
@@ -119,12 +117,12 @@ wwv_flow_imp_page.create_report_columns(
  p_id=>wwv_flow_imp.id(19435893579895702)
 ,p_query_column_id=>3
 ,p_column_alias=>'QATR_DATE'
-,p_column_display_sequence=>50
+,p_column_display_sequence=>30
 ,p_column_heading=>'Date'
 ,p_use_as_row_header=>'N'
-,p_column_format=>'MM/DD/YYYY HH24:MI'
+,p_column_format=>'MM/DD/YYYY'
 ,p_heading_alignment=>'LEFT'
-,p_default_sort_column_sequence=>4
+,p_default_sort_column_sequence=>3
 ,p_default_sort_dir=>'desc'
 ,p_disable_sort_column=>'N'
 ,p_derived_column=>'N'
@@ -190,7 +188,7 @@ wwv_flow_imp_page.create_report_columns(
 ,p_column_heading=>'Category'
 ,p_use_as_row_header=>'N'
 ,p_heading_alignment=>'LEFT'
-,p_default_sort_column_sequence=>5
+,p_default_sort_column_sequence=>4
 ,p_disable_sort_column=>'N'
 ,p_display_as=>'TEXT_FROM_LOV_ESC'
 ,p_named_lov=>wwv_flow_imp.id(28141307571811854)
@@ -205,7 +203,7 @@ wwv_flow_imp_page.create_report_columns(
 ,p_column_heading=>'Rule Name'
 ,p_use_as_row_header=>'N'
 ,p_heading_alignment=>'LEFT'
-,p_default_sort_column_sequence=>6
+,p_default_sort_column_sequence=>5
 ,p_disable_sort_column=>'N'
 ,p_derived_column=>'N'
 ,p_include_in_export=>'Y'

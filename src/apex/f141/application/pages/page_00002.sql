@@ -23,7 +23,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'03'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240409123717'
+,p_last_upd_yyyymmddhh24miss=>'20240419105318'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(21698602325160714)
@@ -174,6 +174,7 @@ wwv_flow_imp_page.create_page_item(
 ,p_name=>'P2_OPTION'
 ,p_item_sequence=>50
 ,p_item_plug_id=>wwv_flow_imp.id(21698602325160714)
+,p_item_default=>'1'
 ,p_prompt=>'Option'
 ,p_display_as=>'NATIVE_RADIOGROUP'
 ,p_lov=>'STATIC2:Single Package per Scheme;1,Single Package per Scheme and Rule;2'
