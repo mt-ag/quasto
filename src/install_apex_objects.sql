@@ -67,12 +67,6 @@ PROMPT src/plsql/pkg/qa_apex_app_pkg.sql
 @src/plsql/pkg/qa_apex_app_pkg.sql
 PROMPT src/plsql/pkg/qa_apex_api_pkg.sql
 @src/plsql/pkg/qa_apex_api_pkg.sql
-PROMPT src/plsql/pkg/qa_apex_plugin_pkg.sql
-@src/plsql/pkg/qa_apex_plugin_pkg.sql
-
-PROMPT PLUGIN
-PROMPT src/plugin/region_type_plugin_quasto_region.sql
---@src/plugin/region_type_plugin_quasto_region.sql
 
 
 PROMPT #######################################
