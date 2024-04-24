@@ -36,11 +36,11 @@ prompt APPLICATION 141 - QUASTO
 --   Exported By:     QUASTO
 --   Flashback:       0
 --   Export Type:     Application Export
---     Pages:                     12
---       Items:                   43
+--     Pages:                     13
+--       Items:                   45
 --       Validations:              2
 --       Processes:               16
---       Regions:                 47
+--       Regions:                 48
 --       Buttons:                 28
 --       Dynamic Actions:         16
 --     Shared Components:
@@ -66,7 +66,7 @@ prompt APPLICATION 141 - QUASTO
 --           Breadcrumb:           1
 --           Button:               3
 --           Report:              12
---         LOVs:                   7
+--         LOVs:                   9
 --         Plug-ins:               1
 --       PWA:
 --       Globalization:
@@ -103,7 +103,7 @@ wwv_imp_workspace.create_flow(
 ,p_timestamp_tz_format=>'DS'
 ,p_direction_right_to_left=>'N'
 ,p_flow_image_prefix => nvl(wwv_flow_application_install.get_image_prefix,'')
-,p_authentication_id=>wwv_flow_imp.id(50668898619675067)
+,p_authentication_id=>wwv_flow_imp.id(48686292485118198)
 ,p_application_tab_set=>1
 ,p_logo_type=>'T'
 ,p_logo_text=>'QUASTO'
@@ -125,8 +125,8 @@ wwv_imp_workspace.create_flow(
 ,p_substitution_value_02=>'MM/DD/YYYY'
 ,p_substitution_string_03=>'PROVIDER_SLOGAN'
 ,p_substitution_value_03=>'Copyright 2024 Hyand Solutions GmbH'
-,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240422205737'
+,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
+,p_last_upd_yyyymmddhh24miss=>'20240424175623'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_files_version=>9
 ,p_print_server_type=>'NATIVE'
@@ -180,6 +180,15 @@ wwv_flow_imp_shared.create_list_item(
 ,p_list_item_icon=>'fa-table'
 ,p_list_item_current_type=>'COLON_DELIMITED_PAGE_LIST'
 ,p_list_item_current_for_pages=>'6'
+);
+wwv_flow_imp_shared.create_list_item(
+ p_id=>wwv_flow_imp.id(44359428615413835)
+,p_list_item_display_sequence=>30
+,p_list_item_link_text=>'Region Template'
+,p_list_item_link_target=>'f?p=&APP_ID.:20:&APP_SESSION.::&DEBUG.:::'
+,p_list_item_icon=>'fa-box-arrow-out-ne'
+,p_list_item_current_type=>'COLON_DELIMITED_PAGE_LIST'
+,p_list_item_current_for_pages=>'20'
 );
 end;
 /
@@ -786,6 +795,46 @@ wwv_flow_imp_shared.create_list_of_values_cols(
 ,p_data_type=>'VARCHAR2'
 ,p_is_visible=>'N'
 ,p_is_searchable=>'N'
+);
+end;
+/
+prompt --application/shared_components/user_interface/lovs/application_lov
+begin
+wwv_flow_imp_shared.create_list_of_values(
+ p_id=>wwv_flow_imp.id(44381359686205992)
+,p_lov_name=>'APPLICATION_LOV'
+,p_lov_query=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'select to_number(application_id) as r,  application_id || '' - '' || application_name as d',
+'from apex_applications',
+'where workspace != ''INTERNAL''',
+'order by application_name desc'))
+,p_source_type=>'SQL'
+,p_location=>'LOCAL'
+,p_use_local_sync_table=>false
+,p_return_column_name=>'R'
+,p_display_column_name=>'D'
+,p_group_sort_direction=>'ASC'
+,p_default_sort_direction=>'ASC'
+);
+end;
+/
+prompt --application/shared_components/user_interface/lovs/app_page_lov
+begin
+wwv_flow_imp_shared.create_list_of_values(
+ p_id=>wwv_flow_imp.id(44383986428080598)
+,p_lov_name=>'APP_PAGE_LOV'
+,p_lov_query=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'select page_id as r, page_id || '' - '' || page_name as d',
+'from apex_application_pages',
+'where workspace != ''INTERNAL'' and (:P20_APP_ID = application_id or :P20_APP_ID is null)'))
+,p_source_type=>'SQL'
+,p_location=>'LOCAL'
+,p_use_local_sync_table=>false
+,p_return_column_name=>'R'
+,p_display_column_name=>'D'
+,p_group_sort_direction=>'ASC'
+,p_default_sort_column_name=>'D'
+,p_default_sort_direction=>'ASC'
 );
 end;
 /
@@ -14636,36 +14685,148 @@ wwv_flow_imp_shared.create_plugin(
 ,p_name=>'QUASTO_REGION'
 ,p_display_name=>'Quasto - Region'
 ,p_image_prefix => nvl(wwv_flow_application_install.get_static_plugin_file_prefix('REGION TYPE','QUASTO_REGION'),'')
+,p_plsql_code=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'function render_qa_region',
+'(',
+'  p_region              in apex_plugin.t_region',
+' ,p_plugin              in apex_plugin.t_plugin',
+' ,p_is_printer_friendly in boolean',
+') return apex_plugin.t_region_render_result is',
+'',
+'  c_plugin_qa_collection_name constant varchar2(30) := ''PLUGIN_QA_COLLECTION'';',
+'',
+'',
+'  l_qa_rules_t           qa_rules_t;',
+'  l_region_render_result apex_plugin.t_region_render_result;',
+'',
+'  -- variables',
+'  l_app_id      apex_application_page_regions.attribute_01%type := p_region.attribute_01;',
+'  l_app_page_id apex_application_page_regions.attribute_02%type := p_region.attribute_02;',
+'  l_rule_number apex_application_page_regions.attribute_03%type := p_region.attribute_03;',
+'  l_client_name apex_application_page_regions.attribute_04%type := p_region.attribute_04;',
+'',
+'  function get_collection_name return varchar2 is',
+'  begin',
+'    return c_plugin_qa_collection_name;',
+'  end get_collection_name;',
+'',
+'',
+'  -- HTML formated header for the region plugin',
+'  function get_html_region_header return varchar2 is',
+'    l_header varchar2(32767);',
+'  begin',
+'    l_header := ''<table class="apexir_WORKSHEET_DATA">'' || --',
+'                ''<tr><th> # </th>'' || --',
+'                ''<th>Objecttype</th>'' || --',
+'                ''<th>Objectname</th>'' || --',
+'                ''<th>Message</th>'' || --',
+'                ''</tr>'';',
+'  ',
+'    return l_header;',
+'  end get_html_region_header;',
+'',
+'  -- Footer for Region Plugin',
+'  function get_html_region_footer return varchar2 is',
+'    l_footer varchar2(32767);',
+'  begin',
+'    l_footer := ''</table>'';',
+'  ',
+'    return l_footer;',
+'  end get_html_region_footer;',
+'',
+'  -- Every single line will be formated like this',
+'  function get_html_rule_line',
+'  (',
+'    p_nr        in pls_integer',
+'   ,p_qa_rule_t in qa_rule_t',
+'  ) return varchar2 is',
+'    l_line varchar2(32767);',
+'  begin',
+'    l_line := ''<tr><td>'' || p_nr || ''</td>'' || --',
+'              ''<td>'' || p_qa_rule_t.object_details || ''</td>'' || --',
+'              ''<td>'' || p_qa_rule_t.object_name || ''</td>'' || --',
+'              ''<td>'' || p_qa_rule_t.qaru_error_message || ''</td>'' || --',
+'              ''</tr>'';',
+'    return l_line;',
+'  end get_html_rule_line;',
+'',
+'  -- print the rules to the region',
+'  procedure print_result(p_qa_rules_t in qa_rules_t) is',
+'  begin',
+'    if p_qa_rules_t is not null and',
+'       p_qa_rules_t.count > 0',
+'    then',
+'      -- print header for plugin region',
+'      htp.p(get_html_region_header);',
+'      -- go through all messages',
+'      for i in 1 .. p_qa_rules_t.count',
+'      loop',
+'        htp.p(get_html_rule_line(p_nr        => i',
+'                                ,p_qa_rule_t => p_qa_rules_t(i)));',
+'      end loop;',
+'    ',
+'      -- print footer',
+'      htp.p(get_html_region_footer);',
+'    end if;',
+'  ',
+'  end print_result;',
+'',
+'begin',
+'',
+'  if l_rule_number is not null',
+'  then',
+'    l_qa_rules_t := qa_apex_api_pkg.tf_run_rule(pi_app_id           => l_app_id',
+'                                               ,pi_page_id          => l_app_page_id',
+'                                               ,pi_qaru_rule_number => l_rule_number',
+'                                               ,pi_qaru_client_name => l_client_name',
+'                                               ,pi_target_scheme    => null);',
+'  else',
+'    l_qa_rules_t := qa_apex_api_pkg.tf_run_rules(pi_app_id           => l_app_id',
+'                                                ,pi_page_id          => l_app_page_id',
+'                                                ,pi_qaru_client_name => l_client_name);',
+'  end if;',
+'  dbms_output.put_line(''Reached print Result'');',
+'  if l_qa_rules_t.count > 0 and',
+'     l_qa_rules_t is not null',
+'  then',
+'    print_result(p_qa_rules_t => l_qa_rules_t);',
+'  end if;',
+'',
+'  return l_region_render_result;',
+'',
+'',
+'end render_qa_region;',
+''))
 ,p_default_escape_mode=>'HTML'
 ,p_api_version=>2
-,p_render_function=>'qa_apex_plugin_pkg.render_qa_region'
+,p_render_function=>'render_qa_region'
 ,p_substitute_attributes=>true
 ,p_subscribe_plugin_settings=>true
 ,p_version_identifier=>'1.0'
 ,p_about_url=>'https://github.com/mt-ag/quasto'
 );
 wwv_flow_imp_shared.create_plugin_attribute(
- p_id=>wwv_flow_imp.id(42945167529859485)
+ p_id=>wwv_flow_imp.id(44403350636896285)
 ,p_plugin_id=>wwv_flow_imp.id(42944716633863174)
 ,p_attribute_scope=>'COMPONENT'
 ,p_attribute_sequence=>1
 ,p_display_sequence=>10
 ,p_prompt=>'Application ID'
-,p_attribute_type=>'INTEGER'
+,p_attribute_type=>'TEXT'
 ,p_is_required=>true
 ,p_default_value=>'&APP_ID.'
 ,p_is_translatable=>false
 );
 wwv_flow_imp_shared.create_plugin_attribute(
- p_id=>wwv_flow_imp.id(42945556833857316)
+ p_id=>wwv_flow_imp.id(44405807515893587)
 ,p_plugin_id=>wwv_flow_imp.id(42944716633863174)
 ,p_attribute_scope=>'COMPONENT'
 ,p_attribute_sequence=>2
 ,p_display_sequence=>20
 ,p_prompt=>'Page ID'
-,p_attribute_type=>'INTEGER'
+,p_attribute_type=>'TEXT'
 ,p_is_required=>false
-,p_default_value=>'&APP_PAGE_ID.'
+,p_default_value=>'&PAGE_ID.'
 ,p_is_translatable=>false
 );
 wwv_flow_imp_shared.create_plugin_attribute(
@@ -14708,22 +14869,8 @@ wwv_flow_imp_page.create_page(
 ,p_page_template_options=>'#DEFAULT#'
 ,p_protection_level=>'D'
 ,p_page_component_map=>'14'
-,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240422205624'
-);
-wwv_flow_imp_page.create_page_plug(
- p_id=>wwv_flow_imp.id(18125858190567134)
-,p_plug_name=>'QUASTO Region Plugin'
-,p_region_template_options=>'#DEFAULT#:t-Region--scrollBody'
-,p_plug_template=>wwv_flow_imp.id(50780356327675132)
-,p_plug_display_sequence=>10
-,p_plug_display_point=>'REGION_POSITION_05'
-,p_plug_source_type=>'PLUGIN_QUASTO_REGION'
-,p_required_patch=>wwv_flow_imp.id(50668567409675065)
-,p_attribute_01=>'&APP_ID.'
-,p_attribute_02=>'&APP_PAGE_ID.'
-,p_attribute_03=>'&P0_RULE_SELECTION.'
-,p_attribute_04=>'MT AG'
+,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
+,p_last_upd_yyyymmddhh24miss=>'20240424175623'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(37433164330732402)
@@ -14735,27 +14882,6 @@ wwv_flow_imp_page.create_page_plug(
 ,p_plug_source=>'<span style="font-size: var(--ut-footer-apex-font-size, .75rem);">&PROVIDER_SLOGAN.</span>'
 ,p_attribute_01=>'N'
 ,p_attribute_02=>'HTML'
-);
-wwv_flow_imp_page.create_page_item(
- p_id=>wwv_flow_imp.id(18125923812567135)
-,p_name=>'P0_RULE_SELECTION'
-,p_item_sequence=>10
-,p_item_plug_id=>wwv_flow_imp.id(18125858190567134)
-,p_prompt=>'Rule Selection'
-,p_display_as=>'NATIVE_SELECT_LIST'
-,p_named_lov=>'APEX_RULES_LOV'
-,p_lov=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'select qaru_rule_number || '' - '' || qaru_name as d,qaru_rule_number as r from qa_rules',
-'where qaru_is_active = 1',
-'and qaru_category = ''APEX'''))
-,p_lov_display_null=>'YES'
-,p_lov_null_text=>'All'
-,p_cHeight=>1
-,p_field_template=>wwv_flow_imp.id(50842276801675164)
-,p_item_template_options=>'#DEFAULT#'
-,p_lov_display_extra=>'NO'
-,p_attribute_01=>'SUBMIT'
-,p_attribute_03=>'N'
 );
 end;
 /
@@ -18267,6 +18393,140 @@ wwv_flow_imp_page.create_page_process(
 ,p_process_when_button_id=>wwv_flow_imp.id(51471535036214133)
 ,p_process_success_message=>'Job started.'
 ,p_internal_uid=>51471617693214134
+);
+end;
+/
+prompt --application/pages/page_00020
+begin
+wwv_flow_imp_page.create_page(
+ p_id=>20
+,p_name=>'Region Plugin'
+,p_alias=>'REGION-PLUGIN'
+,p_step_title=>'Region Plugin'
+,p_autocomplete_on_off=>'OFF'
+,p_page_template_options=>'#DEFAULT#'
+,p_protection_level=>'C'
+,p_page_component_map=>'17'
+,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
+,p_last_upd_yyyymmddhh24miss=>'20240424175545'
+);
+wwv_flow_imp_page.create_page_plug(
+ p_id=>wwv_flow_imp.id(18126053872567136)
+,p_plug_name=>'QUASTO Region Plugin'
+,p_region_template_options=>'#DEFAULT#'
+,p_plug_template=>wwv_flow_imp.id(50728801114675111)
+,p_plug_display_sequence=>20
+,p_plug_source=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'<h1>Sample Page to demonstrate the functionality of the QUASTO Region Plugin</h1>',
+'',
+'<h2>Usage:</h2>',
+'<ol>',
+'    <li>Select an Application or all</li>',
+'    <li>Select a page to test or all</li>',
+'    <li>Select a rule or none to test all</li>',
+'</ol>',
+'',
+'<p><strong>Note:</strong> You don''t have to select a specific App/Page or Rule. The Plugin will simply run for all available Combinations all Rules based on the Selection you make.</p>',
+'',
+'<h2>How to install the Plugin:</h2>',
+'<p>Import the region plugin over the Appbuilder. The installation file is located under <code>quasto/src/plugin/region_type_plugin_quasto_region.sql</code> in our GitHub Repository: <a href="https://github.com/mt-ag/quasto">https://github.com/mt-ag/q'
+||'uasto</a></p>',
+'',
+'<h2>How to Implement the Plugin into your Application:</h2>',
+'<!-- Add implementation steps here -->',
+'',
+'<h2>How to use the region Plugin:</h2>',
+'<p>One Possible Use Case would be to create a new Region on your Global Page. The Region will be Shown by Default and you can customize when the Region shall be displayed e.g. only in the Development Application.</p>',
+'',
+'<p>Once you created the Region you can set the Default Parameters:</p>',
+'<ul>',
+'    <li>Application ID => pass a custom ID or default APP ID of your application (e.g. "&amp;APP_ID.") or leave empty to run rules for all Applications</li>',
+'    <li>Page ID => pass a custom ID or default PAGE ID of your current Page (e.g. "&amp;PAGE_ID.") or leave empty to run rules for all Pages</li>',
+'    <li>Rule Number => pass the Rule number or leave empty to test all Rules. Right now it is necessary that the user creates their own select list. An example is P20_RULE_SELECTION of this page</li>',
+'</ul>'))
+,p_attribute_01=>'N'
+,p_attribute_02=>'HTML'
+);
+wwv_flow_imp_page.create_page_plug(
+ p_id=>wwv_flow_imp.id(62488812881968151)
+,p_plug_name=>'QUASTO Region Plugin Demo'
+,p_parent_plug_id=>wwv_flow_imp.id(18126053872567136)
+,p_region_template_options=>'#DEFAULT#:t-Region--scrollBody'
+,p_plug_template=>wwv_flow_imp.id(50780356327675132)
+,p_plug_display_sequence=>10
+,p_plug_display_point=>'SUB_REGIONS'
+,p_plug_source_type=>'PLUGIN_QUASTO_REGION'
+,p_attribute_01=>'&P20_APP_ID.'
+,p_attribute_02=>'&P20_APP_PAGE_ID.'
+,p_attribute_03=>'&P20_RULE_SELECTION.'
+,p_attribute_04=>'MT AG'
+);
+wwv_flow_imp_page.create_page_item(
+ p_id=>wwv_flow_imp.id(37288452984645603)
+,p_name=>'P20_APP_ID'
+,p_item_sequence=>10
+,p_item_plug_id=>wwv_flow_imp.id(62488812881968151)
+,p_prompt=>'Applicaiton'
+,p_display_as=>'NATIVE_SELECT_LIST'
+,p_named_lov=>'APPLICATION_LOV'
+,p_lov=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'select to_number(application_id) as r,  application_id || '' - '' || application_name as d',
+'from apex_applications',
+'where workspace != ''INTERNAL''',
+'order by application_name desc'))
+,p_lov_display_null=>'YES'
+,p_lov_null_text=>'All'
+,p_cHeight=>1
+,p_field_template=>wwv_flow_imp.id(50842276801675164)
+,p_item_template_options=>'#DEFAULT#'
+,p_lov_display_extra=>'NO'
+,p_attribute_01=>'SUBMIT'
+,p_attribute_03=>'N'
+);
+wwv_flow_imp_page.create_page_item(
+ p_id=>wwv_flow_imp.id(37288665264645605)
+,p_name=>'P20_APP_PAGE_ID'
+,p_item_sequence=>20
+,p_item_plug_id=>wwv_flow_imp.id(62488812881968151)
+,p_prompt=>'Page'
+,p_display_as=>'NATIVE_SELECT_LIST'
+,p_named_lov=>'APP_PAGE_LOV'
+,p_lov=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'select page_id as r, page_id || '' - '' || page_name as d',
+'from apex_application_pages',
+'where workspace != ''INTERNAL'' and (:P20_APP_ID = application_id or :P20_APP_ID is null)'))
+,p_lov_display_null=>'YES'
+,p_lov_null_text=>'All'
+,p_lov_cascade_parent_items=>'P20_APP_ID'
+,p_ajax_items_to_submit=>'P20_APP_ID'
+,p_ajax_optimize_refresh=>'Y'
+,p_cHeight=>1
+,p_field_template=>wwv_flow_imp.id(50842276801675164)
+,p_item_template_options=>'#DEFAULT#'
+,p_lov_display_extra=>'NO'
+,p_attribute_01=>'SUBMIT'
+,p_attribute_03=>'N'
+);
+wwv_flow_imp_page.create_page_item(
+ p_id=>wwv_flow_imp.id(62489177196968150)
+,p_name=>'P20_RULE_SELECTION'
+,p_item_sequence=>30
+,p_item_plug_id=>wwv_flow_imp.id(62488812881968151)
+,p_prompt=>'Rule Selection'
+,p_display_as=>'NATIVE_SELECT_LIST'
+,p_named_lov=>'APEX_RULES_LOV'
+,p_lov=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'select qaru_rule_number || '' - '' || qaru_name as d,qaru_rule_number as r from qa_rules',
+'where qaru_is_active = 1',
+'and qaru_category = ''APEX'''))
+,p_lov_display_null=>'YES'
+,p_lov_null_text=>'All'
+,p_cHeight=>1
+,p_field_template=>wwv_flow_imp.id(50842276801675164)
+,p_item_template_options=>'#DEFAULT#'
+,p_lov_display_extra=>'NO'
+,p_attribute_01=>'SUBMIT'
+,p_attribute_03=>'N'
 );
 end;
 /

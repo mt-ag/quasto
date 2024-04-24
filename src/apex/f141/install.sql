@@ -22,6 +22,8 @@ prompt --install
 @@application/shared_components/navigation/tabs/standard.sql
 @@application/shared_components/navigation/tabs/parent.sql
 @@application/shared_components/user_interface/lovs/apex_rules_lov.sql
+@@application/shared_components/user_interface/lovs/application_lov.sql
+@@application/shared_components/user_interface/lovs/app_page_lov.sql
 @@application/shared_components/user_interface/lovs/rule_categories_lov.sql
 @@application/shared_components/user_interface/lovs/rule_error_levels_lov.sql
 @@application/shared_components/user_interface/lovs/rule_layers_lov.sql
@@ -124,6 +126,7 @@ prompt --install
 @@application/pages/page_00008.sql
 @@application/pages/page_00009.sql
 @@application/pages/page_00011.sql
+@@application/pages/page_00020.sql
 @@application/pages/page_09999.sql
 @@application/deployment/definition.sql
 @@application/deployment/checks.sql
