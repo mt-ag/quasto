@@ -55,8 +55,10 @@ create or replace package body qa_api_pkg as
   
     c_unit constant varchar2(32767) := $$plsql_unit || '.tf_run_rule';
     l_param_list qa_logger_pkg.tab_param;
-
+  
     l_rule_active boolean;
+    l_app_id      number := null;
+    l_page_id     number := null;
     l_qa_rule     qa_rule_t;
     l_qa_rules    qa_rules_t;
   
@@ -68,35 +70,56 @@ create or replace package body qa_api_pkg as
                               ,p_val_02  => pi_qaru_client_name
                               ,p_name_03 => 'pi_target_scheme'
                               ,p_val_03  => pi_target_scheme);
-
-    if pi_qaru_rule_number is null or pi_qaru_client_name is null or pi_target_scheme is null
+  
+    if pi_qaru_rule_number is null or
+       pi_qaru_client_name is null or
+       pi_target_scheme is null
     then
-      raise_application_error(-20001, 'Missing input parameter value for pi_qaru_rule_number: ' || pi_qaru_rule_number || ' or pi_qaru_client_name: ' || pi_qaru_client_name || ' or pi_target_scheme: ' || pi_target_scheme);
+      raise_application_error(-20001
+                             ,'Missing input parameter value for pi_qaru_rule_number: ' || pi_qaru_rule_number || ' or pi_qaru_client_name: ' || pi_qaru_client_name || ' or pi_target_scheme: ' || pi_target_scheme);
     end if;
-
+  
     if qa_main_pkg.f_is_owner_black_listed(pi_user_name => pi_target_scheme) = false
     then
-
+    
       l_rule_active := qa_main_pkg.f_is_rule_active(pi_qaru_rule_number => pi_qaru_rule_number
                                                    ,pi_qaru_client_name => pi_qaru_client_name);
       if l_rule_active = false
       then
-        raise_application_error(-20001, 'Rule is not set to active for rule number: ' || pi_qaru_rule_number || ' and client name: ' || pi_qaru_client_name);
+        raise_application_error(-20001
+                               ,'Rule is not set to active for rule number: ' || pi_qaru_rule_number || ' and client name: ' || pi_qaru_client_name);
       end if;
-
+    
       l_qa_rule := qa_main_pkg.f_get_rule(pi_qaru_rule_number => pi_qaru_rule_number
                                          ,pi_qaru_client_name => pi_qaru_client_name);
     
-      execute immediate l_qa_rule.qaru_sql bulk collect
-        into l_qa_rules
-      -- :1 scheme
-      -- :2 qaru_id
-      -- :3 qaru_category
-      -- :4 qaru_error_level
-      -- :5 qaru_object_types
-      -- :6 qaru_error_message    
-      -- :7 qaru_sql
-        using pi_target_scheme, l_qa_rule.qaru_id, l_qa_rule.qaru_category, l_qa_rule.qaru_error_level, l_qa_rule.qaru_object_types, l_qa_rule.qaru_error_message, l_qa_rule.qaru_sql;
+      -- for all non Apex rules we dont need to pass app and page ID
+      if l_qa_rule.qaru_category != 'APEX'
+      then
+        execute immediate l_qa_rule.qaru_sql bulk collect
+          into l_qa_rules
+        -- :1 scheme
+        -- :2 qaru_id
+        -- :3 qaru_category
+        -- :4 qaru_error_level
+        -- :5 qaru_object_types
+        -- :6 qaru_error_message    
+        -- :7 qaru_sql
+          using pi_target_scheme, l_qa_rule.qaru_id, l_qa_rule.qaru_category, l_qa_rule.qaru_error_level, l_qa_rule.qaru_object_types, l_qa_rule.qaru_error_message, l_qa_rule.qaru_sql;
+      else
+        execute immediate l_qa_rule.qaru_sql bulk collect
+          into l_qa_rules
+        -- :1 scheme
+        -- :2 qaru_id
+        -- :3 qaru_category
+        -- :4 qaru_error_level
+        -- :5 qaru_object_types
+        -- :6 qaru_error_message    
+        -- :7 qaru_sql
+        -- :8 app_id Default null damit alle Anwendungen getestet werden
+        -- :9 page_id Default null damit alle Pages getestet werden
+          using pi_target_scheme, l_qa_rule.qaru_id, l_qa_rule.qaru_category, l_qa_rule.qaru_error_level, l_qa_rule.qaru_object_types, l_qa_rule.qaru_error_message, l_qa_rule.qaru_sql, l_app_id, l_page_id;
+      end if;
       --Remove entries that dont belong to the current owner
       if l_qa_rule.qaru_category != 'APEX'
       then
@@ -104,15 +127,15 @@ create or replace package body qa_api_pkg as
                                                ,pi_qa_rules_t   => l_qa_rules);
       end if;
       $IF qa_constant_pkg.gc_apex_flag = 1
-        $THEN
-          if l_qa_rule.qaru_category = 'APEX'
-          then
-            qa_apex_api_pkg.p_exclude_not_whitelisted_apex_entries(pi_qa_rules_t => l_qa_rules);
-          end if;
-        $ELSE
-          null;
+      $THEN
+        if l_qa_rule.qaru_category = 'APEX'
+        then
+          qa_apex_api_pkg.p_exclude_not_whitelisted_apex_entries(pi_qa_rules_t => l_qa_rules);
+        end if;
+      $ELSE
+      null;
       $END
-      
+    
       qa_main_pkg.p_exclude_objects(pi_qa_rules => l_qa_rules);
       return l_qa_rules;
     else
@@ -156,12 +179,14 @@ create or replace package body qa_api_pkg as
                               ,p_val_01  => pi_qaru_client_name
                               ,p_name_02 => 'pi_target_scheme'
                               ,p_val_02  => pi_target_scheme);
-
-    if pi_qaru_client_name is null or pi_target_scheme is null
+  
+    if pi_qaru_client_name is null or
+       pi_target_scheme is null
     then
-      raise_application_error(-20001, 'Missing input parameter value for pi_qaru_client_name: ' || pi_qaru_client_name || ' or pi_target_scheme: ' || pi_target_scheme);
+      raise_application_error(-20001
+                             ,'Missing input parameter value for pi_qaru_client_name: ' || pi_qaru_client_name || ' or pi_target_scheme: ' || pi_target_scheme);
     end if;
-
+  
     --check for loops in predecessor order (raises error if cycle is detected so no if clause is needed)
     l_no_loop := qa_main_pkg.f_check_for_loop(pi_qaru_rule_number => null
                                              ,pi_client_name      => pi_qaru_client_name);
