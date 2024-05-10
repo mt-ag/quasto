@@ -29,7 +29,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'13'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240422204027'
+,p_last_upd_yyyymmddhh24miss=>'20240510111926'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(50026038309358532)
@@ -92,7 +92,7 @@ wwv_flow_imp_page.create_report_columns(
  p_id=>wwv_flow_imp.id(15081518459011702)
 ,p_query_column_id=>1
 ,p_column_alias=>'QATR_ID'
-,p_column_display_sequence=>40
+,p_column_display_sequence=>50
 ,p_column_heading=>'ID'
 ,p_use_as_row_header=>'N'
 ,p_heading_alignment=>'LEFT'
@@ -104,11 +104,11 @@ wwv_flow_imp_page.create_report_columns(
  p_id=>wwv_flow_imp.id(19437053615895714)
 ,p_query_column_id=>2
 ,p_column_alias=>'QATR_SCHEME_NAME'
-,p_column_display_sequence=>20
+,p_column_display_sequence=>30
 ,p_column_heading=>'Scheme Name'
 ,p_use_as_row_header=>'N'
 ,p_heading_alignment=>'LEFT'
-,p_default_sort_column_sequence=>2
+,p_default_sort_column_sequence=>3
 ,p_disable_sort_column=>'N'
 ,p_derived_column=>'N'
 ,p_include_in_export=>'Y'
@@ -117,12 +117,12 @@ wwv_flow_imp_page.create_report_columns(
  p_id=>wwv_flow_imp.id(19435893579895702)
 ,p_query_column_id=>3
 ,p_column_alias=>'QATR_DATE'
-,p_column_display_sequence=>30
+,p_column_display_sequence=>20
 ,p_column_heading=>'Date'
 ,p_use_as_row_header=>'N'
 ,p_column_format=>'MM/DD/YYYY'
 ,p_heading_alignment=>'LEFT'
-,p_default_sort_column_sequence=>3
+,p_default_sort_column_sequence=>2
 ,p_default_sort_dir=>'desc'
 ,p_disable_sort_column=>'N'
 ,p_derived_column=>'N'
