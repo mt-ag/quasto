@@ -3,6 +3,16 @@ create or replace trigger qaif_i_trg
   referencing new as new
   for each row
 
+/******************************************************************************
+   NAME:       qaif_i_trg
+   PURPOSE:    Trigger for insert operations on table qa_import_files
+
+   REVISIONS:
+   Release    Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   24.1       04.03.2024  pdahlem          Trigger has been added to QUASTO
+******************************************************************************/
+
 begin
   if inserting and
      :new.qaif_id is null
