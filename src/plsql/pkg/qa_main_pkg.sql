@@ -1040,7 +1040,6 @@ create or replace package body qa_main_pkg as
         and owner = upper(pi_current_user);
         if l_count = 0
         then
-          dbms_output.put_line('remove obsolete entries');
           pi_qa_rules_t.delete(i);
         end if;
       end loop;
