@@ -10,11 +10,11 @@
 A project for checking guidelines and code quality for inside the oracle database.
 The current version supports checks for your data model, PL/SQL code and data itself.
 It also provides utPLSQL tests to check your rules and an APEX Front-End.
-CI/CD support for jenkins/azure devops or gitlab/github are integrated.
+CI/CD support for jenkins/azure devops or gitlab/github are planned for the future.
 
 You need to have installed Oracle 19c or higher to be able to install and use QUASTO.
 
-Project uses the MIT License.
+The project uses the MIT License.
 
 ## 2. Installing QUASTO
 ### Installing Guidelines for QUASTO
@@ -50,7 +50,7 @@ If you want to run APEX Tests, you should grant the APEX_ADMINISTRATOR_ROLE to Q
 grant APEX_ADMINISTRATOR_ROLE to quasto;
 ```
 
-### Running the Install Script:
+### Running the Install Script
 ```
 @install.sql [1/0] [1/0] [1/0] [1/0]
 ```
@@ -58,25 +58,27 @@ grant APEX_ADMINISTRATOR_ROLE to quasto;
 To ensure a clean installation, it is important to decide what you want to install.
 It is not mandatory to install APEX or utPLSQL. However, you get more features for your quality approach.
 
-Arguments that are required to be passed to the script:
-1. Do you want to install supporting objects for utPLSQL usage? 1=yes / 0=no (you need to install utPLSQL separatly)
-2. Do you want to install supporting objects for APEX usage? 1=yes / 0=no (you need to install APEX separatly)
-3. Do you want to install supporting objects for Jenkins usage? 1=yes / 0=no (you need to run Jenkins separatly)
-4. Do you have the offical oracle logger framework installed? 1=yes / 0=no (required for conditional compilation of a package)
+Arguments that are required to be passed to the script are:
+1. Do you want to install supporting objects for utPLSQL? 1=yes / 0=no (you need to install supporting utPLSQL objects separately later, if desired)
+2. Do you want to install supporting objects for Oracle APEX? 1=yes / 0=no (you need to install supporting APEX objects separately later, if desired)
+3. Do you want to install supporting objects for Jenkins? 1=yes / 0=no (you need to install supporting Jenkins objects separately later, if desired)
+4. Do you wish to install a lightweight logger functionality for debugging? 1=yes / 0=no (if activated, you can debug procedures and variable values via the database console output)
 
-It is possible to install utPLSQL, APEX or Jenkins objects later.
+Please not that the third argument about Jenkins does not have any effect yet. Jenkins objects will be added in a future release of QUASTO.
+
+It is possible to install QUASTO, utPLSQL or APEX objects separately.
 To do this, the user needs to move from the root directory of the project into the /src/ directory.
 
-There are the three installer scripts:
-1. install_utplsql_objects.sql
-2. install_apex_objects.sql
-3. install_jenkins_objects.sql
+Currently, there are three installer scripts:
+1. install_quasto_objects.sql
+2. install_utplsql_objects.sql
+3. install_apex_objects.sql
 
-All of these scripts can be run without arguments and should be executed in the scheme in which QUASTO was installed.
+The first script is necessary for any installation and includes all core objects of QUASTO. The second and third script can be executed optionally. All of these scripts do not need any arguments and should be executed in the same scheme.
 
 Example:
 ```sql
-@install_utplsql_objects.sql 1 1 0 0
+@install_utplsql_objects.sql
 ```
 
 ### Upgrading from a prior Version to the latest version
@@ -185,7 +187,7 @@ All rules that belong to an APEX scheme have this rule as predecessor. So if thi
 
 ### Export and Import Rules
 
-#### Exporting Rules:
+#### Exporting Rules
 
 In order to export a JSON file of the currently existing rules of the QA_RULES table, change into the folder /src/scripts/ and connect to the database via SQL*Plus or SQLcl executing the following command:
 
@@ -204,7 +206,7 @@ Example:
 @export_rules_to_file.sql "MT IT-Solutions" ""
 ```
 
-#### Importing Rules:
+#### Importing Rules
 In order to import rules, SQLcl is required. The user has to either download it and unzip the client or can use any existing installation.
 We need to switch into the scripts folder on command line again before connecting to the database. Then we connect via SQLcl and run the import command which is structured as follows:
 

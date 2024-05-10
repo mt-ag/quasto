@@ -24,26 +24,26 @@ variable version_old VARCHAR2(50)
 
 --Begin Instruction
 PROMPT '------------------------------------'
-PROMPT the install scripts expects 4 diffrent arguments!
-PROMPT these arguments are expected in a certain order
+PROMPT The install scripts expects 4 diffrent arguments.
+PROMPT These arguments are expected in a certain order, as follows:
 PROMPT 
-PROMPT example Usage:
+PROMPT example usage:
 PROMPT @install [1/0] [1/0] [1/0] [1/0]
 PROMPT 
 PROMPT Argument 1: 
-PROMPT Do you have  already ut_plsql installed?
+PROMPT Do you want to install supporting objects for utPLSQL?
 PROMPT (yes/no) (1/0)
 PROMPT '------------------------------------'
 PROMPT Argument 2:
-PROMPT Do you have already apex installed?
+PROMPT Do you want to install supporting objects for Oracle APEX?
 PROMPT (yes/no) (1/0)
 PROMPT '------------------------------------'
 PROMPT Argument 3:
-PROMPT Do you pass specific Jenkins parameters to the script? 
+PROMPT Do you want to install supporting objects for Jenkins? 
 PROMPT (yes/no) (1/0)
 PROMPT '------------------------------------'
 PROMPT Argument 4:
-PROMPT Do you already have logger installed?
+PROMPT Do you wish to install a lightweight logger functionality for debugging?
 PROMPT (yes/no) (1/0)
 PROMPT '------------------------------------'
 
