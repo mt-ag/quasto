@@ -41,8 +41,8 @@ from QA_TEST_RUNS qatr
 join QA_RULES qaru
 on qaru.qaru_id = qatr.qatr_qaru_id
 order by qaru.qaru_client_name asc,
-         qatr.qatr_scheme_name asc,
          qatr.qatr_date desc,
+         qatr.qatr_scheme_name asc,
          qaru.qaru_category asc,
          qaru.qaru_name asc
 ;
