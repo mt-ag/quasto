@@ -192,17 +192,6 @@ create or replace package qa_main_pkg authid definer as
   function f_get_full_rule_pred(pi_rule_number in qa_rules.qaru_rule_number%type) return varchar2;
 
   /**
-  * procedure for removing all objects from a given rule entity which do not belong to the given user
-  * @param pi_current_user specifies the user
-  * @param pi_qa_rules_t specifies the rule entity
-  */
-  procedure p_exclude_not_owned_entries
-  (
-    pi_current_user in varchar2
-   ,pi_qa_rules_t   in out qa_rules_t
-  );
-
-  /**
   * function to check if given user is black listed in qa_scheme_names_for_testing_v
   * @param  pi_user_name specifies the user
   * @throws E_USER_BLACKLISTED if given user is blacklisted
@@ -1013,44 +1002,6 @@ create or replace package body qa_main_pkg as
                             ,p_params => l_param_list);
       raise;
   end f_get_full_rule_pred;
-
-  procedure p_exclude_not_owned_entries
-  (
-    pi_current_user in varchar2
-   ,pi_qa_rules_t   in out qa_rules_t
-  ) is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.p_exclude_not_owned_entries';
-  
-    l_param_list qa_logger_pkg.tab_param;
-    l_count      number;
-  begin
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_current_user'
-                              ,p_val_01  => pi_current_user);
-  
-    if pi_qa_rules_t.count > 0
-    then
-      for i in pi_qa_rules_t.first .. pi_qa_rules_t.last
-      loop
-        select count(1)
-        into l_count
-        from all_objects
-        where object_name = pi_qa_rules_t(i).object_name
-        and owner = upper(pi_current_user);
-        if l_count = 0
-        then
-          pi_qa_rules_t.delete(i);
-        end if;
-      end loop;
-    end if;
-  exception
-    when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'Cant remove Objects from qa_rules Table Record that dont belong to the current owner!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-      raise;
-  end p_exclude_not_owned_entries;
 
   function f_is_owner_black_listed(pi_user_name varchar2) return boolean is
     c_unit constant varchar2(32767) := $$plsql_unit || '.f_is_owner_black_listed';

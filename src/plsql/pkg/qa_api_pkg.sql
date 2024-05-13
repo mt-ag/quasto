@@ -120,12 +120,7 @@ create or replace package body qa_api_pkg as
         -- :9 page_id Default null damit alle Pages getestet werden
           using pi_target_scheme, l_qa_rule.qaru_id, l_qa_rule.qaru_category, l_qa_rule.qaru_error_level, l_qa_rule.qaru_object_types, l_qa_rule.qaru_error_message, l_qa_rule.qaru_sql, l_app_id, l_page_id;
       end if;
-      --Remove entries that dont belong to the current owner
-      if l_qa_rule.qaru_category != 'APEX'
-      then
-        qa_main_pkg.p_exclude_not_owned_entries(pi_current_user => pi_target_scheme
-                                               ,pi_qa_rules_t   => l_qa_rules);
-      end if;
+
       $IF qa_constant_pkg.gc_apex_flag = 1
       $THEN
         if l_qa_rule.qaru_category = 'APEX'
