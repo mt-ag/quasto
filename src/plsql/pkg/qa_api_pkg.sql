@@ -1,9 +1,26 @@
-create or replace package qa_api_pkg authid current_user as
+create or replace package qa_api_pkg
+  authid current_user
+as
 
-  -- run a single rule and get for every mismatch one line back
-  -- %param pi_qaru_rule_number number to identify the rule combined with client name is unique
-  -- %param pi_qaru_client_name client or project name
-  -- %param pi_target_scheme should it run in one dedicated scheme
+/******************************************************************************
+   NAME:       qa_api_pkg
+   PURPOSE:    Methods for executing QUASTO rules
+
+   REVISIONS:
+   Release    Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   0.91       29.08.2022  olemm            Package has been added to QUASTO
+   1.1        21.04.2023  sprang           Added predecessor logic
+******************************************************************************/
+ 
+/** 
+ * function to run a single rule by given rule number and client name
+ * @param  pi_qaru_rule_number specifies the number of the rule from table QA_RULES
+ * @param  pi_qaru_client_name specifies the client or project name
+ * @param  pi_target_scheme specifies the scheme name to be tested
+ * @throws NO_DATA_FOUND if rule does not exist
+ * @return returns objects as type qa_rules_t
+*/ 
   function tf_run_rule
   (
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
@@ -11,9 +28,14 @@ create or replace package qa_api_pkg authid current_user as
    ,pi_target_scheme    in varchar2 default user
   ) return qa_rules_t;
 
-  -- run all rules from a client or project
-  -- %param pi_qaru_client_name 
-  -- %param pi_target_scheme 
+
+/** 
+ * function to run all rules by given client name in the selected scheme
+ * @param  pi_qaru_client_name specifies the client or project name
+ * @param  pi_target_scheme specifies the scheme name to be tested
+ * @throws NO_DATA_FOUND if rule does not exist
+ * @return returns objects as type qa_rules_t
+*/
   function tf_run_rules
   (
     pi_qaru_client_name in qa_rules.qaru_client_name%type
@@ -34,51 +56,86 @@ create or replace package body qa_api_pkg as
     c_unit constant varchar2(32767) := $$plsql_unit || '.tf_run_rule';
     l_param_list qa_logger_pkg.tab_param;
   
-    l_qa_rule  qa_rule_t;
-    l_qa_rules qa_rules_t;
+    l_rule_active boolean;
+    l_app_id      number := null;
+    l_page_id     number := null;
+    l_qa_rule     qa_rule_t;
+    l_qa_rules    qa_rules_t;
   
   begin
-  
     qa_logger_pkg.append_param(p_params  => l_param_list
                               ,p_name_01 => 'pi_qaru_rule_number'
                               ,p_val_01  => pi_qaru_rule_number
                               ,p_name_02 => 'pi_qaru_client_name'
-                              ,p_val_02  => pi_qaru_client_name);
+                              ,p_val_02  => pi_qaru_client_name
+                              ,p_name_03 => 'pi_target_scheme'
+                              ,p_val_03  => pi_target_scheme);
   
-  
-    l_qa_rule := qa_main_pkg.f_get_rule(pi_qaru_rule_number => pi_qaru_rule_number
-                                       ,pi_qaru_client_name => pi_qaru_client_name);
-  
-    -- Fill Apex Type Attributes when its an Apex Rule
-    if l_qa_rule.qaru_category = 'APEX'
+    if pi_qaru_rule_number is null or
+       pi_qaru_client_name is null or
+       pi_target_scheme is null
     then
-      execute immediate l_qa_rule.qaru_sql bulk collect
-        into l_qa_rules
-      -- :1 scheme
-      -- :2 qaru_id
-      -- :3 qaru_category
-      -- :4 qaru_error_level
-      -- :5 qaru_object_types
-      -- :6 qaru_error_message    
-      -- :7 qaru_sql
-      -- :8 apex_app_id
-      -- :9 apex_page_id
-        using pi_target_scheme, l_qa_rule.qaru_id, l_qa_rule.qaru_category, l_qa_rule.qaru_error_level, l_qa_rule.qaru_object_types, l_qa_rule.qaru_error_message, l_qa_rule.qaru_sql, l_qa_rule.apex_app_id, l_qa_rule.apex_page_id;
-    else
-      execute immediate l_qa_rule.qaru_sql bulk collect
-        into l_qa_rules
-      -- :1 scheme
-      -- :2 qaru_id
-      -- :3 qaru_category
-      -- :4 qaru_error_level
-      -- :5 qaru_object_types
-      -- :6 qaru_error_message    
-      -- :7 qaru_sql
-        using pi_target_scheme, l_qa_rule.qaru_id, l_qa_rule.qaru_category, l_qa_rule.qaru_error_level, l_qa_rule.qaru_object_types, l_qa_rule.qaru_error_message, l_qa_rule.qaru_sql;
+      raise_application_error(-20001
+                             ,'Missing input parameter value for pi_qaru_rule_number: ' || pi_qaru_rule_number || ' or pi_qaru_client_name: ' || pi_qaru_client_name || ' or pi_target_scheme: ' || pi_target_scheme);
     end if;
   
-    qa_main_pkg.p_exclude_objects(pi_qa_rules => l_qa_rules);
-    return l_qa_rules;
+    if qa_main_pkg.f_is_owner_black_listed(pi_user_name => pi_target_scheme) = false
+    then
+    
+      l_rule_active := qa_main_pkg.f_is_rule_active(pi_qaru_rule_number => pi_qaru_rule_number
+                                                   ,pi_qaru_client_name => pi_qaru_client_name);
+      if l_rule_active = false
+      then
+        raise_application_error(-20001
+                               ,'Rule is not set to active for rule number: ' || pi_qaru_rule_number || ' and client name: ' || pi_qaru_client_name);
+      end if;
+    
+      l_qa_rule := qa_main_pkg.f_get_rule(pi_qaru_rule_number => pi_qaru_rule_number
+                                         ,pi_qaru_client_name => pi_qaru_client_name);
+    
+      -- for all non Apex rules we dont need to pass app and page ID
+      if l_qa_rule.qaru_category != 'APEX'
+      then
+        execute immediate l_qa_rule.qaru_sql bulk collect
+          into l_qa_rules
+        -- :1 scheme
+        -- :2 qaru_id
+        -- :3 qaru_category
+        -- :4 qaru_error_level
+        -- :5 qaru_object_types
+        -- :6 qaru_error_message    
+        -- :7 qaru_sql
+          using pi_target_scheme, l_qa_rule.qaru_id, l_qa_rule.qaru_category, l_qa_rule.qaru_error_level, l_qa_rule.qaru_object_types, l_qa_rule.qaru_error_message, l_qa_rule.qaru_sql;
+      else
+        execute immediate l_qa_rule.qaru_sql bulk collect
+          into l_qa_rules
+        -- :1 scheme
+        -- :2 qaru_id
+        -- :3 qaru_category
+        -- :4 qaru_error_level
+        -- :5 qaru_object_types
+        -- :6 qaru_error_message    
+        -- :7 qaru_sql
+        -- :8 app_id Default null damit alle Anwendungen getestet werden
+        -- :9 page_id Default null damit alle Pages getestet werden
+          using pi_target_scheme, l_qa_rule.qaru_id, l_qa_rule.qaru_category, l_qa_rule.qaru_error_level, l_qa_rule.qaru_object_types, l_qa_rule.qaru_error_message, l_qa_rule.qaru_sql, l_app_id, l_page_id;
+      end if;
+
+      $IF qa_constant_pkg.gc_apex_flag = 1
+      $THEN
+        if l_qa_rule.qaru_category = 'APEX'
+        then
+          qa_apex_api_pkg.p_exclude_not_whitelisted_apex_entries(pi_qa_rules_t => l_qa_rules);
+        end if;
+      $ELSE
+      null;
+      $END
+    
+      qa_main_pkg.p_exclude_objects(pi_qa_rules => l_qa_rules);
+      return l_qa_rules;
+    else
+      return null;
+    end if;
   exception
     when no_data_found then
       qa_logger_pkg.p_qa_log(p_text   => 'No Data found while selecting from qa_rules'
@@ -105,32 +162,46 @@ create or replace package body qa_api_pkg as
     l_qaru_rule_numbers varchar2_tab_t;
     l_qa_rules          qa_rules_t := new qa_rules_t();
     l_qa_rules_temp     qa_rules_t := new qa_rules_t();
-    l_running_rules     running_rules_t := new running_rules_t();
+    l_running_rules     qa_running_rules_t := new qa_running_rules_t();
   
     l_allowed_to_run number;
     l_success        varchar2(1);
     l_no_loop        qa_rules.qaru_rule_number%type;
   
   begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qaru_client_name'
+                              ,p_val_01  => pi_qaru_client_name
+                              ,p_name_02 => 'pi_target_scheme'
+                              ,p_val_02  => pi_target_scheme);
+  
+    if pi_qaru_client_name is null or
+       pi_target_scheme is null
+    then
+      raise_application_error(-20001
+                             ,'Missing input parameter value for pi_qaru_client_name: ' || pi_qaru_client_name || ' or pi_target_scheme: ' || pi_target_scheme);
+    end if;
+  
     --check for loops in predecessor order (raises error if cycle is detected so no if clause is needed)
-    l_no_loop := qa_main_pkg.f_check_for_loop(pi_qaru_rule_number => null, pi_client_name => pi_qaru_client_name);
+    l_no_loop := qa_main_pkg.f_check_for_loop(pi_qaru_rule_number => null
+                                             ,pi_client_name      => pi_qaru_client_name);
     if l_no_loop is not null
     then
       return null;
     end if;
   
-    select running_rule_t(t.qaru_rule_number
-                         ,trim(regexp_substr(t.qaru_predecessor_ids
-                                            ,'[^:]+'
-                                            ,1
-                                            ,levels.column_value))
-                         ,case
-                            when t.qaru_is_active <> 1 then
-                             'N'
-                            else
-                             null
-                          end
-                         ,rownum)
+    select qa_running_rule_t(t.qaru_rule_number
+                            ,trim(regexp_substr(t.qaru_predecessor_ids
+                                               ,'[^:]+'
+                                               ,1
+                                               ,levels.column_value))
+                            ,case
+                               when t.qaru_is_active <> 1 then
+                                'N'
+                               else
+                                null
+                             end
+                            ,rownum)
     bulk collect
     into l_running_rules
     from qa_rules t
@@ -139,13 +210,6 @@ create or replace package body qa_api_pkg as
                      connect by level <= length(regexp_replace(t.qaru_predecessor_ids
                                                               ,'[^:]+')) + 1) as sys.odcinumberlist)) levels
     where t.qaru_client_name = pi_qaru_client_name;
-  
-  
-    qa_logger_pkg.append_param(p_params  => l_param_list
-                              ,p_name_01 => 'pi_qaru_client_name'
-                              ,p_val_01  => pi_qaru_client_name
-                              ,p_name_02 => 'pi_target_scheme'
-                              ,p_val_02  => pi_target_scheme);
   
     l_qaru_rule_numbers := qa_main_pkg.tf_get_rule_numbers(pi_qaru_client_name => pi_qaru_client_name);
   
@@ -163,6 +227,7 @@ create or replace package body qa_api_pkg as
       -- if there is no predecessor not running or not being successfull, run this rule
       if l_allowed_to_run = 0
       then
+        dbms_output.put_line(l_qaru_rule_numbers(i));
         l_qa_rules_temp := tf_run_rule(pi_qaru_rule_number => l_qaru_rule_numbers(i)
                                       ,pi_qaru_client_name => pi_qaru_client_name
                                       ,pi_target_scheme    => pi_target_scheme);

@@ -1,8 +1,27 @@
 create or replace package qa_logger_pkg authid definer is
-  -- TYPES
+
+/******************************************************************************
+   NAME:       qa_logger_pkg
+   PURPOSE:    Methods for creating and printing logs to the console output
+
+   REVISIONS:
+   Release    Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   1.1        21.04.2023  pdahlem          Package has been added to QUASTO
+******************************************************************************/
+
+/**
+ * type for the logger parameters
+ * @param name specifies the name of the parameter
+ * @param val specifies the value of the parameter
+*/
   type rec_param is record(
      name varchar2(255)
     ,val  varchar2(4000));
+
+/**
+ * type of table for the logger parameters
+*/
   type tab_param is table of rec_param index by binary_integer;
 
   gc_empty_tab_param tab_param;
@@ -10,6 +29,13 @@ create or replace package qa_logger_pkg authid definer is
   gc_timestamp_format    constant varchar2(255) := gc_date_format || ':FF';
   gc_timestamp_tz_format constant varchar2(255) := gc_timestamp_format || ' TZR';
 
+/**
+ * procedure to log entries
+ * @param p_text specifies the message text
+ * @param p_scope specifies the unit where the log was made
+ * @param p_extra specifies additional information
+ * @param p_params specifies the parameter list
+*/
   procedure p_qa_log
   (
     p_text   in varchar2
@@ -18,6 +44,12 @@ create or replace package qa_logger_pkg authid definer is
    ,p_params in tab_param default gc_empty_tab_param
   );
 
+/**
+ * procedure to append parameters
+ * @param p_params specifies the param entity
+ * @param p_name specifies the name of the parameter
+ * @param p_val specifies the value as varchar2 of the parameter
+*/
   procedure append_param
   (
     p_params in out nocopy tab_param
@@ -25,6 +57,38 @@ create or replace package qa_logger_pkg authid definer is
    ,p_val    in varchar2
   );
 
+/**
+ * procedure to append parameters
+ * @param p_params specifies the param entity
+ * @param p_name_01 specifies the name of the parameter 1
+ * @param p_val_01 specifies the value as varchar2 of the parameter 1
+ * @param p_name_02 specifies the name of the parameter 2
+ * @param p_val_02 specifies the value as varchar2 of the parameter 2
+ * @param p_name_03 specifies the name of the parameter 3
+ * @param p_val_03 specifies the value as varchar2 of the parameter 3
+ * @param p_name_04 specifies the name of the parameter 4
+ * @param p_val_04 specifies the value as varchar2 of the parameter 4
+ * @param p_name_05 specifies the name of the parameter 5
+ * @param p_val_05 specifies the value as varchar2 of the parameter 5
+ * @param p_name_06 specifies the name of the parameter 6
+ * @param p_val_06 specifies the value as varchar2 of the parameter 6
+ * @param p_name_07 specifies the name of the parameter 7
+ * @param p_val_07 specifies the value as varchar2 of the parameter 7
+ * @param p_name_08 specifies the name of the parameter 8
+ * @param p_val_08 specifies the value as varchar2 of the parameter 8
+ * @param p_name_09 specifies the name of the parameter 9
+ * @param p_val_09 specifies the value as varchar2 of the parameter 9
+ * @param p_name_10 specifies the name of the parameter 10
+ * @param p_val_10 specifies the value as varchar2 of the parameter 10
+ * @param p_name_11 specifies the name of the parameter 11
+ * @param p_val_11 specifies the value as varchar2 of the parameter 11
+ * @param p_name_12 specifies the name of the parameter 12
+ * @param p_val_12 specifies the value as varchar2 of the parameter 12
+ * @param p_name_13 specifies the name of the parameter 13
+ * @param p_val_13 specifies the value as varchar2 of the parameter 13
+ * @param p_name_14 specifies the name of the parameter 14
+ * @param p_val_14 specifies the value as varchar2 of the parameter 14
+*/
   procedure append_param
   (
     p_params  in out nocopy tab_param
@@ -58,6 +122,12 @@ create or replace package qa_logger_pkg authid definer is
    ,p_val_14  in varchar2 default null
   );
 
+/**
+ * procedure to append parameters
+ * @param p_params specifies the param entity
+ * @param p_name specifies the name of the parameter
+ * @param p_val specifies the value as number of the parameter
+*/
   procedure append_param
   (
     p_params in out nocopy tab_param
@@ -65,6 +135,12 @@ create or replace package qa_logger_pkg authid definer is
    ,p_val    in number
   );
 
+/**
+ * procedure to append parameters
+ * @param p_params specifies the param entity
+ * @param p_name specifies the name of the parameter
+ * @param p_val specifies the value as date of the parameter
+*/
   procedure append_param
   (
     p_params in out nocopy tab_param
@@ -72,6 +148,12 @@ create or replace package qa_logger_pkg authid definer is
    ,p_val    in date
   );
 
+/**
+ * procedure to append parameters
+ * @param p_params specifies the param entity
+ * @param p_name specifies the name of the parameter
+ * @param p_val specifies the value as timestamp of the parameter
+*/
   procedure append_param
   (
     p_params in out nocopy tab_param
@@ -79,6 +161,12 @@ create or replace package qa_logger_pkg authid definer is
    ,p_val    in timestamp
   );
 
+/**
+ * procedure to append parameters
+ * @param p_params specifies the param entity
+ * @param p_name specifies the name of the parameter
+ * @param p_val specifies the value as timestamp with time zone of the parameter
+*/
   procedure append_param
   (
     p_params in out nocopy tab_param
@@ -86,6 +174,12 @@ create or replace package qa_logger_pkg authid definer is
    ,p_val    in timestamp with time zone
   );
 
+/**
+ * procedure to append parameters
+ * @param p_params specifies the param entity
+ * @param p_name specifies the name of the parameter
+ * @param p_val specifies the value as timestamp with local time zone of the parameter
+*/
   procedure append_param
   (
     p_params in out nocopy tab_param
@@ -93,6 +187,12 @@ create or replace package qa_logger_pkg authid definer is
    ,p_val    in timestamp with local time zone
   );
 
+/**
+ * procedure to append parameters
+ * @param p_params specifies the param entity
+ * @param p_name specifies the name of the parameter
+ * @param p_val specifies the value as boolean of the parameter
+*/
   procedure append_param
   (
     p_params in out nocopy tab_param
@@ -100,17 +200,59 @@ create or replace package qa_logger_pkg authid definer is
    ,p_val    in boolean
   );
 
-  function tochar(p_val in number) return varchar2;
+/**
+ * function to convert a number to varchar2
+ * @param  p_val specifies the param value
+ * @return varchar2 returns the converted value
+*/
+  function tochar(
+    p_val in number
+  ) return varchar2;
+  
+/**
+ * function to convert a date to varchar2
+ * @param  p_val specifies the param value
+ * @return varchar2 returns the converted value
+*/
+  function tochar(
+    p_val in date
+  ) return varchar2;
 
-  function tochar(p_val in date) return varchar2;
+/**
+ * function to convert a timestamp to varchar2
+ * @param  p_val specifies the param value
+ * @return varchar2 returns the converted value
+*/
+  function tochar(
+    p_val in timestamp
+  ) return varchar2;
 
-  function tochar(p_val in timestamp) return varchar2;
+/**
+ * function to convert a timestamp with time zone to varchar2
+ * @param  p_val specifies the param value
+ * @return varchar2 returns the converted value
+*/
+  function tochar(
+    p_val in timestamp with time zone
+  ) return varchar2;
 
-  function tochar(p_val in timestamp with time zone) return varchar2;
+/**
+ * function to convert a timestamp with local time zone to varchar2
+ * @param  p_val specifies the param value
+ * @return varchar2 returns the converted value
+*/
+  function tochar(
+    p_val in timestamp with local time zone
+  ) return varchar2;
 
-  function tochar(p_val in timestamp with local time zone) return varchar2;
-
-  function tochar(p_val in boolean) return varchar2;
+/**
+ * function to convert a boolean to varchar2
+ * @param  p_val specifies the param value
+ * @return varchar2 returns the converted value
+*/
+  function tochar(
+    p_val in boolean
+  ) return varchar2;
 
 end;
 /
@@ -127,8 +269,8 @@ create or replace package body qa_logger_pkg as
                       $THEN
     l_params logger.tab_param default logger.gc_empty_tab_param;
     $END
-  
-  
+
+
   begin
     $IF qa_constant_pkg.gc_logger_flag = 1
                         $THEN
@@ -141,7 +283,7 @@ create or replace package body qa_logger_pkg as
                            ,p_name   => (p_params(i).name)
                            ,p_val    => nvl(p_params(i).val
                                            ,''));
-      
+
       end loop;
     end if;
     logger.log(p_text   => p_text

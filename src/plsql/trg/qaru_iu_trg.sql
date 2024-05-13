@@ -1,8 +1,18 @@
-PROMPT create or replace trigger QARU_IU_TRG
-CREATE OR REPLACE TRIGGER QARU_IU_TRG
+create or replace TRIGGER QARU_IU_TRG
   BEFORE INSERT OR UPDATE ON QA_RULES
   REFERENCING NEW AS NEW OLD AS OLD
   FOR EACH ROW
+
+/******************************************************************************
+   NAME:       qaru_iu_trg
+   PURPOSE:    Trigger for insert and update operations on table qa_rules
+
+   REVISIONS:
+   Release    Date        Author           Description
+   ---------  ----------  ---------------  ------------------------------------
+   0.91       29.08.2022  olemm            Trigger has been added to QUASTO
+******************************************************************************/
+
 DECLARE
   l_user VARCHAR2(255);
 BEGIN
