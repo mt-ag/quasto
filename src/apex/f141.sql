@@ -33,7 +33,8 @@ prompt APPLICATION 141 - QUASTO
 -- Application Export:
 --   Application:     141
 --   Name:            QUASTO
---   Exported By:     QUASTO
+--   Date and Time:   15:40 Monday May 13, 2024
+--   Exported By:     PHILIPP.DAHLEM@HYAND.COM
 --   Flashback:       0
 --   Export Type:     Application Export
 --     Pages:                     13
@@ -103,7 +104,7 @@ wwv_imp_workspace.create_flow(
 ,p_timestamp_tz_format=>'DS'
 ,p_direction_right_to_left=>'N'
 ,p_flow_image_prefix => nvl(wwv_flow_application_install.get_image_prefix,'')
-,p_authentication_id=>wwv_flow_imp.id(50668898619675067)
+,p_authentication_id=>wwv_flow_imp.id(48686292485118198)
 ,p_application_tab_set=>1
 ,p_logo_type=>'T'
 ,p_logo_text=>'QUASTO'
@@ -125,8 +126,8 @@ wwv_imp_workspace.create_flow(
 ,p_substitution_value_02=>'MM/DD/YYYY'
 ,p_substitution_string_03=>'PROVIDER_SLOGAN'
 ,p_substitution_value_03=>'Copyright 2024 Hyand Solutions GmbH'
-,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240510114332'
+,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
+,p_last_upd_yyyymmddhh24miss=>'20240513153909'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_files_version=>9
 ,p_print_server_type=>'NATIVE'
@@ -946,6 +947,11 @@ wwv_flow_imp_page.create_page_group(
  p_id=>wwv_flow_imp.id(50873306834675208)
 ,p_group_name=>'Administration'
 );
+end;
+/
+prompt --application/comments
+begin
+null;
 end;
 /
 prompt --application/shared_components/navigation/breadcrumbs/breadcrumb
@@ -14634,6 +14640,11 @@ begin
 null;
 end;
 /
+prompt --application/shared_components/globalization/translations
+begin
+null;
+end;
+/
 prompt --application/shared_components/logic/build_options
 begin
 wwv_flow_imp_shared.create_build_option(
@@ -17602,8 +17613,8 @@ wwv_flow_imp_page.create_page(
 ,p_dialog_width=>'1500px'
 ,p_protection_level=>'C'
 ,p_page_component_map=>'03'
-,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240417151448'
+,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
+,p_last_upd_yyyymmddhh24miss=>'20240513153909'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(51469936526214117)
@@ -18029,6 +18040,16 @@ wwv_flow_imp_page.create_page_process(
 ', :P9_REPEAT_INTERVAL',
 ', :P9_JOB_STATE',
 'from QA_JOB_DETAILS_P0009_V;',
+'',
+'exception',
+'  when no_data_found',
+'    then',
+'      :P9_START_DATE        := null;',
+'      :P9_LAST_START_DATE   := null;',
+'      :P9_LAST_RUN_DURATION := null;',
+'      :P9_NEXT_RUN_DATE     := null;',
+'      :P9_REPEAT_INTERVAL   := null;',
+'      :P9_JOB_STATE         := null;',
 'end;'))
 ,p_process_clob_language=>'PLSQL'
 ,p_internal_uid=>51470870455214126
