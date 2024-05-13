@@ -959,7 +959,6 @@ create or replace package body qa_main_pkg as
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
-      dbms_output.put_line('The Rule Number contains a predecessor Loop: ' || l_loop_rule_number);
       raise;
       return l_loop_rule_number;
     when others then
