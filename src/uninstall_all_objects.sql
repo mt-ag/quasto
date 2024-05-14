@@ -276,19 +276,19 @@ end;
 /
 /
 
-PROMPT DROP SCHEDULER JOB JOB_RUN_UNIT_TESTS
+PROMPT DROP SCHEDULER JOB CRONJOB_RUN_UNIT_TESTS
 DECLARE
   l_count number;
 BEGIN
   select count(1)
   into l_count
   from user_scheduler_jobs
-  where job_name = 'JOB_RUN_UNIT_TESTS';
+  where job_name = 'CRONJOB_RUN_UNIT_TESTS';
 
   if l_count > 0
     then 
-      dbms_scheduler.drop_job(job_name => 'JOB_RUN_UNIT_TESTS');
-      dbms_output.put_line('Job JOB_RUN_UNIT_TESTS dropped');
+      dbms_scheduler.drop_job(job_name => 'CRONJOB_RUN_UNIT_TESTS');
+      dbms_output.put_line('Job CRONJOB_RUN_UNIT_TESTS dropped');
   end if;
 
 END;

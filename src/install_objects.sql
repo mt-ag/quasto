@@ -56,6 +56,11 @@ exec :flag := 'Y';
 variable version varchar2 (50 char)
 exec :version := '24.1';
 
+-- Check if Required Permissions are granted to the current User
+
+@src/scripts/install_prereqs.sql
+
+
 -- Block to proceess first Argument
 declare
     l_script_name_utplsql           varchar2(100) := 'install_utplsql_objects.sql';
