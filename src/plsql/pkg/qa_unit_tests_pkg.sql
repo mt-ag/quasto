@@ -213,13 +213,13 @@ end qa_unit_tests_pkg;
 /
 create or replace package body qa_unit_tests_pkg is
 
-  function f_get_suitepath(
+  function f_get_suitepath_format(
     pi_qaru_client_name in qa_rules.qaru_client_name%type default null
    ,pi_scheme_name      in varchar2 default null
    ,pi_get_root_only    in varchar2 default 'N'
   ) return varchar2
   is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_suitepath';
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_suitepath_format';
     l_param_list qa_logger_pkg.tab_param;
 
     l_client_name_unified varchar2(1000);
@@ -231,8 +231,14 @@ create or replace package body qa_unit_tests_pkg is
                               ,p_val_02  => pi_scheme_name
                               ,p_name_03 => 'pi_get_root_only'
                               ,p_val_03  => pi_get_root_only);
+
+    if ((pi_qaru_client_name is null or pi_scheme_name is null) and pi_get_root_only = 'N')
+    or pi_get_root_only not in ('Y','N')
+    then
+      raise_application_error(-20001, 'Missing or invalid input parameter value for pi_qaru_client_name: ' || pi_qaru_client_name || ', pi_scheme_name: ' || pi_scheme_name || ' or pi_get_root_only: ' || pi_get_root_only);
+    end if;
     
-    if pi_qaru_client_name is not null and pi_scheme_name is not null and pi_get_root_only = 'N'
+    if pi_get_root_only = 'N'
     then
       l_client_name_unified := qa_utils_pkg.f_get_unified_string(pi_string => pi_qaru_client_name);
       return lower(qa_constant_pkg.gc_quasto_name || '.' || l_client_name_unified || '.' || pi_scheme_name);
@@ -241,26 +247,397 @@ create or replace package body qa_unit_tests_pkg is
     end if;
   exception
     when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get the suitepath for unit tests!'
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get the suitepath format for unit tests!'
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
       raise;
-  end f_get_suitepath;
+  end f_get_suitepath_format;
+
+  function f_get_ut_package_name_format(
+    pi_qaru_client_name in qa_rules.qaru_client_name%type
+   ,pi_qaru_rule_number in qa_rules.qaru_rule_number%type default null
+   ,pi_scheme_name      in varchar2
+   ,pi_option           in number
+  ) return varchar2
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_ut_package_name_format';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_client_name_unified varchar2(1000);
+    l_qaru_name_unified varchar2(1000);
+    l_package_name varchar2(1000);
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qaru_client_name'
+                              ,p_val_01  => pi_qaru_client_name
+                              ,p_name_02 => 'pi_qaru_rule_number'
+                              ,p_val_02  => pi_qaru_rule_number
+                              ,p_name_03 => 'pi_scheme_name'
+                              ,p_val_03  => pi_scheme_name
+                              ,p_name_04 => 'pi_option'
+                              ,p_val_04  => pi_option);
+    
+    if pi_qaru_client_name is null
+    or pi_scheme_name is null
+    or (pi_qaru_rule_number is null and pi_option = qa_constant_pkg.gc_utplsql_single_package_per_rule)
+    or pi_option not in (qa_constant_pkg.gc_utplsql_single_package
+                        ,qa_constant_pkg.gc_utplsql_single_package_per_rule)
+    then
+      raise_application_error(-20001, 'Missing or invalid input parameter value for pi_qaru_client_name: ' || pi_qaru_client_name || ', pi_qaru_rule_number: ' || pi_qaru_rule_number || ', pi_scheme_name: ' || pi_scheme_name || ' or pi_option: ' || pi_option);
+    end if;
+    
+    l_client_name_unified := qa_utils_pkg.f_get_unified_string(pi_string => pi_qaru_client_name, pi_transform_case => 'u');
+    
+    if pi_option = qa_constant_pkg.gc_utplsql_single_package
+    then
+      l_package_name := upper(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix || pi_scheme_name || '_' || l_client_name_unified || '_pkg');
+    elsif pi_option = qa_constant_pkg.gc_utplsql_single_package_per_rule
+    then
+      select qa_utils_pkg.f_get_unified_string(pi_string => qaru_name)
+      into l_qaru_name_unified
+      from qa_rules
+      where qaru_client_name = pi_qaru_client_name
+      and qaru_rule_number = pi_qaru_rule_number;
+
+      l_package_name := upper(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix || pi_scheme_name || '_' || l_client_name_unified || '_' || l_qaru_name_unified || '_pkg');
+    end if;
+
+    return l_package_name;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get the unit test package name format!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_get_ut_package_name_format;
+
+  function f_get_ut_procedure_name_format(
+    pi_qaru_rule_number in qa_rules.qaru_rule_number%type
+  ) return varchar2
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_ut_procedure_name_format';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_rule_number_unified varchar2(1000);
+    l_procedure_name varchar2(1000);
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qaru_rule_number'
+                              ,p_val_01  => pi_qaru_rule_number);
+    
+    if pi_qaru_rule_number is null
+    then
+      raise_application_error(-20001, 'Missing input parameter value for pi_qaru_rule_number: ' || pi_qaru_rule_number);
+    end if;
+    
+    l_rule_number_unified := qa_utils_pkg.f_get_unified_string(pi_string => pi_qaru_rule_number);
+    l_procedure_name := upper(qa_constant_pkg.gc_utplsql_ut_test_procedure_prefix || l_rule_number_unified);
+
+    return l_procedure_name;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get the unit test procedure name format!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_get_ut_procedure_name_format;
+
+  function f_get_unit_test_name_format(
+    pi_qaru_rule_number  in qa_rules.qaru_rule_number%type
+   ,pi_qaru_name         in qa_rules.qaru_name%type
+  ) return varchar2
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_unit_test_name_format';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_rule_number_unified varchar2(1000);
+    l_qaru_name_unified varchar2(1000);
+    l_unit_test_name varchar2(1000);
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qaru_rule_number'
+                              ,p_val_01  => pi_qaru_rule_number
+                              ,p_name_02 => 'pi_qaru_name'
+                              ,p_val_02  => pi_qaru_name);
+    
+    if pi_qaru_rule_number is null or pi_qaru_name is null
+    then
+      raise_application_error(-20001, 'Missing input parameter value for pi_qaru_rule_number: ' || pi_qaru_rule_number || ' or pi_qaru_name: ' || pi_qaru_name);
+    end if;
+    
+    l_rule_number_unified := qa_utils_pkg.f_get_unified_string(pi_string => pi_qaru_rule_number);
+    l_qaru_name_unified := qa_utils_pkg.f_get_unified_string(pi_string => pi_qaru_name);
+    l_unit_test_name := lower(qa_constant_pkg.gc_utplsql_ut_test_name_prefix || l_rule_number_unified || '_' || l_qaru_name_unified);
+
+    return l_unit_test_name;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get the unit test name format!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_get_unit_test_name_format;
+
+  function f_get_all_scheme_names
+  return VARCHAR2_TAB_T
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_all_scheme_names';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_scheme_names varchar2_tab_t := new varchar2_tab_t();
+  begin
+
+     for rec_users in (select username
+                       from qa_scheme_names_for_testing_v)
+     loop
+       l_scheme_names.extend;
+       l_scheme_names(l_scheme_names.last) := rec_users.username;
+     end loop;
+     
+     return l_scheme_names;
+
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get all scheme names!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_get_all_scheme_names;
+
+  function f_get_ut_tag_value
+  (
+   pi_tag_values      in varchar2
+  ,pi_search_tag_name in varchar2
+  ) return varchar2
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_ut_tag_value';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_ut_tags varchar2_tab_t := new varchar2_tab_t();
+    l_tag_value varchar2(1000);
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_tag_values'
+                              ,p_val_01  => pi_tag_values
+                              ,p_name_02 => 'pi_search_tag_name'
+                              ,p_val_02  => pi_search_tag_name);
+
+     l_ut_tags := qa_utils_pkg.f_get_string_as_table(pi_string => pi_tag_values, pi_separator => ',');
+
+     select tag_value
+     into l_tag_value
+     from (select substr(column_value, 1, instr(column_value, '(')-1) as tag_name,
+                  replace(regexp_substr(column_value, '\((.+)\)', 1, 1, null, 1), qa_constant_pkg.gc_utplsql_ut_test_tag_blank_space_placeholder, ' ') as tag_value
+           from table(l_ut_tags)
+     )
+     where upper(tag_name) = upper(pi_search_tag_name);
+     
+     return l_tag_value;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get the unit test tag value!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_get_ut_tag_value;
+
+  function f_is_ut_component_valid(
+    pi_qaru_client_name  in qa_rules.qaru_client_name%type default null
+   ,pi_qaru_rule_number  in qa_rules.qaru_rule_number%type default null
+   ,pi_scheme_name       in varchar2 default null
+   ,pi_quasto_scheme     in varchar2 default SYS_CONTEXT('USERENV', 'CURRENT_USER')
+   ,pi_any_package_only  in varchar2 default 'N'
+   ,pi_include_procedure in varchar2 default 'N'
+  ) return boolean
+  is
+    c_unit constant varchar2(32767) := $$plsql_unit || '.f_is_ut_component_valid';
+    l_param_list qa_logger_pkg.tab_param;
+
+    l_scheme_names varchar2_tab_t := new varchar2_tab_t();
+    l_package_name_option_1 varchar2(1000);
+    l_package_name_option_2 varchar2(1000);
+    l_procedure_name varchar2(1000);
+    l_count_any_ut_package number := 0;
+    l_count_ut_scheme_package number := 0;
+    l_count_ut_package_procedure number := 0;
+  begin
+    qa_logger_pkg.append_param(p_params  => l_param_list
+                              ,p_name_01 => 'pi_qaru_client_name'
+                              ,p_val_01  => pi_qaru_client_name
+                              ,p_name_02 => 'pi_qaru_rule_number'
+                              ,p_val_02  => pi_qaru_rule_number
+                              ,p_name_03 => 'pi_scheme_name'
+                              ,p_val_03  => pi_scheme_name
+                              ,p_name_04 => 'pi_quasto_scheme'
+                              ,p_val_04  => pi_quasto_scheme
+                              ,p_name_05 => 'pi_any_package_only'
+                              ,p_val_05  => pi_any_package_only
+                              ,p_name_06 => 'pi_include_procedure'
+                              ,p_val_06  => pi_include_procedure);
+    
+    if ((pi_qaru_client_name is null or pi_scheme_name is null) and pi_any_package_only = 'N')
+    or (pi_any_package_only = 'Y' and (pi_qaru_client_name is not null or pi_qaru_rule_number is not null or pi_scheme_name is not null or pi_include_procedure = 'Y'))
+    or pi_quasto_scheme is null
+    or pi_any_package_only not in ('Y','N')
+    or pi_include_procedure not in ('Y','N')
+    then
+      raise_application_error(-20001, 'Missing or invalid input parameter value for pi_qaru_client_name: ' || pi_qaru_client_name || ', pi_qaru_rule_number: ' || pi_qaru_rule_number || ', pi_scheme_name: ' || pi_scheme_name || ', pi_quasto_scheme: ' || pi_quasto_scheme || ', pi_any_package_only: ' || pi_any_package_only || ' or pi_include_procedure: ' || pi_include_procedure);
+    end if;
+
+    -- all unit tests should run (triggered by cronjob or user)
+    if pi_any_package_only = 'Y'
+    then
+      /*l_scheme_names := f_get_all_scheme_names;
+      
+      for rec_schemes in l_scheme_names.FIRST .. l_scheme_names.LAST
+      loop
+        for rec_clients in (select qaru_client_name
+                            from qa_rules
+                            where qaru_is_active = 1 
+                            group by qaru_client_name)*/ null;
+        /*for rec_unit_tests in (select object_names, item_name, tags
+                               from table(ut_runner.get_suites_info())
+                               where object_owner = pi_quasto_scheme
+                               and item_type = 'UT_TEST'
+                               and object_name like replace(qa_utils_pkg.f_get_constant_string_value('gc_utplsql_ut_test_packages_prefix'), '_', '\_') || '%' escape '\')
+        loop
+          l_package_name_option_1 := f_get_ut_package_name_format(pi_qaru_client_name => rec_clients.qaru_client_name, pi_scheme_name => l_scheme_names(rec_schemes), pi_option => qa_constant_pkg.gc_utplsql_single_package);
+
+          for rec_rules in (select qaru_rule_number
+                            from qa_rules
+                            where qaru_is_active = 1
+                            and qaru_client_name = pi_qaru_client_name
+                            group by qaru_id
+                                    ,qaru_client_name
+                                    ,qaru_rule_number
+                            order by qaru_id asc)
+          loop
+            l_package_name_option_2 := f_get_ut_package_name_format(pi_qaru_client_name => rec_clients.qaru_client_name, pi_qaru_rule_number => rec_rules.qaru_rule_number, pi_scheme_name => l_scheme_names(rec_schemes), pi_option => qa_constant_pkg.gc_utplsql_single_package_per_rule);
+
+            select count(1)
+            into l_count_ut_scheme_package
+            from table(ut_runner.get_suites_info())
+            where object_owner = pi_quasto_scheme
+            and item_type = 'UT_SUITE'
+            and object_name in (l_package_name_option_1
+                               ,l_package_name_option_2);
+
+            l_count_any_ut_package := l_count_any_ut_package + l_count_ut_scheme_package;
+            
+            -- ignore clients and schemes for which no unit tests exists
+            if l_count_ut_scheme_package > 1
+            then
+              return false;
+            else
+              continue;
+            end if;
+          end loop;
+        end loop;*/
+      --end loop;
+    else
+    -- one unit test procedure should run (triggered by custom job)
+    -- or all unit tests of one client
+
+      l_package_name_option_1 := f_get_ut_package_name_format(pi_qaru_client_name => pi_qaru_client_name, pi_scheme_name => pi_scheme_name, pi_option => qa_constant_pkg.gc_utplsql_single_package);
+
+      if pi_qaru_rule_number is not null
+      then
+        l_package_name_option_2 := f_get_ut_package_name_format(pi_qaru_client_name => pi_qaru_client_name, pi_qaru_rule_number => pi_qaru_rule_number, pi_scheme_name => pi_scheme_name, pi_option => qa_constant_pkg.gc_utplsql_single_package_per_rule);
+
+        select count(1)
+        into l_count_ut_scheme_package
+        from table(ut_runner.get_suites_info())
+        where object_owner = pi_quasto_scheme
+        and item_type = 'UT_SUITE'
+        and object_name in (l_package_name_option_1
+                           ,l_package_name_option_2);
+        
+        if l_count_ut_scheme_package != 1
+        then
+          return false;
+        end if;
+      else
+        for rec_rules in (select qaru_rule_number
+                          from qa_rules
+                          where qaru_is_active = 1
+                          and qaru_client_name = pi_qaru_client_name
+                          group by qaru_id
+                                  ,qaru_client_name
+                                  ,qaru_rule_number
+                          order by qaru_id asc)
+        loop
+          l_package_name_option_2 := f_get_ut_package_name_format(pi_qaru_client_name => pi_qaru_client_name, pi_qaru_rule_number => rec_rules.qaru_rule_number, pi_scheme_name => pi_scheme_name, pi_option => qa_constant_pkg.gc_utplsql_single_package_per_rule);
+
+          select count(1)
+          into l_count_ut_scheme_package
+          from table(ut_runner.get_suites_info())
+          where object_owner = pi_quasto_scheme
+          and item_type = 'UT_SUITE'
+          and object_name in (l_package_name_option_1
+                             ,l_package_name_option_2);
+        
+          if l_count_ut_scheme_package != 1
+          then
+            return false;
+          else
+            continue;
+          end if;
+        end loop;
+      end if;
+
+      -- one unit test procedure should run (triggered by custom job)
+      if pi_include_procedure = 'Y'
+      then
+        l_procedure_name := f_get_ut_procedure_name_format(pi_qaru_rule_number => pi_qaru_rule_number);
+
+        select count(1)
+        into l_count_ut_package_procedure
+        from table(ut_runner.get_suites_info())
+        where object_owner = pi_quasto_scheme
+        and item_type = 'UT_TEST'
+        and object_name in (l_package_name_option_1
+                           ,l_package_name_option_2)
+        and item_name = l_procedure_name;
+      end if;
+    end if;
+
+    if (pi_any_package_only = 'Y' and l_count_any_ut_package = 0)
+    or (pi_any_package_only = 'N' and pi_include_procedure = 'Y' and l_count_ut_package_procedure != 1)
+    then
+      return false;
+    else
+      return true;
+    end if;
+  exception
+    when others then
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to check the unit test package and procedure!'
+                            ,p_scope  => c_unit
+                            ,p_extra  => sqlerrm
+                            ,p_params => l_param_list);
+      raise;
+  end f_is_ut_component_valid;
 
   function f_get_unit_test_call(
     pi_qaru_rule_number in qa_rules.qaru_rule_number%type
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
    ,pi_scheme_name      in varchar2
+   ,pi_quasto_scheme    in varchar2 default SYS_CONTEXT('USERENV', 'CURRENT_USER')
   ) return varchar2
   is
     c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_unit_test_call';
     l_param_list qa_logger_pkg.tab_param;
 
-    l_qaru_name_unified varchar2(1000);
-    l_client_name_unified varchar2(1000);
-    l_rule_number_unified varchar2(1000);
-    l_package_name varchar2(1000);
+    l_package_name_option_1 varchar2(1000);
+    l_package_name_option_2 varchar2(1000);
+    l_procedure_name varchar2(1000);
+    l_ut_package_name varchar2(1000);
+    l_ut_procedure_name varchar2(255);
   begin
     qa_logger_pkg.append_param(p_params  => l_param_list
                               ,p_name_01 => 'pi_qaru_rule_number'
@@ -268,28 +645,32 @@ create or replace package body qa_unit_tests_pkg is
                               ,p_name_02 => 'pi_qaru_client_name'
                               ,p_val_02  => pi_qaru_client_name
                               ,p_name_03 => 'pi_scheme_name'
-                              ,p_val_03  => pi_scheme_name);
-    
-    select qa_utils_pkg.f_get_unified_string(pi_string => qaru_name)
-    into l_qaru_name_unified
-    from qa_rules
-    where qaru_client_name = pi_qaru_client_name
-    and qaru_rule_number = pi_qaru_rule_number;
+                              ,p_val_03  => pi_scheme_name
+                              ,p_name_04 => 'pi_quasto_scheme'
+                              ,p_val_04  => pi_quasto_scheme);
 
-    l_client_name_unified := qa_utils_pkg.f_get_unified_string(pi_string => pi_qaru_client_name, pi_transform_case => 'u');
-    l_rule_number_unified := qa_utils_pkg.f_get_unified_string(pi_string => pi_qaru_rule_number);
+    /*if f_is_ut_component_valid(pi_qaru_client_name => pi_qaru_client_name, pi_qaru_rule_number => pi_qaru_rule_number, pi_scheme_name => pi_scheme_name, pi_quasto_scheme => pi_quasto_scheme, pi_include_procedure => 'Y') = false
+    then
+      raise_application_error(-20001, 'Unit Test procedure could not be executed for pi_qaru_client_name: ' || pi_qaru_client_name || ', pi_qaru_rule_number: ' || pi_qaru_rule_number || ', pi_scheme_name: ' || pi_scheme_name || '. If the error persists, try recreating the unit tests for the affected scheme.');
+    end if;*/
+
+    l_package_name_option_1 := f_get_ut_package_name_format(pi_qaru_client_name => pi_qaru_client_name, pi_scheme_name => pi_scheme_name, pi_option => qa_constant_pkg.gc_utplsql_single_package);
+    l_package_name_option_2 := f_get_ut_package_name_format(pi_qaru_client_name => pi_qaru_client_name, pi_qaru_rule_number => pi_qaru_rule_number, pi_scheme_name => pi_scheme_name, pi_option => qa_constant_pkg.gc_utplsql_single_package_per_rule);
+    l_procedure_name := f_get_ut_procedure_name_format(pi_qaru_rule_number => pi_qaru_rule_number);
+
+    select object_name, item_name
+    into l_ut_package_name, l_ut_procedure_name
+    from table(ut_runner.get_suites_info())
+    where object_owner = pi_quasto_scheme
+    and item_type = 'UT_TEST'
+    and object_name in (l_package_name_option_1
+                       ,l_package_name_option_2)
+    and item_name = l_procedure_name;
     
-    select object_name
-    into l_package_name
-    from user_objects
-    where object_type = 'PACKAGE'
-    and object_name in (upper(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix || pi_scheme_name || '_' || l_client_name_unified || '_pkg')
-                       ,upper(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix || pi_scheme_name || '_' || l_client_name_unified || '_' || l_qaru_name_unified || '_pkg'));
-    
-    return lower(l_package_name || '.p_ut_rule_' || l_rule_number_unified);
+    return upper(l_ut_package_name || '.' || l_ut_procedure_name);
   exception
     when others then
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get the direct call of a unit test!'
+      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get the direct call of a unit test procedure!'
                             ,p_scope  => c_unit
                             ,p_extra  => sqlerrm
                             ,p_params => l_param_list);
@@ -369,42 +750,10 @@ create or replace package body qa_unit_tests_pkg is
       raise;
   end p_verify_rules;
 
-  function f_get_all_scheme_names
-  return VARCHAR2_TAB_T
-  is
-    c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_all_scheme_names';
-    l_param_list qa_logger_pkg.tab_param;
-
-    l_scheme_names varchar2_tab_t := new varchar2_tab_t();
-  begin
-
-     for rec_users in (select username
-                       from qa_scheme_names_for_testing_v)
-     loop
-       l_scheme_names.extend;
-       l_scheme_names(l_scheme_names.last) := rec_users.username;
-     end loop;
-     
-     return l_scheme_names;
-
-  exception
-    when others then
-      dbms_output.put_line('--ERROR--');
-      dbms_output.put_line('Getting of all scheme names raised exception.');
-      dbms_output.put_line(sqlerrm);
-      dbms_output.put_line(dbms_utility.format_error_backtrace);
-      qa_logger_pkg.p_qa_log(p_text   => 'There has been an error while trying to get all scheme names!'
-                            ,p_scope  => c_unit
-                            ,p_extra  => sqlerrm
-                            ,p_params => l_param_list);
-      raise;
-  end f_get_all_scheme_names;
-
   function f_get_package_spec_header(
-    pi_package_name             in varchar2
-   ,pi_scheme_name              in varchar2
-   ,pi_qaru_client_name         in qa_rules.qaru_client_name%type
-   ,pi_qaru_client_name_unified in varchar2
+    pi_package_name         in varchar2
+   ,pi_scheme_name          in varchar2
+   ,pi_qaru_client_name     in qa_rules.qaru_client_name%type
   )
   return clob
   is
@@ -420,9 +769,7 @@ create or replace package body qa_unit_tests_pkg is
                                 ,p_name_02 => 'pi_scheme_name'
                                 ,p_val_02  => pi_scheme_name
                                 ,p_name_03 => 'pi_qaru_client_name'
-                                ,p_val_03  => pi_qaru_client_name
-                                ,p_name_04 => 'pi_qaru_client_name_unified'
-                                ,p_val_04  => pi_qaru_client_name_unified);
+                                ,p_val_03  => pi_qaru_client_name);
 
       l_clob := 'CREATE OR REPLACE PACKAGE ' || pi_package_name || ' IS' || chr(10) || chr(10);
       l_clob := l_clob || '/******************************************************************************' || chr(10);
@@ -430,13 +777,13 @@ create or replace package body qa_unit_tests_pkg is
       l_clob := l_clob || '   NAME:                  ' || pi_package_name || chr(10);
       l_clob := l_clob || '   PURPOSE:               ' || l_package_purpose || chr(10) || chr(10);
 
-      l_clob := l_clob || '   TIMESTAMP OF CREATION: ' || systimestamp || chr(10);
+      l_clob := l_clob || '   TIMESTAMP OF CREATION: ' || to_char(sysdate,'MM/DD/YYYY HH24:MI:SS') || chr(10);
       l_clob := l_clob || '   SCHEME NAME:           ' || upper(pi_scheme_name) || chr(10);
       l_clob := l_clob || '   CLIENT NAME:           ' || pi_qaru_client_name || chr(10);
       l_clob := l_clob || '******************************************************************************/' || chr(10) || chr(10);
 
       l_clob := l_clob || '  --%suite(Tests of ' || pi_qaru_client_name || ' on ' || upper(pi_scheme_name) || ')' || chr(10);
-      l_clob := l_clob || '  --%suitepath(' || f_get_suitepath(pi_qaru_client_name => pi_qaru_client_name_unified, pi_scheme_name => pi_scheme_name, pi_get_root_only => 'N') || ')' || chr(10) || chr(10);
+      l_clob := l_clob || '  --%suitepath(' || f_get_suitepath_format(pi_qaru_client_name => pi_qaru_client_name, pi_scheme_name => pi_scheme_name, pi_get_root_only => 'N') || ')' || chr(10) || chr(10);
 
       l_clob := l_clob || '  c_scheme_name constant varchar2_tab_t := new varchar2_tab_t(''' || upper(pi_scheme_name) || ''');' || chr(10);
       l_clob := l_clob || '  c_client_name constant qa_rules.qaru_client_name%type := ''' || pi_qaru_client_name || ''';' || chr(10) || chr(10);
@@ -457,26 +804,42 @@ create or replace package body qa_unit_tests_pkg is
   end f_get_package_spec_header;
 
   function f_get_package_spec_content(
-    pi_previous_clob            in clob
-   ,pi_qaru_rule_number_unified in varchar2
-   ,pi_qaru_name_unified        in varchar2
+    pi_previous_clob       in clob
+   ,pi_qaru_rule_number    in qa_rules.qaru_rule_number%type
+   ,pi_qaru_client_name    in qa_rules.qaru_client_name%type
+   ,pi_qaru_name           in qa_rules.qaru_name%type
+   ,pi_scheme_name         in varchar2
   )
   return clob
   is
     c_unit constant varchar2(32767) := $$plsql_unit || '.f_get_package_spec_content';
     l_param_list qa_logger_pkg.tab_param;
 
+    l_rule_number_tag varchar2(1000);
+    l_client_name_tag varchar2(1000);
+    l_scheme_name_tag varchar2(1000);
     l_clob clob;
   begin
       qa_logger_pkg.append_param(p_params  => l_param_list
-                                ,p_name_01 => 'pi_qaru_rule_number_unified'
-                                ,p_val_01  => pi_qaru_rule_number_unified);
+                                ,p_name_01 => 'pi_qaru_rule_number'
+                                ,p_val_01  => pi_qaru_rule_number
+                                ,p_name_02 => 'pi_qaru_client_name'
+                                ,p_val_02  => pi_qaru_client_name
+                                ,p_name_03 => 'pi_qaru_name'
+                                ,p_val_03  => pi_qaru_name
+                                ,p_name_04 => 'pi_scheme_name'
+                                ,p_val_04  => pi_scheme_name);
+      
+      -- utPLSQL does not allow blank spaces in tags
+      l_rule_number_tag := qa_constant_pkg.gc_utplsql_ut_test_tag_name_rule_number || qa_constant_pkg.gc_utplsql_ut_test_tag_value_begin || replace(pi_qaru_rule_number, ' ', qa_constant_pkg.gc_utplsql_ut_test_tag_blank_space_placeholder) || qa_constant_pkg.gc_utplsql_ut_test_tag_value_end;
+      l_client_name_tag := qa_constant_pkg.gc_utplsql_ut_test_tag_name_client_name || qa_constant_pkg.gc_utplsql_ut_test_tag_value_begin || replace(pi_qaru_client_name, ' ', qa_constant_pkg.gc_utplsql_ut_test_tag_blank_space_placeholder) || qa_constant_pkg.gc_utplsql_ut_test_tag_value_end;
+      l_scheme_name_tag := qa_constant_pkg.gc_utplsql_ut_test_tag_name_scheme_name || qa_constant_pkg.gc_utplsql_ut_test_tag_value_begin || replace(pi_scheme_name, ' ', qa_constant_pkg.gc_utplsql_ut_test_tag_blank_space_placeholder) || qa_constant_pkg.gc_utplsql_ut_test_tag_value_end;
 
-      l_clob := pi_previous_clob || '  --%test(quasto_test_rule_' || pi_qaru_rule_number_unified || '_' || pi_qaru_name_unified || ')' || chr(10);
-      l_clob := l_clob || '  PROCEDURE p_ut_rule_' || pi_qaru_rule_number_unified || ';' || chr(10);
+      l_clob := pi_previous_clob || '  --%test(' || f_get_unit_test_name_format(pi_qaru_rule_number => pi_qaru_rule_number, pi_qaru_name => pi_qaru_name) || ')' || chr(10);
+      l_clob := l_clob || '  --%tags(' || l_rule_number_tag || ',' || l_client_name_tag || ',' || l_scheme_name_tag || ')' || chr(10);
+      l_clob := l_clob || '  PROCEDURE ' || f_get_ut_procedure_name_format(pi_qaru_rule_number => pi_qaru_rule_number) || ';' || chr(10);
       
       return l_clob;
-
   exception
     when others then
       dbms_output.put_line('--ERROR--');
@@ -554,10 +917,9 @@ create or replace package body qa_unit_tests_pkg is
   end f_get_package_body_header;
 
   function f_get_package_body_content(
-    pi_previous_clob            in clob
-   ,pi_qaru_rule_number         in qa_rules.qaru_rule_number%type
-   ,pi_qaru_rule_number_unified in varchar2
-   ,pi_scheme_name              in varchar2
+    pi_previous_clob       in clob
+   ,pi_qaru_rule_number    in qa_rules.qaru_rule_number%type
+   ,pi_scheme_name         in varchar2
   )
   return clob
   is
@@ -569,12 +931,10 @@ create or replace package body qa_unit_tests_pkg is
       qa_logger_pkg.append_param(p_params  => l_param_list
                                 ,p_name_01 => 'pi_qaru_rule_number'
                                 ,p_val_01  => pi_qaru_rule_number
-                                ,p_name_02 => 'pi_qaru_rule_number_unified'
-                                ,p_val_02  => pi_qaru_rule_number_unified
-                                ,p_name_03 => 'pi_scheme_name'
-                                ,p_val_03  => pi_scheme_name);
+                                ,p_name_02 => 'pi_scheme_name'
+                                ,p_val_02  => pi_scheme_name);
 
-        l_clob := pi_previous_clob || '  PROCEDURE p_ut_rule_' || pi_qaru_rule_number_unified || chr(10);
+        l_clob := pi_previous_clob || '  PROCEDURE ' || f_get_ut_procedure_name_format(pi_qaru_rule_number => pi_qaru_rule_number) || chr(10);
         l_clob := l_clob || '  IS' || chr(10);
         l_clob := l_clob || '    l_scheme_objects qa_scheme_object_amounts_t := new qa_scheme_object_amounts_t();' || chr(10);
         l_clob := l_clob || '    l_invalid_objects qa_rules_t := new qa_rules_t();' || chr(10);
@@ -605,7 +965,7 @@ create or replace package body qa_unit_tests_pkg is
         l_clob := l_clob || '                                               ,pi_program_name     => l_program_name' || chr(10);
         l_clob := l_clob || '                                               ,pi_runtime_error    => SQLERRM || '' - '' || DBMS_UTILITY.format_error_backtrace);' || chr(10);
         l_clob := l_clob || '      RAISE;' || chr(10);
-        l_clob := l_clob || '  END p_ut_rule_' || pi_qaru_rule_number_unified || ';' || chr(10);
+        l_clob := l_clob || '  END ' || f_get_ut_procedure_name_format(pi_qaru_rule_number => pi_qaru_rule_number) || ';' || chr(10);
 
         return l_clob;
 
@@ -690,31 +1050,30 @@ create or replace package body qa_unit_tests_pkg is
       loop
 
         for rec_clients in (select qaru_client_name
-                                  ,qa_utils_pkg.f_get_unified_string(pi_string => qaru_client_name, pi_transform_case => 'l') as qaru_client_name_unified
                            from qa_rules
                            where qaru_is_active = 1 
                            group by qaru_client_name)
        loop
 
-         l_package_name := lower(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix) || lower(l_scheme_names(rec_schemes)) || '_' || rec_clients.qaru_client_name_unified || '_pkg';
+         l_package_name := f_get_ut_package_name_format(pi_qaru_client_name => rec_clients.qaru_client_name, pi_scheme_name => l_scheme_names(rec_schemes), pi_option => qa_constant_pkg.gc_utplsql_single_package);
 
-         l_clob := f_get_package_spec_header(pi_package_name             => l_package_name
-                                            ,pi_scheme_name              => l_scheme_names(rec_schemes)
-                                            ,pi_qaru_client_name         => rec_clients.qaru_client_name
-                                            ,pi_qaru_client_name_unified => rec_clients.qaru_client_name_unified);
+         l_clob := f_get_package_spec_header(pi_package_name        => l_package_name
+                                            ,pi_scheme_name         => l_scheme_names(rec_schemes)
+                                            ,pi_qaru_client_name    => rec_clients.qaru_client_name);
 
          for rec_rules in (select qaru_rule_number
-                                 ,qa_utils_pkg.f_get_unified_string(pi_string => qaru_rule_number, pi_transform_case => 'l') as qaru_rule_number_unified
-                                 ,qa_utils_pkg.f_get_unified_string(pi_string => qaru_name, pi_transform_case => 'l') as qaru_name_unified
+                                 ,qaru_name
                            from qa_rules
                            where qaru_client_name = rec_clients.qaru_client_name
                            and qaru_is_active = 1 
                            order by qaru_id asc)
          loop
       
-           l_clob := f_get_package_spec_content(pi_previous_clob            => l_clob
-                                               ,pi_qaru_rule_number_unified => rec_rules.qaru_rule_number_unified
-                                               ,pi_qaru_name_unified        => rec_rules.qaru_name_unified);
+           l_clob := f_get_package_spec_content(pi_previous_clob       => l_clob
+                                               ,pi_qaru_rule_number    => rec_rules.qaru_rule_number
+                                               ,pi_qaru_client_name    => rec_clients.qaru_client_name
+                                               ,pi_qaru_name           => rec_rules.qaru_name
+                                               ,pi_scheme_name         => l_scheme_names(rec_schemes));
 
          end loop;
 
@@ -727,17 +1086,15 @@ create or replace package body qa_unit_tests_pkg is
          l_clob := f_get_package_body_header(pi_package_name => l_package_name);
 
          for rec_rules in (select qaru_rule_number
-                                 ,qa_utils_pkg.f_get_unified_string(pi_string => qaru_rule_number, pi_transform_case => 'l') as qaru_rule_number_unified
                            from qa_rules
                            where qaru_client_name = rec_clients.qaru_client_name
                            and qaru_is_active = 1 
                            order by qaru_id asc)
          loop
 
-           l_clob := f_get_package_body_content(pi_previous_clob            => l_clob
-                                               ,pi_qaru_rule_number         => rec_rules.qaru_rule_number
-                                               ,pi_qaru_rule_number_unified => rec_rules.qaru_rule_number_unified
-                                               ,pi_scheme_name              => l_scheme_names(rec_schemes));
+           l_clob := f_get_package_body_content(pi_previous_clob        => l_clob
+                                               ,pi_qaru_rule_number     => rec_rules.qaru_rule_number
+                                               ,pi_scheme_name          => l_scheme_names(rec_schemes));
 
          end loop;
 
@@ -760,9 +1117,6 @@ create or replace package body qa_unit_tests_pkg is
         for rec_client_rules in (select qaru_client_name
                                        ,qaru_rule_number
                                        ,qaru_name
-                                       ,qa_utils_pkg.f_get_unified_string(pi_string => qaru_client_name, pi_transform_case => 'l') as qaru_client_name_unified
-                                       ,qa_utils_pkg.f_get_unified_string(pi_string => qaru_rule_number, pi_transform_case => 'l') as qaru_rule_number_unified
-                                       ,qa_utils_pkg.f_get_unified_string(pi_string => qaru_name, pi_transform_case => 'l') as qaru_name_unified
                                  from qa_rules
                                  where qaru_is_active = 1 
                                  group by qaru_id
@@ -772,16 +1126,17 @@ create or replace package body qa_unit_tests_pkg is
                                  order by qaru_id asc)
         loop
 
-          l_package_name := lower(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix) || lower(l_scheme_names(rec_schemes)) || '_' || rec_client_rules.qaru_client_name_unified || '_' || rec_client_rules.qaru_name_unified ||'_pkg';
+          l_package_name := f_get_ut_package_name_format(pi_qaru_client_name => rec_client_rules.qaru_client_name, pi_qaru_rule_number => rec_client_rules.qaru_rule_number, pi_scheme_name => l_scheme_names(rec_schemes), pi_option => qa_constant_pkg.gc_utplsql_single_package_per_rule);
 
-          l_clob := f_get_package_spec_header(pi_package_name             => l_package_name
-                                             ,pi_scheme_name              => l_scheme_names(rec_schemes)
-                                             ,pi_qaru_client_name         => rec_client_rules.qaru_client_name
-                                             ,pi_qaru_client_name_unified => rec_client_rules.qaru_client_name_unified);
+          l_clob := f_get_package_spec_header(pi_package_name         => l_package_name
+                                             ,pi_scheme_name          => l_scheme_names(rec_schemes)
+                                             ,pi_qaru_client_name     => rec_client_rules.qaru_client_name);
 
-          l_clob := f_get_package_spec_content(pi_previous_clob            => l_clob
-                                              ,pi_qaru_rule_number_unified => rec_client_rules.qaru_rule_number_unified
-                                              ,pi_qaru_name_unified        => rec_client_rules.qaru_name_unified);
+          l_clob := f_get_package_spec_content(pi_previous_clob       => l_clob
+                                              ,pi_qaru_rule_number    => rec_client_rules.qaru_rule_number
+                                              ,pi_qaru_client_name    => rec_client_rules.qaru_client_name
+                                              ,pi_qaru_name           => rec_client_rules.qaru_name
+                                              ,pi_scheme_name         => l_scheme_names(rec_schemes));
 
           l_clob := f_get_package_spec_footer(pi_previous_clob => l_clob
                                              ,pi_package_name  => l_package_name);
@@ -791,10 +1146,9 @@ create or replace package body qa_unit_tests_pkg is
       
           l_clob := f_get_package_body_header(pi_package_name => l_package_name);
 
-          l_clob := f_get_package_body_content(pi_previous_clob            => l_clob
-                                              ,pi_qaru_rule_number         => rec_client_rules.qaru_rule_number
-                                              ,pi_qaru_rule_number_unified => rec_client_rules.qaru_rule_number_unified
-                                              ,pi_scheme_name              => l_scheme_names(rec_schemes));
+          l_clob := f_get_package_body_content(pi_previous_clob        => l_clob
+                                              ,pi_qaru_rule_number     => rec_client_rules.qaru_rule_number
+                                              ,pi_scheme_name          => l_scheme_names(rec_schemes));
 
           l_clob := f_get_package_body_footer(pi_previous_clob => l_clob
                                              ,pi_package_name  => l_package_name);
@@ -835,10 +1189,11 @@ create or replace package body qa_unit_tests_pkg is
     then
       for rec_scheme_names in pi_scheme_names.FIRST .. pi_scheme_names.LAST
       loop
-        for rec_packages in (select object_name
-                             from user_objects
-                             where object_type = 'PACKAGE'
-                             and object_name like replace(upper(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix || pi_scheme_names(rec_scheme_names)) || '_%', '_', '\_') escape '\')
+        for rec_packages in (select ur.object_name
+                             from table(ut_runner.get_suites_info()) ur
+                             where ur.item_type = 'UT_SUITE'
+                             and ur.object_owner = sys_context('USERENV', 'CURRENT_USER')
+                             and ur.object_name like replace(upper(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix || pi_scheme_names(rec_scheme_names)), '_', '\_') || '%' escape '\')
         loop
           l_package_name := rec_packages.object_name;
           execute immediate 'DROP PACKAGE ' || l_package_name;
@@ -846,10 +1201,11 @@ create or replace package body qa_unit_tests_pkg is
         end loop;
      end loop;
    else
-     for rec_packages in (select object_name
-                          from user_objects
-                          where object_type = 'PACKAGE'
-                          and object_name like replace(upper(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix) || '%', '_', '\_') escape '\')
+     for rec_packages in (select ur.object_name
+                          from table(ut_runner.get_suites_info()) ur
+                          where ur.item_type = 'UT_SUITE'
+                          and ur.object_owner = sys_context('USERENV', 'CURRENT_USER')
+                          and ur.object_name like replace(upper(qa_constant_pkg.gc_utplsql_ut_test_packages_prefix), '_', '\_') || '%' escape '\')
      loop
        l_package_name := rec_packages.object_name;
        execute immediate 'DROP PACKAGE ' || l_package_name;
@@ -888,6 +1244,11 @@ create or replace package body qa_unit_tests_pkg is
                               ,p_val_02  => pi_qaru_client_name
                               ,p_name_03 => 'pi_scheme_name'
                               ,p_val_03  => pi_scheme_name);
+
+    /*if f_is_ut_component_valid(pi_qaru_rule_number => pi_qaru_rule_number, pi_qaru_client_name => pi_qaru_client_name, pi_scheme_name => pi_scheme_name, pi_include_procedure => 'Y') = false
+    then
+      raise_application_error(-20001, 'Unit Test procedure could not be executed. If the error persists, try recreating the unit tests for the affected scheme.');
+    end if;*/
     
     l_job_start_date := systimestamp + interval '5' second;
     l_job_name := f_get_job_name(pi_qaru_rule_number => pi_qaru_rule_number
@@ -959,12 +1320,27 @@ create or replace package body qa_unit_tests_pkg is
     then
       raise_application_error(-20001, 'Missing input parameter value for pi_quasto_scheme: ' || pi_quasto_scheme || ' or pi_character_set: ' || pi_character_set);
     end if;
+
+    if pi_qaru_client_name is not null and pi_scheme_name is not null
+    then
+      /*if f_is_ut_component_valid(pi_qaru_client_name => pi_qaru_client_name, pi_scheme_name => pi_scheme_name) = false
+      then
+        raise_application_error(-20001, 'Unit Tests could not be executed for given Client Name and Scheme. If the error persists, try recreating the unit tests for the affected scheme.');
+      end if;*/
+      null;
+    else
+      /*if f_is_ut_component_valid(pi_any_package_only => 'Y') = false
+      then
+        raise_application_error(-20001, 'Unit Tests could not be executed. If the error persists, try recreating the unit tests.');
+      end if;*/
+      null;
+    end if;
     
     if pi_qaru_client_name is not null and pi_scheme_name is not null
     then
-      l_suitepath := f_get_suitepath(pi_qaru_client_name => pi_qaru_client_name, pi_scheme_name => pi_scheme_name, pi_get_root_only => 'N');
+      l_suitepath := f_get_suitepath_format(pi_qaru_client_name => pi_qaru_client_name, pi_scheme_name => pi_scheme_name, pi_get_root_only => 'N');
     else
-      l_suitepath := f_get_suitepath(pi_get_root_only => 'Y');
+      l_suitepath := f_get_suitepath_format(pi_get_root_only => 'Y');
     end if;
 
     dbms_output.enable(buffer_size => 1000000);
@@ -1011,7 +1387,7 @@ create or replace package body qa_unit_tests_pkg is
 
     if pi_qaru_rule_number is null or pi_qaru_client_name is null or pi_scheme_name is null or pi_character_set is null
     then
-      raise_application_error(-20001, 'Missing input parameter value for pi_qaru_rule_number: ' || pi_qaru_rule_number || ' or pi_qaru_client_name: ' || pi_qaru_client_name || ' or pi_scheme_name: ' || pi_scheme_name || ' or pi_character_set: ' || pi_character_set);
+      raise_application_error(-20001, 'Missing input parameter value for pi_qaru_rule_number: ' || pi_qaru_rule_number || ', pi_qaru_client_name: ' || pi_qaru_client_name || ', pi_scheme_name: ' || pi_scheme_name || ' or pi_character_set: ' || pi_character_set);
     end if;
 
     l_utplsql_call := f_get_unit_test_call(pi_qaru_rule_number => pi_qaru_rule_number, pi_qaru_client_name => pi_qaru_client_name, pi_scheme_name => pi_scheme_name);
@@ -1195,7 +1571,7 @@ create or replace package body qa_unit_tests_pkg is
     if ((pi_qaru_rule_number is null or pi_qaru_client_name is null or pi_scheme_name is null) and pi_is_cronjob != 'Y')
     or pi_is_cronjob not in ('Y','N')
     then
-      raise_application_error(-20001, 'Missing or invalid input parameter value for pi_qaru_rule_number: ' || pi_qaru_rule_number || ', pi_qaru_client_name: ' || pi_qaru_client_name || ', pi_scheme_name: ' || pi_scheme_name || ', pi_is_cronjob: ' || pi_is_cronjob);
+      raise_application_error(-20001, 'Missing or invalid input parameter value for pi_qaru_rule_number: ' || pi_qaru_rule_number || ', pi_qaru_client_name: ' || pi_qaru_client_name || ', pi_scheme_name: ' || pi_scheme_name || ' or pi_is_cronjob: ' || pi_is_cronjob);
     end if;
     
     if pi_is_cronjob = 'Y'
@@ -1368,6 +1744,11 @@ create or replace package body qa_unit_tests_pkg is
     c_unit constant varchar2(32767) := $$plsql_unit || '.p_trigger_scheduler_cronjob';
     l_param_list qa_logger_pkg.tab_param;
   begin
+
+    /*if f_is_ut_component_valid(pi_any_package_only => 'Y') = false
+    then
+      raise_application_error(-20001, 'Unit Tests could not be executed. If the error persists, try recreating the unit tests.');
+    end if;*/
 
     if f_is_job_running(pi_job_name => qa_constant_pkg.gc_utplsql_scheduler_cronjob_name) = 'N'
     then
