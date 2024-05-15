@@ -1,7 +1,7 @@
 create or replace force view qa_job_run_details_p0009_v as
 select job_name
       ,log_date
-      ,case when status = 'FAILED' then 'ERROR' else status end as status
+      ,case when status = 'FAILED' then 'ERROR' else status end status
       ,error#
       ,errors
       ,lpad(to_char(extract(hour from run_duration))
