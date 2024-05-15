@@ -28,8 +28,8 @@ wwv_flow_imp_page.create_page(
 ,p_page_template_options=>'#DEFAULT#'
 ,p_protection_level=>'C'
 ,p_page_component_map=>'13'
-,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240510111926'
+,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
+,p_last_upd_yyyymmddhh24miss=>'20240515121139'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(50026038309358532)
@@ -694,7 +694,7 @@ wwv_flow_imp_page.create_page_da_event(
 ,p_triggering_region_id=>wwv_flow_imp.id(54282244796258516)
 ,p_bind_type=>'bind'
 ,p_execution_type=>'IMMEDIATE'
-,p_bind_event_type=>'apexafterclosedialog'
+,p_bind_event_type=>'apexafterclosecanceldialog'
 );
 wwv_flow_imp_page.create_page_da_action(
  p_id=>wwv_flow_imp.id(42250855318031718)
@@ -792,7 +792,7 @@ wwv_flow_imp_page.create_page_da_event(
 ,p_triggering_region_id=>wwv_flow_imp.id(15081484244011701)
 ,p_bind_type=>'bind'
 ,p_execution_type=>'IMMEDIATE'
-,p_bind_event_type=>'apexafterclosedialog'
+,p_bind_event_type=>'apexafterclosecanceldialog'
 );
 wwv_flow_imp_page.create_page_da_action(
  p_id=>wwv_flow_imp.id(32892829688706114)

@@ -53,7 +53,7 @@ wwv_imp_workspace.create_flow(
 ,p_substitution_string_03=>'PROVIDER_SLOGAN'
 ,p_substitution_value_03=>'Copyright 2024 Hyand Solutions GmbH'
 ,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240513153909'
+,p_last_upd_yyyymmddhh24miss=>'20240515121139'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_files_version=>9
 ,p_print_server_type=>'NATIVE'

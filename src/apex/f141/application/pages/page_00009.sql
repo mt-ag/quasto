@@ -23,12 +23,12 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'03'
 ,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240513153909'
+,p_last_upd_yyyymmddhh24miss=>'20240514164648'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(51469936526214117)
 ,p_plug_name=>'Job History'
-,p_region_template_options=>'#DEFAULT#:is-collapsed:t-Region--scrollBody'
+,p_region_template_options=>'#DEFAULT#:is-expanded:t-Region--scrollBody'
 ,p_plug_template=>wwv_flow_imp.id(50747098537675120)
 ,p_plug_display_sequence=>30
 ,p_include_in_reg_disp_sel_yn=>'Y'
