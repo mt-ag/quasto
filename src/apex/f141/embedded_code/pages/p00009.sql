@@ -37,5 +37,15 @@ into
 , :P9_REPEAT_INTERVAL
 , :P9_JOB_STATE
 from QA_JOB_DETAILS_P0009_V;
+
+exception
+  when no_data_found
+    then
+      :P9_START_DATE        := null;
+      :P9_LAST_START_DATE   := null;
+      :P9_LAST_RUN_DURATION := null;
+      :P9_NEXT_RUN_DATE     := null;
+      :P9_REPEAT_INTERVAL   := null;
+      :P9_JOB_STATE         := null;
 end;
 
