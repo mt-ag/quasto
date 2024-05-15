@@ -143,6 +143,211 @@ and not exists (select null
        and cons.status = 'ENABLED')
 ```
 
+Example for DML/DATA Rule - Table QA_RULES not empty
+``` sql
+with param as
+ (select :1 scheme
+        ,:2 qaru_id
+        ,:3 qaru_category
+        ,:4 qaru_error_level
+        ,:5 qaru_object_types
+        ,:6 qaru_error_message
+        ,:7 qaru_sql
+  from dual)
+select qa_rule_t(pi_qaru_id             => p.qaru_id
+                ,pi_qaru_category       => p.qaru_category
+                ,pi_qaru_error_level    => p.qaru_error_level
+                ,pi_qaru_error_message  => p.qaru_error_message
+                ,pi_qaru_object_types   => p.qaru_object_types
+                ,pi_qaru_sql            => p.qaru_sql
+                ,pi_scheme_name         => p.scheme
+                ,pi_object_id           => src.object_id
+                ,pi_object_name         => src.object_name
+                ,pi_object_details      => src.object_name || ' without Data'
+                ,pi_object_type         => 'TABLE'
+                ,pi_object_value        => src.object_value
+                ,pi_object_updated_user => src.updated_user
+                ,pi_object_updated_date => src.updated_date)
+from param p
+cross join (select null as object_id
+                  ,'QA_RULES' as object_name
+                  ,'TABLE' as object_type
+                  ,'0' as object_value
+                  ,null as updated_user
+                  ,null as updated_date
+            from dual
+            where not exists (select *
+                   from qa_rules)) src
+```
+
+Example for APEX Rule - No Never Condition
+Here we need two additional Paramters for Apex Page and App ID
+``` sql
+with param as
+ (select :1 scheme
+        ,:2 qaru_id
+        ,:3 qaru_category
+        ,:4 qaru_error_level
+        ,:5 qaru_object_types
+        ,:6 qaru_error_message
+        ,:7 qaru_sql
+        ,:8 apex_app_id
+        ,:9 apex_page_id
+  from dual)
+select qa_rule_t(pi_qaru_id             => qaru_id
+                ,pi_qaru_category       => qaru_category
+                ,pi_qaru_error_level    => qaru_error_level
+                ,pi_qaru_error_message  => qaru_error_message
+                ,pi_qaru_object_types   => qaru_object_types
+                ,pi_qaru_sql            => qaru_sql
+                ,pi_scheme_name         => scheme
+                ,pi_object_id           => object_id
+                ,pi_object_name         => object_name
+                ,pi_object_details      => 'The Item ' || object_name || ' on Page ' || c.page_id || ' in ' || application_name || ' has a never condition!'
+                ,pi_object_type         => object_type
+                ,pi_object_value        => object_value
+                ,pi_object_updated_user => object_updated_user
+                ,pi_object_updated_date => object_updated_date
+                ,pi_apex_app_id         => c.apex_app_id
+                ,pi_apex_page_id        => c.apex_page_id)
+from param p
+cross join (select 'ITEM' object_type
+            ,pi.application_id
+            ,pi.application_name
+            ,pi.page_id
+            ,pi.region_id
+            ,pi.item_id object_id
+            ,pi.item_name object_name
+            ,pi.condition_type_code object_value
+            ,pi.last_updated_by object_updated_user
+            ,pi.last_updated_on object_updated_date
+            ,pi.application_id as apex_app_id
+            ,pi.page_id as apex_page_id
+      from apex_application_page_items pi
+      where pi.condition_type_code = 'NEVER'
+      union
+      select 'REGION' object_type
+            ,pr.application_id
+            ,pr.application_name
+            ,pr.page_id
+            ,pr.region_id
+            ,pr.region_id object_id
+            ,pr.region_name object_name
+            ,pr.condition_type_code object_value
+            ,pr.last_updated_by object_updated_user
+            ,pr.last_updated_on object_updated_date
+            ,pr.application_id as apex_app_id
+            ,pr.page_id as apex_page_id
+      from apex_application_page_regions pr
+      where condition_type_code = 'NEVER'
+      union
+      select 'BUTTON' object_type
+            ,pb.application_id
+            ,pb.application_name
+            ,pb.page_id
+            ,pb.region_id
+            ,pb.button_id object_id
+            ,pb.button_name object_name
+            ,pb.condition_type_code object_value
+            ,pb.last_updated_by object_updated_user
+            ,pb.last_updated_on object_updated_date
+            ,pb.application_id as apex_app_id
+            ,pb.page_id as apex_page_id
+      from apex_application_page_buttons pb
+      where pb.condition_type_code = 'NEVER'
+      union
+      select 'RPT_COL' object_type
+            ,prc.application_id
+            ,prc.application_name
+            ,prc.page_id
+            ,prc.region_id
+            ,prc.region_report_column_id object_id
+            ,prc.column_alias object_name
+            ,prc.condition_type_code object_value
+            ,prc.last_updated_by object_updated_user
+            ,prc.last_updated_on object_updated_date
+            ,prc.application_id as apex_app_id
+            ,prc.page_id as apex_page_id
+      from apex_application_page_rpt_cols prc
+      where prc.condition_type_code = 'NEVER'
+      union
+      select 'COMPUTATION' object_type
+            ,pc.application_id
+            ,pc.application_name
+            ,pc.page_id
+            ,null region_id
+            ,pc.computation_id object_id
+            ,pc.item_name object_name
+            ,pc.condition_type_code object_value
+            ,pc.last_updated_by object_updated_user
+            ,pc.last_updated_on object_updated_date
+            ,pc.application_id as apex_app_id
+            ,pc.page_id as apex_page_id
+      from apex_application_page_comp pc
+      where pc.condition_type_code = 'NEVER'
+      union
+      select 'VALIDATION' object_type
+            ,pv.application_id
+            ,pv.application_name
+            ,pv.page_id
+            ,null region_id
+            ,pv.validation_id object_id
+            ,pv.validation_name object_name
+            ,pv.condition_type_code object_value
+            ,pv.last_updated_by object_updated_user
+            ,pv.last_updated_on object_updated_date
+            ,pv.application_id as apex_app_id
+            ,pv.page_id as apex_page_id
+      from apex_application_page_val pv
+      where pv.condition_type_code = 'NEVER'
+      union
+      select 'PROCESS' object_type
+            ,pp.application_id
+            ,pp.application_name
+            ,pp.page_id
+            ,null region_id
+            ,pp.process_id object_id
+            ,pp.process_name object_name
+            ,pp.condition_type_code object_value
+            ,pp.last_updated_by object_updated_user
+            ,pp.last_updated_on object_updated_date
+            ,pp.application_id as apex_app_id
+            ,pp.page_id as apex_page_id
+      from apex_application_page_proc pp
+      where pp.condition_type_code = 'NEVER'
+      union
+      select 'BRANCH' object_type
+            ,pb.application_id
+            ,pb.application_name
+            ,pb.page_id
+            ,null region_id
+            ,pb.branch_id object_id
+            ,pb.branch_point object_name
+            ,pb.condition_type_code object_value
+            ,pb.last_updated_by object_updated_user
+            ,pb.last_updated_on object_updated_date
+            ,pb.application_id as apex_app_id
+            ,pb.page_id as apex_page_id
+      from apex_application_page_branches pb
+      where pb.condition_type_code = 'NEVER'
+      union
+      select 'DA' object_type
+            ,pd.application_id
+            ,pd.application_name
+            ,pd.page_id
+            ,null region_id
+            ,pd.dynamic_action_id object_id
+            ,pd.dynamic_action_name object_name
+            ,pd.condition_type_code object_value
+            ,pd.last_updated_by object_updated_user
+            ,pd.last_updated_on object_updated_date
+            ,pd.application_id as apex_app_id
+            ,pd.page_id as apex_page_id
+      from apex_application_page_da pd
+      where pd.condition_type_code = 'NEVER') c
+where (p.apex_app_id = c.apex_app_id or p.apex_app_id is null)
+and (p.apex_page_id = c.apex_page_id or p.apex_page_id is null)
+```
 ### Running rules
 After you defined one or more rules, you can run these rules. The easiest way is to call them in your SQL tool.
 To run rules, you can use the package QA_API_PKG. It allows you to run a single rule, or a complete ruleset for one project only with a single SQL query.
