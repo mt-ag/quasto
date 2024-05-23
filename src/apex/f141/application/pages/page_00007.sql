@@ -22,7 +22,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'02'
 ,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240514183700'
+,p_last_upd_yyyymmddhh24miss=>'20240523101305'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(54280765006258501)
@@ -446,6 +446,70 @@ wwv_flow_imp_page.create_page_validation(
 ,p_validation_type=>'EXPRESSION'
 ,p_error_message=>'The Rule has saved test results and therefore cannot be deleted. Please set it to "Inactive" instead.'
 ,p_when_button_pressed=>wwv_flow_imp.id(54468111224367589)
+,p_error_display_location=>'INLINE_WITH_FIELD_AND_NOTIFICATION'
+);
+wwv_flow_imp_page.create_page_validation(
+ p_id=>wwv_flow_imp.id(37289631365645615)
+,p_validation_name=>'Validate if Rule already exists'
+,p_validation_sequence=>20
+,p_validation=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'declare',
+'  l_count number;',
+'begin',
+'  select count(1)',
+'  into l_count',
+'  from qa_rules',
+'  where qaru_rule_number = :P7_QARU_RULE_NUMBER',
+'  and qaru_client_name = :P7_QARU_CLIENT_NAME;',
+'',
+'  if l_count > 0',
+'    then',
+'      return false;',
+'  else',
+'      return true;',
+'  end if;',
+'  exception',
+'    when no_data_found',
+'      then',
+'        return true;',
+'end;'))
+,p_validation2=>'PLSQL'
+,p_validation_type=>'FUNC_BODY_RETURNING_BOOLEAN'
+,p_error_message=>'Rulenumber already exists for this client.'
+,p_when_button_pressed=>wwv_flow_imp.id(37067720447570637)
+,p_associated_item=>wwv_flow_imp.id(54279634041258490)
+,p_error_display_location=>'INLINE_WITH_FIELD_AND_NOTIFICATION'
+);
+wwv_flow_imp_page.create_page_validation(
+ p_id=>wwv_flow_imp.id(37289712992645616)
+,p_validation_name=>'Validate if Name already exists'
+,p_validation_sequence=>30
+,p_validation=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'declare',
+'  l_count number;',
+'begin',
+'  select count(1)',
+'  into l_count',
+'  from qa_rules',
+'  where qaru_name = :P7_QARU_NAME',
+'  and qaru_client_name = :P7_QARU_CLIENT_NAME;',
+'',
+'  if l_count > 0',
+'    then',
+'      return false;',
+'  else',
+'      return true;',
+'  end if;',
+'  exception',
+'    when no_data_found',
+'      then',
+'        return true;',
+'end;'))
+,p_validation2=>'PLSQL'
+,p_validation_type=>'FUNC_BODY_RETURNING_BOOLEAN'
+,p_error_message=>'Rulename already exists for this client.'
+,p_when_button_pressed=>wwv_flow_imp.id(37067720447570637)
+,p_associated_item=>wwv_flow_imp.id(54279823323258492)
 ,p_error_display_location=>'INLINE_WITH_FIELD_AND_NOTIFICATION'
 );
 wwv_flow_imp_page.create_page_da_event(

@@ -38,7 +38,7 @@ prompt APPLICATION 141 - QUASTO
 --   Export Type:     Application Export
 --     Pages:                     13
 --       Items:                   45
---       Validations:              2
+--       Validations:              4
 --       Processes:               16
 --       Regions:                 48
 --       Buttons:                 28
@@ -126,7 +126,7 @@ wwv_imp_workspace.create_flow(
 ,p_substitution_string_03=>'PROVIDER_SLOGAN'
 ,p_substitution_value_03=>'Copyright 2024 Hyand Solutions GmbH'
 ,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240522130008'
+,p_last_upd_yyyymmddhh24miss=>'20240523105329'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_files_version=>9
 ,p_print_server_type=>'NATIVE'
@@ -16882,7 +16882,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'02'
 ,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240514183700'
+,p_last_upd_yyyymmddhh24miss=>'20240523101305'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(54280765006258501)
@@ -17306,6 +17306,70 @@ wwv_flow_imp_page.create_page_validation(
 ,p_validation_type=>'EXPRESSION'
 ,p_error_message=>'The Rule has saved test results and therefore cannot be deleted. Please set it to "Inactive" instead.'
 ,p_when_button_pressed=>wwv_flow_imp.id(54468111224367589)
+,p_error_display_location=>'INLINE_WITH_FIELD_AND_NOTIFICATION'
+);
+wwv_flow_imp_page.create_page_validation(
+ p_id=>wwv_flow_imp.id(37289631365645615)
+,p_validation_name=>'Validate if Rule already exists'
+,p_validation_sequence=>20
+,p_validation=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'declare',
+'  l_count number;',
+'begin',
+'  select count(1)',
+'  into l_count',
+'  from qa_rules',
+'  where qaru_rule_number = :P7_QARU_RULE_NUMBER',
+'  and qaru_client_name = :P7_QARU_CLIENT_NAME;',
+'',
+'  if l_count > 0',
+'    then',
+'      return false;',
+'  else',
+'      return true;',
+'  end if;',
+'  exception',
+'    when no_data_found',
+'      then',
+'        return true;',
+'end;'))
+,p_validation2=>'PLSQL'
+,p_validation_type=>'FUNC_BODY_RETURNING_BOOLEAN'
+,p_error_message=>'Rulenumber already exists for this client.'
+,p_when_button_pressed=>wwv_flow_imp.id(37067720447570637)
+,p_associated_item=>wwv_flow_imp.id(54279634041258490)
+,p_error_display_location=>'INLINE_WITH_FIELD_AND_NOTIFICATION'
+);
+wwv_flow_imp_page.create_page_validation(
+ p_id=>wwv_flow_imp.id(37289712992645616)
+,p_validation_name=>'Validate if Name already exists'
+,p_validation_sequence=>30
+,p_validation=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'declare',
+'  l_count number;',
+'begin',
+'  select count(1)',
+'  into l_count',
+'  from qa_rules',
+'  where qaru_name = :P7_QARU_NAME',
+'  and qaru_client_name = :P7_QARU_CLIENT_NAME;',
+'',
+'  if l_count > 0',
+'    then',
+'      return false;',
+'  else',
+'      return true;',
+'  end if;',
+'  exception',
+'    when no_data_found',
+'      then',
+'        return true;',
+'end;'))
+,p_validation2=>'PLSQL'
+,p_validation_type=>'FUNC_BODY_RETURNING_BOOLEAN'
+,p_error_message=>'Rulename already exists for this client.'
+,p_when_button_pressed=>wwv_flow_imp.id(37067720447570637)
+,p_associated_item=>wwv_flow_imp.id(54279823323258492)
 ,p_error_display_location=>'INLINE_WITH_FIELD_AND_NOTIFICATION'
 );
 wwv_flow_imp_page.create_page_da_event(
@@ -18054,8 +18118,8 @@ wwv_flow_imp_page.create_page(
 ,p_dialog_width=>'1000px'
 ,p_protection_level=>'C'
 ,p_page_component_map=>'03'
-,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240408180047'
+,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
+,p_last_upd_yyyymmddhh24miss=>'20240523105329'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(32891540502706101)
@@ -18082,7 +18146,7 @@ wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(8769661398376820)
 ,p_plug_name=>'Job History'
 ,p_parent_plug_id=>wwv_flow_imp.id(104945985645082588)
-,p_region_template_options=>'#DEFAULT#:is-collapsed:t-Region--scrollBody:margin-top-md'
+,p_region_template_options=>'#DEFAULT#:is-expanded:t-Region--scrollBody:margin-top-md'
 ,p_plug_template=>wwv_flow_imp.id(50747098537675120)
 ,p_plug_display_sequence=>10
 ,p_plug_display_point=>'SUB_REGIONS'

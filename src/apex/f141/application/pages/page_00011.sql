@@ -22,8 +22,8 @@ wwv_flow_imp_page.create_page(
 ,p_dialog_width=>'1000px'
 ,p_protection_level=>'C'
 ,p_page_component_map=>'03'
-,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240408180047'
+,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
+,p_last_upd_yyyymmddhh24miss=>'20240523105329'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(32891540502706101)
@@ -50,7 +50,7 @@ wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(8769661398376820)
 ,p_plug_name=>'Job History'
 ,p_parent_plug_id=>wwv_flow_imp.id(104945985645082588)
-,p_region_template_options=>'#DEFAULT#:is-collapsed:t-Region--scrollBody:margin-top-md'
+,p_region_template_options=>'#DEFAULT#:is-expanded:t-Region--scrollBody:margin-top-md'
 ,p_plug_template=>wwv_flow_imp.id(50747098537675120)
 ,p_plug_display_sequence=>10
 ,p_plug_display_point=>'SUB_REGIONS'
