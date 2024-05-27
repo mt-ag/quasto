@@ -21,7 +21,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'17'
 ,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240424175545'
+,p_last_upd_yyyymmddhh24miss=>'20240527225916'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(18126053872567136)
@@ -69,15 +69,16 @@ wwv_flow_imp_page.create_page_plug(
 ,p_plug_display_sequence=>10
 ,p_plug_display_point=>'SUB_REGIONS'
 ,p_plug_source_type=>'PLUGIN_QUASTO_REGION'
-,p_attribute_01=>'&P20_APP_ID.'
-,p_attribute_02=>'&P20_APP_PAGE_ID.'
-,p_attribute_03=>'&P20_RULE_SELECTION.'
-,p_attribute_04=>'MT AG'
+,p_plug_query_num_rows=>15
+,p_attribute_01=>'MT AG'
+,p_attribute_02=>'&P20_RULE_SELECTION.'
+,p_attribute_03=>'&P20_APP_ID.'
+,p_attribute_04=>'&P20_APP_PAGE_ID.'
 );
 wwv_flow_imp_page.create_page_item(
  p_id=>wwv_flow_imp.id(37288452984645603)
 ,p_name=>'P20_APP_ID'
-,p_item_sequence=>10
+,p_item_sequence=>30
 ,p_item_plug_id=>wwv_flow_imp.id(62488812881968151)
 ,p_prompt=>'Applicaiton'
 ,p_display_as=>'NATIVE_SELECT_LIST'
@@ -99,7 +100,7 @@ wwv_flow_imp_page.create_page_item(
 wwv_flow_imp_page.create_page_item(
  p_id=>wwv_flow_imp.id(37288665264645605)
 ,p_name=>'P20_APP_PAGE_ID'
-,p_item_sequence=>20
+,p_item_sequence=>40
 ,p_item_plug_id=>wwv_flow_imp.id(62488812881968151)
 ,p_prompt=>'Page'
 ,p_display_as=>'NATIVE_SELECT_LIST'
@@ -121,17 +122,16 @@ wwv_flow_imp_page.create_page_item(
 ,p_attribute_03=>'N'
 );
 wwv_flow_imp_page.create_page_item(
- p_id=>wwv_flow_imp.id(62489177196968150)
-,p_name=>'P20_RULE_SELECTION'
-,p_item_sequence=>30
+ p_id=>wwv_flow_imp.id(37289864038645617)
+,p_name=>'P20_CLIENT_NAME'
+,p_item_sequence=>10
 ,p_item_plug_id=>wwv_flow_imp.id(62488812881968151)
-,p_prompt=>'Rule Selection'
+,p_prompt=>'Client Name'
 ,p_display_as=>'NATIVE_SELECT_LIST'
-,p_named_lov=>'APEX_RULES_LOV'
 ,p_lov=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'select qaru_rule_number || '' - '' || qaru_name as d,qaru_rule_number as r from qa_rules',
-'where qaru_is_active = 1',
-'and qaru_category = ''APEX'''))
+'select distinct qaru_client_name as d, qaru_client_name as',
+'from qa_rules',
+'where qaru_category = ''APEX'';'))
 ,p_lov_display_null=>'YES'
 ,p_lov_null_text=>'All'
 ,p_cHeight=>1
@@ -140,6 +140,31 @@ wwv_flow_imp_page.create_page_item(
 ,p_lov_display_extra=>'NO'
 ,p_attribute_01=>'SUBMIT'
 ,p_attribute_03=>'N'
+);
+wwv_flow_imp_page.create_page_item(
+ p_id=>wwv_flow_imp.id(62489177196968150)
+,p_name=>'P20_RULE_SELECTION'
+,p_item_sequence=>20
+,p_item_plug_id=>wwv_flow_imp.id(62488812881968151)
+,p_prompt=>'Rule Selection'
+,p_display_as=>'NATIVE_SELECT_LIST'
+,p_lov=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'select qaru_rule_number || '' - '' || qaru_name as d , qaru_rule_number as r',
+'from qa_rules',
+'where qaru_category = ''APEX'' ',
+'and (qaru_client_name = :P20_CLIENT_NAME or :P20_CLIENT_NAME is null)',
+''))
+,p_lov_display_null=>'YES'
+,p_lov_null_text=>'All'
+,p_lov_cascade_parent_items=>'P20_CLIENT_NAME'
+,p_ajax_items_to_submit=>'P20_CLIENT_NAME,P20_RULE_SELECTION'
+,p_ajax_optimize_refresh=>'N'
+,p_cHeight=>1
+,p_field_template=>wwv_flow_imp.id(50842276801675164)
+,p_item_template_options=>'#DEFAULT#'
+,p_lov_display_extra=>'NO'
+,p_attribute_01=>'SUBMIT'
+,p_attribute_03=>'Y'
 );
 wwv_flow_imp.component_end;
 end;

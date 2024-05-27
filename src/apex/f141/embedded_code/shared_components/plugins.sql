@@ -21,14 +21,17 @@ function render_qa_region
   c_plugin_qa_collection_name constant varchar2(30) := 'PLUGIN_QA_COLLECTION';
 
 
-  l_qa_rules_t           qa_rules_t;
+  l_qa_rules_t           qa_rules_t := new qa_rules_t();
+  l_qa_rules_temp_t      qa_rules_t := new qa_rules_t();
   l_region_render_result apex_plugin.t_region_render_result;
 
   -- variables
-  l_app_id      apex_application_page_regions.attribute_01%type := p_region.attribute_01;
-  l_app_page_id apex_application_page_regions.attribute_02%type := p_region.attribute_02;
-  l_rule_number apex_application_page_regions.attribute_03%type := p_region.attribute_03;
-  l_client_name apex_application_page_regions.attribute_04%type := p_region.attribute_04;
+  l_client_name apex_application_page_regions.attribute_04%type := p_region.attribute_01;
+  l_rule_number apex_application_page_regions.attribute_03%type := p_region.attribute_02;
+  l_app_id      apex_application_page_regions.attribute_01%type := p_region.attribute_03;
+  l_app_page_id apex_application_page_regions.attribute_02%type := p_region.attribute_04;
+
+
 
   function get_collection_name return varchar2 is
   begin
@@ -40,12 +43,15 @@ function render_qa_region
   function get_html_region_header return varchar2 is
     l_header varchar2(32767);
   begin
-    l_header := '<table class="apexir_WORKSHEET_DATA">' || --
-                '<tr><th> # </th>' || --
-                '<th>Objecttype</th>' || --
-                '<th>Objectname</th>' || --
-                '<th>Message</th>' || --
-                '</tr>';
+    l_header := '<table class="table-std">' || --
+                '<thead><tr><th class="table-header"> # </th>' || --
+                '<th class="table-header">Error Level</th>' || --
+                '<th class="table-header">Rule Number</th>' || --
+                '<th class="table-header">Rule Name</th>' || --
+                '<th class="table-header">Object Type</th>' || --
+                '<th class="table-header">Object Name</th>' || --
+                '<th class="table-header">Details</th>' || --
+                '</tr></thead>';
   
     return l_header;
   end get_html_region_header;
@@ -67,10 +73,13 @@ function render_qa_region
   ) return varchar2 is
     l_line varchar2(32767);
   begin
-    l_line := '<tr><td>' || p_nr || '</td>' || --
-              '<td>' || p_qa_rule_t.object_details || '</td>' || --
-              '<td>' || p_qa_rule_t.object_name || '</td>' || --
-              '<td>' || p_qa_rule_t.qaru_error_message || '</td>' || --
+    l_line := '<tr><td class="table-row">' || p_nr || '</td>' || --
+              '<td class="table-row">' || p_qa_rule_t.qaru_error_level || '</td>' || --
+              '<td  class="table-row">' || p_qa_rule_t.qaru_error_level || '</td>' || --
+              '<td  class="table-row">' || p_qa_rule_t.qaru_error_level || '</td>' || --
+              '<td  class="table-row">' || p_qa_rule_t.object_type || '</td>' || --
+              '<td  class="table-row">' || p_qa_rule_t.object_name || '</td>' || --
+              '<td class="table-row">' || p_qa_rule_t.object_details || '</td>' || --
               '</tr>';
     return l_line;
   end get_html_rule_line;
@@ -97,19 +106,21 @@ function render_qa_region
   end print_result;
 
 begin
-
-  if l_rule_number is not null
-  then
-    l_qa_rules_t := qa_apex_api_pkg.tf_run_rule(pi_app_id           => l_app_id
-                                               ,pi_page_id          => l_app_page_id
-                                               ,pi_qaru_rule_number => l_rule_number
-                                               ,pi_qaru_client_name => l_client_name
-                                               ,pi_target_scheme    => null);
-  else
-    l_qa_rules_t := qa_apex_api_pkg.tf_run_rules(pi_app_id           => l_app_id
-                                                ,pi_page_id          => l_app_page_id
-                                                ,pi_qaru_client_name => l_client_name);
-  end if;
+  for i in (select qaru_rule_number as l_number
+                  ,qaru_name
+                  ,qaru_client_name
+            from qa_rules
+            where (qaru_client_name = l_client_name or l_client_name is null)
+            and (qaru_rule_number = l_rule_number or l_rule_number is null)
+            and qaru_category = 'APEX')
+  loop
+    l_qa_rules_temp_t := qa_apex_api_pkg.tf_run_rule(pi_app_id           => l_app_id
+                                                    ,pi_page_id          => l_app_page_id
+                                                    ,pi_qaru_rule_number => i.l_number
+                                                    ,pi_qaru_client_name => i.qaru_client_name
+                                                    ,pi_target_scheme    => null);
+    l_qa_rules_t      := l_qa_rules_t multiset union l_qa_rules_temp_t;
+  end loop;
   dbms_output.put_line('Reached print Result');
   if l_qa_rules_t.count > 0 and
      l_qa_rules_t is not null
@@ -121,7 +132,6 @@ begin
 
 
 end render_qa_region;
-
 
 -- ----------------------------------------
 -- Plugin: Quasto - Region > Source > PL/SQL Code
@@ -136,14 +146,17 @@ function render_qa_region
   c_plugin_qa_collection_name constant varchar2(30) := 'PLUGIN_QA_COLLECTION';
 
 
-  l_qa_rules_t           qa_rules_t;
+  l_qa_rules_t           qa_rules_t := new qa_rules_t();
+  l_qa_rules_temp_t      qa_rules_t := new qa_rules_t();
   l_region_render_result apex_plugin.t_region_render_result;
 
   -- variables
-  l_app_id      apex_application_page_regions.attribute_01%type := p_region.attribute_01;
-  l_app_page_id apex_application_page_regions.attribute_02%type := p_region.attribute_02;
-  l_rule_number apex_application_page_regions.attribute_03%type := p_region.attribute_03;
-  l_client_name apex_application_page_regions.attribute_04%type := p_region.attribute_04;
+  l_client_name apex_application_page_regions.attribute_04%type := p_region.attribute_01;
+  l_rule_number apex_application_page_regions.attribute_03%type := p_region.attribute_02;
+  l_app_id      apex_application_page_regions.attribute_01%type := p_region.attribute_03;
+  l_app_page_id apex_application_page_regions.attribute_02%type := p_region.attribute_04;
+
+
 
   function get_collection_name return varchar2 is
   begin
@@ -155,12 +168,15 @@ function render_qa_region
   function get_html_region_header return varchar2 is
     l_header varchar2(32767);
   begin
-    l_header := '<table class="apexir_WORKSHEET_DATA">' || --
-                '<tr><th> # </th>' || --
-                '<th>Objecttype</th>' || --
-                '<th>Objectname</th>' || --
-                '<th>Message</th>' || --
-                '</tr>';
+    l_header := '<table class="table-std">' || --
+                '<thead><tr><th class="table-header"> # </th>' || --
+                '<th class="table-header">Error Level</th>' || --
+                '<th class="table-header">Rule Number</th>' || --
+                '<th class="table-header">Rule Name</th>' || --
+                '<th class="table-header">Object Type</th>' || --
+                '<th class="table-header">Object Name</th>' || --
+                '<th class="table-header">Details</th>' || --
+                '</tr></thead>';
   
     return l_header;
   end get_html_region_header;
@@ -182,10 +198,13 @@ function render_qa_region
   ) return varchar2 is
     l_line varchar2(32767);
   begin
-    l_line := '<tr><td>' || p_nr || '</td>' || --
-              '<td>' || p_qa_rule_t.object_details || '</td>' || --
-              '<td>' || p_qa_rule_t.object_name || '</td>' || --
-              '<td>' || p_qa_rule_t.qaru_error_message || '</td>' || --
+    l_line := '<tr><td class="table-row">' || p_nr || '</td>' || --
+              '<td class="table-row">' || p_qa_rule_t.qaru_error_level || '</td>' || --
+              '<td  class="table-row">' || p_qa_rule_t.qaru_error_level || '</td>' || --
+              '<td  class="table-row">' || p_qa_rule_t.qaru_error_level || '</td>' || --
+              '<td  class="table-row">' || p_qa_rule_t.object_type || '</td>' || --
+              '<td  class="table-row">' || p_qa_rule_t.object_name || '</td>' || --
+              '<td class="table-row">' || p_qa_rule_t.object_details || '</td>' || --
               '</tr>';
     return l_line;
   end get_html_rule_line;
@@ -212,19 +231,21 @@ function render_qa_region
   end print_result;
 
 begin
-
-  if l_rule_number is not null
-  then
-    l_qa_rules_t := qa_apex_api_pkg.tf_run_rule(pi_app_id           => l_app_id
-                                               ,pi_page_id          => l_app_page_id
-                                               ,pi_qaru_rule_number => l_rule_number
-                                               ,pi_qaru_client_name => l_client_name
-                                               ,pi_target_scheme    => null);
-  else
-    l_qa_rules_t := qa_apex_api_pkg.tf_run_rules(pi_app_id           => l_app_id
-                                                ,pi_page_id          => l_app_page_id
-                                                ,pi_qaru_client_name => l_client_name);
-  end if;
+  for i in (select qaru_rule_number as l_number
+                  ,qaru_name
+                  ,qaru_client_name
+            from qa_rules
+            where (qaru_client_name = l_client_name or l_client_name is null)
+            and (qaru_rule_number = l_rule_number or l_rule_number is null)
+            and qaru_category = 'APEX')
+  loop
+    l_qa_rules_temp_t := qa_apex_api_pkg.tf_run_rule(pi_app_id           => l_app_id
+                                                    ,pi_page_id          => l_app_page_id
+                                                    ,pi_qaru_rule_number => i.l_number
+                                                    ,pi_qaru_client_name => i.qaru_client_name
+                                                    ,pi_target_scheme    => null);
+    l_qa_rules_t      := l_qa_rules_t multiset union l_qa_rules_temp_t;
+  end loop;
   dbms_output.put_line('Reached print Result');
   if l_qa_rules_t.count > 0 and
      l_qa_rules_t is not null
@@ -236,5 +257,4 @@ begin
 
 
 end render_qa_region;
-
 
