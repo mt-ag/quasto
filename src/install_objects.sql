@@ -110,6 +110,12 @@ select 'Wrong Argument or no Argument has been passed correctly!' from dual wher
 set feedback on
 set head on
 
+spool install.log
+
+PROMPT ####################
+PROMPT Installation started
+PROMPT ####################
+
 -- Constant Package Generation with last argument as current Version
 @@src/scripts/install_constant_package '~1' '~2' '~3' '~4' '23.2'
 
@@ -119,3 +125,36 @@ set head on
 @src/scripts/recompile_quasto_objects.sql
 @@src/~script_name_utplsql_recompile
 @@src/~script_name_apex_recompile
+
+PROMPT #####################
+PROMPT Installation finished
+PROMPT #####################
+
+column text format a100
+column error_count noprint new_value error_count
+
+PROMPT #######################
+PROMPT Validating Installation
+PROMPT #######################
+
+set heading on
+select type, name, sequence, line, position, text, count(1) over() error_count
+  from user_errors
+ where name not like 'BIN$%' -- not recycled
+   and (name = 'VARCHAR2_TAB_T' or name like 'QA\_%' escape '\')
+   -- errors only. ignore warnings
+   and attribute = 'ERROR'
+ order by name, type, sequence
+/
+
+begin
+  if to_number('&&error_count') > 0 then
+    dbms_output.put_line('ERROR: Not all sources were successfully installed.');
+  else
+    dbms_output.put_line('Installation completed successfully.');
+  end if;
+  dbms_output.put_line('Please check the output written into log file install.log');
+end;
+/
+
+spool off
