@@ -32,7 +32,7 @@ To start the installation, you need to connect to the database scheme in which y
 In order to use QUASTO in other schemes, a public synonym is required on the type "QA_RULE_T".
 The user has to create this outside of the regular QUASTO installation.
 
-<b>Note:</b> To drop a public synonym, the user needs the DROP PUBLIC SYNONYM or DROP ANY SYNONYM privilege.
+> <b>Note</b>: To drop a public synonym, the user needs the DROP PUBLIC SYNONYM or DROP ANY SYNONYM privilege.
 
 ### Minimal user rights
 If you install QUASTO in a blank new scheme, the user needs the following rights:
@@ -64,9 +64,9 @@ Arguments that are required to be passed to the script are:
 3. Do you want to install supporting objects for Jenkins? 1=yes / 0=no (you need to install supporting Jenkins objects separately later, if desired [*])
 4. Do you wish to install a logger functionality for debugging? 1=yes / 0=no (if activated, you can debug parameter and variable values [**])
 
-[*] Please not that the third argument about Jenkins does not have any effect yet. Jenkins objects will be added in a future release of QUASTO.
-
-[**] QUASTO is using the open-source logger framework. You can download it on GitHub: https://github.com/OraOpenSource/Logger.
+> <b>Note</b>:\
+> [*] Please not that the third argument about Jenkins does not have any effect yet. Jenkins objects will be added in a future release of QUASTO.\
+> [**] QUASTO is using the open-source logger framework. You can download it on GitHub: https://github.com/OraOpenSource/Logger.
 
 It is possible to install QUASTO, utPLSQL or APEX objects separately.
 To do this, the user needs to move from the root directory of the project into the /src/ directory.
@@ -95,7 +95,7 @@ The script automatically detects if no version or one of the previous versions (
 
 An alternative way to install the new release is to fully remove the old version and install the latest one by using the unistall and install scripts.
 
-<b>Note:</b> Please be aware that the uninstall will remove all QUASTO objects including the table QA_RULES and its data. Therefore it is recommended to export or backup all rules and reimport them once the full installation process is finished. More information on how to backup rules, you can find in the section [Export and Import Rules](https://github.com/mt-ag/quasto#export-and-import-rules).
+> <b>Note</b>: Please be aware that the uninstall will remove all QUASTO objects including the table QA_RULES and its data. Therefore it is recommended to export or backup all rules and reimport them once the full installation process is finished. More information on how to backup rules, you can find in the section [Export and Import Rules](https://github.com/mt-ag/quasto#export-and-import-rules).
 
 
 ### Uninstalling utPLSQL and QUASTO objects
@@ -406,7 +406,7 @@ Here we use two arguments.
 1. The name of the client we want to export the rules for. This name needs to be the exact entry of the client name inside the QA_RULES table!
 2. The optional name of the category for which rules we want to export.
 
-Note: Leaving the brackets empty is required in case the user wants to export all categories at once.
+> <b>Note</b>: Leaving the brackets empty is required in case the user wants to export all categories at once.
 
 Example:
 ```sh
