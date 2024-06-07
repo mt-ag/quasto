@@ -61,10 +61,12 @@ It is not mandatory to install APEX or utPLSQL. However, you get more features f
 Arguments that are required to be passed to the script are:
 1. Do you want to install supporting objects for utPLSQL? 1=yes / 0=no (you need to install supporting utPLSQL objects separately later, if desired)
 2. Do you want to install supporting objects for Oracle APEX? 1=yes / 0=no (you need to install supporting APEX objects separately later, if desired)
-3. Do you want to install supporting objects for Jenkins? 1=yes / 0=no (you need to install supporting Jenkins objects separately later, if desired)
-4. Do you wish to install a lightweight logger functionality for debugging? 1=yes / 0=no (if activated, you can debug procedures and variable values via the database console output)
+3. Do you want to install supporting objects for Jenkins? 1=yes / 0=no (you need to install supporting Jenkins objects separately later, if desired [*])
+4. Do you wish to install a logger functionality for debugging? 1=yes / 0=no (if activated, you can debug parameter and variable values [**])
 
-Please not that the third argument about Jenkins does not have any effect yet. Jenkins objects will be added in a future release of QUASTO.
+[*] Please not that the third argument about Jenkins does not have any effect yet. Jenkins objects will be added in a future release of QUASTO.
+
+[**] QUASTO is using the open-source logger framework. You can download it on GitHub: https://github.com/OraOpenSource/Logger.
 
 It is possible to install QUASTO, utPLSQL or APEX objects separately.
 To do this, the user needs to move from the root directory of the project into the /src/ directory.
