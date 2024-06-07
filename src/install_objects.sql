@@ -148,7 +148,7 @@ select type, name, sequence, line, position, text, count(1) over() error_count
 /
 
 begin
-  if to_number('&&error_count') > 0 then
+  if to_number('~error_count') > 0 then
     dbms_output.put_line('ERROR: Not all sources were successfully installed.');
   else
     dbms_output.put_line('Installation completed successfully.');
