@@ -1,4 +1,10 @@
 set serveroutput on;
+set define '~'
+set feedback on
+set head on
+set concat on
+set concat .
+set verify off
 
 spool uninstall.log
 
@@ -274,7 +280,6 @@ exception
                                                                            ,0
                                                                            ,200));
 end;
-/
 /
 
 PROMPT DROP SCHEDULER JOB CRONJOB_RUN_UNIT_TESTS
