@@ -1,8 +1,9 @@
 set serveroutput on;
 
-PROMPT #########################
-PROMPT   Uninstall all objects
-PROMPT #########################
+spool uninstall.log
+
+PROMPT Uninstall all objects
+PROMPT #####################
 declare
   type t_object_rec is record (
     object_name varchar2(1000 char),
@@ -194,7 +195,7 @@ begin
   l_index := l_index + 1;
 
 
-  while l_counter < l_object.count
+  while l_counter <= l_object.count
   loop
     if l_object(l_counter).object_type = 'TABLE'
     then
@@ -296,6 +297,35 @@ END;
 -- Empty recyclebin because of lobs in user_objects after dropping objects with lobs
 purge recyclebin;
 
+PROMPT 
+PROMPT Uninstallation finished
+PROMPT #######################
+
+column text format a100
+column object_count noprint new_value object_count
+
+PROMPT 
+PROMPT Validating Uninstallation
 PROMPT #########################
-PROMPT  Uninstallation finished
-PROMPT #########################
+
+set heading on
+select object_type, object_name, count(1) over() object_count
+  from user_objects
+ where object_name not like 'BIN$%' -- not recycled
+   and (object_name = 'VARCHAR2_TAB_T' or object_name like 'QA\_%' escape '\')
+ order by object_name, object_type
+/
+
+begin
+  if to_number('~object_count') > 0 then
+    dbms_output.put_line('ERROR: Not all sources were successfully removed.');
+  else
+    dbms_output.put_line('Uninstallation completed successfully.');
+  end if;
+  dbms_output.put_line('Please check the output written into log file uninstall.log');
+end;
+/
+
+undefine object_count
+
+spool off

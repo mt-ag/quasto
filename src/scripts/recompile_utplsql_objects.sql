@@ -1,4 +1,6 @@
-Prompt Recomile UTPLSQL Objects
+PROMPT 
+PROMPT # Recomile utPLSQL Objects
+PROMPT 
 set serveroutput on;
 declare
   type t_object_rec is record (

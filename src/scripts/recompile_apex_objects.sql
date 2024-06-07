@@ -1,4 +1,6 @@
-Prompt Recomile Apex Objects
+PROMPT 
+PROMPT # Recomile APEX Objects
+PROMPT 
 set serveroutput on;
 declare
   type t_object_rec is record (

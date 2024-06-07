@@ -60,7 +60,6 @@ begin
 
 end;';
 
-    dbms_output.put_line(l_action_pkg_spec);
     execute immediate l_action_pkg_spec;
 
     select count(1)

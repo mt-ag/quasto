@@ -1,18 +1,18 @@
-PROMPT #######################################
-PROMPT      Installation: APEX objects
-PROMPT #######################################
+PROMPT 
+PROMPT Installation: APEX objects
+PROMPT ##########################
 
-PROMPT ################
-PROMPT       TYPES
-PROMPT ################
+PROMPT 
+PROMPT # TYPES
+PROMPT 
 PROMPT src/plsql/typ/qa_test_results_row_t.sql
 @src/plsql/typ/qa_test_results_row_t.sql
 PROMPT src/plsql/typ/qa_test_results_table_t.sql
 @src/plsql/typ/qa_test_results_table_t.sql
 
-PROMPT ################
-PROMPT      VIEWS
-PROMPT ################
+PROMPT 
+PROMPT # VIEWS
+PROMPT 
 PROMPT src/plsql/vw/qa_apex_blacklisted_apps_v.sql
 @src/plsql/vw/qa_apex_blacklisted_apps_v.sql
 PROMPT src/plsql/vw/qa_application_owner_v.sql
@@ -60,15 +60,15 @@ PROMPT src/plsql/vw/qa_test_execution_dates_lov.sql
 PROMPT src/plsql/vw/qa_test_scheme_names_lov.sql
 @src/plsql/vw/qa_test_scheme_names_lov.sql
 
-PROMPT ################
-PROMPT     PACKAGES
-PROMPT ################
+PROMPT 
+PROMPT # PACKAGES
+PROMPT 
 PROMPT src/plsql/pkg/qa_apex_app_pkg.sql
 @src/plsql/pkg/qa_apex_app_pkg.sql
 PROMPT src/plsql/pkg/qa_apex_api_pkg.sql
 @src/plsql/pkg/qa_apex_api_pkg.sql
 
 
-PROMPT #######################################
-PROMPT  Installation of APEX objects finished
-PROMPT #######################################
+PROMPT 
+PROMPT Installation of APEX objects finished
+PROMPT #####################################

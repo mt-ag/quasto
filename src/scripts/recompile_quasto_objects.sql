@@ -1,4 +1,6 @@
-Prompt Recomile QUASTO Objects
+PROMPT 
+PROMPT # Recomile QUASTO Objects
+PROMPT 
 set serveroutput on;
 
 declare

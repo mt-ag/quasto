@@ -25,16 +25,15 @@ begin
     for c1 in (select privilege from session_privs)
     loop
         l_sess_privs(c1.privilege) := 1;
-    end loop;  --c1
-
-    dbms_output.put_line('_____________________________________________________________________________');
+    end loop;
     
     l_priv := l_req_privs.first;
     loop
     exit when l_priv is null;
         begin
             l_dummy := l_sess_privs(l_priv);
-        exception when no_data_found then
+        exception
+          when no_data_found then
             dbms_output.put_line('Error, the current schema is missing the following privilege: '||l_priv);
             l_priv_error := true;
         end;
@@ -42,13 +41,11 @@ begin
     end loop;
     
     if not l_priv_error then
-        dbms_output.put_line('User has all required privileges, installation will continue.');
+        dbms_output.put_line('INFO: User has all required privileges, installation will continue.');
     end if;
-    
-    dbms_output.put_line('_____________________________________________________________________________');
 
     if l_priv_error then
-      raise_application_error (-20000, 'One or more required privileges are missing.');
+      raise_application_error (-20000, 'ERROR: One or more required privileges are missing.');
     end if;
 end;
 /

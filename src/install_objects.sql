@@ -56,11 +56,6 @@ exec :flag := 'Y';
 variable version varchar2 (50 char)
 exec :version := '24.1';
 
--- Check if Required Permissions are granted to the current User
-
-@src/scripts/install_prereqs.sql
-
-
 -- Block to proceess first Argument
 declare
     l_script_name_utplsql           varchar2(100) := 'install_utplsql_objects.sql';
@@ -71,7 +66,6 @@ declare
     l_arg_apex                      number := '~2';
 
 begin
-
     if 1 != l_arg_utplsq
       then 
         l_script_name_utplsql := 'null.sql'; 
@@ -104,7 +98,7 @@ select :script_apex from dual;
 select :script_apex_recompile from dual;
 
 -- DML only does anything if flag stayed Y
-select sysdate from dual
+select null from dual
 where :flag = 'Y';
 select 'Wrong Argument or no Argument has been passed correctly!' from dual where :flag != 'Y';
 set feedback on
@@ -112,9 +106,19 @@ set head on
 
 spool install.log
 
-PROMPT ####################
 PROMPT Installation started
 PROMPT ####################
+
+PROMPT 
+PROMPT Check Pre-requirements
+PROMPT ######################
+
+-- Check if Required Permissions are granted to the current User
+@src/scripts/install_prereqs.sql
+
+PROMPT 
+PROMPT Install Objects
+PROMPT ###############
 
 -- Constant Package Generation with last argument as current Version
 @@src/scripts/install_constant_package '~1' '~2' '~3' '~4' '23.2'
@@ -122,18 +126,23 @@ PROMPT ####################
 @src/install_quasto_objects.sql
 @@src/~script_name_utplsql
 @@src/~script_name_apex
+
+PROMPT 
+PROMPT Recompile Objects
+PROMPT #################
+
 @src/scripts/recompile_quasto_objects.sql
 @@src/~script_name_utplsql_recompile
 @@src/~script_name_apex_recompile
 
-PROMPT #####################
+PROMPT 
 PROMPT Installation finished
 PROMPT #####################
 
 column text format a100
 column error_count noprint new_value error_count
 
-PROMPT #######################
+PROMPT 
 PROMPT Validating Installation
 PROMPT #######################
 
@@ -156,5 +165,7 @@ begin
   dbms_output.put_line('Please check the output written into log file install.log');
 end;
 /
+
+undefine error_count
 
 spool off
