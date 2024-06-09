@@ -282,7 +282,9 @@ exception
 end;
 /
 
-PROMPT DROP SCHEDULER JOB CRONJOB_RUN_UNIT_TESTS
+PROMPT 
+PROMPT # Drop Scheduler Job CRONJOB_RUN_UNIT_TESTS
+PROMPT 
 DECLARE
   l_count number;
 BEGIN
@@ -293,9 +295,25 @@ BEGIN
 
   if l_count > 0
     then 
-      dbms_scheduler.drop_job(job_name => 'CRONJOB_RUN_UNIT_TESTS');
+      dbms_scheduler.drop_job(job_name => 'CRONJOB_RUN_UNIT_TESTS', force => true);
       dbms_output.put_line('Job CRONJOB_RUN_UNIT_TESTS dropped');
   end if;
+
+END;
+/
+
+PROMPT 
+PROMPT # Drop generated utPLSQL packages
+PROMPT 
+BEGIN
+  for rec_packages in (select object_name
+                       from user_objects
+                       where object_type = 'PACKAGE'
+                       and object_name like 'QA\_UT\_%' escape '\')
+  loop
+    execute immediate 'DROP PACKAGE ' || rec_packages.object_name;
+    dbms_output.put_line('Drop of package ' || rec_packages.object_name || ' successful.');
+  end loop;
 
 END;
 /
