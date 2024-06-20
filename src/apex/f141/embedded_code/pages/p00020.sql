@@ -23,3 +23,10 @@ from qa_rules
 where qaru_category = 'APEX' 
 and (qaru_client_name = :P20_CLIENT_NAME or :P20_CLIENT_NAME is null);
 
+-- ----------------------------------------
+-- Page: 20 - Region Plugin > Page Item: P20_RULE_SELECTION > Default > SQL Query
+
+select min(qaru_rule_number) from qa_rules
+where qaru_category = 'APEX'
+and (qaru_client_name = :P20_CLIENT_NAME or :P20_CLIENT_NAME is null);
+

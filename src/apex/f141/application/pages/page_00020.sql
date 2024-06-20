@@ -21,7 +21,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'17'
 ,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240527225916'
+,p_last_upd_yyyymmddhh24miss=>'20240528083830'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(18126053872567136)
@@ -146,6 +146,11 @@ wwv_flow_imp_page.create_page_item(
 ,p_name=>'P20_RULE_SELECTION'
 ,p_item_sequence=>20
 ,p_item_plug_id=>wwv_flow_imp.id(62488812881968151)
+,p_item_default=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'select min(qaru_rule_number) from qa_rules',
+'where qaru_category = ''APEX''',
+'and (qaru_client_name = :P20_CLIENT_NAME or :P20_CLIENT_NAME is null)'))
+,p_item_default_type=>'SQL_QUERY'
 ,p_prompt=>'Rule Selection'
 ,p_display_as=>'NATIVE_SELECT_LIST'
 ,p_lov=>wwv_flow_string.join(wwv_flow_t_varchar2(

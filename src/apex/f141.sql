@@ -103,7 +103,7 @@ wwv_imp_workspace.create_flow(
 ,p_timestamp_tz_format=>'DS'
 ,p_direction_right_to_left=>'N'
 ,p_flow_image_prefix => nvl(wwv_flow_application_install.get_image_prefix,'')
-,p_authentication_id=>wwv_flow_imp.id(50668898619675067)
+,p_authentication_id=>wwv_flow_imp.id(48686292485118198)
 ,p_application_tab_set=>1
 ,p_logo_type=>'T'
 ,p_logo_text=>'QUASTO'
@@ -125,8 +125,8 @@ wwv_imp_workspace.create_flow(
 ,p_substitution_value_02=>'MM/DD/YYYY'
 ,p_substitution_string_03=>'PROVIDER_SLOGAN'
 ,p_substitution_value_03=>'Copyright 2024 Hyand Solutions GmbH'
-,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240527225916'
+,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
+,p_last_upd_yyyymmddhh24miss=>'20240617110351'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_files_version=>9
 ,p_print_server_type=>'NATIVE'
@@ -14698,7 +14698,7 @@ wwv_flow_imp_shared.create_plugin(
 '',
 '',
 '  l_qa_rules_t           qa_rules_t := new qa_rules_t();',
-'  l_qa_rules_temp_t      qa_rules_t := new qa_rules_t();',
+'  l_qa_rules_temp_t      qa_rules_t;-- := new qa_rules_t();',
 '  l_region_render_result apex_plugin.t_region_render_result;',
 '',
 '  -- variables',
@@ -14744,15 +14744,17 @@ wwv_flow_imp_shared.create_plugin(
 '  -- Every single line will be formated like this',
 '  function get_html_rule_line',
 '  (',
-'    p_nr        in pls_integer',
-'   ,p_qa_rule_t in qa_rule_t',
+'    p_nr           in pls_integer',
+'   ,p_qa_rule_t    in qa_rule_t',
+'   ,pi_rule_number in varchar2',
+'   ,pi_rule_name   in varchar2',
 '  ) return varchar2 is',
 '    l_line varchar2(32767);',
 '  begin',
 '    l_line := ''<tr><td class="table-row">'' || p_nr || ''</td>'' || --',
 '              ''<td class="table-row">'' || p_qa_rule_t.qaru_error_level || ''</td>'' || --',
-'              ''<td  class="table-row">'' || p_qa_rule_t.qaru_error_level || ''</td>'' || --',
-'              ''<td  class="table-row">'' || p_qa_rule_t.qaru_error_level || ''</td>'' || --',
+'              ''<td  class="table-row">'' || pi_rule_number || ''</td>'' || --',
+'              ''<td  class="table-row">'' || pi_rule_name || ''</td>'' || --',
 '              ''<td  class="table-row">'' || p_qa_rule_t.object_type || ''</td>'' || --',
 '              ''<td  class="table-row">'' || p_qa_rule_t.object_name || ''</td>'' || --',
 '              ''<td class="table-row">'' || p_qa_rule_t.object_details || ''</td>'' || --',
@@ -14761,7 +14763,12 @@ wwv_flow_imp_shared.create_plugin(
 '  end get_html_rule_line;',
 '',
 '  -- print the rules to the region',
-'  procedure print_result(p_qa_rules_t in qa_rules_t) is',
+'  procedure print_result',
+'  (',
+'    p_qa_rules_t   in qa_rules_t',
+'   ,pi_rule_number in varchar2',
+'   ,pi_rule_name   in varchar2',
+'  ) is',
 '  begin',
 '    if p_qa_rules_t is not null and',
 '       p_qa_rules_t.count > 0',
@@ -14769,10 +14776,12 @@ wwv_flow_imp_shared.create_plugin(
 '      -- print header for plugin region',
 '      htp.p(get_html_region_header);',
 '      -- go through all messages',
-'      for i in 1 .. p_qa_rules_t.count',
+'      for s in 1 .. p_qa_rules_t.count',
 '      loop',
-'        htp.p(get_html_rule_line(p_nr        => i',
-'                                ,p_qa_rule_t => p_qa_rules_t(i)));',
+'        htp.p(get_html_rule_line(p_nr           => s',
+'                                ,p_qa_rule_t    => p_qa_rules_t(s)',
+'                                ,pi_rule_number => pi_rule_number',
+'                                ,pi_rule_name   => pi_rule_name));',
 '      end loop;',
 '    ',
 '      -- print footer',
@@ -14782,6 +14791,8 @@ wwv_flow_imp_shared.create_plugin(
 '  end print_result;',
 '',
 'begin',
+'  -- Print Header',
+'  htp.p(get_html_region_header);',
 '  for i in (select qaru_rule_number as l_number',
 '                  ,qaru_name',
 '                  ,qaru_client_name',
@@ -14790,24 +14801,37 @@ wwv_flow_imp_shared.create_plugin(
 '            and (qaru_rule_number = l_rule_number or l_rule_number is null)',
 '            and qaru_category = ''APEX'')',
 '  loop',
-'    l_qa_rules_temp_t := qa_apex_api_pkg.tf_run_rule(pi_app_id           => l_app_id',
+'    l_qa_rules_t := qa_apex_api_pkg.tf_run_rule(pi_app_id           => l_app_id',
 '                                                    ,pi_page_id          => l_app_page_id',
 '                                                    ,pi_qaru_rule_number => i.l_number',
 '                                                    ,pi_qaru_client_name => i.qaru_client_name',
 '                                                    ,pi_target_scheme    => null);',
-'    l_qa_rules_t      := l_qa_rules_t multiset union l_qa_rules_temp_t;',
+'    if l_qa_rules_t is not null and',
+'       l_qa_rules_t.count > 0',
+'    then',
+'      for s in 1 .. l_qa_rules_t.count',
+'      loop',
+'        htp.p(get_html_rule_line(p_nr           => s',
+'                                ,p_qa_rule_t    => l_qa_rules_t(s)',
+'                                ,pi_rule_number => i.l_number',
+'                                ,pi_rule_name   => i.qaru_client_name));',
+'                                null;',
+'      end loop;',
+'    end if;',
+'    --    l_qa_rules_t      := l_qa_rules_t multiset union l_qa_rules_temp_t;',
 '  end loop;',
-'  dbms_output.put_line(''Reached print Result'');',
-'  if l_qa_rules_t.count > 0 and',
-'     l_qa_rules_t is not null',
-'  then',
-'    print_result(p_qa_rules_t => l_qa_rules_t);',
-'  end if;',
-'',
+'  htp.p(get_html_region_footer);',
+'  /*',
+'    dbms_output.put_line(''Reached print Result'');',
+'    if l_qa_rules_t.count > 0 and',
+'       l_qa_rules_t is not null',
+'    then',
+'      print_result(p_qa_rules_t => l_qa_rules_t);',
+'    end if;',
+'  */',
 '  return l_region_render_result;',
-'',
-'',
-'end render_qa_region;'))
+'end render_qa_region;',
+''))
 ,p_default_escape_mode=>'HTML'
 ,p_api_version=>2
 ,p_render_function=>'render_qa_region'
@@ -18539,7 +18563,7 @@ wwv_flow_imp_page.create_page(
 ,p_protection_level=>'C'
 ,p_page_component_map=>'17'
 ,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240527225916'
+,p_last_upd_yyyymmddhh24miss=>'20240528083830'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(18126053872567136)
@@ -18664,6 +18688,11 @@ wwv_flow_imp_page.create_page_item(
 ,p_name=>'P20_RULE_SELECTION'
 ,p_item_sequence=>20
 ,p_item_plug_id=>wwv_flow_imp.id(62488812881968151)
+,p_item_default=>wwv_flow_string.join(wwv_flow_t_varchar2(
+'select min(qaru_rule_number) from qa_rules',
+'where qaru_category = ''APEX''',
+'and (qaru_client_name = :P20_CLIENT_NAME or :P20_CLIENT_NAME is null)'))
+,p_item_default_type=>'SQL_QUERY'
 ,p_prompt=>'Rule Selection'
 ,p_display_as=>'NATIVE_SELECT_LIST'
 ,p_lov=>wwv_flow_string.join(wwv_flow_t_varchar2(

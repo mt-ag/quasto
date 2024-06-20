@@ -22,7 +22,7 @@ function render_qa_region
 
 
   l_qa_rules_t           qa_rules_t := new qa_rules_t();
-  l_qa_rules_temp_t      qa_rules_t := new qa_rules_t();
+  l_qa_rules_temp_t      qa_rules_t;-- := new qa_rules_t();
   l_region_render_result apex_plugin.t_region_render_result;
 
   -- variables
@@ -68,15 +68,17 @@ function render_qa_region
   -- Every single line will be formated like this
   function get_html_rule_line
   (
-    p_nr        in pls_integer
-   ,p_qa_rule_t in qa_rule_t
+    p_nr           in pls_integer
+   ,p_qa_rule_t    in qa_rule_t
+   ,pi_rule_number in varchar2
+   ,pi_rule_name   in varchar2
   ) return varchar2 is
     l_line varchar2(32767);
   begin
     l_line := '<tr><td class="table-row">' || p_nr || '</td>' || --
               '<td class="table-row">' || p_qa_rule_t.qaru_error_level || '</td>' || --
-              '<td  class="table-row">' || p_qa_rule_t.qaru_error_level || '</td>' || --
-              '<td  class="table-row">' || p_qa_rule_t.qaru_error_level || '</td>' || --
+              '<td  class="table-row">' || pi_rule_number || '</td>' || --
+              '<td  class="table-row">' || pi_rule_name || '</td>' || --
               '<td  class="table-row">' || p_qa_rule_t.object_type || '</td>' || --
               '<td  class="table-row">' || p_qa_rule_t.object_name || '</td>' || --
               '<td class="table-row">' || p_qa_rule_t.object_details || '</td>' || --
@@ -85,7 +87,12 @@ function render_qa_region
   end get_html_rule_line;
 
   -- print the rules to the region
-  procedure print_result(p_qa_rules_t in qa_rules_t) is
+  procedure print_result
+  (
+    p_qa_rules_t   in qa_rules_t
+   ,pi_rule_number in varchar2
+   ,pi_rule_name   in varchar2
+  ) is
   begin
     if p_qa_rules_t is not null and
        p_qa_rules_t.count > 0
@@ -93,10 +100,12 @@ function render_qa_region
       -- print header for plugin region
       htp.p(get_html_region_header);
       -- go through all messages
-      for i in 1 .. p_qa_rules_t.count
+      for s in 1 .. p_qa_rules_t.count
       loop
-        htp.p(get_html_rule_line(p_nr        => i
-                                ,p_qa_rule_t => p_qa_rules_t(i)));
+        htp.p(get_html_rule_line(p_nr           => s
+                                ,p_qa_rule_t    => p_qa_rules_t(s)
+                                ,pi_rule_number => pi_rule_number
+                                ,pi_rule_name   => pi_rule_name));
       end loop;
     
       -- print footer
@@ -106,6 +115,8 @@ function render_qa_region
   end print_result;
 
 begin
+  -- Print Header
+  htp.p(get_html_region_header);
   for i in (select qaru_rule_number as l_number
                   ,qaru_name
                   ,qaru_client_name
@@ -114,24 +125,37 @@ begin
             and (qaru_rule_number = l_rule_number or l_rule_number is null)
             and qaru_category = 'APEX')
   loop
-    l_qa_rules_temp_t := qa_apex_api_pkg.tf_run_rule(pi_app_id           => l_app_id
+    l_qa_rules_t := qa_apex_api_pkg.tf_run_rule(pi_app_id           => l_app_id
                                                     ,pi_page_id          => l_app_page_id
                                                     ,pi_qaru_rule_number => i.l_number
                                                     ,pi_qaru_client_name => i.qaru_client_name
                                                     ,pi_target_scheme    => null);
-    l_qa_rules_t      := l_qa_rules_t multiset union l_qa_rules_temp_t;
+    if l_qa_rules_t is not null and
+       l_qa_rules_t.count > 0
+    then
+      for s in 1 .. l_qa_rules_t.count
+      loop
+        htp.p(get_html_rule_line(p_nr           => s
+                                ,p_qa_rule_t    => l_qa_rules_t(s)
+                                ,pi_rule_number => i.l_number
+                                ,pi_rule_name   => i.qaru_client_name));
+                                null;
+      end loop;
+    end if;
+    --    l_qa_rules_t      := l_qa_rules_t multiset union l_qa_rules_temp_t;
   end loop;
-  dbms_output.put_line('Reached print Result');
-  if l_qa_rules_t.count > 0 and
-     l_qa_rules_t is not null
-  then
-    print_result(p_qa_rules_t => l_qa_rules_t);
-  end if;
-
+  htp.p(get_html_region_footer);
+  /*
+    dbms_output.put_line('Reached print Result');
+    if l_qa_rules_t.count > 0 and
+       l_qa_rules_t is not null
+    then
+      print_result(p_qa_rules_t => l_qa_rules_t);
+    end if;
+  */
   return l_region_render_result;
-
-
 end render_qa_region;
+
 
 -- ----------------------------------------
 -- Plugin: Quasto - Region > Source > PL/SQL Code
@@ -147,7 +171,7 @@ function render_qa_region
 
 
   l_qa_rules_t           qa_rules_t := new qa_rules_t();
-  l_qa_rules_temp_t      qa_rules_t := new qa_rules_t();
+  l_qa_rules_temp_t      qa_rules_t;-- := new qa_rules_t();
   l_region_render_result apex_plugin.t_region_render_result;
 
   -- variables
@@ -193,15 +217,17 @@ function render_qa_region
   -- Every single line will be formated like this
   function get_html_rule_line
   (
-    p_nr        in pls_integer
-   ,p_qa_rule_t in qa_rule_t
+    p_nr           in pls_integer
+   ,p_qa_rule_t    in qa_rule_t
+   ,pi_rule_number in varchar2
+   ,pi_rule_name   in varchar2
   ) return varchar2 is
     l_line varchar2(32767);
   begin
     l_line := '<tr><td class="table-row">' || p_nr || '</td>' || --
               '<td class="table-row">' || p_qa_rule_t.qaru_error_level || '</td>' || --
-              '<td  class="table-row">' || p_qa_rule_t.qaru_error_level || '</td>' || --
-              '<td  class="table-row">' || p_qa_rule_t.qaru_error_level || '</td>' || --
+              '<td  class="table-row">' || pi_rule_number || '</td>' || --
+              '<td  class="table-row">' || pi_rule_name || '</td>' || --
               '<td  class="table-row">' || p_qa_rule_t.object_type || '</td>' || --
               '<td  class="table-row">' || p_qa_rule_t.object_name || '</td>' || --
               '<td class="table-row">' || p_qa_rule_t.object_details || '</td>' || --
@@ -210,7 +236,12 @@ function render_qa_region
   end get_html_rule_line;
 
   -- print the rules to the region
-  procedure print_result(p_qa_rules_t in qa_rules_t) is
+  procedure print_result
+  (
+    p_qa_rules_t   in qa_rules_t
+   ,pi_rule_number in varchar2
+   ,pi_rule_name   in varchar2
+  ) is
   begin
     if p_qa_rules_t is not null and
        p_qa_rules_t.count > 0
@@ -218,10 +249,12 @@ function render_qa_region
       -- print header for plugin region
       htp.p(get_html_region_header);
       -- go through all messages
-      for i in 1 .. p_qa_rules_t.count
+      for s in 1 .. p_qa_rules_t.count
       loop
-        htp.p(get_html_rule_line(p_nr        => i
-                                ,p_qa_rule_t => p_qa_rules_t(i)));
+        htp.p(get_html_rule_line(p_nr           => s
+                                ,p_qa_rule_t    => p_qa_rules_t(s)
+                                ,pi_rule_number => pi_rule_number
+                                ,pi_rule_name   => pi_rule_name));
       end loop;
     
       -- print footer
@@ -231,6 +264,8 @@ function render_qa_region
   end print_result;
 
 begin
+  -- Print Header
+  htp.p(get_html_region_header);
   for i in (select qaru_rule_number as l_number
                   ,qaru_name
                   ,qaru_client_name
@@ -239,22 +274,35 @@ begin
             and (qaru_rule_number = l_rule_number or l_rule_number is null)
             and qaru_category = 'APEX')
   loop
-    l_qa_rules_temp_t := qa_apex_api_pkg.tf_run_rule(pi_app_id           => l_app_id
+    l_qa_rules_t := qa_apex_api_pkg.tf_run_rule(pi_app_id           => l_app_id
                                                     ,pi_page_id          => l_app_page_id
                                                     ,pi_qaru_rule_number => i.l_number
                                                     ,pi_qaru_client_name => i.qaru_client_name
                                                     ,pi_target_scheme    => null);
-    l_qa_rules_t      := l_qa_rules_t multiset union l_qa_rules_temp_t;
+    if l_qa_rules_t is not null and
+       l_qa_rules_t.count > 0
+    then
+      for s in 1 .. l_qa_rules_t.count
+      loop
+        htp.p(get_html_rule_line(p_nr           => s
+                                ,p_qa_rule_t    => l_qa_rules_t(s)
+                                ,pi_rule_number => i.l_number
+                                ,pi_rule_name   => i.qaru_client_name));
+                                null;
+      end loop;
+    end if;
+    --    l_qa_rules_t      := l_qa_rules_t multiset union l_qa_rules_temp_t;
   end loop;
-  dbms_output.put_line('Reached print Result');
-  if l_qa_rules_t.count > 0 and
-     l_qa_rules_t is not null
-  then
-    print_result(p_qa_rules_t => l_qa_rules_t);
-  end if;
-
+  htp.p(get_html_region_footer);
+  /*
+    dbms_output.put_line('Reached print Result');
+    if l_qa_rules_t.count > 0 and
+       l_qa_rules_t is not null
+    then
+      print_result(p_qa_rules_t => l_qa_rules_t);
+    end if;
+  */
   return l_region_render_result;
-
-
 end render_qa_region;
+
 
