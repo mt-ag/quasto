@@ -1,17 +1,20 @@
 # QUASTO - The Quality Assurance Tool for Oracle databases
-## Table of Contents
-- [QUASTO framework](https://github.com/mt-ag/quasto#quasto-framework)
-  - [What is QUASTO?](https://github.com/mt-ag/quasto#what-is-quasto)
-  - [Installing QUASTO](https://github.com/mt-ag/quasto#installing-quasto)
-  - [Using QUASTO](https://github.com/mt-ag/quasto#using-quasto)
-- [utPLSQL framework](https://github.com/mt-ag/quasto#utplsql-framework)
-  - [What is utPLSQL?](https://github.com/mt-ag/quasto#what-is-utplsql)
-  - [Installing utPLSQL](https://github.com/mt-ag/quasto#installing-utplsql)
-- [Logger framework](https://github.com/mt-ag/quasto#logger-framework)
-  - [What is the logger?](https://github.com/mt-ag/quasto#what-is-the-logger)
-  - [Using the logger](https://github.com/mt-ag/quasto#using-the-logger)
-- [Upcoming Features](https://github.com/mt-ag/quasto#upcoming-features)
-- [Latest Releases](https://github.com/mt-ag/quasto#latest-releases)
+<fieldset>
+    <legend>Table of Contents</legend>
+
+- [QUASTO framework](#quasto-framework)
+  - [What is QUASTO?](#what-is-quasto)
+  - [Installing QUASTO](#installing-quasto)
+  - [Using QUASTO](#using-quasto)
+- [utPLSQL framework](#utplsql-framework)
+  - [What is utPLSQL?](#what-is-utplsql)
+  - [Installing utPLSQL](#installing-utplsql)
+- [Logger framework](#logger-framework)
+  - [What is the logger?](#what-is-the-logger)
+  - [Using the logger](#using-the-logger)
+- [Upcoming Features](#upcoming-features)
+- [Latest Releases](#latest-releases)
+</fieldset>
 
 ## QUASTO framework
 ### - What is QUASTO? -
