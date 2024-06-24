@@ -19,7 +19,7 @@ whenever sqlerror exit sql.sqlcode rollback
 begin
 wwv_flow_imp.import_begin (
  p_version_yyyy_mm_dd=>'2023.10.31'
-,p_release=>'23.2.4'
+,p_release=>'23.2.6'
 ,p_default_workspace_id=>33657925800256602
 ,p_default_application_id=>141
 ,p_default_id_offset=>33662320935301187
@@ -73,7 +73,7 @@ prompt APPLICATION 141 - QUASTO
 --       Reports:
 --       E-Mail:
 --     Supporting Objects:  Included
---   Version:         23.2.4
+--   Version:         23.2.6
 --   Instance ID:     248258786232538
 --
 
@@ -103,7 +103,7 @@ wwv_imp_workspace.create_flow(
 ,p_timestamp_tz_format=>'DS'
 ,p_direction_right_to_left=>'N'
 ,p_flow_image_prefix => nvl(wwv_flow_application_install.get_image_prefix,'')
-,p_authentication_id=>wwv_flow_imp.id(48686292485118198)
+,p_authentication_id=>wwv_flow_imp.id(50668898619675067)
 ,p_application_tab_set=>1
 ,p_logo_type=>'T'
 ,p_logo_text=>'QUASTO'
@@ -126,7 +126,7 @@ wwv_imp_workspace.create_flow(
 ,p_substitution_string_03=>'PROVIDER_SLOGAN'
 ,p_substitution_value_03=>'Copyright 2024 Hyand Solutions GmbH'
 ,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240617110351'
+,p_last_upd_yyyymmddhh24miss=>'20240624124240'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_files_version=>9
 ,p_print_server_type=>'NATIVE'
@@ -18562,8 +18562,8 @@ wwv_flow_imp_page.create_page(
 ,p_page_template_options=>'#DEFAULT#'
 ,p_protection_level=>'C'
 ,p_page_component_map=>'17'
-,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240528083830'
+,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
+,p_last_upd_yyyymmddhh24miss=>'20240624114929'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(18126053872567136)
@@ -18584,8 +18584,8 @@ wwv_flow_imp_page.create_page_plug(
 '<p><strong>Note:</strong> You don''t have to select a specific App/Page or Rule. The Plugin will simply run for all available Combinations all Rules based on the Selection you make.</p>',
 '',
 '<h2>How to install the Plugin:</h2>',
-'<p>Import the region plugin over the Appbuilder. The installation file is located under <code>quasto/src/plugin/region_type_plugin_quasto_region.sql</code> in our GitHub Repository: <a href="https://github.com/mt-ag/quasto">https://github.com/mt-ag/q'
-||'uasto</a></p>',
+'<p>Import the region plugin over the Appbuilder. The installation file is located under <code>quasto/src/apex/plugin/region_type_plugin_quasto_region.sql</code> in our GitHub Repository: <a href="https://github.com/mt-ag/quasto">https://github.com/mt'
+||'-ag/quasto</a></p>',
 '',
 '<h2>How to Implement the Plugin into your Application:</h2>',
 '<!-- Add implementation steps here -->',
