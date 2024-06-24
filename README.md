@@ -2,15 +2,15 @@
 ## Table of Contents
 
 - [QUASTO framework](#quasto-framework)
-  - [What is QUASTO?](#what-is-quasto)
-  - [Installing QUASTO](#installing-quasto)
-  - [Using QUASTO](#using-quasto)
+  - [What is QUASTO?](#--what-is-quasto--)
+  - [Installing QUASTO](#--installing-quasto--)
+  - [Using QUASTO](#--using-quasto--)
 - [utPLSQL framework](#utplsql-framework)
-  - [What is utPLSQL?](#what-is-utplsql)
-  - [Installing utPLSQL](#installing-utplsql)
+  - [What is utPLSQL?](#--what-is-utplsql--)
+  - [Installing utPLSQL](#--installing-utplsql--)
 - [Logger framework](#logger-framework)
-  - [What is the logger?](#what-is-the-logger)
-  - [Using the logger](#using-the-logger)
+  - [What is the logger?](#--what-is-the-logger--)
+  - [Using the logger](#--using-the-logger--)
 - [Upcoming Features](#upcoming-features)
 - [Latest Releases](#latest-releases)
 
