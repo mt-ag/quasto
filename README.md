@@ -1,6 +1,5 @@
 # QUASTO - The Quality Assurance Tool for Oracle databases
-<fieldset>
-    <legend>Table of Contents</legend>
+## Table of Contents
 
 - [QUASTO framework](#quasto-framework)
   - [What is QUASTO?](#what-is-quasto)
@@ -14,7 +13,7 @@
   - [Using the logger](#using-the-logger)
 - [Upcoming Features](#upcoming-features)
 - [Latest Releases](#latest-releases)
-</fieldset>
+
 
 ## QUASTO framework
 ### - What is QUASTO? -
