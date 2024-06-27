@@ -15,7 +15,7 @@ create or replace package qa_apex_api_pkg authid definer as
   * @param pi_qa_rules_t specifies the rule entity
   */
   procedure p_exclude_not_whitelisted_apex_entries(pi_qa_rules_t in out qa_rules_t);
-  
+
   function tf_run_rule
   (
     pi_app_id           in apex_application_items.application_id%type
@@ -24,13 +24,14 @@ create or replace package qa_apex_api_pkg authid definer as
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
    ,pi_target_scheme    in varchar2 default user
   ) return qa_rules_t;
-  
+
   function tf_run_rules
   (
     pi_app_id           in apex_application_items.application_id%type
    ,pi_page_id          in apex_application_pages.page_id%type
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
    ,pi_target_scheme    in varchar2 default user
+   ,pi_rule_number      in qa_rules.qaru_rule_number%type
   ) return qa_rules_t;
 
 end qa_apex_api_pkg;
@@ -186,6 +187,7 @@ create or replace package body qa_apex_api_pkg as
    ,pi_page_id          in apex_application_pages.page_id%type
    ,pi_qaru_client_name in qa_rules.qaru_client_name%type
    ,pi_target_scheme    in varchar2 default user
+   ,pi_rule_number      in qa_rules.qaru_rule_number%type
   ) return qa_rules_t is
   
     c_unit constant varchar2(32767) := $$plsql_unit || '.tf_run_rules';
@@ -201,15 +203,17 @@ create or replace package body qa_apex_api_pkg as
                               ,p_val_02  => pi_page_id
                               ,p_name_03 => 'pi_target_scheme');
   
-    for i in (select qaru_rule_number
+    for i in (select qaru_rule_number,qaru_client_name
               from qa_rules
               where qaru_category = 'APEX'
-              and qaru_is_active = 1)
+              and qaru_is_active = 1
+              and (qaru_client_name = pi_qaru_client_name or pi_qaru_client_name is null)
+              and (qaru_rule_number = pi_rule_number or pi_rule_number is null))
     loop
       l_qa_rules_temp := tf_run_rule(pi_app_id           => pi_app_id
                                     ,pi_page_id          => pi_page_id
                                     ,pi_qaru_rule_number => i.qaru_rule_number
-                                    ,pi_qaru_client_name => pi_qaru_client_name
+                                    ,pi_qaru_client_name => i.qaru_client_name
                                     ,pi_target_scheme    => pi_target_scheme);
       l_qa_rules      := l_qa_rules multiset union l_qa_rules_temp;
     end loop;
