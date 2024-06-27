@@ -20,8 +20,8 @@ wwv_flow_imp_page.create_page(
 ,p_page_template_options=>'#DEFAULT#'
 ,p_protection_level=>'C'
 ,p_page_component_map=>'17'
-,p_last_updated_by=>'MAURICE.WILHELM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240624114929'
+,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
+,p_last_upd_yyyymmddhh24miss=>'20240627174458'
 );
 wwv_flow_imp_page.create_page_plug(
  p_id=>wwv_flow_imp.id(18126053872567136)
@@ -70,7 +70,7 @@ wwv_flow_imp_page.create_page_plug(
 ,p_plug_display_point=>'SUB_REGIONS'
 ,p_plug_source_type=>'PLUGIN_QUASTO_REGION'
 ,p_plug_query_num_rows=>15
-,p_attribute_01=>'MT AG'
+,p_attribute_01=>'&P20_CLIENT_NAME.'
 ,p_attribute_02=>'&P20_RULE_SELECTION.'
 ,p_attribute_03=>'&P20_APP_ID.'
 ,p_attribute_04=>'&P20_APP_PAGE_ID.'
@@ -146,11 +146,6 @@ wwv_flow_imp_page.create_page_item(
 ,p_name=>'P20_RULE_SELECTION'
 ,p_item_sequence=>20
 ,p_item_plug_id=>wwv_flow_imp.id(62488812881968151)
-,p_item_default=>wwv_flow_string.join(wwv_flow_t_varchar2(
-'select min(qaru_rule_number) from qa_rules',
-'where qaru_category = ''APEX''',
-'and (qaru_client_name = :P20_CLIENT_NAME or :P20_CLIENT_NAME is null)'))
-,p_item_default_type=>'SQL_QUERY'
 ,p_prompt=>'Rule Selection'
 ,p_display_as=>'NATIVE_SELECT_LIST'
 ,p_lov=>wwv_flow_string.join(wwv_flow_t_varchar2(
