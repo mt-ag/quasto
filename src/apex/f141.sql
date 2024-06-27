@@ -126,7 +126,7 @@ wwv_imp_workspace.create_flow(
 ,p_substitution_string_03=>'PROVIDER_SLOGAN'
 ,p_substitution_value_03=>'Copyright 2024 Hyand Solutions GmbH'
 ,p_last_updated_by=>'PHILIPP.DAHLEM@HYAND.COM'
-,p_last_upd_yyyymmddhh24miss=>'20240627174458'
+,p_last_upd_yyyymmddhh24miss=>'20240627181439'
 ,p_file_prefix => nvl(wwv_flow_application_install.get_static_app_file_prefix,'')
 ,p_files_version=>9
 ,p_print_server_type=>'NATIVE'
@@ -14707,6 +14707,9 @@ wwv_flow_imp_shared.create_plugin(
 '  l_app_id      apex_application_page_regions.attribute_01%type := p_region.attribute_03;',
 '  l_app_page_id apex_application_page_regions.attribute_02%type := p_region.attribute_04;',
 '',
+'  l_display_rule_number varchar2(5000 char);',
+'  l_display_rule_name   qa_rules.qaru_name%type;',
+'',
 '',
 '',
 '  function get_collection_name return varchar2 is',
@@ -14803,10 +14806,14 @@ wwv_flow_imp_shared.create_plugin(
 '    then',
 '      for s in 1 .. l_qa_rules_t.count',
 '      loop',
-'        htp.p(get_html_rule_line(p_nr           => s',
-'                                ,p_qa_rule_t    => l_qa_rules_t(s)',
-'                                ,pi_rule_number => null',
-'                                ,pi_rule_name   => l_client_name));',
+'          select qaru_name,qaru_rule_number ',
+'          into l_display_rule_number,l_display_rule_name',
+'          from qa_rules where qaru_id = l_qa_rules_t(s).qaru_id;',
+'',
+'          htp.p(get_html_rule_line(p_nr           => s',
+'                                  ,p_qa_rule_t    => l_qa_rules_t(s)',
+'                                  ,pi_rule_number => l_display_rule_number',
+'                                  ,pi_rule_name   => l_display_rule_name));',
 '      end loop;',
 '    end if;',
 '  htp.p(get_html_region_footer);',
