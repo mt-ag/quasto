@@ -112,8 +112,8 @@ The user has to create this outside of the regular QUASTO installation.
 
 In the following you can see three different SQL statements for defining QUASTO rules:
 
-<details>
-  <summary>Example 1: DDL based rule for checking primary keys on tables</summary>
+<details open>
+  <summary><b>Example 1:</b> DDL based rule for checking primary keys on tables</summary>
 
 ```sql
 with param as
@@ -152,8 +152,8 @@ and not exists (select null
 ```
 </details>
 
-<details>
-  <summary>Example 2: DML based rule for checking if tables are empty</summary>
+<details open>
+  <summary><b>Example 2:</b> DML based rule for checking if tables are empty</summary>
 
 ``` sql
 with param as
@@ -192,8 +192,8 @@ cross join (select null as object_id
 ```
 </details>
 
-<details>
-  <summary>Example 3: APEX based rule for checking if "Never" Condition is used</summary>
+<details open>
+  <summary><b>Example 3:</b> APEX based rule for checking if "Never" Condition is used</summary>
 
 ``` sql
 with param as
